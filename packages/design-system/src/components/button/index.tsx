@@ -1,8 +1,10 @@
 'use client';
 
 import { type ButtonHTMLAttributes } from 'react';
-import type { ButtonColorMap } from './ButtonLayout';
+
 import { ButtonWrapper } from './ButtonLayout';
+
+import type { ButtonColorMap } from './ButtonLayout';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'filled' | 'outline';

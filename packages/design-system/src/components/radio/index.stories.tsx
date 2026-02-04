@@ -1,7 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
 import styled from '@emotion/styled';
+import { useState } from 'react';
+
 import { Radio } from '.';
+
+import type { Meta, StoryObj } from '@storybook/react';
 
 const RadioWrapper = styled.div`
   display: flex;

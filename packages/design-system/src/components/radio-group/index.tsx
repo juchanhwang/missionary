@@ -2,16 +2,16 @@
 
 // TODO: (주찬) 아직 작업 중인 컴포넌트입니다. [24-05-15]
 
-import type { HTMLProps, Ref } from 'react';
-import { useCallback } from 'react';
-import React, { useMemo } from 'react';
-import { forwardRefWithAs } from '@utils';
 import { useControllableState } from '@hooks';
+import { forwardRefWithAs } from '@utils';
+import React, { useCallback , useMemo } from 'react';
 
 import {
   RadioGroupActionsContext,
   RadioGroupDataContext,
 } from './radioGroupContext';
+
+import type { HTMLProps, Ref } from 'react';
 
 interface RadioGroupProps
   extends Omit<
@@ -40,7 +40,7 @@ const RadioGroupRoot = (
   }: RadioGroupProps,
   ref?: Ref<HTMLInputElement>,
 ) => {
-  let [value, onChange] = useControllableState<string>(
+  const [value, onChange] = useControllableState<string>(
     controlledValue,
     controlledOnChange,
     defaultCheckedValue,

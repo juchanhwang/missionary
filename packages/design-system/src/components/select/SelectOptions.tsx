@@ -1,7 +1,10 @@
-import type { HTMLProps, Ref } from 'react';
-import React from 'react';
-import { SelectDataContext } from './index';
 import { useContextData } from '@hooks';
+import React from 'react';
+
+import { SelectDataContext } from './index';
+
+import type { HTMLProps, Ref } from 'react';
+
 
 interface SelectOptionsProps extends HTMLProps<HTMLUListElement> {
   label?: string;

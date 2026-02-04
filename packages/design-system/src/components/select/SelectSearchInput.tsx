@@ -1,7 +1,10 @@
-import type { InputHTMLAttributes, Ref } from 'react';
-import React, { useEffect } from 'react';
-import { SelectDataContext } from './index';
 import { useContextData } from '@hooks';
+import React, { useEffect } from 'react';
+
+import { SelectDataContext } from './index';
+
+import type { InputHTMLAttributes, Ref } from 'react';
+
 
 interface SelectSearchInputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {

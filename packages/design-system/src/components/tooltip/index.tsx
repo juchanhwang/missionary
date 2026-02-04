@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { TooltipWrapper } from './TooltipLayout';
 
 interface TooltipProps {

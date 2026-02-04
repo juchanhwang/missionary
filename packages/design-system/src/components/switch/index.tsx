@@ -1,9 +1,9 @@
 'use client';
 
-import React, { createContext, type Ref, useMemo } from 'react';
 import styled from '@emotion/styled';
 import { useControllableState } from '@hooks';
 import { forwardRefWithAs } from '@utils';
+import React, { createContext, type Ref, useMemo } from 'react';
 
 const StyledInput = styled.input`
   display: none;
@@ -47,7 +47,7 @@ export const Switch = forwardRefWithAs(
     }: SwitchProps,
     ref?: Ref<HTMLInputElement>,
   ) => {
-    let [checked, onChange] = useControllableState<boolean>(
+    const [checked, onChange] = useControllableState<boolean>(
       controlledChecked,
       controlledOnChange,
       defaultChecked,

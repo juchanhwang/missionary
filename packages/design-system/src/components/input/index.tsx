@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
-import type { InputHTMLAttributes } from 'react';
-import { InputLayout, InputBox, InputError } from './InputLayout';
 import { IconInputError, IconInputReset } from '@assets/icons'; // icons 디렉토리의 index 파일에서 export한 컴포넌트를 불러옵니다.
+import React from 'react';
+
+import { InputLayout, InputBox, InputError } from './InputLayout';
+
+import type { InputHTMLAttributes } from 'react';
 
 interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
   inputType: string;
@@ -28,7 +30,7 @@ export const Input: React.FC<IInputProps> = React.forwardRef(
       ...rest
     },
     ref: React.Ref<HTMLInputElement>,
-  ): JSX.Element => {
+  ): React.JSX.Element => {
     return (
       <InputLayout>
         <InputBox>

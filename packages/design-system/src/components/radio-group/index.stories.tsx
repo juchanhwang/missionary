@@ -1,9 +1,12 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
-import { RadioGroup } from '.';
-import { Text } from '../text';
 import styled from '@emotion/styled';
+import { useState } from 'react';
+
 import { Radio } from '../radio';
+import { Text } from '../text';
+
+import { RadioGroup } from '.';
+
+import type { Meta, StoryObj } from '@storybook/react';
 
 const RadioGroupContainer = styled.div`
   display: flex;

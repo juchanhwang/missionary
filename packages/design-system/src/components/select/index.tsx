@@ -2,6 +2,8 @@
 
 // TODO: (주찬) 아직 작업 중인 컴포넌트입니다. [24-03-30]
 
+import { useControllableState } from '@hooks';
+import { forwardRefWithAs } from '@utils';
 import React, {
   createContext,
   useCallback,
@@ -11,12 +13,10 @@ import React, {
   useState,
 } from 'react';
 
-import { SelectTrigger } from './Trigger';
-import { SelectSearchInput } from './SelectSearchInput';
-import { SelectOptions } from './SelectOptions';
 import { SelectOption } from './SelectOption';
-import { forwardRefWithAs } from '@utils';
-import { useControllableState } from '@hooks';
+import { SelectOptions } from './SelectOptions';
+import { SelectSearchInput } from './SelectSearchInput';
+import { SelectTrigger } from './Trigger';
 
 type ValueType = string | string[] | undefined | null;
 export const SelectActionsContext = createContext<{
@@ -48,7 +48,7 @@ const SelectRoot = ({
 }: SelectRootProps) => {
   const selectRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
-  let [selectedValue = multiple ? [] : undefined, setSelectedValue] =
+  const [selectedValue = multiple ? [] : undefined, setSelectedValue] =
     useControllableState<ValueType>(
       controlledValue,
       controlledOnChange,

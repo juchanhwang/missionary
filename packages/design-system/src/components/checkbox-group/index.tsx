@@ -2,17 +2,17 @@
 
 // TODO: (주찬) 아직 작업 중인 컴포넌트입니다. [24-05-04]
 
-import type { HTMLProps, Ref } from 'react';
-import { useCallback } from 'react';
-import React, { useMemo } from 'react';
-import { forwardRefWithAs } from '@utils';
 import { useControllableState } from '@hooks';
+import { forwardRefWithAs } from '@utils';
+import React, { useCallback , useMemo } from 'react';
 
 import { Checkbox } from '../checkbox';
 import {
   CheckboxGroupActionsContext,
   CheckboxGroupDataContext,
 } from './checkboxGroupContext';
+
+import type { HTMLProps, Ref } from 'react';
 
 interface CheckboxProps
   extends Omit<
@@ -41,7 +41,7 @@ const CheckboxGroupRoot = (
   }: CheckboxProps,
   ref?: Ref<HTMLInputElement>,
 ) => {
-  let [checkedValues, onChange] = useControllableState<string[]>(
+  const [checkedValues, onChange] = useControllableState<string[]>(
     controlledCheckedValueList,
     controlledOnChange,
     defaultCheckedValues,

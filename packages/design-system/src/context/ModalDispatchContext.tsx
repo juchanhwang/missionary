@@ -1,7 +1,8 @@
 'use client';
 
-import type { ComponentProps } from 'react';
 import { createContext } from 'react';
+
+import type { ComponentProps } from 'react';
 
 interface ModalDispatchContextType {
   openModal: <T extends React.ElementType>(

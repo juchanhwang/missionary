@@ -2,14 +2,14 @@
 
 // TODO: (주찬) 아직 작업 중인 컴포넌트입니다. [24-04-15]
 
-import type { HTMLProps, Ref } from 'react';
-import { useContext } from 'react';
-import React, { createContext, useMemo } from 'react';
-import { forwardRefWithAs } from '@utils';
-import { useControllableState } from '@hooks';
-
 import styled from '@emotion/styled';
+import { useControllableState } from '@hooks';
+import { forwardRefWithAs } from '@utils';
+import React, { useContext , createContext, useMemo } from 'react';
+
 import { CheckboxGroupActionsContext } from '../checkbox-group/checkboxGroupContext';
+
+import type { HTMLProps, Ref } from 'react';
 
 const StyledInput = styled.input`
   display: none;
@@ -54,7 +54,7 @@ export const Checkbox = forwardRefWithAs(
     // useSafeContext를 사용하지 않습니다. Checkbox 단독으로 사용할 경우 groupActions는 undefined이어야합니다.
     const groupActions = useContext(CheckboxGroupActionsContext);
 
-    let [checked, onChange] = useControllableState<boolean>(
+    const [checked, onChange] = useControllableState<boolean>(
       controlledChecked,
       controlledOnChange,
       defaultChecked,

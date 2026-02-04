@@ -1,7 +1,7 @@
 {
   "name": "@samilhero/design-system",
   "version": "0.1.0",
-  "packageManager": "pnpm@9.0.2",
+  "packageManager": "pnpm@10.28.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -13,19 +13,19 @@
     "lint:styles": "stylelint 'src/**/*.{js,jsx,ts,tsx,css,scss}'"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "^1.2.25",
-    "@storybook/addon-essentials": "^8.0.5",
-    "@storybook/addon-interactions": "^8.0.5",
-    "@storybook/addon-links": "^8.0.5",
-    "@storybook/addon-onboarding": "^8.0.5",
-    "@storybook/blocks": "^8.0.5",
-    "@storybook/nextjs": "^8.0.5",
-    "@storybook/react": "^8.0.5",
-    "@storybook/test": "^8.0.5",
+    "@chromatic-com/storybook": "^3.2.6",
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-interactions": "^8.6.14",
+    "@storybook/addon-links": "^8.6.14",
+    "@storybook/addon-onboarding": "^8.6.14",
+    "@storybook/blocks": "^8.6.14",
+    "@storybook/nextjs": "^8.6.14",
+    "@storybook/react": "^8.6.14",
+    "@storybook/test": "^8.6.15",
     "@svgr/webpack": "^8.1.0",
     "prop-types": "^15.8.1",
-    "sass": "^1.76.0",
-    "storybook": "^8.0.5"
+    "sass": "^1.97.3",
+    "storybook": "^8.6.15"
   },
   "dependencies": {
     "classnames": "^2.5.1"

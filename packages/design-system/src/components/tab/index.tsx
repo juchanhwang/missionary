@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { TabLayout, TabList } from './TabLayout';
 
 interface TabProps {

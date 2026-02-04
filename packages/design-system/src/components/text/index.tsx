@@ -4,10 +4,11 @@
 // TODO: 컬러 시스템을 추가해야합니다. [24-04-20]
 // TODO: font weight 시스템을 추가해야합니다. [24-04-20]
 
-import classnames from 'classnames';
-import type { ReactNode, CSSProperties } from 'react';
-import React, { forwardRef } from 'react';
 import styled from '@emotion/styled';
+import classnames from 'classnames';
+import React, { forwardRef } from 'react';
+
+import type { ReactNode, CSSProperties } from 'react';
 
 interface StyledProps {
   textAlign?: CSSProperties['textAlign'];

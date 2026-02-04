@@ -1,7 +1,10 @@
-import type { ButtonHTMLAttributes, Ref } from 'react';
-import React, { useCallback } from 'react';
-import { SelectActionsContext } from './index';
 import { useContextAction } from '@hooks';
+import React, { useCallback } from 'react';
+
+import { SelectActionsContext } from './index';
+
+import type { ButtonHTMLAttributes, Ref } from 'react';
+
 
 interface TriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
 export const SelectTrigger = (

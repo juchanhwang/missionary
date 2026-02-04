@@ -2,7 +2,7 @@
   "name": "missionary-admin",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@9.0.2",
+  "packageManager": "pnpm@10.28.1",
   "scripts": {
     "lint": "eslint 'src/**/*.{js,ts,tsx}'",
     "dev": "next dev",
@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@samilhero/design-system": "workspace:*",
-    "axios": "^1.6.8"
+    "axios": "^1.13.4"
   },
   "devDependencies": {
-    "sass": "^1.75.0"
+    "sass": "^1.97.3"
   }
 }
