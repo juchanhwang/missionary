@@ -30,7 +30,7 @@ export const Input: React.FC<IInputProps> = React.forwardRef(
       ...rest
     },
     ref: React.Ref<HTMLInputElement>,
-  ): React.JSX.Element => {
+  ) => {
     return (
       <InputLayout>
         <InputBox>

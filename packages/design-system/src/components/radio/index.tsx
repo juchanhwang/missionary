@@ -5,7 +5,7 @@
 import styled from '@emotion/styled';
 import { useControllableState } from '@hooks';
 import { forwardRefWithAs } from '@utils';
-import React, { useContext , createContext, useMemo } from 'react';
+import React, { useContext, createContext, useMemo } from 'react';
 
 import { RadioGroupActionsContext } from '../radio-group/radioGroupContext';
 

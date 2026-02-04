@@ -4,7 +4,7 @@
 
 import { useControllableState } from '@hooks';
 import { forwardRefWithAs } from '@utils';
-import React, { useCallback , useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import {
   RadioGroupActionsContext,
@@ -13,11 +13,10 @@ import {
 
 import type { HTMLProps, Ref } from 'react';
 
-interface RadioGroupProps
-  extends Omit<
-    HTMLProps<HTMLDivElement>,
-    'onChange' | 'defaultValue' | 'checked' | 'defaultChecked' | 'value'
-  > {
+interface RadioGroupProps extends Omit<
+  HTMLProps<HTMLDivElement>,
+  'onChange' | 'defaultValue' | 'checked' | 'defaultChecked' | 'value'
+> {
   defaultCheckedValue?: string;
   value?: string;
   onChange?: (value: string) => void;

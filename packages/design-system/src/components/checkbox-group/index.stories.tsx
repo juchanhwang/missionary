@@ -7,8 +7,6 @@ import { CheckboxGroup } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react';
 
-
-
 const Icon = styled.span<{ checked: boolean }>`
   position: relative;
   display: inline-block;

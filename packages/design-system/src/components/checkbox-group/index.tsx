@@ -4,7 +4,7 @@
 
 import { useControllableState } from '@hooks';
 import { forwardRefWithAs } from '@utils';
-import React, { useCallback , useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { Checkbox } from '../checkbox';
 import {
@@ -14,11 +14,10 @@ import {
 
 import type { HTMLProps, Ref } from 'react';
 
-interface CheckboxProps
-  extends Omit<
-    HTMLProps<HTMLDivElement>,
-    'onChange' | 'defaultValue' | 'checked' | 'defaultChecked'
-  > {
+interface CheckboxProps extends Omit<
+  HTMLProps<HTMLDivElement>,
+  'onChange' | 'defaultValue' | 'checked' | 'defaultChecked'
+> {
   defaultCheckedValues?: string[];
   checkedValues?: string[];
   onChange?: (value: string[]) => void;

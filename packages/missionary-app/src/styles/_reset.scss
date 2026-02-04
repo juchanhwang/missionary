@@ -65,15 +65,12 @@ input,
 select,
 textarea {
   vertical-align: middle;
-
   font-size: inherit;
 }
 
 button {
   border: 0;
-
   background-color: transparent;
-
   cursor: pointer;
 }
 
@@ -84,7 +81,6 @@ table {
 
 body {
   text-size-adjust: none;
-
   background: var(--base-background);
 }
 
@@ -97,7 +93,6 @@ input[type='submit'],
 input[type='tel'],
 input[type='text'] {
   appearance: none;
-
   border-radius: 0;
 }
 
