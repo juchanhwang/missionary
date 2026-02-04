@@ -12,7 +12,6 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   disabled?: boolean;
   value: string;
   error?: string;
-  onChange?: () => void;
   onClick?: () => void;
   onReset?: () => void;
   ref?: React.Ref<HTMLInputElement>;
@@ -45,7 +44,7 @@ export function Input({
         {error && <IconInputError />}
         <IconInputReset onClick={() => onReset?.()} />
       </InputBox>
-      {error && <InputError>에러 메세지</InputError>}
+      {error && <InputError>{error}</InputError>}
     </InputLayout>
   );
 }

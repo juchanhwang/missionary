@@ -86,7 +86,7 @@ const SelectRoot = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [selectedValue]);
+  }, []);
 
   const actions = useMemo(
     () => ({

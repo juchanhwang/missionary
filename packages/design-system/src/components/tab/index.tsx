@@ -10,14 +10,18 @@ interface TabProps {
     label: string;
   }>;
   selectedValue: string;
-  onChange: () => void;
+  onChange: (value: string) => void;
 }
 
 export const Tab = ({ list, selectedValue, onChange }: TabProps) => {
   return (
     <TabLayout>
       {list.map((category) => (
-        <TabList key={category.value} active={category.value === selectedValue}>
+        <TabList
+          key={category.value}
+          active={category.value === selectedValue}
+          onClick={() => onChange(category.value)}
+        >
           {category.label}
         </TabList>
       ))}
