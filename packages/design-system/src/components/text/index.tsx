@@ -6,7 +6,7 @@
 
 import styled from '@emotion/styled';
 import classnames from 'classnames';
-import React, { forwardRef } from 'react';
+import React from 'react';
 
 import type { ReactNode, CSSProperties } from 'react';
 
@@ -52,38 +52,32 @@ type TextProps<T extends React.ElementType> = PolymorphicComponentProps<
 type TextComponent = <T extends React.ElementType = 'span'>(
   props: TextProps<T>,
 ) => React.ReactNode | null;
-export const Text: TextComponent = forwardRef(
-  <T extends React.ElementType = 'span'>(
-    {
-      as,
-      className,
-      children,
-      ellipsisAfterLines,
-      typo,
-      fontWeight,
-      // color = 'grey900',
-      stringToJSX,
-      textAlign,
-      wordBreak = true,
-      role,
-      ...props
-    }: TextProps<T>,
-    ref: PolymorphicRef<T>['ref'],
-  ) => {
-    return (
-      <StyledText
-        as={as}
-        ref={ref}
-        className={classnames(
-          {
-            [`typography-${typo}`]: typo,
-          },
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </StyledText>
-    );
-  },
-);
+export const Text: TextComponent = <T extends React.ElementType = 'span'>(
+  {
+    as,
+    className,
+    children,
+    typo,
+    fontWeight,
+    textAlign,
+    ref,
+    ...props
+  }: TextProps<T>,
+) => {
+  return (
+    <StyledText
+      as={as}
+      ref={ref}
+      className={classnames(
+        {
+          [`typography-${typo}`]: typo,
+        },
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </StyledText>
+  );
+};
+(Text as { displayName?: string }).displayName = 'Text';

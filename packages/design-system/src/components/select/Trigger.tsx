@@ -3,12 +3,13 @@ import React, { useCallback } from 'react';
 
 import { SelectActionsContext } from './index';
 
-import type { ButtonHTMLAttributes, Ref } from 'react';
+import type { ButtonHTMLAttributes } from 'react';
 
-interface TriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
+interface TriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  ref?: React.Ref<HTMLButtonElement>;
+}
 export const SelectTrigger = (
-  { children, ...props }: TriggerProps,
-  ref: Ref<HTMLButtonElement>,
+  { children, ref, ...props }: TriggerProps,
 ) => {
   const actions = useContextAction('Select.Trigger', SelectActionsContext);
 

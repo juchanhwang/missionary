@@ -3,14 +3,14 @@ import React from 'react';
 
 import { SelectActionsContext } from './index';
 
-import type { HTMLAttributes, Ref } from 'react';
+import type { HTMLAttributes } from 'react';
 
 interface SelectOptionProps extends HTMLAttributes<HTMLLIElement> {
   item: string;
+  ref?: React.Ref<HTMLLIElement>;
 }
 export const SelectOption = (
-  { item, className, children, ...props }: SelectOptionProps,
-  ref: Ref<HTMLLIElement>,
+  { item, className, children, ref, ...props }: SelectOptionProps,
 ) => {
   const actions = useContextAction('Select.Option', SelectActionsContext);
 

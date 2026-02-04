@@ -1,18 +1,12 @@
 'use client';
 
 import { Modals } from '@components/modal/Modals';
-import {
-  useMemo,
-  useState,
-  type ReactNode,
-  ComponentProps,
-  ComponentType,
-} from 'react';
+import { useMemo, useState, type ReactNode, type ComponentProps } from 'react';
 
 import { ModalDispatchContext } from './ModalDispatchContext';
 import { ModalStateContext } from './ModalStateContext';
 
-import type { Modal, ModalArray } from './ModalStateContext';
+import type { ModalArray } from './ModalStateContext';
 
 interface ModalProviderType {
   children: ReactNode;

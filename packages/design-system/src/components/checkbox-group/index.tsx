@@ -3,7 +3,6 @@
 // TODO: (주찬) 아직 작업 중인 컴포넌트입니다. [24-05-04]
 
 import { useControllableState } from '@hooks';
-import { forwardRefWithAs } from '@utils';
 import React, { useCallback, useMemo } from 'react';
 
 import { Checkbox } from '../checkbox';
@@ -12,10 +11,8 @@ import {
   CheckboxGroupDataContext,
 } from './checkboxGroupContext';
 
-import type { HTMLProps, Ref } from 'react';
-
-interface CheckboxProps extends Omit<
-  HTMLProps<HTMLDivElement>,
+interface CheckboxGroupProps extends Omit<
+  React.HTMLProps<HTMLDivElement>,
   'onChange' | 'defaultValue' | 'checked' | 'defaultChecked'
 > {
   defaultCheckedValues?: string[];
@@ -25,21 +22,20 @@ interface CheckboxProps extends Omit<
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
-  ref?: React.Ref<HTMLInputElement>;
+  ref?: React.Ref<HTMLDivElement>;
 }
-const CheckboxGroupRoot = (
-  {
-    defaultCheckedValues = [],
-    checkedValues: controlledCheckedValueList,
-    onChange: controlledOnChange,
-    disabled,
-    className,
-    children,
-    name,
-    ...props
-  }: CheckboxProps,
-  ref?: Ref<HTMLInputElement>,
-) => {
+
+function CheckboxGroupRoot({
+  defaultCheckedValues = [],
+  checkedValues: controlledCheckedValueList,
+  onChange: controlledOnChange,
+  disabled,
+  className,
+  children,
+  name,
+  ref,
+  ...props
+}: CheckboxGroupProps) {
   const [checkedValues, onChange] = useControllableState<string[]>(
     controlledCheckedValueList,
     controlledOnChange,
@@ -78,7 +74,7 @@ const CheckboxGroupRoot = (
     <CheckboxGroupActionsContext.Provider value={actions}>
       <CheckboxGroupDataContext.Provider value={data}>
         <div
-          role="radiogroup"
+          role="group"
           tabIndex={0}
           className={className}
           ref={ref}
@@ -89,10 +85,10 @@ const CheckboxGroupRoot = (
       </CheckboxGroupDataContext.Provider>
     </CheckboxGroupActionsContext.Provider>
   );
-};
+}
 
 export const CheckboxGroup = Object.assign(
-  forwardRefWithAs(CheckboxGroupRoot),
+  CheckboxGroupRoot,
   {
     Item: Checkbox,
   },

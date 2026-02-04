@@ -4,8 +4,6 @@ import { ModalDispatchContext } from '@context/ModalDispatchContext';
 import { ModalStateContext } from '@context/ModalStateContext';
 import { useContext } from 'react';
 
-export const modals = {};
-
 export const Modals = () => {
   const openedModals = useContext(ModalStateContext);
   const { closeModal } = useContext(ModalDispatchContext);

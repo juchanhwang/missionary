@@ -7,7 +7,7 @@ import { InputLayout, InputBox, InputError } from './InputLayout';
 
 import type { InputHTMLAttributes } from 'react';
 
-interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   inputType: string;
   disabled?: boolean;
   value: string;
@@ -15,39 +15,38 @@ interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
   onChange?: () => void;
   onClick?: () => void;
   onReset?: () => void;
+  ref?: React.Ref<HTMLInputElement>;
 }
 
-export const Input: React.FC<IInputProps> = React.forwardRef(
-  (
-    {
-      inputType = 'text',
-      disabled,
-      value,
-      error,
-      onChange,
-      onClick,
-      onReset,
-      ...rest
-    },
-    ref: React.Ref<HTMLInputElement>,
-  ) => {
-    return (
-      <InputLayout>
-        <InputBox>
-          <input
-            type={inputType}
-            disabled={disabled}
-            autoComplete="off"
-            value={value}
-            onChange={onChange}
-            onClick={onClick}
-            {...rest}
-          />
-          {error && <IconInputError />}
-          <IconInputReset onClick={() => onReset} />
-        </InputBox>
-        {error && <InputError>에러 메세지</InputError>}
-      </InputLayout>
-    );
-  },
-);
+export function Input({
+  inputType = 'text',
+  disabled,
+  value,
+  error,
+  onChange,
+  onClick,
+  onReset,
+  ref,
+  ...rest
+}: InputProps) {
+  return (
+    <InputLayout>
+      <InputBox>
+        <input
+          type={inputType}
+          disabled={disabled}
+          autoComplete="off"
+          value={value}
+          onChange={onChange}
+          onClick={onClick}
+          ref={ref}
+          {...rest}
+        />
+        {error && <IconInputError />}
+        <IconInputReset onClick={() => onReset?.()} />
+      </InputBox>
+      {error && <InputError>에러 메세지</InputError>}
+    </InputLayout>
+  );
+}
+Input.displayName = 'Input';
