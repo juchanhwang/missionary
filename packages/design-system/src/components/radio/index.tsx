@@ -22,7 +22,10 @@ export const RadioDataContext = createContext<{
 } | null>(null);
 RadioDataContext.displayName = 'RadioDataContext';
 
-interface RadioProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
+interface RadioProps extends Omit<
+  React.HTMLProps<HTMLInputElement>,
+  'onChange'
+> {
   defaultChecked?: boolean;
   checked?: boolean;
   onChange?: (checked: boolean) => void;

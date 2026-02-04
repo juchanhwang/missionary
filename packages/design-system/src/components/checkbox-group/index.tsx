@@ -87,9 +87,6 @@ function CheckboxGroupRoot({
   );
 }
 
-export const CheckboxGroup = Object.assign(
-  CheckboxGroupRoot,
-  {
-    Item: Checkbox,
-  },
-);
+export const CheckboxGroup = Object.assign(CheckboxGroupRoot, {
+  Item: Checkbox,
+});

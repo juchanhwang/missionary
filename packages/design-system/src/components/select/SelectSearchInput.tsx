@@ -13,9 +13,14 @@ interface SelectSearchInputProps extends Omit<
   onChange?: (value: string, e?: React.ChangeEvent<HTMLInputElement>) => void;
   ref?: React.Ref<HTMLInputElement>;
 }
-export const SelectSearchInput = (
-  { value, onChange, placeholder, className, ref, ...props }: SelectSearchInputProps,
-) => {
+export const SelectSearchInput = ({
+  value,
+  onChange,
+  placeholder,
+  className,
+  ref,
+  ...props
+}: SelectSearchInputProps) => {
   const data = useContextData('Select.SearchInput', SelectDataContext);
 
   useEffect(() => {

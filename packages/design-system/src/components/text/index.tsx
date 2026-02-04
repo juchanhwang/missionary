@@ -52,18 +52,16 @@ type TextProps<T extends React.ElementType> = PolymorphicComponentProps<
 type TextComponent = <T extends React.ElementType = 'span'>(
   props: TextProps<T>,
 ) => React.ReactNode | null;
-export const Text: TextComponent = <T extends React.ElementType = 'span'>(
-  {
-    as,
-    className,
-    children,
-    typo,
-    fontWeight,
-    textAlign,
-    ref,
-    ...props
-  }: TextProps<T>,
-) => {
+export const Text: TextComponent = <T extends React.ElementType = 'span'>({
+  as,
+  className,
+  children,
+  typo,
+  fontWeight,
+  textAlign,
+  ref,
+  ...props
+}: TextProps<T>) => {
   return (
     <StyledText
       as={as}

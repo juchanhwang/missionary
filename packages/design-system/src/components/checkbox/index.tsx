@@ -22,7 +22,10 @@ export const CheckboxDataContext = createContext<{
 } | null>(null);
 CheckboxDataContext.displayName = 'CheckboxDataContext';
 
-interface CheckboxProps extends Omit<React.HTMLProps<HTMLInputElement>, 'onChange'> {
+interface CheckboxProps extends Omit<
+  React.HTMLProps<HTMLInputElement>,
+  'onChange'
+> {
   defaultChecked?: boolean;
   checked?: boolean;
   onChange?: (checked: boolean) => void;

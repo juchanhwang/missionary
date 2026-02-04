@@ -9,9 +9,13 @@ interface SelectOptionProps extends HTMLAttributes<HTMLLIElement> {
   item: string;
   ref?: React.Ref<HTMLLIElement>;
 }
-export const SelectOption = (
-  { item, className, children, ref, ...props }: SelectOptionProps,
-) => {
+export const SelectOption = ({
+  item,
+  className,
+  children,
+  ref,
+  ...props
+}: SelectOptionProps) => {
   const actions = useContextAction('Select.Option', SelectActionsContext);
 
   return (
