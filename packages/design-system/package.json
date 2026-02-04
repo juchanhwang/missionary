@@ -4,7 +4,7 @@
   "packageManager": "pnpm@10.28.1",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx next build --webpack",
     "start": "next start",
     "preview": "next preview",
     "storybook": "storybook dev -p 6006",
