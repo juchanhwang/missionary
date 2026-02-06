@@ -1,4 +1,4 @@
-import 'styles/tailwind.css';
+import '@styles/tailwind.css';
 import 'styles/_global.scss';
 import { QueryProvider } from 'lib/QueryProvider';
 
