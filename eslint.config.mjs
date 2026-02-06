@@ -15,6 +15,7 @@ export default tseslint.config([
   ]),
   {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['packages/missionary-server/**/*.ts'],
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     plugins: {
       'react-hooks': reactHooks,
@@ -26,6 +27,19 @@ export default tseslint.config([
     rules: {
       ...reactHooks.configs.recommended.rules,
 
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-empty-object-type': 'off',
+    },
+  },
+  {
+    files: ['packages/missionary-server/**/*.ts'],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.node,
+    },
+    rules: {
       '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-empty-object-type': 'off',

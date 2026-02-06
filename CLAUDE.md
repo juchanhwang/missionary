@@ -4,10 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A pnpm monorepo ("missionary-client") with three packages:
+A pnpm monorepo ("missionary-client") with four packages:
 - **@samilhero/design-system** — Shared UI component library with Storybook
 - **missionary-app** — Main user-facing Next.js 16 application
 - **missionary-admin** — Admin Next.js 16 application
+- **missionary-server** — NestJS 11 API server
 
 Package manager: **pnpm 10.28.1**, Node 20.
 
@@ -16,6 +17,8 @@ Package manager: **pnpm 10.28.1**, Node 20.
 - TypeScript 5.9 (`moduleResolution: "bundler"`)
 - Emotion CSS-in-JS (`@emotion/react`, `@emotion/styled`)
 - Storybook 8.6
+- NestJS 11 (missionary-server, `moduleResolution: "node"`, CommonJS)
+- Prisma ORM + PostgreSQL (missionary-server)
 
 ## Commands
 
@@ -24,7 +27,8 @@ Package manager: **pnpm 10.28.1**, Node 20.
 pnpm dev:app          # missionary-app dev server
 pnpm dev:admin        # missionary-admin dev server
 pnpm dev:ds           # design-system dev server
-pnpm dev:all          # all three in parallel
+pnpm dev:server       # missionary-server dev (port 3100)
+pnpm dev:all          # all four in parallel
 pnpm sb:ds            # Storybook for design-system (port 6006)
 ```
 
@@ -33,6 +37,7 @@ pnpm sb:ds            # Storybook for design-system (port 6006)
 pnpm build:app        # build missionary-app
 pnpm build:admin      # build missionary-admin
 pnpm build:ds         # build design-system
+pnpm build:server     # build missionary-server
 pnpm build:all        # build all
 ```
 
@@ -41,6 +46,16 @@ pnpm build:all        # build all
 pnpm lint:all         # ESLint + Prettier + Stylelint checks
 pnpm lint:fix:all     # auto-fix all
 pnpm type-check       # TypeScript type checking across packages
+```
+
+### Server Database (Prisma)
+```bash
+pnpm --filter missionary-server prisma:generate        # Prisma Client 생성
+pnpm --filter missionary-server prisma:migrate:dev      # 마이그레이션 생성/적용 (개발)
+pnpm --filter missionary-server prisma:migrate:deploy   # 마이그레이션 적용 (프로덕션)
+pnpm --filter missionary-server prisma:studio           # Prisma Studio GUI
+pnpm --filter missionary-server db:push                 # 스키마 직접 반영 (프로토타이핑)
+pnpm --filter missionary-server db:reset                # DB 초기화
 ```
 
 ### Dependencies
@@ -99,10 +114,12 @@ pnpm add <pkg> --filter <package-name>   # add dependency to specific package
 - `/packages/design-system/` — component library consumed by both apps
 - `/packages/missionary-app/` — main app, imports design-system via `workspace:*`
 - `/packages/missionary-admin/` — admin app, imports design-system via `workspace:*`
+- `/packages/missionary-server/` — NestJS API server (독립 tsconfig, base 미상속)
 
 ### Lint & Formatting Config
 All config files are at the project root (single file each):
 - `eslint.config.mjs` — ESLint flat config (typescript-eslint + import order + react-hooks)
+  - `packages/missionary-server/**`는 별도 블록: react-hooks 비활성화, `globals.node` 적용
 - `.prettierrc` — Prettier settings
 - `.stylelintrc.json` — Stylelint for SCSS files only (`stylelint-config-standard-scss`)
 
@@ -111,6 +128,7 @@ All packages use `@*` path aliases (baseUrl: `./src`). In apps, these resolve to
 - missionary-app: `"@*" → "../../design-system/src/*"`
 - missionary-admin: `"@*" → "../../design-system/src/*"`
 - design-system: `"@*" → "./*"` (local)
+- missionary-server: `"@/*" → "./src/*"` (local, 서버 전용)
 
 ### Styling
 Emotion CSS-in-JS for component styling. Each component typically has a layout file (e.g., `ButtonLayout.ts`) with styled components. SCSS is used for global/utility styles. Color palette is centralized in `design-system/src/styles/color.ts`. `next.config.js` enables `compiler: { emotion: true }`.
@@ -123,6 +141,35 @@ Components follow a consistent structure:
 - Support both controlled and uncontrolled usage via `useControllableState`
 - Context pattern (`useSafeContext`, `useContextData`, `useContextAction`) for compound components
 - React 19: new components should use `ref` as a regular prop instead of `forwardRef`
+
+### NestJS Server Pattern
+`missionary-server`는 NestJS의 Module/Controller/Service 패턴을 따른다.
+
+**디렉토리 구조 (도메인별 분류):**
+```
+src/
+├── main.ts                     # 엔트리포인트
+├── app.module.ts               # 루트 모듈
+├── app.controller.ts           # health check 등 루트 엔드포인트
+├── app.service.ts
+└── <domain>/                   # 도메인별 디렉토리
+    ├── <domain>.module.ts
+    ├── <domain>.controller.ts
+    ├── <domain>.service.ts
+    ├── dto/                    # Request/Response DTO
+    │   ├── create-<domain>.dto.ts
+    │   └── update-<domain>.dto.ts
+    └── entities/               # 엔티티 (DB 연동 시)
+        └── <domain>.entity.ts
+```
+
+**파일 네이밍:** `<도메인>.<역할>.ts` — 예: `user.controller.ts`, `user.service.ts`, `user.module.ts`
+
+**핵심 규칙:**
+- 하나의 Module이 하나의 도메인을 담당한다 (응집도 원칙)
+- Controller는 요청/응답 처리만, 비즈니스 로직은 Service에 위임한다
+- Service 간 의존은 Module의 `imports`/`exports`를 통해 명시적으로 관리한다
+- DTO로 요청/응답 형태를 명시하여 예측 가능성을 확보한다
 
 ### Git Workflow
 - Branches: `dev` (primary), `prod` (production), feature branches as `feat/SMH-*`

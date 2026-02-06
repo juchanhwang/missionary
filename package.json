@@ -15,15 +15,17 @@
     "stylelint:fix": "stylelint './packages/**/src/**/*.{css,scss}' --fix",
     "lint:all": "pnpm lint && pnpm prettier && pnpm stylelint",
     "lint:fix:all": "pnpm lint:fix && pnpm prettier:fix && pnpm stylelint:fix",
-    "type-check": "tsc --noEmit -p packages/design-system && tsc --noEmit -p packages/missionary-admin && tsc --noEmit -p packages/missionary-app",
+    "type-check": "tsc --noEmit -p packages/design-system && tsc --noEmit -p packages/missionary-admin && tsc --noEmit -p packages/missionary-app && tsc --noEmit -p packages/missionary-server",
     "dev:admin": "pnpm --filter missionary-admin dev",
     "dev:app": "pnpm --filter missionary-app dev",
     "dev:ds": "pnpm --filter design-system dev",
-    "dev:all": "pnpm dev:admin & pnpm dev:app & pnpm dev:ds",
+    "dev:server": "pnpm --filter missionary-server dev",
+    "dev:all": "pnpm dev:admin & pnpm dev:app & pnpm dev:ds & pnpm dev:server",
     "build:admin": "pnpm --filter missionary-admin build",
     "build:app": "pnpm --filter missionary-app build",
     "build:ds": "pnpm --filter design-system build",
-    "build:all": "pnpm build:admin & pnpm build:app & pnpm build:ds",
+    "build:server": "pnpm --filter missionary-server build",
+    "build:all": "pnpm build:admin & pnpm build:app & pnpm build:ds & pnpm build:server",
     "sb:ds": "pnpm --filter design-system storybook",
     "prepare": "husky"
   },
@@ -34,6 +36,11 @@
     "postcss": "^8.5.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "bcrypt"
+    ]
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
