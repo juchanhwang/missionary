@@ -1,14 +1,15 @@
+import '@styles/tailwind.css';
 import '@styles/_global.scss';
-import { EmotionProvider } from 'lib/EmotionProvider';
+import { QueryProvider } from 'lib/QueryProvider';
 
 import type { Metadata } from 'next';
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko">
-      <EmotionProvider>
+      <QueryProvider>
         <body>{children}</body>
-      </EmotionProvider>
+      </QueryProvider>
     </html>
   );
 };
