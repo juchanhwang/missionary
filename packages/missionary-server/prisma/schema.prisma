@@ -19,17 +19,73 @@ enum UserRole {
   SUPER_ADMIN
 }
 
+enum MissionType {
+  DOMESTIC
+  OVERSEAS
+}
+
+enum MissionStatus {
+  RECRUITING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum MissionMemberRole {
+  LEADER
+  STAFF
+  PARTICIPANT
+}
+
 model User {
-  id         Int          @id @default(autoincrement())
-  email      String       @unique
-  name       String?
-  password   String?
-  provider   AuthProvider @default(LOCAL)
-  providerId String?      @map("provider_id")
-  role       UserRole     @default(USER)
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @updatedAt @map("updated_at")
+  id              Int              @id @default(autoincrement())
+  email           String           @unique
+  name            String?
+  password        String?
+  provider        AuthProvider     @default(LOCAL)
+  providerId      String?          @map("provider_id")
+  role            UserRole         @default(USER)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  createdMissions Mission[]        @relation("createdMissions")
+  missionMembers  MissionMember[]  @relation("missionMembers")
 
   @@unique([provider, providerId])
   @@map("users")
+}
+
+model Mission {
+  id          Int             @id @default(autoincrement())
+  name        String
+  type        MissionType
+  status      MissionStatus   @default(RECRUITING)
+  startDate   DateTime        @map("start_date")
+  endDate     DateTime        @map("end_date")
+  pastorName  String          @map("pastor_name")
+
+  createdBy   User            @relation("createdMissions", fields: [createdById], references: [id])
+  createdById Int             @map("created_by_id")
+
+  members     MissionMember[]
+
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  @@map("missions")
+}
+
+model MissionMember {
+  id        Int                @id @default(autoincrement())
+  mission   Mission            @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  missionId Int                @map("mission_id")
+  user      User               @relation("missionMembers", fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int                @map("user_id")
+  role      MissionMemberRole
+
+  createdAt DateTime           @default(now()) @map("created_at")
+
+  @@unique([missionId, userId])
+  @@index([missionId])
+  @@index([userId])
+  @@map("mission_members")
 }
