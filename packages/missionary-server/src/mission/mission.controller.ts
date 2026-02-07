@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Req,
@@ -28,7 +28,7 @@ export class MissionController {
   @ApiOperation({ summary: '선교 생성' })
   create(@Req() req: Request, @Body() dto: CreateMissionDto) {
     const user = req.user as {
-      id: number;
+      id: string;
       email: string;
       role: string;
       provider: string;
@@ -44,19 +44,22 @@ export class MissionController {
 
   @Get(':id')
   @ApiOperation({ summary: '선교 단건 조회' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.missionService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '선교 수정' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateMissionDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateMissionDto,
+  ) {
     return this.missionService.update(id, dto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: '선교 삭제' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.missionService.remove(id);
   }
 }

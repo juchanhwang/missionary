@@ -5,50 +5,49 @@ import { PrismaService } from '@/database/prisma.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { UpdateMissionDto } from './dto/update-mission.dto';
 
-import type { MissionMemberRole } from '../../prisma/generated/prisma/enums';
-
 @Injectable()
 export class MissionService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(userId: number, dto: CreateMissionDto) {
-    return this.prisma.mission.create({
+  async create(userId: string, dto: CreateMissionDto) {
+    return this.prisma.missionary.create({
       data: {
         name: dto.name,
-        type: dto.type,
         startDate: new Date(dto.startDate),
         endDate: new Date(dto.endDate),
         pastorName: dto.pastorName,
         createdById: userId,
-        members: {
+        regionId: 'placeholder-region-id',
+        participationStartDate: new Date(dto.startDate),
+        participationEndDate: new Date(dto.endDate),
+        staff: {
           create: {
             userId: userId,
             role: 'LEADER' as const,
           },
         },
       },
-      include: { members: true },
+      include: { staff: true },
     });
   }
 
   async findAll() {
-    return this.prisma.mission.findMany({
-      include: { members: true },
+    return this.prisma.missionary.findMany({
+      include: { staff: true },
     });
   }
 
-  async findOne(id: number) {
-    return this.prisma.mission.findUnique({
+  async findOne(id: string) {
+    return this.prisma.missionary.findUnique({
       where: { id },
-      include: { members: true },
+      include: { staff: true },
     });
   }
 
-  async update(id: number, dto: UpdateMissionDto) {
+  async update(id: string, dto: UpdateMissionDto) {
     const data: Record<string, any> = {};
 
     if ('name' in dto && dto.name !== undefined) data.name = dto.name;
-    if ('type' in dto && dto.type !== undefined) data.type = dto.type;
     if ('startDate' in dto && dto.startDate !== undefined)
       data.startDate = new Date(dto.startDate);
     if ('endDate' in dto && dto.endDate !== undefined)
@@ -57,14 +56,14 @@ export class MissionService {
       data.pastorName = dto.pastorName;
     if ('status' in dto && dto.status !== undefined) data.status = dto.status;
 
-    return this.prisma.mission.update({
+    return this.prisma.missionary.update({
       where: { id },
       data,
     });
   }
 
-  async remove(id: number) {
-    return this.prisma.mission.delete({
+  async remove(id: string) {
+    return this.prisma.missionary.delete({
       where: { id },
     });
   }
