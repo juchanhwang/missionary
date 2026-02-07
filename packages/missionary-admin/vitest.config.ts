@@ -16,6 +16,15 @@ const resolveDesignSystemAliases = {
       return '\0virtual:svg-mock';
     }
 
+    // Handle relative SVG imports from design-system
+    if (
+      id.startsWith('./') &&
+      id.endsWith('.svg') &&
+      importer?.includes('design-system')
+    ) {
+      return '\0virtual:svg-mock';
+    }
+
     // Handle @assets/icons specifically
     if (id === '@assets/icons') {
       return path.resolve(designSystemPath, 'assets/icons/index.ts');
@@ -149,6 +158,7 @@ export default defineConfig({
         replacement: path.resolve(__dirname, './src/components'),
       },
       { find: 'utils', replacement: path.resolve(__dirname, './src/utils') },
+      // SVG mock - must be last to catch all remaining SVG imports
       {
         find: /\.svg$/,
         replacement: path.resolve(__dirname, './src/test/svg-mock.ts'),
