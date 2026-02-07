@@ -13,6 +13,7 @@ import { MissionaryModule } from './missionary/missionary.module';
 import { ParticipationModule } from './participation/participation.module';
 import { RegionModule } from './region/region.module';
 import { StaffModule } from './staff/staff.module';
+import { TeamModule } from './team/team.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -27,6 +28,7 @@ import { UserModule } from './user/user.module';
     MissionaryModule,
     StaffModule,
     ParticipationModule,
+    TeamModule,
   ],
   controllers: [AppController],
   providers: [
