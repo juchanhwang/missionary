@@ -1,6 +1,7 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 
+import { CsvExportService } from '@/common/csv/csv-export.service';
 import { PrismaModule } from '@/database/prisma.module';
 
 import { ParticipationController } from './participation.controller';
@@ -15,7 +16,7 @@ import { ParticipationService } from './participation.service';
     }),
   ],
   controllers: [ParticipationController],
-  providers: [ParticipationService, ParticipationProcessor],
+  providers: [ParticipationService, ParticipationProcessor, CsvExportService],
   exports: [ParticipationService],
 })
 export class ParticipationModule {}

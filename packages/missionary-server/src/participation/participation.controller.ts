@@ -10,10 +10,12 @@ import {
   Put,
   Query,
   Req,
+  Response,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request, Response as ExpressResponse } from 'express';
 
+import { CsvExportService } from '@/common/csv/csv-export.service';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums/user-role.enum';
 
@@ -25,7 +27,10 @@ import { ParticipationService } from './participation.service';
 @ApiTags('Participations')
 @Controller('participations')
 export class ParticipationController {
-  constructor(private readonly participationService: ParticipationService) {}
+  constructor(
+    private readonly participationService: ParticipationService,
+    private readonly csvExportService: CsvExportService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: '참가 신청 생성 (비동기 처리)' })
@@ -109,5 +114,27 @@ export class ParticipationController {
   @ApiOperation({ summary: '참가비 납부 승인 (관리자 전용)' })
   approvePayments(@Body() dto: ApprovePaymentDto) {
     return this.participationService.approvePayments(dto.participationIds);
+  }
+
+  @Get('download/:missionaryId')
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
+  @ApiOperation({ summary: '참가 신청 CSV 다운로드 (관리자/스태프 전용)' })
+  async downloadCsv(
+    @Param('missionaryId', ParseUUIDPipe) missionaryId: string,
+    @Response() res: ExpressResponse,
+  ) {
+    const participations = await this.participationService.findAll({
+      missionaryId,
+    });
+
+    const csvBuffer =
+      await this.csvExportService.generateParticipationCsv(participations);
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="participations-${missionaryId}.csv"`,
+    );
+    res.send(csvBuffer);
   }
 }
