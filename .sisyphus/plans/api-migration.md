@@ -75,13 +75,13 @@ missionary-api(Spring Boot)의 전체 비즈니스 도메인과 인프라 기능
 
 ### Definition of Done
 
-- [ ] `pnpm --filter missionary-server prisma:generate` — Exit 0
-- [ ] `pnpm type-check` — Exit 0
-- [ ] `pnpm build:server` — Exit 0
-- [ ] `pnpm --filter missionary-server test` — 모든 테스트 통과
-- [ ] 모든 엔드포인트 Swagger 문서화
-- [ ] Soft Delete 동작 검증 (삭제 → DB에 deletedAt 설정 → API 조회 시 미표시)
-- [ ] RBAC 동작 검증 (USER 역할 → admin 전용 엔드포인트 403)
+- [x] `pnpm --filter missionary-server prisma:generate` — Exit 0
+- [x] `pnpm type-check` — Exit 0
+- [x] `pnpm build:server` — Exit 0
+- [x] `pnpm --filter missionary-server test` — 모든 테스트 통과
+- [x] 모든 엔드포인트 Swagger 문서화
+- [x] Soft Delete 동작 검증 (삭제 → DB에 deletedAt 설정 → API 조회 시 미표시)
+- [x] RBAC 동작 검증 (USER 역할 → admin 전용 엔드포인트 403)
 
 ### Must Have
 
@@ -135,7 +135,7 @@ Each TODO follows RED-GREEN-REFACTOR:
 
 **Test Setup Task (Phase 1):**
 
-- [ ] 0. Setup Jest Test Infrastructure
+- [x] 0. Setup Jest Test Infrastructure
   - NestJS 프로젝트에 Jest가 이미 devDependencies에 있으나 설정 필요
   - Verify: `pnpm --filter missionary-server test` → 실행 가능
 
@@ -790,7 +790,7 @@ Wave 10 (Final):
 
 ---
 
-- [ ] 9. Staff Module (MissionaryStaff)
+- [x] 9. Staff Module (MissionaryStaff)
 
   **What to do**:
   - `src/staff/staff.module.ts`, `staff.controller.ts`, `staff.service.ts`
@@ -837,7 +837,7 @@ Wave 10 (Final):
 
 ---
 
-- [ ] 10. Team Module
+- [x] 10. Team Module
 
   **What to do**:
   - `src/team/team.module.ts`, `team.controller.ts`, `team.service.ts`
@@ -884,7 +884,7 @@ Wave 10 (Final):
 
 ---
 
-- [ ] 11. Board Module (MissionaryBoard)
+- [x] 11. Board Module (MissionaryBoard)
 
   **What to do**:
   - `src/board/board.module.ts`, `board.controller.ts`, `board.service.ts`
@@ -934,7 +934,7 @@ Wave 10 (Final):
 
 ---
 
-- [ ] 12. Terms Module
+- [x] 12. Terms Module
 
   **What to do**:
   - `src/terms/terms.module.ts`, `terms.controller.ts`, `terms.service.ts`
@@ -980,7 +980,7 @@ Wave 10 (Final):
 
 ---
 
-- [ ] 13. CSV Export
+- [x] 13. CSV Export
 
   **What to do**:
   - `src/common/csv/csv-export.service.ts` — fast-csv 기반 CSV 생성
@@ -1026,7 +1026,7 @@ Wave 10 (Final):
 
 ---
 
-- [ ] 14. PII Scheduler (@nestjs/schedule)
+- [x] 14. PII Scheduler (@nestjs/schedule)
 
   **What to do**:
   - `src/common/scheduler/pii-cleanup.service.ts`
@@ -1071,7 +1071,7 @@ Wave 10 (Final):
 
 ---
 
-- [ ] 15. Integration 검증 + Swagger 정리
+- [x] 15. Integration 검증 + Swagger 정리
 
   **What to do**:
   - 전체 모듈 통합 테스트 (E2E)
@@ -1185,15 +1185,15 @@ pnpm --filter missionary-server test               # All tests pass, 0 failures
 
 ### Final Checklist
 
-- [ ] 전체 Prisma 스키마 (15+ 모델) 정의 및 마이그레이션 완료
-- [ ] 모든 Spring API 엔드포인트에 대응하는 NestJS 엔드포인트 존재
-- [ ] RBAC (USER, ADMIN, STAFF) 동작 확인
-- [ ] Soft Delete 전체 적용 및 동작 확인
-- [ ] Audit Trail (createdBy, updatedBy, version) 자동 설정 확인
-- [ ] AES 암호화/복호화 동작 확인
-- [ ] PII 마스킹 API 응답에서 동작 확인
-- [ ] BullMQ 비동기 참가 처리 동작 확인
-- [ ] CSV export UTF-8 BOM 포함 확인
-- [ ] PII Scheduler 동작 확인
-- [ ] Swagger 전체 엔드포인트 문서화
-- [ ] 모든 테스트 통과
+- [x] 전체 Prisma 스키마 (15+ 모델) 정의 및 마이그레이션 완료
+- [x] 모든 Spring API 엔드포인트에 대응하는 NestJS 엔드포인트 존재
+- [x] RBAC (USER, ADMIN, STAFF) 동작 확인
+- [x] Soft Delete 전체 적용 및 동작 확인
+- [x] Audit Trail (createdBy, updatedBy, version) 자동 설정 확인
+- [x] AES 암호화/복호화 동작 확인
+- [x] PII 마스킹 API 응답에서 동작 확인
+- [x] BullMQ 비동기 참가 처리 동작 확인
+- [x] CSV export UTF-8 BOM 포함 확인
+- [x] PII Scheduler 동작 확인
+- [x] Swagger 전체 엔드포인트 문서화
+- [x] 모든 테스트 통과
