@@ -39,6 +39,9 @@ export class MissionaryService {
 
   async findAll() {
     return this.prisma.missionary.findMany({
+      where: {
+        deletedAt: null,
+      },
       include: {
         region: true,
       },
@@ -60,6 +63,10 @@ export class MissionaryService {
 
     if (!missionary) {
       throw new NotFoundException(`Missionary with ID ${id} not found`);
+    }
+
+    if (missionary.deletedAt !== null) {
+      throw new NotFoundException(`Missionary with ID ${id} has been deleted`);
     }
 
     return missionary;
@@ -103,8 +110,11 @@ export class MissionaryService {
   async remove(id: string) {
     await this.findOne(id);
 
-    return this.prisma.missionary.delete({
+    return this.prisma.missionary.update({
       where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
     });
   }
 
