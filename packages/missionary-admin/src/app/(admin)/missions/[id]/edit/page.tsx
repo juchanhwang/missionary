@@ -1,20 +1,25 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Button,
   InputField,
   DatePicker,
   Select,
 } from '@samilhero/design-system';
-import { DeleteConfirmModal } from 'components/missionary/DeleteConfirmModal';
-import {
-  useMissionary,
-  useUpdateMissionary,
-  useDeleteMissionary,
-} from 'hooks/missionary';
-import { useRegions } from 'hooks/region';
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+
+import { DeleteConfirmModal } from './components/DeleteConfirmModal';
+import { useDeleteMissionary } from '../../hooks/useDeleteMissionary';
+import { useMissionary } from '../../hooks/useMissionary';
+import { useRegions } from '../../hooks/useRegions';
+import { useUpdateMissionary } from '../../hooks/useUpdateMissionary';
+import {
+  missionSchema,
+  type MissionFormData,
+} from '../../schemas/missionSchema';
 
 export default function MissionaryEditPage() {
   const router = useRouter();
@@ -28,60 +33,42 @@ export default function MissionaryEditPage() {
   const updateMutation = useUpdateMissionary(id);
   const deleteMutation = useDeleteMissionary(id);
 
-  const [name, setName] = useState('');
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [pastorName, setPastorName] = useState('');
-  const [regionId, setRegionId] = useState('');
-  const [participationStartDate, setParticipationStartDate] =
-    useState<Date | null>(null);
-  const [participationEndDate, setParticipationEndDate] = useState<Date | null>(
-    null,
-  );
+  const form = useForm<MissionFormData>({
+    resolver: zodResolver(missionSchema),
+    mode: 'onSubmit',
+    defaultValues: {
+      name: '',
+      pastorName: '',
+      regionId: '',
+    },
+  });
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (missionary) {
-      setName(missionary.name);
-      setStartDate(new Date(missionary.startDate));
-      setEndDate(new Date(missionary.endDate));
-      setPastorName(missionary.pastorName || '');
-      setRegionId(missionary.regionId || '');
-      setParticipationStartDate(new Date(missionary.participationStartDate));
-      setParticipationEndDate(new Date(missionary.participationEndDate));
+      form.reset({
+        name: missionary.name,
+        startDate: new Date(missionary.startDate),
+        endDate: new Date(missionary.endDate),
+        pastorName: missionary.pastorName || '',
+        regionId: missionary.regionId || '',
+        participationStartDate: new Date(missionary.participationStartDate),
+        participationEndDate: new Date(missionary.participationEndDate),
+      });
     }
-  }, [missionary]);
+  }, [missionary, form]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const newErrors: Record<string, string> = {};
-    if (!name) newErrors.name = '선교 이름을 입력해주세요';
-    if (!startDate) newErrors.startDate = '시작일을 선택해주세요';
-    if (!endDate) newErrors.endDate = '종료일을 선택해주세요';
-    if (!pastorName) newErrors.pastorName = '담당 교역자를 입력해주세요';
-    if (!regionId) newErrors.regionId = '지역을 선택해주세요';
-    if (!participationStartDate)
-      newErrors.participationStartDate = '참가 신청 시작일을 선택해주세요';
-    if (!participationEndDate)
-      newErrors.participationEndDate = '참가 신청 종료일을 선택해주세요';
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
+  const onSubmit = (data: MissionFormData) => {
     updateMutation.mutate(
       {
-        name,
-        startDate: startDate!.toISOString(),
-        endDate: endDate!.toISOString(),
-        pastorName,
-        regionId,
-        participationStartDate: participationStartDate!.toISOString(),
-        participationEndDate: participationEndDate!.toISOString(),
+        name: data.name,
+        startDate: data.startDate.toISOString(),
+        endDate: data.endDate.toISOString(),
+        pastorName: data.pastorName,
+        regionId: data.regionId,
+        participationStartDate: data.participationStartDate.toISOString(),
+        participationEndDate: data.participationEndDate.toISOString(),
       },
       {
         onSuccess: () => {
@@ -108,94 +95,131 @@ export default function MissionaryEditPage() {
     );
   }
 
-  const selectedRegion = regions?.find((r) => r.id === regionId);
+  const selectedRegion = regions?.find((r) => r.id === form.watch('regionId'));
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-8">선교 수정</h1>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-6"
+      >
         <InputField
           label="선교 이름"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
           placeholder="선교 이름을 입력하세요"
-          error={errors.name}
+          {...form.register('name')}
+          error={form.formState.errors.name?.message}
           disabled={updateMutation.isPending}
         />
 
         <div className="grid grid-cols-2 gap-4">
-          <DatePicker
-            label="선교 시작일"
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
-            placeholder="YYYY-MM-DD"
-            error={errors.startDate}
-            disabled={updateMutation.isPending}
+          <Controller
+            name="startDate"
+            control={form.control}
+            render={({ field }) => (
+              <DatePicker
+                label="선교 시작일"
+                selected={field.value}
+                onChange={field.onChange}
+                placeholder="YYYY-MM-DD"
+                error={form.formState.errors.startDate?.message}
+                disabled={updateMutation.isPending}
+              />
+            )}
           />
-          <DatePicker
-            label="선교 종료일"
-            selected={endDate}
-            onChange={(date) => setEndDate(date)}
-            placeholder="YYYY-MM-DD"
-            error={errors.endDate}
-            disabled={updateMutation.isPending}
-            minDate={startDate || undefined}
+          <Controller
+            name="endDate"
+            control={form.control}
+            render={({ field }) => (
+              <DatePicker
+                label="선교 종료일"
+                selected={field.value}
+                onChange={field.onChange}
+                placeholder="YYYY-MM-DD"
+                error={form.formState.errors.endDate?.message}
+                disabled={updateMutation.isPending}
+                minDate={form.watch('startDate') || undefined}
+              />
+            )}
           />
         </div>
 
         <InputField
           label="담당 교역자"
-          value={pastorName}
-          onChange={(e) => setPastorName(e.target.value)}
           placeholder="담당 교역자 이름을 입력하세요"
-          error={errors.pastorName}
+          {...form.register('pastorName')}
+          error={form.formState.errors.pastorName?.message}
           disabled={updateMutation.isPending}
         />
 
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 relative">
           <label className="text-xs font-normal leading-[1.833] text-gray-70">
             지역
           </label>
-          <Select
-            value={regionId}
-            onChange={(val) => setRegionId(val as string)}
-          >
-            <Select.Trigger className="w-full flex items-center justify-between h-12 px-4 rounded-lg bg-gray-02 text-sm">
-              {selectedRegion ? selectedRegion.name : '지역을 선택하세요'}
-            </Select.Trigger>
-            <Select.Options>
-              {regions?.map((region) => (
-                <Select.Option key={region.id} item={region.id}>
-                  {region.name}
-                </Select.Option>
-              ))}
-            </Select.Options>
-          </Select>
-          {errors.regionId && (
+          <Controller
+            name="regionId"
+            control={form.control}
+            render={({ field }) => (
+              <Select value={field.value} onChange={field.onChange}>
+                <Select.Trigger
+                  type="button"
+                  className={`w-full flex items-center justify-between h-12 px-4 rounded-lg bg-gray-02 text-sm ${
+                    !field.value ? 'text-gray-30' : 'text-black'
+                  }`}
+                >
+                  {selectedRegion ? selectedRegion.name : '지역을 선택하세요'}
+                </Select.Trigger>
+                <Select.Options className="absolute z-10 w-full mt-1 bg-white border border-gray-10 rounded-lg shadow-lg max-h-60 overflow-auto">
+                  {regions?.map((region) => (
+                    <Select.Option
+                      key={region.id}
+                      item={region.id}
+                      className="px-4 py-2 hover:bg-gray-05 cursor-pointer text-sm"
+                    >
+                      {region.name}
+                    </Select.Option>
+                  ))}
+                </Select.Options>
+              </Select>
+            )}
+          />
+          {form.formState.errors.regionId && (
             <div className="mt-1 text-error-60 text-xs leading-[1.5]">
-              {errors.regionId}
+              {form.formState.errors.regionId.message}
             </div>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <DatePicker
-            label="참가 신청 시작일"
-            selected={participationStartDate}
-            onChange={(date) => setParticipationStartDate(date)}
-            placeholder="YYYY-MM-DD"
-            error={errors.participationStartDate}
-            disabled={updateMutation.isPending}
+          <Controller
+            name="participationStartDate"
+            control={form.control}
+            render={({ field }) => (
+              <DatePicker
+                label="참가 신청 시작일"
+                selected={field.value}
+                onChange={field.onChange}
+                placeholder="YYYY-MM-DD"
+                error={form.formState.errors.participationStartDate?.message}
+                disabled={updateMutation.isPending}
+              />
+            )}
           />
-          <DatePicker
-            label="참가 신청 종료일"
-            selected={participationEndDate}
-            onChange={(date) => setParticipationEndDate(date)}
-            placeholder="YYYY-MM-DD"
-            error={errors.participationEndDate}
-            disabled={updateMutation.isPending}
-            minDate={participationStartDate || undefined}
+          <Controller
+            name="participationEndDate"
+            control={form.control}
+            render={({ field }) => (
+              <DatePicker
+                label="참가 신청 종료일"
+                selected={field.value}
+                onChange={field.onChange}
+                placeholder="YYYY-MM-DD"
+                error={form.formState.errors.participationEndDate?.message}
+                disabled={updateMutation.isPending}
+                minDate={form.watch('participationStartDate') || undefined}
+              />
+            )}
           />
         </div>
 

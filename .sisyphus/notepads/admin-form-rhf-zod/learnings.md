@@ -387,3 +387,155 @@ All error messages follow consistent Korean phrasing standards.
 - [ ] Update errors: `form.formState.errors.fieldName?.message`
 - [ ] Convert Date → ISO string in onSubmit handler (if API expects strings)
 
+
+---
+
+## Task 4: Mission Edit Form Refactoring (TDD)
+
+### Completed
+
+**Phase 1: Edit Form Test (RED-GREEN-REFACTOR)**
+- ✅ RED: Created EditMissionPage.test.tsx with 6 component test cases
+- ✅ REFACTOR: Fixed test mocking pattern (no dynamic imports, use vi.mocked())
+
+**Phase 2: Edit Form Refactoring (GREEN)**
+- ✅ GREEN: Refactored page.tsx to use useForm + zodResolver + Controller
+- ✅ REFACTOR: All tests passing (43 total: 37 baseline + 6 new)
+
+### Key Learnings
+
+#### Test Mocking Pattern (CRITICAL)
+- **DO**: Import hooks at top, use `vi.mocked()` in `beforeEach()`
+- **DON'T**: Use dynamic `await import()` inside tests (causes hanging)
+- **Pattern**:
+```tsx
+import { useRouter } from 'next/navigation';
+vi.mock('next/navigation', () => ({ useRouter: vi.fn() }));
+
+const mockUseRouter = vi.mocked(useRouter);
+beforeEach(() => {
+  mockUseRouter.mockReturnValue({ push: vi.fn() } as any);
+});
+```
+
+#### Form Prefill with form.reset()
+- **Pattern**: `useEffect + form.reset()` when API data arrives
+- **Implementation**:
+```tsx
+useEffect(() => {
+  if (missionary) {
+    form.reset({
+      name: missionary.name,
+      startDate: new Date(missionary.startDate),
+      endDate: new Date(missionary.endDate),
+      pastorName: missionary.pastorName || '',
+      regionId: missionary.regionId || '',
+      participationStartDate: new Date(missionary.participationStartDate),
+      participationEndDate: new Date(missionary.participationEndDate),
+    });
+  }
+}, [missionary, form]);
+```
+- **Key point**: Convert ISO string dates from API to Date objects for form state
+
+#### Delete Functionality Preservation
+- Delete button + modal logic remained completely untouched
+- Kept `isDeleteModalOpen` as separate useState (not in form state)
+- DeleteConfirmModal tests still pass (8 tests)
+- **Lesson**: Surgical refactoring - only change what needs changing
+
+#### Loading/Not-Found States Preservation
+- Lines 96-107 remained unchanged
+- No refactoring needed for non-form logic
+- **Lesson**: TDD focused refactoring - only touch form-related code
+
+### Test Results
+
+**Edit Form Tests** (6 passing):
+```bash
+$ pnpm vitest run src/app/(admin)/missions/[id]/edit/__tests__
+✓ API 데이터로 폼이 프리필된다
+✓ 빈 이름으로 제출하면 에러 메시지를 표시한다
+✓ 유효한 데이터를 제출하면 ISO 문자열 날짜로 mutate를 호출한다
+✓ isPending 상태일 때 버튼이 비활성화되고 "수정 중..." 텍스트를 표시한다
+✓ 로딩 상태일 때 "로딩 중..." 텍스트를 표시한다
+✓ 삭제 버튼을 클릭하면 DeleteConfirmModal이 열린다
+```
+
+**Regression Check** (43 total passing):
+```bash
+$ pnpm vitest run
+Test Files  9 passed (9)
+Tests  43 passed (43)
+Duration  10.92s
+```
+
+**Type Safety**:
+```bash
+$ pnpm tsc --noEmit --project packages/missionary-admin/tsconfig.json
+✓ 0 errors
+```
+
+### Files Created/Modified
+
+**Created**:
+1. `src/app/(admin)/missions/[id]/edit/__tests__/EditMissionPage.test.tsx` - 6 component integration tests
+
+**Modified**:
+1. `src/app/(admin)/missions/[id]/edit/page.tsx` - Refactored to use react-hook-form
+   - Replaced `useState` (9 variables: 8 fields + errors) with `useForm`
+   - Kept `isDeleteModalOpen` as separate useState
+   - Added `zodResolver(missionSchema)` for validation
+   - Updated InputFields to use `register()`
+   - Added `Controller` for DatePicker (4 fields) and Select (1 field)
+   - Changed prefill from `useEffect + setState` to `useEffect + form.reset()`
+   - Changed onSubmit to convert Date → ISO string
+   - Error handling via `form.formState.errors`
+
+### TDD Observations
+
+**RED Phase Challenges**:
+- Initial test setup used dynamic imports → caused hanging
+- Fixed by using static imports + `vi.mocked()` pattern
+- Tests ran successfully after pattern fix
+
+**GREEN Phase Efficiency**:
+- Multiple edits to page.tsx made all 6 tests pass
+- No regressions in existing tests (DeleteConfirmModal, create form, login)
+- Form state reduced from 9 variables to 2 (1 useForm + 1 isDeleteModalOpen)
+
+**REFACTOR Phase Benefits**:
+- Type safety enforced via shared missionSchema
+- Centralized validation logic (reused from Task 3)
+- Automatic prefill handling with form.reset()
+- Cleaner component code (less manual state management)
+
+### Error Message Standards
+
+**Korean Error Messages** (from shared missionSchema.ts):
+- All validation errors use consistent Korean phrasing
+- Error messages match between create and edit forms (schema sharing)
+
+### Patterns Established
+
+**Edit Form Refactoring Checklist**:
+- [ ] Import useForm, Controller, zodResolver
+- [ ] Import shared Zod schema
+- [ ] Replace field useState with useForm + zodResolver
+- [ ] Keep non-form useState (e.g., isDeleteModalOpen)
+- [ ] InputField → spread `{...register('fieldName')}`
+- [ ] DatePicker → wrap with `<Controller name="fieldName" />`
+- [ ] Select → wrap with `<Controller name="fieldName" />`
+- [ ] Update form submit: `<form onSubmit={form.handleSubmit(onSubmit)}>`
+- [ ] Update errors: `form.formState.errors.fieldName?.message`
+- [ ] Add prefill: `useEffect(() => { form.reset({...}) }, [data, form])`
+- [ ] Convert Date → ISO string in onSubmit handler
+- [ ] Preserve delete/cancel functionality (don't refactor unrelated logic)
+
+**Test Mocking Best Practices**:
+- [ ] Import hooks at top of test file
+- [ ] Use `vi.mock()` declarations before describe block
+- [ ] Use `vi.mocked()` to get typed mocks
+- [ ] Update mock return values in `beforeEach()`
+- [ ] Never use dynamic `await import()` for mocks
+
