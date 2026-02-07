@@ -5,6 +5,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { createSoftDeleteExtension } from 'prisma-extension-soft-delete';
 
 import { PrismaClient } from '../../prisma/generated/prisma/client';
 
@@ -27,6 +28,19 @@ export class PrismaService
           ? ['query', 'info', 'warn', 'error']
           : ['warn', 'error'],
     });
+
+    return this.$extends(
+      createSoftDeleteExtension({
+        models: {},
+        defaultConfig: {
+          field: 'deletedAt',
+          createValue: (deleted: boolean) => {
+            if (deleted) return new Date();
+            return null;
+          },
+        },
+      }),
+    ) as this;
   }
 
   async onModuleInit() {
