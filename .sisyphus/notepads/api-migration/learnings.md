@@ -283,3 +283,80 @@ packages/missionary-server/src/
 - Tasks 5-15: Domain module implementations (all depend on this schema)
 - All models ready for Prisma Client usage with typed queries
 
+
+## [2026-02-07] Task 3: User Module Refactoring
+
+### UUID Migration
+- Changed all ID types from number to string (UUID)
+- Updated user.service.ts: All methods now accept/return string IDs
+- Updated user.controller.ts: Added ParseUUIDPipe validation for route params
+- Updated auth interfaces: JwtPayload.sub changed from number to string
+- Updated auth.service.ts: generateTokens() signature accepts string ID
+- Fixed Prisma Client import: Changed from `../../prisma/generated/prisma/client` to `../../prisma/generated/prisma`
+
+### PII Fields Added  
+- Extended CreateUserDto with validation decorators:
+  - phoneNumber (string, optional)
+  - birthDate (DateString, optional)
+  - gender (string, optional)
+  - isBaptized (boolean, optional)
+  - baptizedAt (DateString, optional)
+  - identityNumber (string, optional, encrypted)
+  - loginId (string, optional, for admin users)
+- UpdateUserDto automatically inherits all fields via PartialType(CreateUserDto)
+- Service layer handles date conversion: birthDate/baptizedAt strings → Date objects
+
+### PII Encryption
+- identityNumber encrypted with AES-128-CBC before save using encrypt() from common/utils/encryption.ts
+- Service layer decrypts identityNumber after reading from DB
+- Decryption applied in all read operations: findOne, findAll, findByEmail, findByProvider
+- Added helper methods: encryptIdentityNumber(), decryptIdentityNumber(), decryptIdentityNumberNullable()
+
+### RBAC Applied
+- Admin-only endpoints decorated with @Roles(UserRole.ADMIN):
+  - GET /users (list all users)
+  - DELETE /users/:id (delete user)
+- Public/User-accessible endpoints (no @Roles decorator):
+  - POST /users (create user)
+  - GET /users/:id (get user by ID)
+  - PATCH /users/:id (update user)
+- Import pattern: `import { Roles } from '@/common/decorators/roles.decorator'`
+- Import pattern: `import { UserRole } from '@/common/enums/user-role.enum'`
+
+### Soft Delete
+- Service remove() method uses `prisma.user.delete()` which triggers soft delete via prisma-extension-soft-delete
+- Extension automatically sets deletedAt field instead of hard deleting
+- Soft-deleted users automatically excluded from all queries (findMany, findOne, etc.)
+
+### Test Coverage
+- **Tests NOT implemented** due to Prisma mocking complexity in Jest
+- Issue: prisma-extension-soft-delete requires PrismaClient initialization, which conflicts with Jest module mocking
+- Workaround attempted: jest.mock(), MockPrismaService class, custom moduleNameMapper
+- Resolution deferred: Tests can be added later with proper e2e testing strategy or alternative mocking approach
+
+### Type System Updates
+- User model now correctly uses String ID (UUID) across entire codebase
+- Fixed type mismatches in auth.controller.ts: Updated req.user type assertions from `id: number` to `id: string`
+- Fixed generateTokens() parameter type to accept nullable provider field
+
+### Gotchas Discovered
+- **Prisma Client Import Path**: Must import from `../../prisma/generated/prisma` NOT `../../prisma/generated/prisma/client`
+- **TypeScript Cache**: After regenerating Prisma Client, may need to delete tsconfig.tsbuildinfo to force type refresh
+- **Jest + Prisma Extensions**: prisma-extension-soft-delete doesn't play nicely with Jest module mocks
+- **Date Conversion**: DTOs accept ISO date strings, service converts to Date objects before Prisma operations
+
+### Files Modified
+1. `user.service.ts` — UUID IDs, PII encryption, soft delete support
+2. `user.controller.ts` — ParseUUIDPipe, @Roles decorators
+3. `create-user.dto.ts` — Extended with 7 new PII fields
+4. `update-user.dto.ts` — Already extends PartialType (no changes needed)
+5. `auth/interfaces/jwt-payload.interface.ts` — sub: string, role: 'STAFF' (was 'SUPER_ADMIN')
+6. `auth/auth.service.ts` — generateTokens() signature updated
+7. `auth/auth.controller.ts` — req.user type assertions updated
+8. `database/prisma.service.ts` — Fixed PrismaClient import path
+9. `.env` — Added AES_ENCRYPT_KEY
+
+### Next Steps (Task 4+)
+- Task 4 will add actual RolesGuard enforcement and JWT authentication to routes
+- User module is ready for RBAC integration
+- Consider e2e tests instead of unit tests for Prisma-dependent services

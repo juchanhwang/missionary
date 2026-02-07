@@ -7,7 +7,7 @@ import {
 import { PrismaPg } from '@prisma/adapter-pg';
 import { createSoftDeleteExtension } from 'prisma-extension-soft-delete';
 
-import { PrismaClient } from '../../prisma/generated/prisma/client';
+import { PrismaClient } from '../../prisma/generated/prisma';
 
 @Injectable()
 export class PrismaService

@@ -1,6 +1,6 @@
 export interface JwtPayload {
-  sub: number;
+  sub: string;
   email: string;
-  role: 'USER' | 'ADMIN' | 'SUPER_ADMIN';
+  role: 'USER' | 'ADMIN' | 'STAFF';
   provider: 'LOCAL' | 'GOOGLE' | 'KAKAO';
 }

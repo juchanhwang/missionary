@@ -66,7 +66,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = req.user as {
-      id: number;
+      id: string;
       email: string;
       role: string;
       provider: string;
@@ -92,7 +92,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Google OAuth 콜백' })
   googleCallback(@Req() req: Request, @Res() res: Response) {
     const user = req.user as {
-      id: number;
+      id: string;
       email: string;
       role: string;
       provider: string;
@@ -122,7 +122,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Kakao OAuth 콜백' })
   kakaoCallback(@Req() req: Request, @Res() res: Response) {
     const user = req.user as {
-      id: number;
+      id: string;
       email: string;
       role: string;
       provider: string;

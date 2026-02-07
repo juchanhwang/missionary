@@ -66,10 +66,10 @@ export class AuthService {
   }
 
   generateTokens(user: {
-    id: number;
-    email: string;
+    id: string;
+    email: string | null;
     role: string;
-    provider: string;
+    provider: string | null;
   }) {
     const payload = {
       sub: user.id,

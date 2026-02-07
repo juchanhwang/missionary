@@ -9,6 +9,7 @@ const config: Config = {
   coverageDirectory: '../coverage',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    '^\\.prisma/client/(.*)$': '<rootDir>/../prisma/generated/prisma/$1',
   },
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
