@@ -1,8 +1,8 @@
 import { resolve } from 'path';
 
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vitest/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { defineConfig } from 'vitest/config';
 
 const srcPath = resolve(__dirname, 'src');
 

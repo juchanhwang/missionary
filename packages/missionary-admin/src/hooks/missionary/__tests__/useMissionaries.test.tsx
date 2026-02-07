@@ -1,9 +1,11 @@
-import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { vi } from 'vitest';
-import type { ReactNode } from 'react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { missionaryApi } from 'apis/missionary';
+import { vi } from 'vitest';
+
 import { useMissionaries } from '../useMissionaries';
+
+import type { ReactNode } from 'react';
 
 vi.mock('apis/missionary', () => ({
   missionaryApi: {

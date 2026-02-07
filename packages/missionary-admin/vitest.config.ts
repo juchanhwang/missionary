@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vitest/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { defineConfig } from 'vitest/config';
 
 const designSystemPath = path.resolve(__dirname, '../design-system/src');
 

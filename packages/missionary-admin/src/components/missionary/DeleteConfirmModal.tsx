@@ -1,8 +1,8 @@
 'use client';
 
+import { Button } from '@samilhero/design-system';
 import { useEffect } from 'react';
 import Modal from 'react-modal';
-import { Button } from '@samilhero/design-system';
 
 export interface DeleteConfirmModalProps {
   isOpen: boolean;
