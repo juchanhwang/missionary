@@ -1,13 +1,22 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, InputField } from '@samilhero/design-system';
-import { useLogin } from 'hooks/auth';
-import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+
+import { useLogin } from './hooks/useLogin';
+import { loginSchema, type LoginFormData } from './schemas/loginSchema';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: 'onSubmit',
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
   const loginMutation = useLogin();
 
@@ -16,23 +25,21 @@ export default function LoginPage() {
     const oauthError = params.get('error');
 
     if (oauthError) {
-      setError('소셜 로그인에 실패했습니다. 다시 시도해주세요.');
+      form.setError('root.serverError', {
+        message: '소셜 로그인에 실패했습니다. 다시 시도해주세요.',
+      });
       window.history.replaceState({}, '', '/login');
     }
-  }, []);
+  }, [form]);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError('');
-
-    loginMutation.mutate(
-      { email, password },
-      {
-        onError: () => {
-          setError('이메일 또는 비밀번호가 올바르지 않습니다.');
-        },
+  const onSubmit = (data: LoginFormData) => {
+    loginMutation.mutate(data, {
+      onError: () => {
+        form.setError('root.serverError', {
+          message: '이메일 또는 비밀번호가 올바르지 않습니다.',
+        });
       },
-    );
+    });
   };
 
   const handleGoogleLogin = () => {
@@ -46,7 +53,7 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col items-center justify-center w-full min-h-screen bg-white">
       <form
-        onSubmit={handleSubmit}
+        onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col items-center w-[400px]"
       >
         <img
@@ -70,10 +77,8 @@ export default function LoginPage() {
             hideLabel
             type="email"
             placeholder="이메일"
-            value={email}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value)
-            }
+            {...form.register('email')}
+            error={form.formState.errors.email?.message}
             className="w-full"
           />
           <InputField
@@ -81,11 +86,11 @@ export default function LoginPage() {
             hideLabel
             type="password"
             placeholder="비밀번호"
-            value={password}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setPassword(e.target.value)
+            {...form.register('password')}
+            error={
+              form.formState.errors.password?.message ||
+              form.formState.errors.root?.serverError?.message
             }
-            error={error}
             className="w-full"
           />
         </div>
