@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-
 import { PrismaService } from '@/database/prisma.service';
 
 import { AddMembersDto } from './dto/add-members.dto';
