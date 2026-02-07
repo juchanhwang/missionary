@@ -15,6 +15,7 @@ import { ParticipationModule } from './participation/participation.module';
 import { RegionModule } from './region/region.module';
 import { StaffModule } from './staff/staff.module';
 import { TeamModule } from './team/team.module';
+import { TermsModule } from './terms/terms.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -31,6 +32,7 @@ import { UserModule } from './user/user.module';
     ParticipationModule,
     TeamModule,
     BoardModule,
+    TermsModule,
   ],
   controllers: [AppController],
   providers: [
