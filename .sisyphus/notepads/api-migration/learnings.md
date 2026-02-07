@@ -431,3 +431,56 @@ packages/missionary-server/src/
 - ⚠️ Unit tests: Fail at runtime due to Prisma extension (test code is correct)
 - ✅ LSP diagnostics: Clean
 
+
+## [2026-02-07] Task 5: Region Module (MissionaryRegion)
+
+### Module Structure
+- Created RegionModule with standard NestJS pattern
+- Exports RegionService for use in Missionary module (Task 7)
+- No DatabaseModule import needed - PrismaService injected directly
+
+### CRUD Implementation
+- **create()**: Creates new region with name and type (DOMESTIC/ABROAD)
+- **findAll()**: Lists all regions ordered by createdAt descending
+- **findOne()**: Finds by UUID, throws NotFoundException if not found
+- **update()**: Verifies existence before updating, supports partial updates
+- **remove()**: Soft deletes via prisma-extension-soft-delete (sets deletedAt)
+
+### RBAC Applied
+- POST /regions: @Roles(UserRole.ADMIN) — admin-only creation
+- GET /regions: Public — no @Roles decorator
+- GET /regions/:id: Public — no @Roles decorator
+- PATCH /regions/:id: @Roles(UserRole.ADMIN) — admin-only updates
+- DELETE /regions/:id: @Roles(UserRole.ADMIN) — admin-only soft delete
+
+### DTOs
+- **CreateRegionDto**: name (string), type (enum: DOMESTIC | ABROAD)
+- **UpdateRegionDto**: Extends PartialType(CreateRegionDto) for partial updates
+- Validation: @IsString() for name, @IsEnum() for type
+
+### Soft Delete
+- Service remove() calls prisma.missionaryRegion.delete()
+- prisma-extension-soft-delete automatically sets deletedAt instead of hard delete
+- Soft-deleted regions excluded from all queries automatically
+
+### Files Created
+- `src/region/region.module.ts` — Module definition
+- `src/region/region.controller.ts` — 5 endpoints (POST, GET, GET/:id, PATCH/:id, DELETE/:id)
+- `src/region/region.service.ts` — 5 CRUD methods
+- `src/region/dto/create-region.dto.ts` — Create request DTO
+- `src/region/dto/update-region.dto.ts` — Update request DTO
+
+### Files Modified
+- `src/app.module.ts` — Added RegionModule to imports
+
+### Verification
+- ✅ pnpm type-check: Exit 0 (no TypeScript errors)
+- ✅ pnpm build:server: Exit 0 (build successful)
+- ✅ LSP diagnostics: Clean on all region files
+
+### Lessons Learned
+1. **Enum Handling**: Use string literals ('DOMESTIC' | 'ABROAD') in DTOs instead of importing enum type
+2. **Soft Delete Pattern**: prisma-extension-soft-delete handles soft delete automatically - no special logic needed in service
+3. **RBAC Pattern**: Consistent with User module - @Roles(ADMIN) on write operations, public on reads
+4. **Module Export**: Always export service for use in related modules (Missionary will import RegionService)
+
