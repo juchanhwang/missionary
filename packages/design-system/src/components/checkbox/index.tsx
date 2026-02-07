@@ -1,16 +1,9 @@
 'use client';
 
-// TODO: (주찬) 아직 작업 중인 컴포넌트입니다. [24-04-15]
-
-import styled from '@emotion/styled';
 import { useControllableState } from '@hooks';
 import React, { useContext, createContext, useMemo } from 'react';
 
 import { CheckboxGroupActionsContext } from '../checkbox-group/checkboxGroupContext';
-
-const StyledInput = styled.input`
-  display: none;
-`;
 
 export const CheckboxActionsContext = createContext<{
   onChange: (checked: boolean) => void;
@@ -49,7 +42,6 @@ export function Checkbox({
   ref,
   ...props
 }: CheckboxProps) {
-  // useSafeContext를 사용하지 않습니다. Checkbox 단독으로 사용할 경우 groupActions는 undefined이어야합니다.
   const groupActions = useContext(CheckboxGroupActionsContext);
 
   const [checked, onChange] = useControllableState<boolean>(
@@ -81,8 +73,7 @@ export function Checkbox({
   return (
     <CheckboxActionsContext.Provider value={actions}>
       <CheckboxDataContext.Provider value={data}>
-        {/* TODO: Input 컴포넌트로 변경 */}
-        <StyledInput
+        <input
           readOnly
           type="checkbox"
           role="checkbox"
@@ -91,6 +82,7 @@ export function Checkbox({
           value={value}
           disabled={disabled}
           name={name}
+          className="hidden"
         />
         <div
           className={className}

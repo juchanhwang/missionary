@@ -1,5 +1,3 @@
-import { ButtonColorMap } from './ButtonLayout';
-
 import { Button } from '.';
 
 import type { ButtonProps } from '.';
@@ -16,7 +14,7 @@ const meta: Meta<ButtonProps> = {
       control: { type: 'select', options: ['sm', 'md', 'lg', 'xlg', 'xxlg'] },
     },
     color: {
-      control: { type: 'select', options: Object.keys(ButtonColorMap) },
+      control: { type: 'select', options: ['primary', 'secondary'] },
     },
     width: {
       control: { type: 'text' },

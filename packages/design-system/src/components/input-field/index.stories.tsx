@@ -20,7 +20,7 @@ function DefaultStory() {
         label="라벨"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        maxLength={100}
+        onClear={() => setValue('')}
         placeholder="플레이스홀더 텍스트"
       />
     </div>
@@ -29,6 +29,26 @@ function DefaultStory() {
 
 export const Default: Story = {
   render: () => <DefaultStory />,
+};
+
+function WithClearButtonStory() {
+  const [value, setValue] = useState('입력된 텍스트');
+
+  return (
+    <div style={{ width: '320px' }}>
+      <InputField
+        label="Clear 버튼 포함"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onClear={() => setValue('')}
+        placeholder="플레이스홀더 텍스트"
+      />
+    </div>
+  );
+}
+
+export const WithClearButton: Story = {
+  render: () => <WithClearButtonStory />,
 };
 
 function WithErrorStory() {
@@ -40,7 +60,7 @@ function WithErrorStory() {
         label="라벨"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        maxLength={100}
+        onClear={() => setValue('')}
         error="에러 메시지입니다"
       />
     </div>
@@ -56,9 +76,8 @@ export const Disabled: Story = {
     <div style={{ width: '320px' }}>
       <InputField
         label="라벨"
-        value=""
+        value="비활성 상태"
         placeholder="비활성 상태"
-        maxLength={100}
         disabled
       />
     </div>

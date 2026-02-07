@@ -1,16 +1,9 @@
 'use client';
 
-// TODO: (주찬) 아직 작업 중인 컴포넌트입니다. [24-05-15]
-
-import styled from '@emotion/styled';
 import { useControllableState } from '@hooks';
 import React, { useContext, createContext, useMemo } from 'react';
 
 import { RadioGroupActionsContext } from '../radio-group/radioGroupContext';
-
-const StyledInput = styled.input`
-  display: none;
-`;
 
 export const RadioActionsContext = createContext<{
   onChange: (checked: boolean) => void;
@@ -49,7 +42,6 @@ export function Radio({
   ref,
   ...props
 }: RadioProps) {
-  // useSafeContext를 사용하지 않습니다. Checkbox 단독으로 사용할 경우 groupActions는 undefined이어야합니다.
   const groupActions = useContext(RadioGroupActionsContext);
   const [checked, onChange] = useControllableState<boolean>(
     controlledChecked,
@@ -80,8 +72,7 @@ export function Radio({
   return (
     <RadioActionsContext.Provider value={actions}>
       <RadioDataContext.Provider value={data}>
-        {/* TODO: Input 컴포넌트로 변경 */}
-        <StyledInput
+        <input
           readOnly
           type="radio"
           role="radio"
@@ -90,6 +81,7 @@ export function Radio({
           value={value}
           disabled={disabled}
           name={name}
+          className="hidden"
         />
         <div
           className={className}

@@ -5,7 +5,7 @@ import { SelectActionsContext } from './index';
 
 import type { ButtonHTMLAttributes } from 'react';
 
-interface TriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface TriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   ref?: React.Ref<HTMLButtonElement>;
 }
 export const SelectTrigger = ({ children, ref, ...props }: TriggerProps) => {

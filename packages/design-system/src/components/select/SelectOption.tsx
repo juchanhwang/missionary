@@ -5,7 +5,7 @@ import { SelectActionsContext } from './index';
 
 import type { HTMLAttributes } from 'react';
 
-interface SelectOptionProps extends HTMLAttributes<HTMLLIElement> {
+export interface SelectOptionProps extends HTMLAttributes<HTMLLIElement> {
   item: string;
   ref?: React.Ref<HTMLLIElement>;
 }

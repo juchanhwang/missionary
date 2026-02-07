@@ -1,6 +1,6 @@
 'use client';
 
-import { TopButtonRoot } from './TopButtonLayout';
+import classnames from 'classnames';
 
 interface TopButtonProps {
   onClick?: () => void;
@@ -9,10 +9,13 @@ interface TopButtonProps {
 
 export function TopButton({ onClick, className }: TopButtonProps) {
   return (
-    <TopButtonRoot
+    <button
       type="button"
       onClick={onClick}
-      className={className}
+      className={classnames(
+        'flex items-center justify-center w-12 h-12 p-0 border border-gray-05 rounded-full bg-white opacity-70 cursor-pointer hover:opacity-100',
+        className,
+      )}
       aria-label="맨 위로 이동"
     >
       <svg
@@ -30,7 +33,7 @@ export function TopButton({ onClick, className }: TopButtonProps) {
           strokeLinejoin="round"
         />
       </svg>
-    </TopButtonRoot>
+    </button>
   );
 }
 TopButton.displayName = 'TopButton';

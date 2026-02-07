@@ -1,12 +1,7 @@
 'use client';
 
-import styled from '@emotion/styled';
 import { useControllableState } from '@hooks';
 import React, { createContext, useMemo } from 'react';
-
-const StyledInput = styled.input`
-  display: none;
-`;
 
 export const SwitchActionsContext = createContext<{
   onChange: (checked: boolean) => void;
@@ -69,7 +64,7 @@ export function Switch({
   return (
     <SwitchActionsContext.Provider value={actions}>
       <SwitchDataContext.Provider value={data}>
-        <StyledInput
+        <input
           readOnly
           type="checkbox"
           role="switch"
@@ -78,6 +73,7 @@ export function Switch({
           value={value}
           disabled={disabled}
           name={name}
+          className="hidden"
         />
         <div
           className={className}

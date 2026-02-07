@@ -4,7 +4,7 @@ import { createContext } from 'react';
 
 import type { ComponentProps } from 'react';
 
-interface ModalDispatchContextType {
+export interface ModalDispatchContextType {
   openModal: <T extends React.ElementType>(
     Component: T,
     props: ComponentProps<T>,

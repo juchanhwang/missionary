@@ -5,7 +5,7 @@ import { SelectDataContext } from './index';
 
 import type { HTMLProps } from 'react';
 
-interface SelectOptionsProps extends HTMLProps<HTMLUListElement> {
+export interface SelectOptionsProps extends HTMLProps<HTMLUListElement> {
   label?: string;
   ref?: React.Ref<HTMLUListElement>;
 }

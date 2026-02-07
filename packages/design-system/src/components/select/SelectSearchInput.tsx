@@ -5,7 +5,7 @@ import { SelectDataContext } from './index';
 
 import type { InputHTMLAttributes } from 'react';
 
-interface SelectSearchInputProps extends Omit<
+export interface SelectSearchInputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'onChange'
 > {

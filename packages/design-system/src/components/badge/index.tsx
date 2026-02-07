@@ -1,8 +1,6 @@
 'use client';
 
-import { colors } from '@styles/color';
-
-import { BadgeRoot } from './BadgeLayout';
+import classnames from 'classnames';
 
 import type { ReactNode } from 'react';
 
@@ -14,26 +12,23 @@ interface BadgeProps {
   className?: string;
 }
 
-const variantStyles: Record<
-  BadgeVariant,
-  { backgroundColor: string; textColor: string }
-> = {
-  success: { backgroundColor: colors.green90, textColor: colors.green50 },
-  warning: { backgroundColor: colors.error90, textColor: colors.error30 },
-  info: { backgroundColor: colors.primary90, textColor: colors.primary20 },
+const variantClasses: Record<BadgeVariant, string> = {
+  success: 'bg-green-10 text-green-50',
+  warning: 'bg-error-10 text-error-70',
+  info: 'bg-primary-10 text-primary-80',
 };
 
 export function Badge({ variant, children, className }: BadgeProps) {
-  const { backgroundColor, textColor } = variantStyles[variant];
-
   return (
-    <BadgeRoot
-      backgroundColor={backgroundColor}
-      textColor={textColor}
-      className={className}
+    <span
+      className={classnames(
+        'inline-flex items-center px-2 py-1 rounded text-sm font-bold leading-[1.429] whitespace-nowrap',
+        variantClasses[variant],
+        className,
+      )}
     >
       {children}
-    </BadgeRoot>
+    </span>
   );
 }
 Badge.displayName = 'Badge';
