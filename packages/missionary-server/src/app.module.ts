@@ -12,6 +12,7 @@ import { PrismaModule } from './database/prisma.module';
 import { MissionaryModule } from './missionary/missionary.module';
 import { ParticipationModule } from './participation/participation.module';
 import { RegionModule } from './region/region.module';
+import { StaffModule } from './staff/staff.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -24,6 +25,7 @@ import { UserModule } from './user/user.module';
     RegionModule,
     ChurchModule,
     MissionaryModule,
+    StaffModule,
     ParticipationModule,
   ],
   controllers: [AppController],

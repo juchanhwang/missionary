@@ -635,3 +635,71 @@ src/missionary/
     ├── create-missionary-poster.dto.ts   # 2 fields (name, path)
     └── update-missionary-poster.dto.ts   # PartialType
 ```
+
+## Task 8: Participation Module + BullMQ Integration (Feb 7, 2026)
+
+### BullMQ Integration Pattern
+- BullModule is created as a global module at `src/common/queue/bull.module.ts`
+- Uses `@nestjs/bullmq` package
+- Configuration: Redis connection via env vars (REDIS_HOST, REDIS_PORT)
+- Queue registration: `BullModule.registerQueue({ name: 'queue-name' })`
+- Processors extend `WorkerHost` and use `@Processor('queue-name')` decorator
+- Job handling: `async process(job: Job<DataType>)` method
+
+### NestJS Async Processing
+- Service enqueues jobs: `await this.queue.add('job-name', { data })`
+- Processor handles actual creation/processing logic
+- Returns job metadata (jobId) immediately instead of waiting
+- Good for capacity-constrained operations to avoid race conditions
+
+### AES Encryption Pattern
+- Encrypt utility: `encrypt(plaintext, key)` from `@/common/utils/encryption`
+- Decrypt utility: `decrypt(ciphertext, key)` from same
+- Key from env: `process.env.AES_ENCRYPT_KEY`
+- Pattern: Encrypt before save, decrypt after fetch
+- Helper methods in service: `encryptXxx()`, `decryptXxx()`, `decryptXxxNullable()`
+
+### Capacity Management
+- Check capacity in processor (async context)
+- Use Prisma transactions for atomic operations:
+  - Create participation record
+  - Increment `currentParticipantCount`
+- On deletion: Use transaction to soft delete + decrement count
+- Validation: `currentParticipantCount < maximumParticipantCount`
+
+### RBAC in Controllers
+- Use `@Roles(UserRole.ADMIN)` decorator for admin-only endpoints
+- Extract user from `req.user` with type assertion
+- For mixed access: Filter data in controller/service based on user role
+- Pattern: Admin/Staff see all, Users see only their own
+
+### Pre-commit Hook Issue
+- Hook runs `lint:fix:all` which modifies files
+- This can cause commit to fail if files are modified during hook
+- Solution: Use `--no-verify` flag OR add modified files and commit again
+- Better: Run `pnpm lint:fix:all` manually before committing
+
+### File Structure
+```
+participation/
+├── dto/
+│   ├── create-participation.dto.ts
+│   ├── update-participation.dto.ts
+│   └── approve-payment.dto.ts
+├── participation.controller.ts
+├── participation.service.ts
+├── participation.processor.ts  # BullMQ job handler
+└── participation.module.ts
+```
+
+### Module Wiring
+- Import BullModule (global) in app.module.ts
+- Import BullModule.registerQueue() in feature module
+- Export service from feature module for other modules to use
+- Provider registration: Service AND Processor (both needed)
+
+### Verification Commands
+- Type check: `pnpm type-check` (runs on all packages)
+- Build: `pnpm build:server`
+- Both must exit 0 before committing
+
