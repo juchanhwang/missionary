@@ -1,5 +1,6 @@
 'use client';
 
+import { Button, IconButton } from '@samilhero/design-system';
 import { useAuth } from 'lib/auth/AuthContext';
 
 interface HeaderProps {
@@ -13,31 +14,33 @@ export function Header({
 
   return (
     <header className="relative flex items-center w-full h-[100px] bg-white">
-      <span className="absolute left-[40px] top-1/2 -translate-y-1/2 text-[28px] font-bold leading-[1.214] text-primary-20">
+      <span className="absolute left-[40px] top-1/2 -translate-y-1/2 text-[28px] font-bold leading-[1.214] text-primary-80">
         {statusText}
       </span>
       <div className="absolute right-[40px] top-1/2 -translate-y-1/2 flex items-center gap-[16px]">
         {user && (
-          <span className="text-[14px] font-medium leading-[1.43] text-gray-40">
+          <span className="text-[14px] font-medium leading-[1.43] text-gray-60">
             {user.email}
           </span>
         )}
-        <button
+        <Button
           type="button"
+          size="sm"
+          variant="outline"
           onClick={logout}
-          className="px-[12px] py-[6px] border border-gray-90 rounded-[6px] bg-transparent text-[13px] font-medium font-inherit leading-[1.38] text-gray-40 cursor-pointer hover:bg-gray-98"
+          className="!border-gray-10 !text-gray-60 !rounded-[6px] hover:!bg-gray-02"
         >
           로그아웃
-        </button>
-        <button
+        </Button>
+        <IconButton
           type="button"
-          className="flex items-center gap-[4px] p-0 border-0 bg-transparent cursor-pointer"
-        >
-          <img src="/icon-home.svg" alt="" className="w-[34px] h-[34px]" />
-          <span className="text-[28px] font-bold leading-[1.214] text-black">
-            홈으로
-          </span>
-        </button>
+          variant="ghost"
+          icon={
+            <img src="/icon-home.svg" alt="" className="w-[34px] h-[34px]" />
+          }
+          label="홈으로"
+          className="!h-auto !text-[28px] !font-bold !text-black"
+        />
       </div>
     </header>
   );

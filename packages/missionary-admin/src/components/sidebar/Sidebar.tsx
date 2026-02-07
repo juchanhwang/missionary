@@ -1,5 +1,6 @@
 'use client';
 
+import { NavItem } from '@samilhero/design-system';
 import { useState } from 'react';
 
 interface SubMenu {
@@ -30,26 +31,6 @@ const MENU_DATA: MenuGroup[] = [
   },
 ];
 
-function ChevronDownIcon() {
-  return (
-    <svg
-      width="12"
-      height="6"
-      viewBox="0 0 12 6"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M1 1L6 5L11 1"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 export function Sidebar() {
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(
     new Set(['국내선교']),
@@ -68,7 +49,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed top-0 left-0 z-10 flex flex-col w-[260px] h-screen bg-primary-30">
+    <aside className="fixed top-0 left-0 z-10 flex flex-col w-[260px] h-screen bg-primary-70">
       <div className="w-[260px] h-[100px]">
         <img
           src="/logo-sidebar.svg"
@@ -76,38 +57,30 @@ export function Sidebar() {
           className="w-full h-full"
         />
       </div>
-      <div className="w-[260px] h-[4px] bg-gray-95" />
+      <div className="w-[260px] h-[4px] bg-gray-05" />
       <nav className="flex flex-col flex-1 overflow-y-auto">
         {MENU_DATA.map((group) => {
           const expanded = expandedMenus.has(group.label);
 
           return (
             <div key={group.label}>
-              <button
-                type="button"
+              <NavItem
+                label={group.label}
                 onClick={() => toggleMenu(group.label)}
-                className="relative flex items-center w-[260px] h-[55px] px-[20px] border-0 border-b border-gray-95 bg-transparent text-white font-inherit text-[16px] font-normal leading-[1.375] text-left cursor-pointer hover:bg-white/5"
-              >
-                {group.label}
-                {group.subMenus.length > 0 && (
-                  <span
-                    className={`absolute right-[16px] flex items-center justify-center w-[24px] h-[24px] transition-transform duration-200 text-white ${
-                      expanded ? 'rotate-180' : 'rotate-0'
-                    }`}
-                  >
-                    <ChevronDownIcon />
-                  </span>
-                )}
-              </button>
+                hasChildren={group.subMenus.length > 0}
+                isExpanded={expanded}
+                depth={0}
+                className="w-[260px] border-b border-gray-05"
+              />
               {expanded &&
                 group.subMenus.map((sub) => (
-                  <button
+                  <NavItem
                     key={sub.label}
-                    type="button"
-                    className="flex items-center w-[260px] h-[55px] px-[24px] border-0 border-b border-gray-95 bg-white/8 text-primary-20 font-inherit text-[16px] font-normal leading-[1.375] text-left cursor-pointer hover:bg-white/12"
-                  >
-                    {sub.label}
-                  </button>
+                    label={sub.label}
+                    href={sub.href}
+                    depth={1}
+                    className="w-[260px] border-b border-gray-05"
+                  />
                 ))}
             </div>
           );

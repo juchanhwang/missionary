@@ -18,7 +18,7 @@ export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <div className="flex min-h-screen">
           <Sidebar />
-          <div className="flex flex-col flex-1 ml-[260px] bg-primary-90">
+          <div className="flex flex-col flex-1 ml-[260px] bg-primary-10">
             <Header />
             <main className="flex-1 p-[40px_60px]">{children}</main>
           </div>

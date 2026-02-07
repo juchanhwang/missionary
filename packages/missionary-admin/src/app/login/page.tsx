@@ -1,8 +1,8 @@
 'use client';
 
-import { Button } from '@samilhero/design-system';
+import { Button, InputField } from '@samilhero/design-system';
 import { useLogin } from 'hooks/auth';
-import { type FormEvent, useEffect, useState } from 'react';
+import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -51,7 +51,7 @@ export default function LoginPage() {
       >
         <img
           src="/logo-horizontal.svg"
-          alt="로고"
+          alt="삼일교회 로고"
           className="w-[228px] h-[60px] mb-[50px]"
         />
         <h1 className="m-[0_0_12px] text-[34px] font-bold leading-[1.18] text-center text-black">
@@ -64,25 +64,31 @@ export default function LoginPage() {
           <br />
           로그인 하세요.
         </p>
-        <input
-          type="email"
-          placeholder="이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full h-[48px] px-[16px] py-[13px] border-none rounded-[8px] bg-gray-98 text-[14px] leading-[1.43] text-black box-border placeholder:text-gray-70 focus:outline-none"
-        />
-        <input
-          type="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full h-[48px] px-[16px] py-[13px] border-none rounded-[8px] bg-gray-98 text-[14px] leading-[1.43] text-black box-border placeholder:text-gray-70 focus:outline-none mt-[12px]"
-        />
-        {error && (
-          <p className="w-full mt-[8px] text-[13px] leading-[1.38] text-secondary-50">
-            {error}
-          </p>
-        )}
+        <div className="flex flex-col w-full gap-[12px]">
+          <InputField
+            label="이메일"
+            hideLabel
+            type="email"
+            placeholder="이메일"
+            value={email}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setEmail(e.target.value)
+            }
+            className="w-full"
+          />
+          <InputField
+            label="비밀번호"
+            hideLabel
+            type="password"
+            placeholder="비밀번호"
+            value={password}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setPassword(e.target.value)
+            }
+            error={error}
+            className="w-full"
+          />
+        </div>
         <div className="w-full mt-[12px]">
           <Button
             type="submit"
@@ -95,25 +101,31 @@ export default function LoginPage() {
           </Button>
         </div>
 
-        <div className="relative flex items-center justify-center w-full my-[24px] before:content-[''] before:flex-1 before:h-[1px] before:bg-gray-90 after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-90">
-          <span className="px-[12px] text-[13px] text-gray-70">또는</span>
+        <div className="relative flex items-center justify-center w-full my-[24px] before:content-[''] before:flex-1 before:h-[1px] before:bg-gray-10 after:content-[''] after:flex-1 after:h-[1px] after:bg-gray-10">
+          <span className="px-[12px] text-[13px] text-gray-30">또는</span>
         </div>
 
         <div className="flex flex-col gap-[12px] w-full">
-          <button
+          <Button
             type="button"
+            size="lg"
+            variant="outline"
+            width={400}
             onClick={handleGoogleLogin}
-            className="flex items-center justify-center w-full h-[48px] rounded-[8px] text-[15px] font-semibold font-inherit leading-[1.4] cursor-pointer transition-opacity duration-150 hover:opacity-85 border border-gray-90 bg-white text-gray-30"
+            className="!bg-[#F2F2F2] !border-[#747775] !text-[#1F1F1F] hover:!bg-[#E8E8E8]"
           >
             Google로 로그인
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            size="lg"
+            variant="filled"
+            width={400}
             onClick={handleKakaoLogin}
-            className="flex items-center justify-center w-full h-[48px] rounded-[8px] text-[15px] font-semibold font-inherit leading-[1.4] cursor-pointer transition-opacity duration-150 hover:opacity-85 border-none bg-[#FEE500] text-[#191919]"
+            className="!bg-[#FEE500] !text-[#191919] hover:!bg-[#E6CF00] !border-none"
           >
             Kakao로 로그인
-          </button>
+          </Button>
         </div>
       </form>
     </div>
