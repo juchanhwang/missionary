@@ -1,6 +1,7 @@
 'use client';
 
-import { IconInputError, IconInputReset } from '@assets/icons';
+import IconInputError from '@assets/icons/icon-input-error.svg';
+import IconInputReset from '@assets/icons/icon-input-reset.svg';
 import classnames from 'classnames';
 import React from 'react';
 

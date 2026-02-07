@@ -11,17 +11,8 @@ const resolveDesignSystemAliases = {
   name: 'resolve-design-system-aliases',
   enforce: 'pre' as const,
   resolveId(id: string, importer?: string) {
-    // Handle SVG imports - mock them immediately
+    // Handle SVG imports - mock them immediately (before any other resolution)
     if (id.endsWith('.svg')) {
-      return '\0virtual:svg-mock';
-    }
-
-    // Handle relative SVG imports from design-system
-    if (
-      id.startsWith('./') &&
-      id.endsWith('.svg') &&
-      importer?.includes('design-system')
-    ) {
       return '\0virtual:svg-mock';
     }
 
@@ -92,8 +83,28 @@ const resolveDesignSystemAliases = {
   },
 } as const;
 
+const svgMockPlugin = {
+  name: 'svg-mock',
+  enforce: 'pre' as const,
+  resolveId(id: string) {
+    if (id.endsWith('.svg')) {
+      return '\0virtual:svg-mock';
+    }
+  },
+  load(id: string) {
+    if (id === '\0virtual:svg-mock') {
+      return 'export default "svg-mock";';
+    }
+  },
+} as const;
+
 export default defineConfig({
-  plugins: [react(), tsconfigPaths(), resolveDesignSystemAliases],
+  plugins: [
+    svgMockPlugin,
+    react(),
+    tsconfigPaths(),
+    resolveDesignSystemAliases,
+  ],
   test: {
     environment: 'jsdom',
     globals: true,
