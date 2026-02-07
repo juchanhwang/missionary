@@ -484,3 +484,154 @@ packages/missionary-server/src/
 3. **RBAC Pattern**: Consistent with User module - @Roles(ADMIN) on write operations, public on reads
 4. **Module Export**: Always export service for use in related modules (Missionary will import RegionService)
 
+## [2026-02-07] Task 6: Church Module
+
+### Module Created
+- Full CRUD for Church master data
+- Admin + Staff: create, update, delete
+- Public: list, get by ID
+
+### RBAC Applied
+- @Roles(ADMIN, STAFF) on POST, PATCH, DELETE
+- No decorator on GET (public access)
+
+### Fields
+- name (required)
+- pastorName, pastorPhone (optional, flattened from Pastor embedded object)
+- addressBasic, addressDetail (optional, flattened from Address embedded object)
+
+### Soft Delete
+- Uses Prisma extension from Task 1
+- remove() method calls prisma.church.delete()
+- Extension automatically sets deletedAt instead of hard delete
+
+### Files Created
+- `src/church/church.module.ts` — Module definition
+- `src/church/church.controller.ts` — 5 endpoints (POST, GET, GET/:id, PATCH/:id, DELETE/:id)
+- `src/church/church.service.ts` — 5 CRUD methods
+- `src/church/dto/create-church.dto.ts` — Create request DTO
+- `src/church/dto/update-church.dto.ts` — Update request DTO
+
+### Files Modified
+- `src/app.module.ts` — Added ChurchModule to imports
+
+### Verification
+- ✅ pnpm type-check: Exit 0 (no TypeScript errors)
+- ✅ pnpm build:server: Exit 0 (build successful)
+
+### Lessons Learned
+1. **DTO Property Initialization**: NestJS DTOs with class-validator need `!` non-null assertion on required properties in strict mode
+2. **Module Export Pattern**: Always export service for use in related modules (Missionary module will import ChurchService in Task 7)
+3. **RBAC Consistency**: Admin + Staff pattern matches Region module - write operations require both roles, reads are public
+4. **Soft Delete Transparency**: prisma-extension-soft-delete handles all soft delete logic - service code is identical to hard delete
+
+
+## [2026-02-07] Task 7: Missionary Module Refactoring
+
+### Directory Renamed
+- `src/mission/` → `src/missionary/` (aligned with Spring naming convention)
+- All imports updated across app.module.ts
+
+### Expanded Fields (from Prisma Schema)
+- **Pastor**: pastorName, pastorPhone (flattened from Spring @Embeddable)
+- **Participation Period**: participationStartDate, participationEndDate (flattened from Period)
+- **Price & Limits**: price, description, maximumParticipantCount, currentParticipantCount
+- **Bank Account**: bankName, bankAccountHolder, bankAccountNumber (flattened from BankAccount)
+- **Status Enum**: RECRUITING, IN_PROGRESS, COMPLETED
+- **Region Relation**: regionId (required, many-to-one with MissionaryRegion)
+
+### DTOs Created (6 DTOs)
+1. **CreateMissionaryDto**: All required + optional fields with validation decorators
+   - Required: name, startDate, endDate, participationStartDate, participationEndDate, regionId
+   - Optional: pastorName, pastorPhone, price, description, maximumParticipantCount, bankName, bankAccountHolder, bankAccountNumber, status
+2. **UpdateMissionaryDto**: Extends PartialType(CreateMissionaryDto)
+3. **CreateMissionaryChurchDto**: name (required), visitPurpose, pastorName, pastorPhone, addressBasic, addressDetail (optional)
+4. **UpdateMissionaryChurchDto**: Extends PartialType(CreateMissionaryChurchDto)
+5. **CreateMissionaryPosterDto**: name, path (both required, metadata only)
+6. **UpdateMissionaryPosterDto**: Extends PartialType(CreateMissionaryPosterDto)
+
+### Service Methods (14 methods)
+**Main CRUD**:
+- `create(userId, dto)` — Create with all fields, include region relation
+- `findAll()` — List with region relation, ordered by createdAt desc
+- `findOne(id)` — Get with region, posters, churches relations, throws NotFoundException
+- `update(id, dto)` — Conditional field updates, verifies existence first
+- `remove(id)` — Soft delete via prisma-extension-soft-delete
+
+**MissionaryChurch Sub-resource**:
+- `addChurch(missionaryId, dto)` — Create MissionaryChurch, verifies missionary exists
+- `getChurches(missionaryId)` — List churches for missionary, ordered by createdAt desc
+- `removeChurch(missionaryId, churchId)` — Soft delete church, verifies ownership
+
+**MissionaryPoster Sub-resource**:
+- `addPoster(missionaryId, dto)` — Create MissionaryPoster, verifies missionary exists
+- `getPosters(missionaryId)` — List posters for missionary, ordered by createdAt desc
+- `removePoster(missionaryId, posterId)` — Soft delete poster, verifies ownership
+
+### Controller Endpoints (12 endpoints)
+**Main CRUD**:
+- `POST /missionaries` — @Roles(ADMIN), create missionary
+- `GET /missionaries` — Public, list all
+- `GET /missionaries/:id` — Public, get by ID
+- `PATCH /missionaries/:id` — @Roles(ADMIN), update
+- `DELETE /missionaries/:id` — @Roles(ADMIN), soft delete
+
+**MissionaryChurch**:
+- `POST /missionaries/:id/churches` — @Roles(ADMIN), add church
+- `GET /missionaries/:id/churches` — Public, list churches
+- `DELETE /missionaries/:id/churches/:churchId` — @Roles(ADMIN), remove church
+
+**MissionaryPoster**:
+- `POST /missionaries/:id/posters` — @Roles(ADMIN), add poster
+- `GET /missionaries/:id/posters` — Public, list posters
+- `DELETE /missionaries/:id/posters/:posterId` — @Roles(ADMIN), remove poster
+
+### RBAC Applied
+- Admin-only: All POST, PATCH, DELETE operations (main + sub-resources)
+- Public: All GET operations
+- Pattern: `@Roles(UserRole.ADMIN)` on write endpoints, no decorator on reads
+
+### Relations Included
+- **Missionary → Region**: Many-to-one (required), included in create/findAll/findOne/update
+- **Missionary → MissionaryPoster[]**: One-to-many, included in findOne
+- **Missionary → MissionaryChurch[]**: One-to-many, included in findOne
+
+### Module Configuration
+- Imports: PrismaModule (no RegionModule/ChurchModule needed, relations handled by Prisma)
+- Exports: MissionaryService (for use in Participation/Staff/Board modules)
+
+### Verification
+- ✅ `pnpm type-check`: Exit 0 (zero TypeScript errors)
+- ✅ `pnpm build:server`: Success
+
+### Lessons Learned
+1. **Sub-resource Pattern**: Nested endpoints (`/missionaries/:id/churches`) cleanly separate concerns
+2. **Validation Decorators**: `@IsUUID()` for regionId enforces type safety at API boundary
+3. **Existence Checks**: Always verify parent resource exists before creating/listing sub-resources
+4. **Ownership Verification**: Sub-resource deletion checks both existence AND missionaryId ownership
+5. **PartialType Pattern**: UpdateDto automatically inherits all validation rules from CreateDto
+6. **Soft Delete Transparency**: Service code identical for hard/soft delete - extension handles logic
+7. **Date Conversion**: DTOs accept ISO date strings, service converts to Date objects before Prisma
+8. **Include Strategy**: Main CRUD includes region, findOne includes all relations (region, posters, churches)
+
+### Spring Compatibility Notes
+- Spring's CreateMissionaryRequest only had 5 fields (name, startDate, endDate, pastorName, regionId)
+- NestJS CreateMissionaryDto expanded to 15 fields (matches full Prisma schema)
+- Spring's UpdateAdminMissionaryRequest matched CreateMissionaryRequest (no status field)
+- NestJS UpdateMissionaryDto includes status field via PartialType inheritance
+- Spring used @Embeddable for Pastor/BankAccount/Period - NestJS flattens to columns
+
+### File Structure
+```
+src/missionary/
+├── missionary.module.ts          # Module with PrismaModule import
+├── missionary.controller.ts      # 12 endpoints (CRUD + sub-resources)
+├── missionary.service.ts         # 14 methods (CRUD + sub-resource helpers)
+└── dto/
+    ├── create-missionary.dto.ts          # 15 fields (all Prisma columns)
+    ├── update-missionary.dto.ts          # PartialType
+    ├── create-missionary-church.dto.ts   # 6 fields (name + flattened Pastor/Address)
+    ├── update-missionary-church.dto.ts   # PartialType
+    ├── create-missionary-poster.dto.ts   # 2 fields (name, path)
+    └── update-missionary-poster.dto.ts   # PartialType
+```

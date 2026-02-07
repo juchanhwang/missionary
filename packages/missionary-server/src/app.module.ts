@@ -5,10 +5,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { ChurchModule } from './church/church.module';
 import { RolesGuard } from './common/guards/roles.guard';
 import { PrismaModule } from './database/prisma.module';
-import { ChurchModule } from './church/church.module';
-import { MissionModule } from './mission/mission.module';
+import { MissionaryModule } from './missionary/missionary.module';
 import { RegionModule } from './region/region.module';
 import { UserModule } from './user/user.module';
 
@@ -20,7 +20,7 @@ import { UserModule } from './user/user.module';
     AuthModule,
     RegionModule,
     ChurchModule,
-    MissionModule,
+    MissionaryModule,
   ],
   controllers: [AppController],
   providers: [
