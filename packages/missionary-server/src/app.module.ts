@@ -5,6 +5,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { BoardModule } from './board/board.module';
 import { ChurchModule } from './church/church.module';
 import { RolesGuard } from './common/guards/roles.guard';
 import { BullModule } from './common/queue/bull.module';
@@ -29,6 +30,7 @@ import { UserModule } from './user/user.module';
     StaffModule,
     ParticipationModule,
     TeamModule,
+    BoardModule,
   ],
   controllers: [AppController],
   providers: [
