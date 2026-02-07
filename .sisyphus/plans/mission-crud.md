@@ -86,12 +86,12 @@
 
 ### Definition of Done
 
-- [ ] `pnpm build:admin` 성공 (exit code 0)
-- [ ] `pnpm build:ds` 성공 (exit code 0)
-- [ ] `pnpm build:server` 성공 (exit code 0)
-- [ ] `pnpm type-check` 성공 (exit code 0)
-- [ ] `pnpm lint:all` 성공 (exit code 0)
-- [ ] 어드민 Vitest 테스트 전체 통과
+- [x] `pnpm build:admin` 성공 (exit code 0)
+- [ ] `pnpm build:ds` 성공 (exit code 0) - BLOCKED: Pre-existing SVG file issue
+- [x] `pnpm build:server` 성공 (exit code 0)
+- [x] `pnpm type-check` 성공 (exit code 0)
+- [ ] `pnpm lint:all` 성공 (exit code 0) - BLOCKED: Prisma generated files have lint errors
+- [ ] 어드민 Vitest 테스트 전체 통과 - BLOCKED: DeleteConfirmModal test (SVG import issue)
 
 ### Must Have
 
@@ -633,7 +633,7 @@ Wave 4 (After Wave 3 — navigation wiring):
 
 ---
 
-- [ ] 6. 선교 생성 페이지
+- [x] 6. 선교 생성 페이지
 
   **What to do**:
   - `packages/missionary-admin/src/app/(admin)/missions/create/page.tsx` 생성:
@@ -750,7 +750,7 @@ Wave 4 (After Wave 3 — navigation wiring):
 
 ---
 
-- [ ] 7. 선교 리스트 페이지
+- [x] 7. 선교 리스트 페이지
 
   **What to do**:
   - `packages/missionary-admin/src/app/(admin)/missions/page.tsx` 생성:
@@ -858,7 +858,7 @@ Wave 4 (After Wave 3 — navigation wiring):
 
 ---
 
-- [ ] 8. 선교 수정/삭제 페이지
+- [x] 8. 선교 수정/삭제 페이지
 
   **What to do**:
   - `packages/missionary-admin/src/app/(admin)/missions/[id]/edit/page.tsx` 생성:
@@ -979,7 +979,7 @@ Wave 4 (After Wave 3 — navigation wiring):
 
 ---
 
-- [ ] 9. 네비게이션 연결 (대시보드 버튼 + 사이드바 동적 메뉴)
+- [x] 9. 네비게이션 연결 (대시보드 버튼 + 사이드바 동적 메뉴)
 
   **What to do**:
 
