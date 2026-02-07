@@ -13,6 +13,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
 import { AuthService } from './auth.service';
+import { AdminLoginDto } from './dto/admin-login.dto';
 import { LoginDto } from './dto/login.dto';
 import { OAuthExceptionFilter } from './filters/oauth-exception.filter';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
@@ -76,6 +77,19 @@ export class AuthController {
     this.setTokenCookies(res, tokens);
 
     return { message: '로그인 성공' };
+  }
+
+  @Post('admin/login')
+  @ApiOperation({ summary: '관리자 로그인 (loginId/password)' })
+  async adminLogin(
+    @Body() adminLoginDto: AdminLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const tokens = await this.authService.loginAdmin(adminLoginDto);
+
+    this.setTokenCookies(res, tokens);
+
+    return { message: '관리자 로그인 성공' };
   }
 
   @Get('google')

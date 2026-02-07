@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 
 import { UserService } from '@/user/user.service';
 
+import type { AdminLoginDto } from './dto/admin-login.dto';
 import type { JwtPayload } from './interfaces/jwt-payload.interface';
 import type { AuthProvider } from '../../prisma/generated/prisma/client';
 
@@ -106,5 +107,27 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException('리프레시 토큰이 유효하지 않습니다');
     }
+  }
+
+  async loginAdmin(adminLoginDto: AdminLoginDto) {
+    const user = await this.userService.findByLoginIdAndRole(
+      adminLoginDto.loginId,
+      'ADMIN' as const,
+    );
+
+    if (!user || !user.password) {
+      throw new UnauthorizedException('관리자 인증에 실패했습니다');
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      adminLoginDto.password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('관리자 인증에 실패했습니다');
+    }
+
+    return this.generateTokens(user);
   }
 }

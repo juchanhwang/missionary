@@ -11,7 +11,11 @@ import { PrismaService } from '@/database/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-import type { AuthProvider, User } from '../../prisma/generated/prisma';
+import type {
+  AuthProvider,
+  User,
+  UserRole,
+} from '../../prisma/generated/prisma';
 
 @Injectable()
 export class UserService {
@@ -90,6 +94,13 @@ export class UserService {
   async findByProvider(provider: AuthProvider, providerId: string) {
     const user = await this.prisma.user.findFirst({
       where: { provider, providerId },
+    });
+    return this.decryptIdentityNumberNullable(user);
+  }
+
+  async findByLoginIdAndRole(loginId: string, role: UserRole) {
+    const user = await this.prisma.user.findFirst({
+      where: { loginId, role },
     });
     return this.decryptIdentityNumberNullable(user);
   }
