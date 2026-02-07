@@ -12,6 +12,7 @@ export default tseslint.config([
     '**/dist',
     '**/build',
     '**/storybook-static',
+    '**/generated',
   ]),
   {
     files: ['**/*.{ts,tsx}'],

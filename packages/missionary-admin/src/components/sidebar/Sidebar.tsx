@@ -4,7 +4,6 @@ import { NavItem } from '@samilhero/design-system';
 import { useMissionaries } from 'hooks/missionary';
 import { useState } from 'react';
 
-
 interface SubMenu {
   label: string;
   href: string;
