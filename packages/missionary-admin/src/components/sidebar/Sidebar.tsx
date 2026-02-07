@@ -1,7 +1,9 @@
 'use client';
 
 import { NavItem } from '@samilhero/design-system';
+import { useMissionaries } from 'hooks/missionary';
 import { useState } from 'react';
+
 
 interface SubMenu {
   label: string;
@@ -13,14 +15,7 @@ interface MenuGroup {
   subMenus: SubMenu[];
 }
 
-const MENU_DATA: MenuGroup[] = [
-  {
-    label: '국내선교',
-    subMenus: [
-      { label: '제주선교', href: '#' },
-      { label: '군선교', href: '#' },
-    ],
-  },
+const STATIC_MENU_DATA: MenuGroup[] = [
   {
     label: '해외선교',
     subMenus: [],
@@ -32,9 +27,22 @@ const MENU_DATA: MenuGroup[] = [
 ];
 
 export function Sidebar() {
+  const { data: missionaries } = useMissionaries();
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(
     new Set(['국내선교']),
   );
+
+  const MENU_DATA: MenuGroup[] = [
+    {
+      label: '국내선교',
+      subMenus:
+        missionaries?.map((m) => ({
+          label: m.name,
+          href: `/missions?name=${encodeURIComponent(m.name)}`,
+        })) ?? [],
+    },
+    ...STATIC_MENU_DATA,
+  ];
 
   const toggleMenu = (label: string) => {
     setExpandedMenus((prev) => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@samilhero/design-system';
+import Link from 'next/link';
 
 export default function MainPage() {
   return (
@@ -16,9 +17,11 @@ export default function MainPage() {
           선교 관리
         </h2>
         <div className="flex flex-col gap-[20px]">
-          <Button size="xlg" width={240} color="primary">
-            신규 국내선교 생성
-          </Button>
+          <Link href="/missions/create">
+            <Button size="xlg" width={240} color="primary">
+              신규 국내선교 생성
+            </Button>
+          </Link>
           <Button size="xlg" width={240} color="primary" variant="outline">
             신규 해외선교 생성
           </Button>
