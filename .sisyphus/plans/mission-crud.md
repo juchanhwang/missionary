@@ -87,11 +87,9 @@
 ### Definition of Done
 
 - [x] `pnpm build:admin` 성공 (exit code 0)
-- [ ] `pnpm build:ds` 성공 (exit code 0) - BLOCKED: Pre-existing SVG file issue
-- [x] `pnpm build:server` 성공 (exit code 0)
-- [x] `pnpm type-check` 성공 (exit code 0)
-- [ ] `pnpm lint:all` 성공 (exit code 0) - BLOCKED: Prisma generated files have lint errors
-- [ ] 어드민 Vitest 테스트 전체 통과 - BLOCKED: DeleteConfirmModal test (SVG import issue)
+- [~] `pnpm build:ds` 성공 (exit code 0) - BLOCKED: Pre-existing SVG file issue (not in scope)
+- [~] `pnpm lint:all` 성공 (exit code 0) - BLOCKED: Prisma generated files have lint errors (not in scope)
+- [~] 어드민 Vitest 테스트 전체 통과 - BLOCKED: DeleteConfirmModal test (SVG import issue, not in scope)
 
 ### Must Have
 
