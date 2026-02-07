@@ -7,20 +7,24 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ChurchModule } from './church/church.module';
 import { RolesGuard } from './common/guards/roles.guard';
+import { BullModule } from './common/queue/bull.module';
 import { PrismaModule } from './database/prisma.module';
 import { MissionaryModule } from './missionary/missionary.module';
+import { ParticipationModule } from './participation/participation.module';
 import { RegionModule } from './region/region.module';
 import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    BullModule,
     PrismaModule,
     UserModule,
     AuthModule,
     RegionModule,
     ChurchModule,
     MissionaryModule,
+    ParticipationModule,
   ],
   controllers: [AppController],
   providers: [
