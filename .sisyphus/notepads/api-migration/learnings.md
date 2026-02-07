@@ -209,3 +209,77 @@ packages/missionary-server/src/
 5. **Masking Direction**: Spring masks LAST 6 chars (not first N) — easy to get backwards
 6. **Jest Setup**: Simple `ts-jest` preset sufficient for NestJS — no complex configuration needed
 
+
+## [2026-02-07] Task 2: Prisma Schema Redesign
+
+### Models Created (15 models)
+1. **User** — Unified model merging Spring's Member/User/Admin with role enum (USER, ADMIN, STAFF)
+2. **MissionaryRegion** — Region with type (DOMESTIC/ABROAD)
+3. **Missionary** — Main missionary entity with flattened Period, Pastor, MissionaryDetail, BankAccount
+4. **MissionaryPoster** — Poster images with cascade delete
+5. **MissionaryStaff** — Staff assignments with role (LEADER/MEMBER), unique constraint on (missionaryId, userId)
+6. **MissionaryChurch** — Churches to visit with flattened Pastor and Address
+7. **MissionaryBoard** — Boards with type enum (NOTICE, BUS, ACCOMMODATION, FAQ, SCHEDULE)
+8. **MissionaryBoardFile** — Board attachments (metadata only, no file upload logic)
+9. **Participation** — Participation records with encrypted PII (identificationNumber)
+10. **Team** — Teams with leader user ID and name
+11. **TeamMember** — Team membership join table with cascade delete
+12. **Church** — Church master data with flattened Pastor and Address
+13. **Terms** — Terms and conditions with type, seq, isUsed, isEssential flags
+14. **TermsContent** — Terms content with apply date
+15. **UserTermsAgreement** — User agreement records
+
+### Enums Defined (7 enums)
+- **AuthProvider**: LOCAL, GOOGLE, KAKAO (kept from existing schema)
+- **UserRole**: USER, ADMIN, STAFF (changed from SUPER_ADMIN to STAFF)
+- **MissionaryRegionType**: DOMESTIC, ABROAD
+- **MissionaryBoardType**: NOTICE, BUS, ACCOMMODATION, FAQ, SCHEDULE
+- **MissionaryStaffRole**: LEADER, MEMBER
+- **MissionStatus**: RECRUITING, IN_PROGRESS, COMPLETED (kept from existing schema)
+- **TermsType**: USING_OF_SERVICE, PROCESSING_POLICY_OF_PRIVATE_INFO, USING_OF_PRIVATE_INFO, OFFERING_PRIVATE_INFO_TO_THIRD_PARTY
+
+### Flattening Decisions (Embedded Objects → Columns)
+- **Period** (from Spring @Embeddable) → `startDate DateTime`, `endDate DateTime`
+- **BankAccount** (from Spring @Embeddable) → `bankName String?`, `bankAccountHolder String?`, `bankAccountNumber String?`
+  - Note: Spring field names were `bankName`, `placeHolder`, `number` — renamed to be more explicit
+- **Pastor** (from Spring @Embeddable) → `pastorName String?`, `pastorPhone String?`
+- **Address** (from Spring @Embeddable) → `addressBasic String?`, `addressDetail String?`
+- **MissionaryDetail** (from Spring @Embeddable) → All fields flattened into Missionary:
+  - `participationStartDate`, `participationEndDate` (nested Period)
+  - `price`, `description`, `maximumParticipantCount`, `currentParticipantCount`
+  - `bankName`, `bankAccountHolder`, `bankAccountNumber` (nested BankAccount)
+
+### Relation Patterns
+- **One-to-Many with Cascade Delete**: MissionaryPoster, MissionaryBoardFile, TeamMember
+- **Many-to-One**: Missionary → MissionaryRegion, Missionary → User (creator), Participation → Team (optional)
+- **Unique Constraints**: MissionaryStaff(missionaryId, userId), User(provider, providerId)
+- **Optional Relations**: Team → Church (nullable churchId), Participation → Team (nullable teamId)
+- **Audit Trail Relations**: All models reference User via createdBy/updatedBy (UUID strings)
+
+### Migration Notes
+- **Schema Validation**: Prisma 7.x no longer allows `url` in datasource block — moved to prisma.config.ts
+- **Database Reset**: Successfully reset missionary_db with existing migrations (20260204, 20260206)
+- **New Migration**: Created `20260207060630_full_schema_redesign/migration.sql`
+- **Client Generation**: Prisma Client v7.3.0 generated to `./prisma/generated/prisma`
+- **Type Checking**: All packages pass TypeScript compilation with new schema
+
+### Key Design Choices
+1. **UUID Strategy**: All models use UUID PKs (`@id @default(uuid())`) — breaking change from Int IDs but necessary for distributed system design
+2. **Single User Table**: Merged Spring's 3-table polymorphism (Member ← User/Admin) into one User table with role enum for simplicity
+3. **Snake_Case Mapping**: All table/column names use `@@map()` and `@map()` for PostgreSQL convention compliance
+4. **Soft Delete**: Every model has `deletedAt DateTime?` field (prisma-extension-soft-delete configured in Task 1)
+5. **Audit Fields**: Standard audit fields on all models (createdAt, updatedAt, createdBy, updatedBy, version)
+6. **Encrypted Fields**: Marked fields for service-layer encryption: User.identityNumber, Participation.identificationNumber
+7. **Legacy Support**: Participation.memberId kept as nullable field for Spring DB compatibility during transition
+
+### Issues Discovered
+- **Prisma 7.x Breaking Change**: `datasource.url` must be removed from schema.prisma (now in prisma.config.ts)
+- **Docker Startup Time**: Docker daemon takes 4-10 seconds to become responsive after `open -a Docker`
+- **Spring Field Naming Inconsistency**: BankAccount.placeHolder vs bankAccountHolder — required normalization
+
+### Next Steps (Tasks 3-15)
+- Task 3: User/Auth module implementation (can start immediately)
+- Task 4: JWT/OAuth guards (can start immediately)
+- Tasks 5-15: Domain module implementations (all depend on this schema)
+- All models ready for Prisma Client usage with typed queries
+

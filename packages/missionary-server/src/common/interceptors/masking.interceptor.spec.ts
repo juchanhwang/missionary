@@ -1,5 +1,6 @@
-import { of } from 'rxjs';
 import { ExecutionContext, CallHandler } from '@nestjs/common';
+import { of } from 'rxjs';
+
 import { MaskingInterceptor } from './masking.interceptor';
 
 describe('MaskingInterceptor', () => {
