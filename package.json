@@ -4,7 +4,9 @@
   "private": true,
   "packageManager": "pnpm@10.28.1",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/client/*",
+    "packages/server/*"
   ],
   "scripts": {
     "lint": "eslint .",
@@ -15,7 +17,7 @@
     "stylelint:fix": "stylelint './packages/**/src/**/*.{css,scss}' --fix",
     "lint:all": "pnpm lint && pnpm prettier && pnpm stylelint",
     "lint:fix:all": "pnpm lint:fix && pnpm prettier:fix && pnpm stylelint:fix",
-    "type-check": "tsc --noEmit -p packages/design-system && tsc --noEmit -p packages/missionary-admin && tsc --noEmit -p packages/missionary-app && tsc --noEmit -p packages/missionary-server",
+    "type-check": "tsc --noEmit -p packages/client/design-system && tsc --noEmit -p packages/client/missionary-admin && tsc --noEmit -p packages/client/missionary-app && tsc --noEmit -p packages/server/missionary-server",
     "dev:admin": "pnpm --filter missionary-admin dev",
     "dev:app": "pnpm --filter missionary-app dev",
     "dev:ds": "pnpm --filter design-system dev",
