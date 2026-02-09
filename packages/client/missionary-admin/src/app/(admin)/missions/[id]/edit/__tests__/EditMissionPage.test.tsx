@@ -1,6 +1,6 @@
-import { useParams, useRouter } from 'next/navigation';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useParams, useRouter } from 'next/navigation';
 import { vi } from 'vitest';
 
 import { useDeleteMissionary } from '../../../hooks/useDeleteMissionary';
