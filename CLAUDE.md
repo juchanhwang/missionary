@@ -117,3 +117,30 @@ When creating commits, the AI Agent must follow these rules strictly:
 - `feat: 로그인 기능 구현`
 - `[SMH-123] fix: 회원가입 시 이메일 중복 체크 오류 수정`
 - `design: 메인 페이지 배너 스타일 변경`
+
+## Available Skills
+
+Atlas must evaluate these skills for EVERY delegation:
+
+### Client (Frontend) Skills
+
+- **client-code-quality**: 코드 품질 4원칙 (가독성, 예측 가능성, 응집도, 결합도). **MUST USE** for complex UI logic, refactoring, code review
+- **client-performance**: React 성능 최적화 (리렌더링 방지, 번들 크기, 로딩 성능)
+- **client-a11y**: 웹 접근성 (스크린 리더 3요소, ARIA, 키보드 접근성)
+- **client-react-state**: React 상태 관리 설계 (State Colocation, Props Drilling 해결)
+
+### Server (Backend) Skills
+
+- **server-api-design**: NestJS API 설계 (REST 컨벤션, DTO 검증, 에러 처리)
+- **security**: 보안 코딩 (XSS, 인젝션, 인증/인가, CORS)
+
+### Forgotten Skill Prevention
+
+When delegating tasks, Atlas MUST:
+
+1. Read skill descriptions above
+2. Ask: "Does this skill's domain overlap with my task?"
+3. If YES → Include in `load_skills=[...]`
+4. If NO → Justify why in delegation prompt
+
+**User-installed skills get PRIORITY.** When in doubt, INCLUDE rather than omit.
