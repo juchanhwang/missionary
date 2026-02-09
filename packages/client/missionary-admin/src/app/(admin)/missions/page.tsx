@@ -4,7 +4,7 @@ import { Badge, Button } from '@samilhero/design-system';
 import { Missionary } from 'apis/missionary';
 import { useMissionaries } from 'hooks/missionary/useMissionaries';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -36,8 +36,75 @@ const getStatusBadge = (status: Missionary['status']) => {
   }
 };
 
+function MissionListContent({
+  missionaries,
+  isLoading,
+}: {
+  missionaries: Missionary[] | undefined;
+  isLoading: boolean;
+}) {
+  if (isLoading) {
+    return <div className="text-center py-10">로딩 중...</div>;
+  }
+
+  const isEmpty = !missionaries || missionaries.length === 0;
+
+  if (isEmpty) {
+    return (
+      <div className="text-center py-10 text-gray-500">
+        등록된 선교가 없습니다
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse bg-white">
+        <thead>
+          <tr className="bg-gray-100 border-b">
+            <th className="p-3 text-left font-semibold text-gray-700">
+              선교 이름
+            </th>
+            <th className="p-3 text-left font-semibold text-gray-700">
+              선교 기간
+            </th>
+            <th className="p-3 text-left font-semibold text-gray-700">
+              담당 교역자
+            </th>
+            <th className="p-3 text-left font-semibold text-gray-700">상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          {missionaries.map((missionary) => (
+            <tr
+              key={missionary.id}
+              className="hover:bg-gray-50 border-b last:border-b-0 transition-colors"
+            >
+              <td className="p-3 text-gray-900">
+                <Link
+                  href={`/missions/${missionary.id}/edit`}
+                  className="text-primary-60 underline hover:text-primary-70"
+                >
+                  {missionary.name}
+                </Link>
+              </td>
+              <td className="p-3 text-gray-600">
+                {formatDate(missionary.startDate)} ~{' '}
+                {formatDate(missionary.endDate)}
+              </td>
+              <td className="p-3 text-gray-900">
+                {missionary.pastorName || '-'}
+              </td>
+              <td className="p-3">{getStatusBadge(missionary.status)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function MissionsPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const nameFilter = searchParams.get('name');
   const { data: missionaries, isLoading } = useMissionaries();
@@ -55,53 +122,10 @@ export default function MissionsPage() {
         </Link>
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-10">로딩 중...</div>
-      ) : !filteredMissionaries || filteredMissionaries.length === 0 ? (
-        <div className="text-center py-10 text-gray-500">
-          등록된 선교가 없습니다
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse bg-white">
-            <thead>
-              <tr className="bg-gray-100 border-b">
-                <th className="p-3 text-left font-semibold text-gray-700">
-                  선교 이름
-                </th>
-                <th className="p-3 text-left font-semibold text-gray-700">
-                  선교 기간
-                </th>
-                <th className="p-3 text-left font-semibold text-gray-700">
-                  담당 교역자
-                </th>
-                <th className="p-3 text-left font-semibold text-gray-700">
-                  상태
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredMissionaries.map((missionary) => (
-                <tr
-                  key={missionary.id}
-                  onClick={() => router.push(`/missions/${missionary.id}/edit`)}
-                  className="hover:bg-gray-50 cursor-pointer border-b last:border-b-0 transition-colors"
-                >
-                  <td className="p-3 text-gray-900">{missionary.name}</td>
-                  <td className="p-3 text-gray-600">
-                    {formatDate(missionary.startDate)} ~{' '}
-                    {formatDate(missionary.endDate)}
-                  </td>
-                  <td className="p-3 text-gray-900">
-                    {missionary.pastorName || '-'}
-                  </td>
-                  <td className="p-3">{getStatusBadge(missionary.status)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <MissionListContent
+        missionaries={filteredMissionaries}
+        isLoading={isLoading}
+      />
     </div>
   );
 }

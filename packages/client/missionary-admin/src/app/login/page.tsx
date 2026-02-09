@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, InputField } from '@samilhero/design-system';
+import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -19,18 +20,17 @@ export default function LoginPage() {
   });
 
   const loginMutation = useLogin();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const oauthError = params.get('error');
-
+    const oauthError = searchParams.get('error');
     if (oauthError) {
       form.setError('root.serverError', {
         message: '소셜 로그인에 실패했습니다. 다시 시도해주세요.',
       });
       window.history.replaceState({}, '', '/login');
     }
-  }, [form]);
+  }, [searchParams, form]);
 
   const onSubmit = (data: LoginFormData) => {
     loginMutation.mutate(data, {

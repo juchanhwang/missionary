@@ -9,7 +9,7 @@ import {
 } from '@samilhero/design-system';
 import { Controller, useForm } from 'react-hook-form';
 
-import { useCreateMissionary } from '../hooks/useCreateMissionary';
+import { useCreateMissionary } from './hooks/useCreateMissionary';
 import { useRegions } from '../hooks/useRegions';
 import { missionSchema, type MissionFormData } from '../schemas/missionSchema';
 

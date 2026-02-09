@@ -1,10 +1,5 @@
 import api from './instance';
-
-export interface Region {
-  id: string;
-  name: string;
-  type: 'DOMESTIC' | 'ABROAD';
-}
+import { type Region } from './region';
 
 export interface Missionary {
   id: string;

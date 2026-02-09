@@ -12,10 +12,10 @@ import { useState, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
-import { useDeleteMissionary } from '../../hooks/useDeleteMissionary';
-import { useMissionary } from '../../hooks/useMissionary';
+import { useDeleteMissionary } from './hooks/useDeleteMissionary';
+import { useMissionary } from './hooks/useMissionary';
+import { useUpdateMissionary } from './hooks/useUpdateMissionary';
 import { useRegions } from '../../hooks/useRegions';
-import { useUpdateMissionary } from '../../hooks/useUpdateMissionary';
 import {
   missionSchema,
   type MissionFormData,

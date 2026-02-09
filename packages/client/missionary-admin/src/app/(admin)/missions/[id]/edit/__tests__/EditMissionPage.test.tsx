@@ -3,10 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { useParams, useRouter } from 'next/navigation';
 import { vi } from 'vitest';
 
-import { useDeleteMissionary } from '../../../hooks/useDeleteMissionary';
-import { useMissionary } from '../../../hooks/useMissionary';
 import { useRegions } from '../../../hooks/useRegions';
-import { useUpdateMissionary } from '../../../hooks/useUpdateMissionary';
+import { useDeleteMissionary } from '../hooks/useDeleteMissionary';
+import { useMissionary } from '../hooks/useMissionary';
+import { useUpdateMissionary } from '../hooks/useUpdateMissionary';
 import EditMissionPage from '../page';
 
 vi.mock('next/navigation', () => ({
@@ -14,15 +14,15 @@ vi.mock('next/navigation', () => ({
   useParams: vi.fn(),
 }));
 
-vi.mock('../../../hooks/useMissionary', () => ({
+vi.mock('../hooks/useMissionary', () => ({
   useMissionary: vi.fn(),
 }));
 
-vi.mock('../../../hooks/useUpdateMissionary', () => ({
+vi.mock('../hooks/useUpdateMissionary', () => ({
   useUpdateMissionary: vi.fn(),
 }));
 
-vi.mock('../../../hooks/useDeleteMissionary', () => ({
+vi.mock('../hooks/useDeleteMissionary', () => ({
   useDeleteMissionary: vi.fn(),
 }));
 
