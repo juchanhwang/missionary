@@ -7,6 +7,7 @@ import {
   InputField,
   Select,
 } from '@samilhero/design-system';
+import { useRouter } from 'next/navigation';
 import { Controller, useForm } from 'react-hook-form';
 
 import { useCreateMissionary } from './hooks/useCreateMissionary';
@@ -14,6 +15,7 @@ import { useRegions } from '../hooks/useRegions';
 import { missionSchema, type MissionFormData } from '../schemas/missionSchema';
 
 export default function CreateMissionPage() {
+  const router = useRouter();
   const form = useForm<MissionFormData>({
     resolver: zodResolver(missionSchema),
     mode: 'onSubmit',
@@ -39,6 +41,9 @@ export default function CreateMissionPage() {
         participationEndDate: data.participationEndDate.toISOString(),
       },
       {
+        onSuccess: () => {
+          router.push('/missions');
+        },
         onError: (error) => {
           console.error('Failed to create missionary:', error);
         },

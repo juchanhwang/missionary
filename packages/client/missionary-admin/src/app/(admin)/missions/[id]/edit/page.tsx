@@ -247,7 +247,13 @@ export default function MissionaryEditPage() {
 
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
-        onConfirm={() => deleteMutation.mutate()}
+        onConfirm={() =>
+          deleteMutation.mutate(undefined, {
+            onSuccess: () => {
+              router.push('/missions');
+            },
+          })
+        }
         onCancel={() => setIsDeleteModalOpen(false)}
         missionaryName={missionary?.name || ''}
         isPending={deleteMutation.isPending}
