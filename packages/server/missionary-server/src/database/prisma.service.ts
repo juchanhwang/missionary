@@ -5,7 +5,6 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { createSoftDeleteExtension } from 'prisma-extension-soft-delete';
 
 import { PrismaClient } from '../../prisma/generated/prisma';
 
@@ -29,18 +28,48 @@ export class PrismaService
           : ['warn', 'error'],
     });
 
-    return this.$extends(
-      createSoftDeleteExtension({
-        models: {},
-        defaultConfig: {
-          field: 'deletedAt',
-          createValue: (deleted: boolean) => {
-            if (deleted) return new Date();
-            return null;
+    return this.$extends({
+      query: {
+        $allModels: {
+          async delete({ model, args, query }) {
+            return (this as any)[model].update({
+              ...args,
+              data: { deletedAt: new Date() },
+            });
+          },
+          async deleteMany({ model, args, query }) {
+            return (this as any)[model].updateMany({
+              ...args,
+              data: { deletedAt: new Date() },
+            });
+          },
+          async findFirst({ args, query }) {
+            args.where = { ...args.where, deletedAt: null };
+            return query(args);
+          },
+          async findFirstOrThrow({ args, query }) {
+            args.where = { ...args.where, deletedAt: null };
+            return query(args);
+          },
+          async findMany({ args, query }) {
+            args.where = { ...args.where, deletedAt: null };
+            return query(args);
+          },
+          async findUnique({ args, query }) {
+            args.where = { ...args.where, deletedAt: null };
+            return query(args);
+          },
+          async findUniqueOrThrow({ args, query }) {
+            args.where = { ...args.where, deletedAt: null };
+            return query(args);
+          },
+          async updateMany({ args, query }) {
+            args.where = { ...args.where, deletedAt: null };
+            return query(args);
           },
         },
-      }),
-    ) as this;
+      },
+    }) as this;
   }
 
   async onModuleInit() {
