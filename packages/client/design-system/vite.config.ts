@@ -29,12 +29,8 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: '@assets/icons',
-        replacement: resolve(srcPath, 'assets/icons/index.ts'),
-      },
-      {
-        find: /^@assets\//,
-        replacement: resolve(srcPath, 'assets/'),
+        find: /^@assets/,
+        replacement: resolve(srcPath, 'assets'),
       },
       {
         find: '@assets',
@@ -82,7 +78,13 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'classnames',
+        'react-datepicker',
+      ],
       output: {
         globals: {
           react: 'React',

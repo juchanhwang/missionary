@@ -1,4 +1,13 @@
 /* stylelint-disable selector-class-pattern */
+
+/*
+ * react-datepicker 커스텀 오버라이드
+ *
+ * 주의: 앱 레벨의 CSS reset(margin/padding 초기화)에 의해
+ * react-datepicker 내부 레이아웃이 깨질 수 있으므로,
+ * 필요한 spacing 값을 명시적으로 선언합니다.
+ */
+
 .react-datepicker-wrapper {
   width: 100%;
 }
@@ -10,12 +19,14 @@
 
 .react-datepicker {
   font-family: inherit;
+  font-size: 0.8rem;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   box-shadow:
     0 4px 6px -1px rgb(0 0 0 / 10%),
     0 2px 4px -1px rgb(0 0 0 / 6%);
   background-color: white;
+  line-height: initial;
 }
 
 .react-datepicker__header {
@@ -23,12 +34,35 @@
   border-bottom: 1px solid #e5e7eb;
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
-  padding-top: 0.5rem;
+  padding: 8px 0;
+  text-align: center;
 }
 
 .react-datepicker__current-month {
+  margin-top: 0;
   font-weight: 600;
+  font-size: 0.944rem;
   color: #111827;
+}
+
+h2.react-datepicker__current-month {
+  padding: 0;
+  margin: 0;
+}
+
+.react-datepicker__day-names {
+  margin-bottom: -8px;
+  white-space: nowrap;
+}
+
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  display: inline-block;
+  width: 2.125em;
+  line-height: 2.125em;
+  text-align: center;
+  margin: 0.208em;
 }
 
 .react-datepicker__day-name {
@@ -65,8 +99,16 @@
   color: #9ca3af;
 }
 
+.react-datepicker__month {
+  margin: 0.5em;
+  text-align: center;
+}
+
 .react-datepicker__navigation {
   top: 0.7rem;
+  padding: 0;
+  height: 32px;
+  width: 32px;
 }
 
 .react-datepicker__navigation-icon::before {
@@ -75,4 +117,28 @@
 
 .react-datepicker__triangle {
   display: none;
+}
+
+.react-datepicker__year-dropdown-container--select,
+.react-datepicker__month-dropdown-container--select,
+.react-datepicker__year-dropdown-container--scroll,
+.react-datepicker__month-dropdown-container--scroll {
+  margin: 0 15px;
+}
+
+.react-datepicker__time-container
+  .react-datepicker__time
+  .react-datepicker__time-box
+  ul.react-datepicker__time-list {
+  margin: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.react-datepicker__time-container
+  .react-datepicker__time
+  .react-datepicker__time-box
+  ul.react-datepicker__time-list
+  li.react-datepicker__time-list-item {
+  padding: 5px 10px;
 }
