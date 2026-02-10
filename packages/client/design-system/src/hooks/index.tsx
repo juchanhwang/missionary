@@ -8,3 +8,4 @@ export { useEvent } from './useEvent';
 export { useLatestValue } from './useLatestValue';
 export { useControllableState } from './useControllableState';
 export { useSafeContext } from './useSafeContext';
+export { useMergeRefs } from './useMergeRefs';
