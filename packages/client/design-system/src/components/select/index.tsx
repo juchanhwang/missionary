@@ -2,7 +2,7 @@
 
 // TODO: (주찬) 아직 작업 중인 컴포넌트입니다. [24-03-30]
 
-import { useControllableState } from '@hooks';
+import { useControllableState, useMergeRefs } from '@hooks';
 import React, {
   createContext,
   useCallback,
@@ -37,6 +37,9 @@ interface SelectRootProps {
   children?: React.ReactNode;
   className?: string;
   onChange?(value?: ValueType): void;
+  onBlur?: () => void;
+  name?: string;
+  ref?: React.Ref<HTMLDivElement>;
 }
 const SelectRoot = ({
   defaultValue,
@@ -44,8 +47,13 @@ const SelectRoot = ({
   onChange: controlledOnChange,
   children,
   multiple = false,
+  onBlur,
+  name,
+  ref,
 }: SelectRootProps) => {
   const selectRef = useRef<HTMLDivElement>(null);
+  const mergedRef = useMergeRefs(ref, selectRef);
+  const onBlurRef = useRef(onBlur);
   const [open, setOpen] = useState(false);
   const [selectedValue = multiple ? [] : undefined, setSelectedValue] =
     useControllableState<ValueType>(
@@ -53,6 +61,10 @@ const SelectRoot = ({
       controlledOnChange,
       defaultValue,
     );
+
+  useEffect(() => {
+    onBlurRef.current = onBlur;
+  }, [onBlur]);
 
   const handleSelectValue = useCallback(
     (item: string) => {
@@ -68,8 +80,13 @@ const SelectRoot = ({
       }
 
       setSelectedValue(selectedList);
+
+      if (!multiple) {
+        setOpen(false);
+        onBlurRef.current?.();
+      }
     },
-    [multiple, selectedValue],
+    [multiple, selectedValue, setSelectedValue],
   );
 
   useEffect(() => {
@@ -79,6 +96,7 @@ const SelectRoot = ({
         !selectRef.current.contains(event.target as Node)
       ) {
         setOpen(false);
+        onBlurRef.current?.();
       }
     };
 
@@ -106,7 +124,7 @@ const SelectRoot = ({
   return (
     <SelectActionsContext.Provider value={actions}>
       <SelectDataContext.Provider value={data}>
-        <div ref={selectRef} style={{ position: 'relative' }}>
+        <div ref={mergedRef} data-name={name} style={{ position: 'relative' }}>
           {children}
         </div>
       </SelectDataContext.Provider>

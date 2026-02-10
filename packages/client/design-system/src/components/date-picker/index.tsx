@@ -12,11 +12,14 @@ export interface DatePickerProps {
   hideLabel?: boolean;
   error?: string;
   selected?: Date | null;
+  value?: Date | null;
   onChange: (date: Date | null) => void;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
   id?: string;
+  name?: string;
+  onBlur?: () => void;
   ref?: React.Ref<HTMLInputElement>;
   // Range & Common props
   startDate?: Date | null;
@@ -31,7 +34,6 @@ export interface DatePickerProps {
   timeIntervals?: number;
   timeCaption?: string;
   isClearable?: boolean;
-  [key: string]: any;
 }
 
 export function DatePicker({
@@ -39,17 +41,22 @@ export function DatePicker({
   hideLabel = false,
   error,
   selected,
+  value,
   onChange,
   placeholder,
   disabled,
   className,
   id: providedId,
+  name,
+  onBlur,
   ref,
   ...rest
 }: DatePickerProps) {
   const generatedId = useId();
   const inputId = providedId ?? generatedId;
   const errorId = `${inputId}-error`;
+
+  const dateValue = value ?? selected;
 
   return (
     <div className={classnames('relative flex flex-col', className)}>
@@ -72,14 +79,15 @@ export function DatePicker({
       >
         <ReactDatePicker
           id={inputId}
-          selected={selected}
+          selected={dateValue}
           onChange={onChange as any}
           placeholderText={placeholder}
           disabled={disabled}
+          name={name}
+          onBlur={onBlur}
           className="w-full border-0 bg-transparent text-black text-sm leading-[1.428] focus:outline-none placeholder:text-gray-30 disabled:text-primary-30"
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? errorId : undefined}
-          customInputRef={ref as any}
           autoComplete="off"
           dateFormat="yyyy-MM-dd"
           {...rest}
