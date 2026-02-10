@@ -2,8 +2,8 @@
 
 export function AuthLoadingFallback() {
   return (
-    <div className="flex justify-center items-center h-screen w-full bg-[#f5f5f5]">
-      <div className="w-[48px] h-[48px] border-[4px] border-[#e0e0e0] border-t-[#1976d2] rounded-full animate-spin" />
+    <div className="flex justify-center items-center h-screen w-full bg-gray-02">
+      <div className="w-12 h-12 border-4 border-gray-10 border-t-primary-60 rounded-full animate-spin" />
     </div>
   );
 }

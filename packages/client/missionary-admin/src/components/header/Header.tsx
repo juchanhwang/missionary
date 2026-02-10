@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, IconButton } from '@samilhero/design-system';
+import { IconButton } from '@samilhero/design-system';
 import { useAuth } from 'lib/auth/AuthContext';
 
 interface HeaderProps {
@@ -13,33 +13,28 @@ export function Header({
   const { user, logout } = useAuth();
 
   return (
-    <header className="relative flex items-center w-full h-[100px] bg-white">
-      <span className="absolute left-[40px] top-1/2 -translate-y-1/2 text-[28px] font-bold leading-[1.214] text-primary-80">
+    <header className="relative flex items-center w-full h-24 bg-white">
+      <span className="absolute left-10 top-1/2 -translate-y-1/2 text-[28px] font-bold leading-snug text-primary-80">
         {statusText}
       </span>
-      <div className="absolute right-[40px] top-1/2 -translate-y-1/2 flex items-center gap-[16px]">
+      <div className="absolute right-10 top-1/2 -translate-y-1/2 flex items-center gap-4">
         {user && (
-          <span className="text-[14px] font-medium leading-[1.43] text-gray-60">
+          <span className="text-sm font-medium leading-normal text-gray-60">
             {user.email}
           </span>
         )}
-        <Button
+        <button
           type="button"
-          size="sm"
-          variant="outline"
           onClick={logout}
-          className="!border-gray-10 !text-gray-60 !rounded-[6px] hover:!bg-gray-02"
+          className="px-3 py-1.5 rounded-md border border-gray-10 text-sm text-gray-60 hover:bg-gray-02 transition-colors"
         >
           로그아웃
-        </Button>
+        </button>
         <IconButton
           type="button"
           variant="ghost"
-          icon={
-            <img src="/icon-home.svg" alt="" className="w-[34px] h-[34px]" />
-          }
+          icon={<img src="/icon-home.svg" alt="" className="w-8 h-8" />}
           label="홈으로"
-          className="!h-auto !text-[28px] !font-bold !text-black"
         />
       </div>
     </header>
