@@ -1,3 +1,5 @@
+import 'react-datepicker/dist/react-datepicker.css';
+import '../../../design-system/src/components/date-picker/DatePickerStyles.css';
 import 'styles/tailwind.css';
 import 'styles/_global.scss';
 import { QueryProvider } from 'lib/QueryProvider';

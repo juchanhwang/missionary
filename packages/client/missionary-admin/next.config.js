@@ -1,6 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  transpilePackages: ['@samilhero/design-system'],
-};
+const nextConfig = {};
 
 module.exports = nextConfig;

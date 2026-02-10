@@ -54,6 +54,29 @@ const MissionPage = () => (
 
 > 판단 기준: 구현 상세를 추상화하여 컴포넌트가 본연의 비즈니스 로직에만 집중하게 한다.
 
+**데이터 패칭을 Hook으로 분리**: 컴포넌트는 "무엇을" 가져오는지만 알면 된다. "어떻게" 가져오는지(queryKey, queryFn, 캐시 전략 등)는 데이터 패칭의 구현 상세이므로 별도 Hook으로 분리한다.
+
+```tsx
+// ❌ BAD: 컴포넌트가 데이터 패칭의 구현 상세를 알고 있음
+function TabNavigation() {
+  const { data: categories } = useSuspenseQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  });
+  return <Tab>{categories.map(...)}</Tab>;
+}
+```
+
+```tsx
+// ✅ GOOD: 컴포넌트는 "카테고리가 필요하다"만 표현
+function TabNavigation() {
+  const { data: categories } = useGetCategories();
+  return <Tab>{categories.map(...)}</Tab>;
+}
+```
+
+> 판단 기준: 데이터 패칭은 횡단 관심사다. queryKey, queryFn, staleTime 등의 설정은 컴포넌트의 관심사가 아니므로 Hook으로 추상화하여 관심사를 분리하고, 테스트 시 자연스러운 mock 경계를 제공한다.
+
 **로직 종류에 따라 함수 쪼개기**: 하나의 Hook이나 함수가 너무 많은 책임이나 상태를 가지지 않게 한다.
 
 ```tsx
