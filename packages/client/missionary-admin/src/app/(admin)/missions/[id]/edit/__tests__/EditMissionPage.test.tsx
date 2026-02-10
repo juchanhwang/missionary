@@ -31,7 +31,14 @@ vi.mock('../../../hooks/useRegions', () => ({
 }));
 
 describe('EditMissionPage', () => {
-  const mockRouter = { push: vi.fn() };
+  const mockRouter = {
+    push: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  };
   const mockMutate = vi.fn();
   const mockDeleteMutate = vi.fn();
 
