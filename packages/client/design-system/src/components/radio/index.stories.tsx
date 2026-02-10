@@ -24,7 +24,7 @@ const RadioComponent = ({
       <Radio
         {...args}
         value="value1"
-        onChange={(newChecked) => setChecked(newChecked)}
+        onChange={(e) => setChecked(e.target.checked)}
         className={classnames(
           'flex items-center w-[200px] cursor-pointer',
           args.disabled && 'cursor-not-allowed',

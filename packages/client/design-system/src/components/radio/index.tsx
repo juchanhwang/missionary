@@ -1,7 +1,7 @@
 'use client';
 
-import { useControllableState } from '@hooks';
-import React, { useContext, createContext, useMemo } from 'react';
+import { useControllableState, useMergeRefs } from '@hooks';
+import React, { useContext, createContext, useMemo, useRef } from 'react';
 
 import { RadioGroupActionsContext } from '../radio-group/radioGroupContext';
 
@@ -21,7 +21,7 @@ interface RadioProps extends Omit<
 > {
   defaultChecked?: boolean;
   checked?: boolean;
-  onChange?: (checked: boolean) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string;
   name?: string;
   disabled?: boolean;
@@ -43,11 +43,15 @@ export function Radio({
   ...props
 }: RadioProps) {
   const groupActions = useContext(RadioGroupActionsContext);
+  const internalRef = useRef<HTMLInputElement>(null);
+
   const [checked, onChange] = useControllableState<boolean>(
     controlledChecked,
-    controlledOnChange,
+    undefined,
     defaultChecked,
   );
+
+  const mergedRef = useMergeRefs(ref, internalRef);
 
   const actions = useMemo(
     () => ({
@@ -62,26 +66,32 @@ export function Radio({
     [checked],
   );
 
-  const handleClick = () => {
-    onChange?.(true);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newChecked = e.target.checked;
+    onChange(newChecked);
+    controlledOnChange?.(e);
     if (value && groupActions) {
       groupActions.changeValue?.(value);
     }
+  };
+
+  const handleClick = () => {
+    internalRef.current?.click();
   };
 
   return (
     <RadioActionsContext.Provider value={actions}>
       <RadioDataContext.Provider value={data}>
         <input
-          readOnly
           type="radio"
           role="radio"
-          ref={ref}
+          ref={mergedRef}
           checked={checked}
           value={value}
           disabled={disabled}
           name={name}
-          className="hidden"
+          className="sr-only"
+          onChange={handleInputChange}
         />
         <div
           className={className}

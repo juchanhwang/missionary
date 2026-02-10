@@ -22,8 +22,8 @@ export const Primary: Story = {
           <Switch
             {...args}
             checked={checked}
-            onChange={(newChecked) => {
-              setChecked(newChecked);
+            onChange={(e) => {
+              setChecked(e.target.checked);
             }}
             value={'value'}
             className={classnames(

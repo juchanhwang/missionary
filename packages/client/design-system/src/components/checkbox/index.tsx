@@ -1,7 +1,7 @@
 'use client';
 
-import { useControllableState } from '@hooks';
-import React, { useContext, createContext, useMemo } from 'react';
+import { useControllableState, useMergeRefs } from '@hooks';
+import React, { useContext, createContext, useMemo, useRef } from 'react';
 
 import { CheckboxGroupActionsContext } from '../checkbox-group/checkboxGroupContext';
 
@@ -21,7 +21,7 @@ interface CheckboxProps extends Omit<
 > {
   defaultChecked?: boolean;
   checked?: boolean;
-  onChange?: (checked: boolean) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string;
   name?: string;
   disabled?: boolean;
@@ -43,12 +43,15 @@ export function Checkbox({
   ...props
 }: CheckboxProps) {
   const groupActions = useContext(CheckboxGroupActionsContext);
+  const internalRef = useRef<HTMLInputElement>(null);
 
   const [checked, onChange] = useControllableState<boolean>(
     controlledChecked,
-    controlledOnChange,
+    undefined,
     defaultChecked,
   );
+
+  const mergedRef = useMergeRefs(ref, internalRef);
 
   const actions = useMemo(
     () => ({
@@ -63,26 +66,32 @@ export function Checkbox({
     [checked],
   );
 
-  const handleClick = () => {
-    onChange?.(!checked);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newChecked = e.target.checked;
+    onChange(newChecked);
+    controlledOnChange?.(e);
     if (value && groupActions) {
       groupActions.updateCheckedValue?.(value);
     }
+  };
+
+  const handleClick = () => {
+    internalRef.current?.click();
   };
 
   return (
     <CheckboxActionsContext.Provider value={actions}>
       <CheckboxDataContext.Provider value={data}>
         <input
-          readOnly
           type="checkbox"
           role="checkbox"
-          ref={ref}
+          ref={mergedRef}
           checked={checked}
           value={value}
           disabled={disabled}
           name={name}
-          className="hidden"
+          className="sr-only"
+          onChange={handleInputChange}
         />
         <div
           className={className}
