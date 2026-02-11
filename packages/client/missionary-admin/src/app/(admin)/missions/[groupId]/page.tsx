@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@samilhero/design-system';
-import { CalendarX } from 'lucide-react';
+import { CalendarX, Pencil } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { MissionStatusBadge } from '../_components/MissionStatusBadge';
@@ -51,6 +51,14 @@ export default function MissionGroupDetailPage() {
             >
               {group.type === 'ABROAD' ? '해외' : '국내'}
             </span>
+            <button
+              type="button"
+              onClick={() => router.push(`/missions/${groupId}/edit-group`)}
+              className="p-1 text-gray-50 hover:text-gray-90 transition-colors"
+              aria-label="그룹 수정"
+            >
+              <Pencil size={14} />
+            </button>
           </div>
           {group.description && (
             <p className="text-sm text-gray-50">{group.description}</p>
@@ -60,7 +68,7 @@ export default function MissionGroupDetailPage() {
           size="sm"
           onClick={() => router.push(`/missions/${groupId}/create`)}
         >
-          N차 선교 추가
+          선교 추가
         </Button>
       </div>
 
@@ -107,7 +115,7 @@ export default function MissionGroupDetailPage() {
                       등록된 선교가 없습니다
                     </p>
                     <p className="text-xs text-gray-40">
-                      &apos;N차 선교 추가&apos; 버튼으로 새 선교를 등록하세요
+                      &apos;선교 추가&apos; 버튼으로 새 선교를 등록하세요
                     </p>
                   </div>
                 </td>
