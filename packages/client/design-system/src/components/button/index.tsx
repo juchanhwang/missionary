@@ -8,11 +8,11 @@ type ButtonSize = 'sm' | 'md' | 'lg' | 'xlg' | 'xxlg';
 type ButtonVariant = 'filled' | 'outline';
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'h-8',
-  md: 'h-10',
-  lg: 'h-12',
-  xlg: 'h-[52px]',
-  xxlg: 'h-14 rounded-none',
+  sm: 'h-8 px-3 text-sm gap-1',
+  md: 'h-10 px-4 text-sm gap-1.5',
+  lg: 'h-12 px-5 text-base gap-2',
+  xlg: 'h-[52px] px-6 text-base gap-2',
+  xxlg: 'h-14 px-6 text-lg gap-2 rounded-none',
 };
 
 const filledColorClasses: Record<ButtonColor, string> = {
@@ -52,7 +52,7 @@ export function Button({
   return (
     <button
       className={cn(
-        'text-base font-bold rounded-lg transition-colors',
+        'inline-flex items-center justify-center font-semibold rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-50 focus-visible:ring-offset-2',
         sizeClasses[size],
         variant === 'filled'
           ? filledColorClasses[color]

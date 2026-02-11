@@ -8,13 +8,16 @@ const meta: Meta<ButtonProps> = {
   component: Button,
   argTypes: {
     variant: {
-      control: { type: 'select', options: ['filled', 'outline'] },
+      control: { type: 'select' },
+      options: ['filled', 'outline'],
     },
     size: {
-      control: { type: 'select', options: ['sm', 'md', 'lg', 'xlg', 'xxlg'] },
+      control: { type: 'select' },
+      options: ['sm', 'md', 'lg', 'xlg', 'xxlg'],
     },
     color: {
-      control: { type: 'select', options: ['primary', 'secondary'] },
+      control: { type: 'select' },
+      options: ['primary', 'neutral'],
     },
     width: {
       control: { type: 'text' },
@@ -29,39 +32,67 @@ type Story = StoryObj<ButtonProps>;
 export const Filled: Story = {
   args: {
     variant: 'filled',
-    width: '100px',
     size: 'md',
     color: 'primary',
-    children: 'Filled Button',
+    children: 'Button',
   },
 };
 
 export const Outline: Story = {
   args: {
     variant: 'outline',
-    width: '100px',
     size: 'md',
     color: 'primary',
-    children: 'Outline Button',
+    children: 'Button',
   },
 };
 
-export const XXLarge: Story = {
+export const Neutral: Story = {
   args: {
     variant: 'filled',
-    width: '200px',
-    size: 'xxlg',
-    color: 'primary',
-    children: 'XXLarge Button',
+    size: 'md',
+    color: 'neutral',
+    children: 'Button',
   },
 };
 
-export const CustomColor: Story = {
+export const NeutralOutline: Story = {
+  args: {
+    variant: 'outline',
+    size: 'md',
+    color: 'neutral',
+    children: 'Button',
+  },
+};
+
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex items-end gap-3">
+      <Button size="sm">Small</Button>
+      <Button size="md">Medium</Button>
+      <Button size="lg">Large</Button>
+      <Button size="xlg">XLarge</Button>
+      <Button size="xxlg">XXLarge</Button>
+    </div>
+  ),
+};
+
+export const FullWidth: Story = {
   args: {
     variant: 'filled',
-    width: '150px',
-    size: 'md',
-    color: 'primary',
-    children: 'Custom Color Button',
+    size: 'lg',
+    width: '100%',
+    children: 'Full Width Button',
   },
+};
+
+export const Disabled: Story = {
+  render: () => (
+    <div className="flex items-center gap-3">
+      <Button disabled>Filled</Button>
+      <Button variant="outline" disabled>
+        Outline
+      </Button>
+    </div>
+  ),
 };
