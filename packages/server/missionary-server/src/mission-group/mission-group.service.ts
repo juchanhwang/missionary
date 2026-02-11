@@ -21,7 +21,6 @@ export class MissionGroupService {
 
   async findAll() {
     return this.prisma.missionGroup.findMany({
-      where: { deletedAt: null },
       include: {
         _count: {
           select: { missionaries: true },
@@ -65,7 +64,6 @@ export class MissionGroupService {
     const missionaryCount = await this.prisma.missionary.count({
       where: {
         missionGroupId: id,
-        deletedAt: null,
       },
     });
 
@@ -75,9 +73,8 @@ export class MissionGroupService {
       );
     }
 
-    return this.prisma.missionGroup.update({
+    return this.prisma.missionGroup.delete({
       where: { id },
-      data: { deletedAt: new Date() },
     });
   }
 }

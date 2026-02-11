@@ -7,12 +7,15 @@ import {
   UseFilters,
   UseGuards,
   Body,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
+import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { Public } from '@/common/decorators/public.decorator';
+import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 
 import { AuthService } from './auth.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
@@ -65,15 +68,9 @@ export class AuthController {
   @ApiOperation({ summary: 'ID/PW 로그인' })
   login(
     @Body() _loginDto: LoginDto,
-    @Req() req: Request,
+    @CurrentUser() user: AuthenticatedUser,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = req.user as {
-      id: string;
-      email: string;
-      role: string;
-      provider: string;
-    };
     const tokens = this.authService.generateTokens(user);
 
     this.setTokenCookies(res, tokens);
@@ -109,13 +106,7 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @UseFilters(OAuthExceptionFilter)
   @ApiOperation({ summary: 'Google OAuth 콜백' })
-  googleCallback(@Req() req: Request, @Res() res: Response) {
-    const user = req.user as {
-      id: string;
-      email: string;
-      role: string;
-      provider: string;
-    };
+  googleCallback(@CurrentUser() user: AuthenticatedUser, @Res() res: Response) {
     const tokens = this.authService.generateTokens(user);
 
     this.setTokenCookies(res, tokens);
@@ -141,13 +132,7 @@ export class AuthController {
   @UseGuards(KakaoAuthGuard)
   @UseFilters(OAuthExceptionFilter)
   @ApiOperation({ summary: 'Kakao OAuth 콜백' })
-  kakaoCallback(@Req() req: Request, @Res() res: Response) {
-    const user = req.user as {
-      id: string;
-      email: string;
-      role: string;
-      provider: string;
-    };
+  kakaoCallback(@CurrentUser() user: AuthenticatedUser, @Res() res: Response) {
     const tokens = this.authService.generateTokens(user);
 
     this.setTokenCookies(res, tokens);
@@ -169,8 +154,7 @@ export class AuthController {
     const refreshToken = req.cookies?.refresh_token;
 
     if (!refreshToken) {
-      res.status(401).json({ message: '리프레시 토큰이 없습니다' });
-      return;
+      throw new UnauthorizedException('리프레시 토큰이 없습니다');
     }
 
     const tokens = await this.authService.refreshAccessToken(refreshToken);
@@ -182,8 +166,8 @@ export class AuthController {
 
   @Get('me')
   @ApiOperation({ summary: '현재 로그인 사용자 정보 조회' })
-  getMe(@Req() req: Request) {
-    return req.user;
+  getMe(@CurrentUser() user: AuthenticatedUser) {
+    return user;
   }
 
   @Public()

@@ -6,15 +6,16 @@ import {
 } from '@nestjs/common';
 import { Queue } from 'bullmq';
 
-import { decrypt, encrypt } from '@/common/utils/encryption';
+import { EncryptionService } from '@/common/encryption/encryption.service';
 import { PrismaService } from '@/database/prisma.service';
 
 import { CreateParticipationDto } from './dto/create-participation.dto';
 import { UpdateParticipationDto } from './dto/update-participation.dto';
+import { Prisma } from '../../prisma/generated/prisma';
 
 import type { Participation } from '../../prisma/generated/prisma';
 
-interface FindAllFilters {
+export interface FindAllFilters {
   missionaryId?: string;
   userId?: string;
   isPaid?: boolean;
@@ -22,33 +23,25 @@ interface FindAllFilters {
 
 @Injectable()
 export class ParticipationService {
-  private readonly encryptKey: string;
-
   constructor(
     private readonly prisma: PrismaService,
+    private readonly encryptionService: EncryptionService,
     @InjectQueue('participation-queue') private readonly queue: Queue,
-  ) {
-    this.encryptKey = process.env.AES_ENCRYPT_KEY || '';
-
-    if (!this.encryptKey) {
-      throw new Error('AES_ENCRYPT_KEY is not configured');
-    }
-  }
+  ) {}
 
   private encryptIdentificationNumber(
     identificationNumber: string,
   ): string | undefined {
     if (!identificationNumber) return undefined;
-    return encrypt(identificationNumber, this.encryptKey);
+    return this.encryptionService.encrypt(identificationNumber);
   }
 
   private decryptParticipation(participation: Participation): Participation {
     if (participation.identificationNumber) {
       return {
         ...participation,
-        identificationNumber: decrypt(
+        identificationNumber: this.encryptionService.decrypt(
           participation.identificationNumber,
-          this.encryptKey,
         ),
       };
     }
@@ -76,9 +69,7 @@ export class ParticipationService {
   }
 
   async findAll(filters: FindAllFilters = {}) {
-    const where: any = {
-      deletedAt: null,
-    };
+    const where: Prisma.ParticipationWhereInput = {};
 
     if (filters.missionaryId) {
       where.missionaryId = filters.missionaryId;
@@ -110,7 +101,6 @@ export class ParticipationService {
     const participation = await this.prisma.participation.findFirst({
       where: {
         id,
-        deletedAt: null,
       },
       include: {
         missionary: true,
@@ -129,7 +119,6 @@ export class ParticipationService {
     const participation = await this.prisma.participation.findFirst({
       where: {
         id,
-        deletedAt: null,
       },
     });
 
@@ -143,7 +132,7 @@ export class ParticipationService {
       );
     }
 
-    const updateData: any = {
+    const updateData: Prisma.ParticipationUncheckedUpdateInput = {
       ...dto,
       updatedBy: userId,
       version: { increment: 1 },
@@ -171,10 +160,10 @@ export class ParticipationService {
     const participation = await this.prisma.participation.findFirst({
       where: {
         id,
-        deletedAt: null,
       },
       include: {
         missionary: true,
+        user: true,
       },
     });
 
@@ -211,7 +200,6 @@ export class ParticipationService {
     await this.prisma.participation.updateMany({
       where: {
         id: { in: participationIds },
-        deletedAt: null,
       },
       data: {
         isPaid: true,

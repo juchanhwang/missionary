@@ -4,6 +4,7 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 import { PrismaClient } from '../../prisma/generated/prisma';
@@ -19,10 +20,10 @@ export class PrismaService
 {
   private readonly logger = new Logger(PrismaService.name);
 
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     const adapter = new PrismaPg(
       {
-        connectionString: process.env.DATABASE_URL,
+        connectionString: configService.get<string>('DATABASE_URL'),
         max: POOL_MAX,
         idleTimeoutMillis: IDLE_TIMEOUT_MS,
         connectionTimeoutMillis: CONNECTION_TIMEOUT_MS,
@@ -42,7 +43,7 @@ export class PrismaService
     super({
       adapter,
       log:
-        process.env.NODE_ENV === 'development'
+        configService.get<string>('NODE_ENV', 'production') === 'development'
           ? ['query', 'info', 'warn', 'error']
           : ['warn', 'error'],
     });

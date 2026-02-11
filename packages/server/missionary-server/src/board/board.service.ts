@@ -5,6 +5,7 @@ import { PrismaService } from '@/database/prisma.service';
 
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { Prisma } from '../../prisma/generated/prisma';
 
 @Injectable()
 export class BoardService {
@@ -29,7 +30,6 @@ export class BoardService {
       where: {
         missionaryId,
         type,
-        deletedAt: null,
       },
       include: {
         missionary: true,
@@ -48,7 +48,7 @@ export class BoardService {
       },
     });
 
-    if (!board || board.deletedAt) {
+    if (!board) {
       throw new NotFoundException(`Board with ID ${id} not found`);
     }
 
@@ -58,7 +58,7 @@ export class BoardService {
   async update(id: string, dto: UpdateBoardDto) {
     await this.findOne(id);
 
-    const data: Record<string, any> = {};
+    const data: Prisma.MissionaryBoardUncheckedUpdateInput = {};
 
     if (dto.type !== undefined) data.type = dto.type;
     if (dto.title !== undefined) data.title = dto.title;
@@ -76,11 +76,8 @@ export class BoardService {
   async remove(id: string) {
     await this.findOne(id);
 
-    return this.prisma.missionaryBoard.update({
+    return this.prisma.missionaryBoard.delete({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
       include: {
         missionary: true,
       },

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { decrypt, encrypt } from '@/common/utils/encryption';
+import { EncryptionService } from '@/common/encryption/encryption.service';
 import { PrismaService } from '@/database/prisma.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,26 +18,21 @@ import type {
 
 @Injectable()
 export class UserService {
-  private readonly encryptKey: string;
-
-  constructor(private readonly prisma: PrismaService) {
-    this.encryptKey = process.env.AES_ENCRYPT_KEY || '';
-
-    if (!this.encryptKey) {
-      throw new Error('AES_ENCRYPT_KEY is not configured');
-    }
-  }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly encryptionService: EncryptionService,
+  ) {}
 
   private encryptIdentityNumber(identityNumber?: string): string | undefined {
     if (!identityNumber) return undefined;
-    return encrypt(identityNumber, this.encryptKey);
+    return this.encryptionService.encrypt(identityNumber);
   }
 
   private decryptIdentityNumber(user: User): User {
     if (user.identityNumber) {
       return {
         ...user,
-        identityNumber: decrypt(user.identityNumber, this.encryptKey),
+        identityNumber: this.encryptionService.decrypt(user.identityNumber),
       };
     }
     return user;

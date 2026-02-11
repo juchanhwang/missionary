@@ -9,20 +9,21 @@ import {
   Post,
   Put,
   Query,
-  Req,
   Response,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request, Response as ExpressResponse } from 'express';
+import { Response as ExpressResponse } from 'express';
 
 import { CsvExportService } from '@/common/csv/csv-export.service';
+import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums/user-role.enum';
+import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 
 import { ApprovePaymentDto } from './dto/approve-payment.dto';
 import { CreateParticipationDto } from './dto/create-participation.dto';
 import { UpdateParticipationDto } from './dto/update-participation.dto';
-import { ParticipationService } from './participation.service';
+import { ParticipationService, FindAllFilters } from './participation.service';
 
 @ApiTags('Participations')
 @Controller('participations')
@@ -34,31 +35,21 @@ export class ParticipationController {
 
   @Post()
   @ApiOperation({ summary: '참가 신청 생성 (비동기 처리)' })
-  create(@Req() req: Request, @Body() dto: CreateParticipationDto) {
-    const user = req.user as {
-      id: string;
-      email: string;
-      role: string;
-      provider: string;
-    };
+  create(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CreateParticipationDto,
+  ) {
     return this.participationService.create(dto, user.id);
   }
 
   @Get()
   @ApiOperation({ summary: '참가 신청 목록 조회' })
   findAll(
-    @Req() req: Request,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('missionaryId') missionaryId?: string,
     @Query('isPaid') isPaid?: string,
   ) {
-    const user = req.user as {
-      id: string;
-      email: string;
-      role: string;
-      provider: string;
-    };
-
-    const filters: any = {};
+    const filters: FindAllFilters = {};
 
     if (missionaryId) {
       filters.missionaryId = missionaryId;
@@ -84,28 +75,19 @@ export class ParticipationController {
   @Patch(':id')
   @ApiOperation({ summary: '참가 신청 수정' })
   update(
-    @Req() req: Request,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateParticipationDto,
   ) {
-    const user = req.user as {
-      id: string;
-      email: string;
-      role: string;
-      provider: string;
-    };
     return this.participationService.update(id, dto, user.id);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: '참가 신청 삭제' })
-  remove(@Req() req: Request, @Param('id', ParseUUIDPipe) id: string) {
-    const user = req.user as {
-      id: string;
-      email: string;
-      role: string;
-      provider: string;
-    };
+  remove(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.participationService.remove(id, user.id);
   }
 

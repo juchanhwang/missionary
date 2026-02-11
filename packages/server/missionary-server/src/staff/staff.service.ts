@@ -8,6 +8,7 @@ import { PrismaService } from '@/database/prisma.service';
 
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
+import { Prisma } from '../../prisma/generated/prisma';
 
 @Injectable()
 export class StaffService {
@@ -43,7 +44,6 @@ export class StaffService {
     return this.prisma.missionaryStaff.findMany({
       where: {
         missionaryId,
-        deletedAt: null,
       },
       include: {
         missionary: true,
@@ -64,7 +64,7 @@ export class StaffService {
       },
     });
 
-    if (!staff || staff.deletedAt) {
+    if (!staff) {
       throw new NotFoundException(`Staff assignment with ID ${id} not found`);
     }
 
@@ -74,7 +74,7 @@ export class StaffService {
   async update(id: string, dto: UpdateStaffDto) {
     await this.findOne(id);
 
-    const data: Record<string, any> = {};
+    const data: Prisma.MissionaryStaffUncheckedUpdateInput = {};
 
     if (dto.role !== undefined) data.role = dto.role;
 
@@ -91,11 +91,8 @@ export class StaffService {
   async remove(id: string) {
     await this.findOne(id);
 
-    return this.prisma.missionaryStaff.update({
+    return this.prisma.missionaryStaff.delete({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
       include: {
         missionary: true,
         user: true,

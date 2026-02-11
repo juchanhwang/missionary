@@ -6,6 +6,7 @@ import { CreateMissionaryChurchDto } from './dto/create-missionary-church.dto';
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
+import { Prisma } from '../../prisma/generated/prisma';
 
 @Injectable()
 export class MissionaryService {
@@ -80,9 +81,6 @@ export class MissionaryService {
 
   async findAll() {
     return this.prisma.missionary.findMany({
-      where: {
-        deletedAt: null,
-      },
       include: {
         region: true,
         missionGroup: true,
@@ -108,17 +106,13 @@ export class MissionaryService {
       throw new NotFoundException(`Missionary with ID ${id} not found`);
     }
 
-    if (missionary.deletedAt !== null) {
-      throw new NotFoundException(`Missionary with ID ${id} has been deleted`);
-    }
-
     return missionary;
   }
 
   async update(id: string, dto: UpdateMissionaryDto) {
     await this.findOne(id);
 
-    const data: Record<string, any> = {};
+    const data: Prisma.MissionaryUncheckedUpdateInput = {};
 
     if (dto.name !== undefined) data.name = dto.name;
     if (dto.startDate !== undefined) data.startDate = new Date(dto.startDate);
@@ -153,11 +147,8 @@ export class MissionaryService {
   async remove(id: string) {
     await this.findOne(id);
 
-    return this.prisma.missionary.update({
+    return this.prisma.missionary.delete({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
     });
   }
 

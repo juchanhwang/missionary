@@ -23,7 +23,6 @@ export class TermsService {
   async findAll() {
     return this.prisma.terms.findMany({
       where: {
-        deletedAt: null,
         isUsed: true,
       },
       orderBy: {
@@ -37,7 +36,7 @@ export class TermsService {
       where: { id },
     });
 
-    if (!terms || terms.deletedAt) {
+    if (!terms) {
       throw new NotFoundException(`Terms #${id}을 찾을 수 없습니다`);
     }
 
@@ -56,11 +55,8 @@ export class TermsService {
   async remove(id: string) {
     await this.findOne(id);
 
-    return this.prisma.terms.update({
+    return this.prisma.terms.delete({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
     });
   }
 
@@ -71,7 +67,6 @@ export class TermsService {
       where: {
         termsId,
         userId: dto.userId,
-        deletedAt: null,
       },
     });
 
@@ -102,7 +97,6 @@ export class TermsService {
     return this.prisma.userTermsAgreement.findMany({
       where: {
         userId,
-        deletedAt: null,
       },
       include: {
         terms: true,

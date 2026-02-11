@@ -7,13 +7,13 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-  Req,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
 
+import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums/user-role.enum';
+import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 
 import { CreateMissionaryChurchDto } from './dto/create-missionary-church.dto';
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
@@ -29,13 +29,10 @@ export class MissionaryController {
   @Post()
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: '선교 생성 (관리자 전용)' })
-  create(@Req() req: Request, @Body() dto: CreateMissionaryDto) {
-    const user = req.user as {
-      id: string;
-      email: string;
-      role: string;
-      provider: string;
-    };
+  create(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CreateMissionaryDto,
+  ) {
     return this.missionaryService.create(user.id, dto);
   }
 

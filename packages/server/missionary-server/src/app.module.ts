@@ -3,14 +3,17 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 
+import { validateEnv } from '@/common/config/env.validation';
+import { EncryptionModule } from '@/common/encryption/encryption.module';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { BullModule } from '@/common/queue/bull.module';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { BoardModule } from './board/board.module';
 import { ChurchModule } from './church/church.module';
-import { RolesGuard } from './common/guards/roles.guard';
-import { BullModule } from './common/queue/bull.module';
 import { PrismaModule } from './database/prisma.module';
 import { MissionGroupModule } from './mission-group/mission-group.module';
 import { MissionaryModule } from './missionary/missionary.module';
@@ -23,7 +26,8 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
+    EncryptionModule,
     ScheduleModule.forRoot(),
     BullModule,
     PrismaModule,

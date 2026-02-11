@@ -36,9 +36,7 @@ export class TeamService {
   }
 
   async findAll(missionaryId?: string) {
-    const where: Prisma.TeamWhereInput = {
-      deletedAt: null,
-    };
+    const where: Prisma.TeamWhereInput = {};
 
     if (missionaryId) {
       where.missionaryId = missionaryId;
@@ -81,7 +79,7 @@ export class TeamService {
       },
     });
 
-    if (!team || team.deletedAt) {
+    if (!team) {
       throw new NotFoundException(`Team with ID ${id} not found`);
     }
 
@@ -127,11 +125,8 @@ export class TeamService {
   async remove(id: string) {
     await this.findOne(id);
 
-    return this.prisma.team.update({
+    return this.prisma.team.delete({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
     });
   }
 

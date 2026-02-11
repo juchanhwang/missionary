@@ -2,7 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 
-import { encrypt } from '@/common/utils/encryption';
+import { EncryptionService } from '@/common/encryption/encryption.service';
 import { PrismaService } from '@/database/prisma.service';
 
 import type { CreateParticipationDto } from './dto/create-participation.dto';
@@ -11,15 +11,12 @@ import type { CreateParticipationDto } from './dto/create-participation.dto';
 @Injectable()
 export class ParticipationProcessor extends WorkerHost {
   private readonly logger = new Logger(ParticipationProcessor.name);
-  private readonly encryptKey: string;
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly encryptionService: EncryptionService,
+  ) {
     super();
-    this.encryptKey = process.env.AES_ENCRYPT_KEY || '';
-
-    if (!this.encryptKey) {
-      throw new Error('AES_ENCRYPT_KEY is not configured');
-    }
   }
 
   async process(job: Job<{ dto: CreateParticipationDto; userId: string }>) {
@@ -44,9 +41,8 @@ export class ParticipationProcessor extends WorkerHost {
       throw new ConflictException('Missionary is at full capacity');
     }
 
-    const encryptedIdentificationNumber = encrypt(
+    const encryptedIdentificationNumber = this.encryptionService.encrypt(
       dto.identificationNumber,
-      this.encryptKey,
     );
 
     const result = await this.prisma.$transaction(async (tx) => {
