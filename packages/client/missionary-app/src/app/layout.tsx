@@ -1,5 +1,5 @@
-import '@styles/tailwind.css';
-import '@styles/_global.scss';
+import '../../../design-system/src/styles/tailwind.css';
+import '../../../design-system/src/styles/_global.scss';
 import type { Metadata } from 'next';
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => (
