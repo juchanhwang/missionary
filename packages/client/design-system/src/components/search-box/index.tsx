@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@lib/utils';
+import { Search } from 'lucide-react';
 import React from 'react';
 
 interface SearchBoxProps {
@@ -35,22 +36,7 @@ export function SearchBox({
         ref={ref}
         className="flex-1 border-0 bg-transparent text-black text-sm leading-[1.429] focus:outline-none placeholder:text-gray-50"
       />
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="shrink-0 ml-2 text-gray-50"
-      >
-        <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="2" />
-        <path
-          d="M13.5 13.5L17 17"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
+      <Search size={20} className="shrink-0 ml-2 text-gray-50" />
     </div>
   );
 }

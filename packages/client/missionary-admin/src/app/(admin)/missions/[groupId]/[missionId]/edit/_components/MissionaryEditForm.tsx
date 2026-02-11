@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@samilhero/design-system';
 import { type Missionary } from 'apis/missionary';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -65,24 +66,46 @@ export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <MissionForm
-        form={form}
-        onSubmit={onSubmit}
-        isPending={updateMutation.isPending}
-        submitLabel="수정하기"
-        pendingLabel="수정 중..."
-        groupId={missionary.missionGroupId || ''}
-        groupName=""
-      />
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="flex flex-col flex-1 p-8 gap-5 overflow-y-auto"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-1.5">
+          <h2 className="text-lg font-semibold text-gray-90">선교 수정</h2>
+          <p className="text-sm text-gray-50">{missionary.name}</p>
+        </div>
+      </div>
 
-      <DeleteMissionSection
-        missionaryId={missionary.id}
-        missionaryName={missionary.name}
-        onDeleteSuccess={() =>
-          router.push(`/missions/${missionary.missionGroupId}`)
-        }
-      />
-    </div>
+      <div className="bg-white rounded-xl border border-gray-30 shadow-sm p-6">
+        <MissionForm form={form} isPending={updateMutation.isPending} />
+      </div>
+
+      <div className="flex items-center justify-between">
+        <DeleteMissionSection
+          missionaryId={missionary.id}
+          missionaryName={missionary.name}
+          onDeleteSuccess={() =>
+            router.push(`/missions/${missionary.missionGroupId}`)
+          }
+        />
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            color="neutral"
+            variant="outline"
+            size="md"
+            onClick={() =>
+              router.push(`/missions/${missionary.missionGroupId}`)
+            }
+          >
+            취소
+          </Button>
+          <Button type="submit" disabled={updateMutation.isPending} size="md">
+            {updateMutation.isPending ? '수정 중...' : '수정하기'}
+          </Button>
+        </div>
+      </div>
+    </form>
   );
 }

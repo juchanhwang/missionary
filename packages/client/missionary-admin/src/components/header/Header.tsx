@@ -1,5 +1,6 @@
 'use client';
 
+import { Search } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -31,28 +32,10 @@ export function Header() {
       <h1 className="text-xl font-semibold text-gray-90">{title}</h1>
 
       <div className="relative w-64">
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 18 18"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+        <Search
+          size={18}
           className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-50"
-        >
-          <circle
-            cx="8"
-            cy="8"
-            r="5.25"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M12 12L16 16"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
+        />
         <input
           type="text"
           value={searchValue}

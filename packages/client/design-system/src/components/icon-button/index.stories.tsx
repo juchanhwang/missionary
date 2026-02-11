@@ -1,23 +1,8 @@
+import { Search, Plus, Settings } from 'lucide-react';
+
 import { IconButton, IconButtonProps } from './index';
 
 import type { Meta, StoryObj } from '@storybook/react';
-
-const SearchIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="11" cy="11" r="8" />
-    <path d="m21 21-4.3-4.3" />
-  </svg>
-);
 
 const meta: Meta<typeof IconButton> = {
   title: 'Components/IconButton',
@@ -46,14 +31,14 @@ type Story = StoryObj<typeof IconButton>;
 
 export const Default: Story = {
   args: {
-    icon: <SearchIcon />,
+    icon: <Search size={20} />,
   },
 };
 
 export const WithLabel: Story = {
   args: {
-    icon: <SearchIcon />,
-    label: 'Search',
+    icon: <Plus size={20} />,
+    label: 'Add Item',
   },
 };
 
@@ -66,7 +51,7 @@ export const Sizes: Story = {
     </div>
   ),
   args: {
-    icon: <SearchIcon />,
+    icon: <Settings size={20} />,
   },
 };
 
@@ -79,20 +64,20 @@ export const Variants: Story = {
     </div>
   ),
   args: {
-    icon: <SearchIcon />,
+    icon: <Search size={20} />,
   },
 };
 
 export const Filled: Story = {
   args: {
-    icon: <SearchIcon />,
+    icon: <Search size={20} />,
     variant: 'filled',
   },
 };
 
 export const Outline: Story = {
   args: {
-    icon: <SearchIcon />,
+    icon: <Search size={20} />,
     variant: 'outline',
   },
 };
@@ -100,9 +85,9 @@ export const Outline: Story = {
 export const Disabled: Story = {
   render: () => (
     <div className="flex items-center gap-4">
-      <IconButton icon={<SearchIcon />} variant="ghost" disabled />
-      <IconButton icon={<SearchIcon />} variant="filled" disabled />
-      <IconButton icon={<SearchIcon />} variant="outline" disabled />
+      <IconButton icon={<Search size={20} />} variant="ghost" disabled />
+      <IconButton icon={<Search size={20} />} variant="filled" disabled />
+      <IconButton icon={<Search size={20} />} variant="outline" disabled />
     </div>
   ),
 };

@@ -1,5 +1,6 @@
 'use client';
 
+import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 import { useMemo, useState } from 'react';
@@ -43,47 +44,16 @@ export function GroupPanel() {
           className="flex items-center justify-center w-7 h-7 rounded-md border border-gray-30 bg-white text-gray-60 hover:bg-gray-20 hover:text-gray-80 transition-colors"
           aria-label="새 그룹 만들기"
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M7 2.5V11.5M2.5 7H11.5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
+          <Plus size={14} />
         </Link>
       </div>
 
       <div className="px-3 pb-2">
         <div className="relative">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+          <Search
+            size={14}
             className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-50"
-          >
-            <circle
-              cx="6"
-              cy="6"
-              r="4"
-              stroke="currentColor"
-              strokeWidth="1.3"
-            />
-            <path
-              d="M9.5 9.5L12.5 12.5"
-              stroke="currentColor"
-              strokeWidth="1.3"
-              strokeLinecap="round"
-            />
-          </svg>
+          />
           <input
             type="text"
             value={search}

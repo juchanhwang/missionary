@@ -1,5 +1,14 @@
 'use client';
 
+import {
+  Calendar,
+  CircleCheck,
+  Globe,
+  SquareX,
+  User,
+  Users,
+} from 'lucide-react';
+
 interface MissionCard {
   id: number;
   name: string;
@@ -89,110 +98,25 @@ const STATS: StatCard[] = [
     label: '총 선교',
     value: 6,
     color: 'bg-blue-10 text-blue-60',
-    icon: (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 22 22"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5" />
-        <path
-          d="M11 3C11 3 14.5 7 14.5 11C14.5 15 11 19 11 19"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-        <path
-          d="M11 3C11 3 7.5 7 7.5 11C7.5 15 11 19 11 19"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-        <path d="M3 11H19" stroke="currentColor" strokeWidth="1.5" />
-      </svg>
-    ),
+    icon: <Globe size={22} />,
   },
   {
     label: '진행중',
     value: 3,
     color: 'bg-green-10 text-green-60',
-    icon: (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 22 22"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.5" />
-        <path
-          d="M8 11L10.5 13.5L15 8.5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
+    icon: <CircleCheck size={22} />,
   },
   {
     label: '완료',
     value: 2,
     color: 'bg-gray-20 text-gray-60',
-    icon: (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 22 22"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <rect
-          x="3"
-          y="3"
-          width="16"
-          height="16"
-          rx="2"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-        <path
-          d="M8 8L14 14M14 8L8 14"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
+    icon: <SquareX size={22} />,
   },
   {
     label: '총 참여자',
     value: 99,
     color: 'bg-warning-10 text-warning-60',
-    icon: (
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 22 22"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth="1.5" />
-        <circle cx="15" cy="8" r="3" stroke="currentColor" strokeWidth="1.5" />
-        <path
-          d="M2 19C2 15.68 4.68 13 8 13"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-        <path
-          d="M20 19C20 15.68 17.32 13 15 13C13.5 13 12.12 13.72 11 14.76"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
+    icon: <Users size={22} />,
   },
 ];
 
@@ -233,68 +157,13 @@ function MissionCardItem({ mission }: { mission: MissionCard }) {
 
       <div className="flex flex-col gap-2 text-sm text-gray-60">
         <div className="flex items-center gap-2">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="shrink-0 text-gray-50"
-          >
-            <rect
-              x="1.75"
-              y="2.25"
-              width="10.5"
-              height="10"
-              rx="1"
-              stroke="currentColor"
-              strokeWidth="1.2"
-            />
-            <path
-              d="M1.75 5.25H12.25"
-              stroke="currentColor"
-              strokeWidth="1.2"
-            />
-            <path
-              d="M4.5 1V3.5"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-            />
-            <path
-              d="M9.5 1V3.5"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <Calendar size={14} className="shrink-0 text-gray-50" />
           <span>
             {mission.startDate} ~ {mission.endDate}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="shrink-0 text-gray-50"
-          >
-            <circle
-              cx="7"
-              cy="5"
-              r="2.25"
-              stroke="currentColor"
-              strokeWidth="1.2"
-            />
-            <path
-              d="M2.5 12.5C2.5 10 4.5 8.5 7 8.5C9.5 8.5 11.5 10 11.5 12.5"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <User size={14} className="shrink-0 text-gray-50" />
           <span>
             {mission.participants} / {mission.maxParticipants}명
           </span>

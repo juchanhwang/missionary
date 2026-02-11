@@ -1,5 +1,6 @@
 import { useContextAction, useContextData } from '@hooks';
 import { cn } from '@lib/utils';
+import { ChevronDown } from 'lucide-react';
 import React, { useCallback } from 'react';
 
 import { SelectActionsContext, SelectDataContext } from './index';
@@ -42,27 +43,16 @@ export const SelectTrigger = ({
       {...props}
     >
       <span className="truncate">{children}</span>
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+      <ChevronDown
+        size={20}
+        strokeWidth={1.5}
         className={cn(
           'ml-2 h-5 w-5 shrink-0 transition-transform duration-200',
           {
             'rotate-180': data.open,
           },
         )}
-      >
-        <path
-          d="M5 7.5L10 12.5L15 7.5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      />
     </button>
   );
 };

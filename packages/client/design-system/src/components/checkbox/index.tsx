@@ -2,6 +2,7 @@
 
 import { useControllableState, useMergeRefs } from '@hooks';
 import { cn } from '@lib/utils';
+import { Check } from 'lucide-react';
 import React, { useContext, createContext, useMemo, useRef } from 'react';
 
 import { CheckboxGroupActionsContext } from '../checkbox-group/checkboxGroupContext';
@@ -95,19 +96,7 @@ export function Checkbox({
           checked ? 'border-gray-80 bg-gray-80' : 'border-gray-40 bg-white',
         )}
       >
-        {checked && (
-          <svg
-            className="h-3 w-3 text-white"
-            viewBox="0 0 12 12"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M2.5 6L5 8.5L9.5 3.5" />
-          </svg>
-        )}
+        {checked && <Check size={12} className="text-white" strokeWidth={3} />}
       </span>
       {label && <span className="text-sm">{label}</span>}
     </label>

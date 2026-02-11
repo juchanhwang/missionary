@@ -48,5 +48,3 @@ dist
 # 문서는 커밋, 임시 파일/증거 자료는 로컬만
 .sisyphus/boulder.json
 .sisyphus/evidence/
-check_colors.js
-project-visualization.html

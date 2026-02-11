@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@samilhero/design-system';
+import { CalendarX } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { MissionStatusBadge } from '../_components/MissionStatusBadge';
@@ -101,35 +102,7 @@ export default function MissionGroupDetailPage() {
               <tr>
                 <td colSpan={6} className="px-5 py-16 text-center">
                   <div className="flex flex-col items-center gap-2">
-                    <svg
-                      width="32"
-                      height="32"
-                      viewBox="0 0 32 32"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-gray-40"
-                    >
-                      <rect
-                        x="5"
-                        y="7"
-                        width="22"
-                        height="18"
-                        rx="2"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5 12H27"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M12 7V4M20 7V4"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
+                    <CalendarX size={32} className="text-gray-40" />
                     <p className="text-sm text-gray-50">
                       등록된 선교가 없습니다
                     </p>

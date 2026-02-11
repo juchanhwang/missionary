@@ -1,15 +1,9 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, InputField, Select } from '@samilhero/design-system';
-import { useRouter } from 'next/navigation';
-import { useForm, Controller } from 'react-hook-form';
+import { InputField, Select } from '@samilhero/design-system';
+import { Controller, type UseFormReturn } from 'react-hook-form';
 
-import { useCreateMissionGroup } from '../_hooks/useCreateMissionGroup';
-import {
-  missionGroupSchema,
-  type MissionGroupSchemaType,
-} from '../_schemas/missionGroupSchema';
+import { type MissionGroupSchemaType } from '../_schemas/missionGroupSchema';
 
 const TYPE_LABELS: Record<string, string> = {
   DOMESTIC: '국내',
@@ -17,43 +11,13 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 interface MissionGroupFormProps {
-  submitLabel: string;
-  pendingLabel: string;
+  form: UseFormReturn<MissionGroupSchemaType>;
+  isPending: boolean;
 }
 
-export function MissionGroupForm({
-  submitLabel,
-  pendingLabel,
-}: MissionGroupFormProps) {
-  const router = useRouter();
-  const form = useForm<MissionGroupSchemaType>({
-    resolver: zodResolver(missionGroupSchema),
-    mode: 'onSubmit',
-    defaultValues: {
-      name: '',
-      description: '',
-      type: undefined,
-    },
-  });
-
-  const { mutate, isPending } = useCreateMissionGroup();
-
-  const onSubmit = (data: MissionGroupSchemaType) => {
-    mutate(data, {
-      onSuccess: () => {
-        router.push('/missions');
-      },
-      onError: (error) => {
-        console.error('Failed to create mission group:', error);
-      },
-    });
-  };
-
+export function MissionGroupForm({ form, isPending }: MissionGroupFormProps) {
   return (
-    <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col gap-5 rounded-xl bg-white border border-gray-10 p-6"
-    >
+    <div className="flex flex-col gap-5">
       <InputField
         label="선교 그룹명"
         placeholder="선교 그룹명을 입력하세요"
@@ -90,18 +54,6 @@ export function MissionGroupForm({
         error={form.formState.errors.description?.message}
         disabled={isPending}
       />
-
-      <div className="mt-2">
-        <Button
-          type="submit"
-          disabled={isPending}
-          size="lg"
-          className="w-full"
-          color="neutral"
-        >
-          {isPending ? pendingLabel : submitLabel}
-        </Button>
-      </div>
-    </form>
+    </div>
   );
 }

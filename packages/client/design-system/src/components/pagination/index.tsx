@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@lib/utils';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
   currentPage: number;
@@ -55,21 +56,7 @@ export function Pagination({
         onClick={() => onPageChange(currentPage - 1)}
         aria-label="이전 페이지"
       >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M10 4L6 8L10 12"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <ChevronLeft size={16} />
       </button>
 
       {pages.map((page) => (
@@ -91,21 +78,7 @@ export function Pagination({
         onClick={() => onPageChange(currentPage + 1)}
         aria-label="다음 페이지"
       >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M6 4L10 8L6 12"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <ChevronRight size={16} />
       </button>
     </nav>
   );

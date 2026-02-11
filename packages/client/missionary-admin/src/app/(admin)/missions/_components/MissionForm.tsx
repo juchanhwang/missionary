@@ -7,26 +7,12 @@ import { type MissionFormData } from '../_schemas/missionSchema';
 
 interface MissionFormProps {
   form: UseFormReturn<MissionFormData>;
-  onSubmit: (data: MissionFormData) => void;
   isPending: boolean;
-  submitLabel: string;
-  pendingLabel: string;
-  groupId: string;
-  groupName: string;
 }
 
-export function MissionForm({
-  form,
-  onSubmit,
-  isPending,
-  submitLabel,
-  pendingLabel,
-}: MissionFormProps) {
+export function MissionForm({ form, isPending }: MissionFormProps) {
   return (
-    <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col gap-5 rounded-xl bg-white border border-gray-10 p-6"
-    >
+    <div className="flex flex-col gap-5">
       <div className="grid grid-cols-2 gap-4">
         <InputField
           label="차수"
@@ -83,18 +69,6 @@ export function MissionForm({
         error={form.formState.errors.pastorName?.message}
         disabled={isPending}
       />
-
-      <div className="mt-2">
-        <Button
-          type="submit"
-          disabled={isPending}
-          size="lg"
-          className="w-full"
-          color="neutral"
-        >
-          {isPending ? pendingLabel : submitLabel}
-        </Button>
-      </div>
-    </form>
+    </div>
   );
 }

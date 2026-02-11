@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@lib/utils';
+import { ArrowUp } from 'lucide-react';
 
 interface TopButtonProps {
   onClick?: () => void;
@@ -18,21 +19,7 @@ export function TopButton({ onClick, className }: TopButtonProps) {
       )}
       aria-label="맨 위로 이동"
     >
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M12 5L5 12M12 5L19 12M12 5V19"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <ArrowUp size={24} />
     </button>
   );
 }

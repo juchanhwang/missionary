@@ -2,6 +2,7 @@
 
 import { cn } from '@lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { X } from 'lucide-react';
 
 import type { ReactNode } from 'react';
 
@@ -49,16 +50,7 @@ export function Chips({
           className="ml-1 rounded-full hover:bg-gray-10 p-0.5"
           aria-label="Remove"
         >
-          <svg
-            className="h-3 w-3"
-            viewBox="0 0 12 12"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          >
-            <path d="M9.5 3.5L3.5 9.5M3.5 3.5L9.5 9.5" />
-          </svg>
+          <X size={12} strokeWidth={1.5} className="h-3 w-3" />
         </button>
       )}
     </span>

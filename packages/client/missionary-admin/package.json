@@ -17,6 +17,7 @@
     "@samilhero/design-system": "workspace:*",
     "@tanstack/react-query": "^5.90.20",
     "axios": "^1.13.4",
+    "lucide-react": "^0.563.0",
     "react-error-boundary": "^6.1.0",
     "react-hook-form": "^7.71.1",
     "react-modal": "^3.16.3",
