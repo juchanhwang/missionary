@@ -57,7 +57,7 @@ export default function MissionGroupDetailPage() {
         </div>
         <Button
           size="sm"
-          onClick={() => router.push(`/missions/${groupId}/missions/create`)}
+          onClick={() => router.push(`/missions/${groupId}/create`)}
         >
           N차 선교 추가
         </Button>
@@ -145,9 +145,7 @@ export default function MissionGroupDetailPage() {
                   key={mission.id}
                   className="border-b border-gray-30 last:border-b-0 hover:bg-gray-10 cursor-pointer transition-colors"
                   onClick={() =>
-                    router.push(
-                      `/missions/${groupId}/missions/${mission.id}/edit`,
-                    )
+                    router.push(`/missions/${groupId}/${mission.id}/edit`)
                   }
                 >
                   <td className="px-5 py-3.5 text-sm font-medium text-gray-90">

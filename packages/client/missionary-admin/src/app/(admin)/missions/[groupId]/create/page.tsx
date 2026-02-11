@@ -6,13 +6,13 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useCreateMissionary } from './_hooks/useCreateMissionary';
-import { MissionForm } from '../../../_components/MissionForm';
+import { MissionForm } from '../../_components/MissionForm';
 import {
   missionSchema,
   type MissionFormData,
-} from '../../../_schemas/missionSchema';
-import { toMissionPayload } from '../../../_utils/toMissionPayload';
-import { useMissionGroup } from '../../_hooks/useMissionGroup';
+} from '../../_schemas/missionSchema';
+import { toMissionPayload } from '../../_utils/toMissionPayload';
+import { useMissionGroup } from '../_hooks/useMissionGroup';
 
 export default function CreateMissionPage() {
   const router = useRouter();
