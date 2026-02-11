@@ -6,8 +6,7 @@ import { vi } from 'vitest';
 import { DeleteConfirmModal } from '../DeleteConfirmModal';
 
 describe('DeleteConfirmModal', () => {
-  const mockOnConfirm = vi.fn();
-  const mockOnCancel = vi.fn();
+  const mockClose = vi.fn();
   const missionaryName = '테스트 선교';
 
   beforeEach(() => {
@@ -18,8 +17,7 @@ describe('DeleteConfirmModal', () => {
     render(
       <DeleteConfirmModal
         isOpen={true}
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        close={mockClose}
         missionaryName={missionaryName}
       />,
     );
@@ -33,47 +31,49 @@ describe('DeleteConfirmModal', () => {
     const { container } = render(
       <DeleteConfirmModal
         isOpen={false}
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        close={mockClose}
         missionaryName={missionaryName}
       />,
     );
 
-    // Modal should not be visible
     const modalContent = container.querySelector('.ReactModal__Content');
     expect(modalContent).not.toBeInTheDocument();
   });
 
-  it('should call onConfirm when confirm button is clicked', () => {
+  it('should call close(true) when confirm button is clicked', () => {
     render(
       <DeleteConfirmModal
         isOpen={true}
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        close={mockClose}
         missionaryName={missionaryName}
       />,
     );
 
-    const confirmButton = screen.getByRole('button', { name: '삭제' });
+    const confirmButton = screen.getByRole('button', {
+      name: '삭제',
+      hidden: true,
+    });
     fireEvent.click(confirmButton);
 
-    expect(mockOnConfirm).toHaveBeenCalledTimes(1);
+    expect(mockClose).toHaveBeenCalledWith(true);
   });
 
-  it('should call onCancel when cancel button is clicked', () => {
+  it('should call close(false) when cancel button is clicked', () => {
     render(
       <DeleteConfirmModal
         isOpen={true}
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        close={mockClose}
         missionaryName={missionaryName}
       />,
     );
 
-    const cancelButton = screen.getByRole('button', { name: '취소' });
+    const cancelButton = screen.getByRole('button', {
+      name: '취소',
+      hidden: true,
+    });
     fireEvent.click(cancelButton);
 
-    expect(mockOnCancel).toHaveBeenCalledTimes(1);
+    expect(mockClose).toHaveBeenCalledWith(false);
   });
 
   it('should display missionary name in the message', () => {
@@ -81,8 +81,7 @@ describe('DeleteConfirmModal', () => {
     render(
       <DeleteConfirmModal
         isOpen={true}
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        close={mockClose}
         missionaryName={customName}
       />,
     );
@@ -92,52 +91,54 @@ describe('DeleteConfirmModal', () => {
     ).toBeInTheDocument();
   });
 
-  it('should disable confirm button when isPending is true', () => {
+  it('should disable buttons when isPending is true', () => {
     render(
       <DeleteConfirmModal
         isOpen={true}
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        close={mockClose}
         missionaryName={missionaryName}
         isPending={true}
       />,
     );
 
-    const confirmButton = screen.getByRole('button', { name: '삭제' });
+    const confirmButton = screen.getByRole('button', {
+      name: '삭제',
+      hidden: true,
+    });
     expect(confirmButton).toBeDisabled();
   });
 
-  it('should enable confirm button when isPending is false', () => {
+  it('should enable buttons when isPending is false', () => {
     render(
       <DeleteConfirmModal
         isOpen={true}
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        close={mockClose}
         missionaryName={missionaryName}
         isPending={false}
       />,
     );
 
-    const confirmButton = screen.getByRole('button', { name: '삭제' });
+    const confirmButton = screen.getByRole('button', {
+      name: '삭제',
+      hidden: true,
+    });
     expect(confirmButton).not.toBeDisabled();
   });
 
-  it('should call onCancel when modal is requested to close', () => {
+  it('should call close(false) when modal overlay is clicked', () => {
     render(
       <DeleteConfirmModal
         isOpen={true}
-        onConfirm={mockOnConfirm}
-        onCancel={mockOnCancel}
+        close={mockClose}
         missionaryName={missionaryName}
       />,
     );
 
-    // Simulate closing modal by clicking overlay
     const overlay = document.querySelector('.ReactModal__Overlay');
     if (overlay) {
       fireEvent.click(overlay);
     }
 
-    expect(mockOnCancel).toHaveBeenCalled();
+    expect(mockClose).toHaveBeenCalledWith(false);
   });
 });

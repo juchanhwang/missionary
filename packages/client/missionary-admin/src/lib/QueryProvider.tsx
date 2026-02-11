@@ -1,5 +1,6 @@
 'use client';
 
+import { OverlayProvider } from '@samilhero/design-system';
 import {
   isServer,
   QueryClient,
@@ -33,6 +34,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <OverlayProvider>{children}</OverlayProvider>
+    </QueryClientProvider>
   );
 }

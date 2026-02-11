@@ -69,6 +69,7 @@
   },
   "dependencies": {
     "classnames": "^2.5.1",
+    "overlay-kit": "^1.8.6",
     "react-datepicker": "^9.1.0"
   }
 }

@@ -1,7 +1,6 @@
 'use client';
 
-import { Button } from '@samilhero/design-system';
-import { useState } from 'react';
+import { Button, openOverlayAsync } from '@samilhero/design-system';
 
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { useDeleteMissionary } from '../hooks/useDeleteMissionary';
@@ -17,34 +16,34 @@ export function DeleteMissionSection({
   missionaryName,
   onDeleteSuccess,
 }: DeleteMissionSectionProps) {
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const deleteMutation = useDeleteMissionary(missionaryId);
 
-  const handleConfirmDelete = () => {
-    deleteMutation.mutate(undefined, {
-      onSuccess: onDeleteSuccess,
-    });
-  };
-
-  return (
-    <>
-      <Button
-        type="button"
-        onClick={() => setIsDeleteModalOpen(true)}
-        color="secondary"
-        className="flex-1 bg-error-60 hover:bg-error-70 text-white"
-        size="lg"
-      >
-        삭제하기
-      </Button>
-
+  const handleDelete = async () => {
+    const confirmed = await openOverlayAsync<boolean>(({ isOpen, close }) => (
       <DeleteConfirmModal
-        isOpen={isDeleteModalOpen}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setIsDeleteModalOpen(false)}
+        isOpen={isOpen}
+        close={close}
         missionaryName={missionaryName}
         isPending={deleteMutation.isPending}
       />
-    </>
+    ));
+
+    if (confirmed) {
+      deleteMutation.mutate(undefined, {
+        onSuccess: onDeleteSuccess,
+      });
+    }
+  };
+
+  return (
+    <Button
+      type="button"
+      onClick={handleDelete}
+      color="secondary"
+      className="flex-1 bg-error-60 hover:bg-error-70 text-white"
+      size="lg"
+    >
+      삭제하기
+    </Button>
   );
 }

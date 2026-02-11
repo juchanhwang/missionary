@@ -1,3 +1,4 @@
+import { OverlayProvider } from '@samilhero/design-system';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useParams, useRouter } from 'next/navigation';
@@ -87,8 +88,15 @@ describe('EditMissionPage', () => {
     } as any);
   });
 
+  const renderWithProvider = () =>
+    render(
+      <OverlayProvider>
+        <EditMissionPage />
+      </OverlayProvider>,
+    );
+
   it('API 데이터로 폼이 프리필된다', async () => {
-    render(<EditMissionPage />);
+    renderWithProvider();
 
     await waitFor(() => {
       const nameInput = screen.getByDisplayValue('테스트 선교');
@@ -107,7 +115,7 @@ describe('EditMissionPage', () => {
 
   it('빈 이름으로 제출하면 에러 메시지를 표시한다', async () => {
     const user = userEvent.setup();
-    render(<EditMissionPage />);
+    renderWithProvider();
 
     await waitFor(() => {
       expect(screen.getByDisplayValue('테스트 선교')).toBeInTheDocument();
@@ -126,7 +134,7 @@ describe('EditMissionPage', () => {
 
   it('유효한 데이터를 제출하면 ISO 문자열 날짜로 mutate를 호출한다', async () => {
     const user = userEvent.setup();
-    render(<EditMissionPage />);
+    renderWithProvider();
 
     await waitFor(() => {
       expect(screen.getByDisplayValue('테스트 선교')).toBeInTheDocument();
@@ -157,7 +165,7 @@ describe('EditMissionPage', () => {
       isPending: true,
     } as any);
 
-    render(<EditMissionPage />);
+    renderWithProvider();
 
     await waitFor(() => {
       const button = screen.getByRole('button', { name: /수정 중.../i });
@@ -171,14 +179,14 @@ describe('EditMissionPage', () => {
       isLoading: true,
     } as any);
 
-    render(<EditMissionPage />);
+    renderWithProvider();
 
     expect(screen.getByText('로딩 중...')).toBeInTheDocument();
   });
 
   it('삭제 버튼을 클릭하면 DeleteConfirmModal이 열린다', async () => {
     const user = userEvent.setup();
-    render(<EditMissionPage />);
+    renderWithProvider();
 
     await waitFor(() => {
       expect(screen.getByDisplayValue('테스트 선교')).toBeInTheDocument();
