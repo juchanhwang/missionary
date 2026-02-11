@@ -1,5 +1,5 @@
-import { type Missionary } from './missionary';
 import api from './instance';
+import { type Missionary } from './missionary';
 
 export interface MissionGroup {
   id: string;

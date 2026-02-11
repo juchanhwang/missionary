@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, InputField } from '@samilhero/design-system';
+import { Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useLogin } from './hooks/useLogin';
@@ -9,7 +10,7 @@ import { useOAuthError } from './hooks/useOAuthError';
 import { useSocialLogin } from './hooks/useSocialLogin';
 import { loginSchema, type LoginFormData } from './schemas/loginSchema';
 
-export default function LoginPage() {
+function LoginForm() {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: 'onSubmit',
@@ -111,5 +112,13 @@ export default function LoginPage() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

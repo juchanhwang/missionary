@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { DeleteMissionSection } from './DeleteMissionSection';
 import { MissionForm } from '../../../../../components/MissionForm';
 import {
   missionSchema,
@@ -13,7 +14,6 @@ import {
 } from '../../../../../schemas/missionSchema';
 import { toMissionPayload } from '../../../../../utils/toMissionPayload';
 import { useUpdateMissionary } from '../hooks/useUpdateMissionary';
-import { DeleteMissionSection } from './DeleteMissionSection';
 
 interface MissionaryEditFormProps {
   missionary: Missionary;
