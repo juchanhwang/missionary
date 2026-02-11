@@ -43,3 +43,14 @@ dist
 
 # mcp config (contains API keys)
 .mcp.json
+
+# Sisyphus AI 작업 관련
+# 문서는 커밋, 임시 파일/증거 자료는 로컬만
+.sisyphus/boulder.json
+.sisyphus/evidence/**/*.png
+.sisyphus/evidence/**/*.jpg
+.sisyphus/evidence/**/*.jpeg
+.sisyphus/evidence/**/*.gif
+.sisyphus/evidence/**/*.mp4
+check_colors.js
+project-visualization.html
