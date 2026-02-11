@@ -46,10 +46,10 @@ export function InputField({
       )}
       <div
         className={cn(
-          'flex w-full items-center gap-2 rounded-lg bg-gray-10 px-3 py-2 transition-colors',
-          'focus-within:ring-1 focus-within:ring-gray-40 focus-within:border-gray-40',
-          disabled && 'cursor-not-allowed opacity-50 bg-gray-20',
-          !disabled && 'hover:bg-gray-20',
+          'flex w-full items-center gap-2 rounded-lg border border-gray-30 bg-gray-10 px-3 py-2 transition-colors',
+          'focus-within:ring-1 focus-within:ring-gray-50 focus-within:border-gray-50',
+          disabled && 'cursor-not-allowed opacity-50 bg-gray-20 border-gray-20',
+          !disabled && 'hover:border-gray-40',
           error &&
             'border-error-60 focus-within:border-error-60 focus-within:ring-error-60',
         )}
@@ -61,7 +61,7 @@ export function InputField({
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
           ref={ref}
-          className="flex-1 border-0 bg-transparent text-black text-sm leading-[1.428] focus:outline-none placeholder:text-gray-30 disabled:cursor-not-allowed"
+          className="flex-1 border-0 bg-transparent text-black text-sm leading-[1.428] focus:outline-none placeholder:text-gray-50 disabled:cursor-not-allowed"
           {...rest}
         />
         {showClearButton && (

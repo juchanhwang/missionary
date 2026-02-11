@@ -34,9 +34,9 @@ export const SelectTrigger = ({
       type="button"
       data-state={data.open ? 'open' : 'closed'}
       className={cn(
-        'flex h-12 w-full items-center justify-between rounded-lg border border-gray-20 bg-white px-4 py-2 text-sm transition-colors hover:border-gray-40 focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
-        'data-[state=open]:border-gray-80',
-        isEmpty ? 'text-gray-30' : 'text-gray-90',
+        'flex h-12 w-full items-center justify-between rounded-lg border border-gray-30 bg-gray-10 px-4 py-2 text-sm transition-colors hover:border-gray-40 focus:outline-none focus:ring-1 focus:ring-gray-50 disabled:cursor-not-allowed disabled:opacity-50',
+        'data-[state=open]:border-gray-50 data-[state=open]:ring-1 data-[state=open]:ring-gray-50',
+        isEmpty ? 'text-gray-50' : 'text-gray-90',
         className,
       )}
       {...props}

@@ -30,9 +30,9 @@ export function Input({
     <div className={cn('flex flex-col w-full', className)}>
       <div
         className={cn(
-          'flex w-full items-center gap-2 rounded-lg bg-gray-10 px-3 py-2 transition-colors',
-          'focus-within:ring-1 focus-within:ring-gray-40 focus-within:border-gray-40',
-          disabled && 'cursor-not-allowed opacity-50 bg-gray-20',
+          'flex w-full items-center gap-2 rounded-lg border border-gray-30 bg-gray-10 px-3 py-2 transition-colors',
+          'focus-within:ring-1 focus-within:ring-gray-50 focus-within:border-gray-50',
+          disabled && 'cursor-not-allowed opacity-50 bg-gray-20 border-gray-20',
           error &&
             'border-error-60 focus-within:border-error-60 focus-within:ring-error-60',
         )}
@@ -43,7 +43,7 @@ export function Input({
           autoComplete="off"
           value={value}
           ref={ref}
-          className="flex-1 border-0 bg-transparent text-sm placeholder:text-gray-30 focus:outline-none disabled:cursor-not-allowed"
+          className="flex-1 border-0 bg-transparent text-sm placeholder:text-gray-50 focus:outline-none disabled:cursor-not-allowed"
           {...rest}
         />
         {error && <IconInputError className="shrink-0" />}
