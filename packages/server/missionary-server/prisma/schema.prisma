@@ -122,6 +122,28 @@ model MissionaryRegion {
   @@map("missionary_region")
 }
 
+model MissionGroup {
+  id          String                @id @default(uuid())
+  name        String
+  description String?               @db.Text
+  type        MissionaryRegionType
+
+  // Audit fields
+  createdAt DateTime              @default(now()) @map("created_at")
+  updatedAt DateTime              @updatedAt @map("updated_at")
+  createdBy String?               @map("created_by")
+  updatedBy String?               @map("updated_by")
+  version   Int                   @default(0)
+
+  // Soft delete
+  deletedAt DateTime?             @map("deleted_at")
+
+  // Relations
+  missionaries Missionary[]
+
+  @@map("mission_group")
+}
+
 model Missionary {
   id        String   @id @default(uuid())
   name      String
@@ -135,8 +157,8 @@ model Missionary {
   pastorPhone String? @map("pastor_phone")
 
   // MissionaryDetail embedded object (flattened)
-  participationStartDate       DateTime @map("participation_start_date")
-  participationEndDate         DateTime @map("participation_end_date")
+  participationStartDate       DateTime? @map("participation_start_date")
+  participationEndDate         DateTime? @map("participation_end_date")
   price                        Int?
   description                  String?  @db.Text
   maximumParticipantCount      Int?     @map("maximum_participant_count")
@@ -151,8 +173,10 @@ model Missionary {
   status MissionStatus @default(RECRUITING)
 
   // Foreign keys
-  regionId   String  @map("region_id")
+  regionId   String?  @map("region_id")
+  missionGroupId String? @map("mission_group_id")
   createdById String @map("created_by_id")
+  order      Int?
 
   // Audit fields
   createdAt DateTime @default(now()) @map("created_at")
@@ -165,7 +189,8 @@ model Missionary {
   deletedAt DateTime? @map("deleted_at")
 
   // Relations
-  region          MissionaryRegion      @relation(fields: [regionId], references: [id])
+  region          MissionaryRegion?     @relation(fields: [regionId], references: [id])
+  missionGroup    MissionGroup?         @relation(fields: [missionGroupId], references: [id])
   creator         User                  @relation("MissionaryCreator", fields: [createdById], references: [id])
   posters         MissionaryPoster[]
   staff           MissionaryStaff[]
@@ -174,6 +199,7 @@ model Missionary {
   participations  Participation[]
   teams           Team[]
 
+  @@unique([missionGroupId, order])
   @@map("missionary")
 }
 

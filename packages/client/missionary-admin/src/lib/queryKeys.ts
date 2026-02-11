@@ -13,4 +13,8 @@ export const queryKeys = {
     all: ['regions'] as const,
     list: () => [...queryKeys.regions.all, 'list'] as const,
   },
+  missionGroups: {
+    all: ['missionGroups'] as const,
+    list: () => [...queryKeys.missionGroups.all, 'list'] as const,
+  },
 } as const;

@@ -1,5 +1,6 @@
 import api from './instance';
 import { type Region } from './region';
+import { type MissionGroup } from './missionGroup';
 
 export interface Missionary {
   id: string;
@@ -18,6 +19,9 @@ export interface Missionary {
   bankAccountNumber?: string;
   regionId: string;
   region?: Region;
+  missionGroupId?: string;
+  order?: number;
+  missionGroup?: MissionGroup;
   status: 'RECRUITING' | 'IN_PROGRESS' | 'COMPLETED';
   createdAt: string;
 }
@@ -28,8 +32,8 @@ export interface CreateMissionaryPayload {
   endDate: string;
   pastorName?: string;
   pastorPhone?: string;
-  participationStartDate: string;
-  participationEndDate: string;
+  participationStartDate?: string;
+  participationEndDate?: string;
   price?: number;
   description?: string;
   maximumParticipantCount?: number;
@@ -37,6 +41,8 @@ export interface CreateMissionaryPayload {
   bankAccountHolder?: string;
   bankAccountNumber?: string;
   regionId?: string;
+  missionGroupId?: string;
+  order?: number;
   status?: 'RECRUITING' | 'IN_PROGRESS' | 'COMPLETED';
 }
 
