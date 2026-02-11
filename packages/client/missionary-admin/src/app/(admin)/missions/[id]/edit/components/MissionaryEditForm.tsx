@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type Missionary } from 'apis/missionary';
-import { type Region } from 'apis/region';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -18,13 +17,9 @@ import { useUpdateMissionary } from '../hooks/useUpdateMissionary';
 
 interface MissionaryEditFormProps {
   missionary: Missionary;
-  regions: Region[] | undefined;
 }
 
-export function MissionaryEditForm({
-  missionary,
-  regions,
-}: MissionaryEditFormProps) {
+export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
   const router = useRouter();
   const updateMutation = useUpdateMissionary(missionary.id);
 
@@ -34,7 +29,6 @@ export function MissionaryEditForm({
     defaultValues: {
       name: '',
       pastorName: '',
-      regionId: '',
     },
   });
 
@@ -44,7 +38,6 @@ export function MissionaryEditForm({
       startDate: new Date(missionary.startDate),
       endDate: new Date(missionary.endDate),
       pastorName: missionary.pastorName || '',
-      regionId: missionary.regionId || '',
       participationStartDate: new Date(missionary.participationStartDate),
       participationEndDate: new Date(missionary.participationEndDate),
     });
@@ -65,7 +58,6 @@ export function MissionaryEditForm({
     <div className="flex flex-col gap-6">
       <MissionForm
         form={form}
-        regions={regions}
         onSubmit={onSubmit}
         isPending={updateMutation.isPending}
         submitLabel="수정하기"

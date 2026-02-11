@@ -4,7 +4,6 @@ import { useParams } from 'next/navigation';
 
 import { MissionaryEditForm } from './components/MissionaryEditForm';
 import { useMissionary } from './hooks/useMissionary';
-import { useRegions } from '../../hooks/useRegions';
 
 export default function MissionaryEditPage() {
   const params = useParams();
@@ -12,8 +11,6 @@ export default function MissionaryEditPage() {
 
   const { data: missionary, isLoading: isMissionaryLoading } =
     useMissionary(id);
-  const { data: regions } = useRegions();
-
   if (isMissionaryLoading) {
     return (
       <div className="flex justify-center items-center h-full">로딩 중...</div>
@@ -31,7 +28,7 @@ export default function MissionaryEditPage() {
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
       <h1 className="text-2xl font-bold mb-8">선교 수정</h1>
-      <MissionaryEditForm missionary={missionary} regions={regions} />
+      <MissionaryEditForm missionary={missionary} />
     </div>
   );
 }

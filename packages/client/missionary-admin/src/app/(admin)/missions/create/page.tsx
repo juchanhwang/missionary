@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { MissionForm } from '../components/MissionForm';
-import { useRegions } from '../hooks/useRegions';
 import { missionSchema, type MissionFormData } from '../schemas/missionSchema';
 import { toMissionPayload } from '../utils/toMissionPayload';
 import { useCreateMissionary } from './hooks/useCreateMissionary';
@@ -18,11 +17,9 @@ export default function CreateMissionPage() {
     defaultValues: {
       name: '',
       pastorName: '',
-      regionId: '',
     },
   });
 
-  const { data: regions } = useRegions();
   const createMutation = useCreateMissionary();
 
   const onSubmit = (data: MissionFormData) => {
@@ -41,7 +38,6 @@ export default function CreateMissionPage() {
       <h1 className="text-2xl font-bold mb-4">신규 국내선교 생성</h1>
       <MissionForm
         form={form}
-        regions={regions}
         onSubmit={onSubmit}
         isPending={createMutation.isPending}
         submitLabel="생성하기"

@@ -36,7 +36,7 @@ export interface CreateMissionaryPayload {
   bankName?: string;
   bankAccountHolder?: string;
   bankAccountNumber?: string;
-  regionId: string;
+  regionId?: string;
   status?: 'RECRUITING' | 'IN_PROGRESS' | 'COMPLETED';
 }
 
