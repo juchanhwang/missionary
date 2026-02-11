@@ -8,6 +8,12 @@ import { UserService } from '@/user/user.service';
 
 import { AuthService } from './auth.service';
 
+jest.mock('bcrypt', () => ({
+  ...jest.requireActual('bcrypt'),
+  compare: jest.fn(),
+  hash: jest.fn().mockImplementation((data: string) => `hashed-${data}`),
+}));
+
 describe('AuthService', () => {
   let service: AuthService;
   let userService: jest.Mocked<UserService>;
@@ -160,21 +166,15 @@ describe('AuthService', () => {
       password: 'password123',
     };
 
-    beforeEach(() => {
-      jest
-        .spyOn(bcrypt, 'compare')
-        .mockImplementation(() => Promise.resolve(false));
-    });
-
     it('should successfully login admin with valid credentials', async () => {
-      const hashedPassword = await bcrypt.hash('password123', 10);
+      const hashedPassword = 'hashed-password123';
       const adminUser = {
         ...mockAdminUser,
         password: hashedPassword,
       };
 
       userService.findByLoginIdAndRole.mockResolvedValueOnce(adminUser);
-      (bcrypt.compare as unknown as jest.Mock).mockResolvedValueOnce(true);
+      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(true);
       jwtService.sign.mockReturnValueOnce('mock-access-token');
       jwtService.sign.mockReturnValueOnce('mock-refresh-token');
 
@@ -195,18 +195,22 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException with invalid password', async () => {
-      const hashedPassword = await bcrypt.hash('correct-password', 10);
+      const hashedPassword = 'hashed-correct-password';
       const adminUser = {
         ...mockAdminUser,
         password: hashedPassword,
       };
 
       userService.findByLoginIdAndRole.mockResolvedValueOnce(adminUser);
-      (bcrypt.compare as unknown as jest.Mock).mockResolvedValueOnce(false);
+      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
 
       await expect(service.loginAdmin(adminLoginDto)).rejects.toThrow(
         UnauthorizedException,
       );
+
+      userService.findByLoginIdAndRole.mockResolvedValueOnce(adminUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
+
       await expect(service.loginAdmin(adminLoginDto)).rejects.toThrow(
         '관리자 인증에 실패했습니다',
       );
@@ -218,6 +222,9 @@ describe('AuthService', () => {
       await expect(service.loginAdmin(adminLoginDto)).rejects.toThrow(
         UnauthorizedException,
       );
+
+      userService.findByLoginIdAndRole.mockResolvedValueOnce(null);
+
       await expect(service.loginAdmin(adminLoginDto)).rejects.toThrow(
         '관리자 인증에 실패했습니다',
       );
@@ -236,6 +243,11 @@ describe('AuthService', () => {
       await expect(service.loginAdmin(adminLoginDto)).rejects.toThrow(
         UnauthorizedException,
       );
+
+      userService.findByLoginIdAndRole.mockResolvedValueOnce(
+        adminUserNoPassword,
+      );
+
       await expect(service.loginAdmin(adminLoginDto)).rejects.toThrow(
         '관리자 인증에 실패했습니다',
       );
@@ -255,11 +267,11 @@ describe('AuthService', () => {
 
   describe('validateLocalUser', () => {
     it('should validate user with correct email and password', async () => {
-      const hashedPassword = await bcrypt.hash('password123', 10);
+      const hashedPassword = 'hashed-password123';
       const user = { ...mockAdminUser, password: hashedPassword };
 
       userService.findByEmail.mockResolvedValueOnce(user);
-      (bcrypt.compare as unknown as jest.Mock).mockResolvedValueOnce(true);
+      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(true);
 
       const result = await service.validateLocalUser(
         'admin@example.com',
@@ -270,11 +282,11 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException with invalid password', async () => {
-      const hashedPassword = await bcrypt.hash('correct-password', 10);
+      const hashedPassword = 'hashed-correct-password';
       const user = { ...mockAdminUser, password: hashedPassword };
 
       userService.findByEmail.mockResolvedValueOnce(user);
-      (bcrypt.compare as unknown as jest.Mock).mockResolvedValueOnce(false);
+      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
 
       await expect(
         service.validateLocalUser('admin@example.com', 'wrong-password'),
