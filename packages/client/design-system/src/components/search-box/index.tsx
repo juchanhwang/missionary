@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import React from 'react';
 
 interface SearchBoxProps {
@@ -20,8 +20,10 @@ export function SearchBox({
 }: SearchBoxProps) {
   return (
     <div
-      className={classnames(
-        'flex items-center px-4 py-2.5 rounded-lg bg-gray-02',
+      className={cn(
+        'flex w-full items-center px-4 py-2.5 rounded-lg bg-gray-02 transition-colors',
+        'focus-within:ring-1 focus-within:ring-ring focus-within:border-primary-50',
+        'hover:bg-gray-03',
         className,
       )}
     >

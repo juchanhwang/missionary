@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import React, { useId } from 'react';
 import ReactDatePicker from 'react-datepicker';
 
@@ -49,6 +49,7 @@ export function DatePicker({
   id: providedId,
   name,
   onBlur,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ref,
   ...rest
 }: DatePickerProps) {
@@ -59,11 +60,11 @@ export function DatePicker({
   const dateValue = value ?? selected;
 
   return (
-    <div className={classnames('relative flex flex-col', className)}>
+    <div className={cn('relative flex flex-col', className)}>
       {label && (
         <label
           htmlFor={inputId}
-          className={classnames(
+          className={cn(
             'mb-1 text-xs font-normal leading-[1.833] text-gray-70',
             hideLabel && 'sr-only',
           )}
@@ -72,20 +73,24 @@ export function DatePicker({
         </label>
       )}
       <div
-        className={classnames(
-          'flex h-12 items-center gap-2.5 pt-[14px] pb-[14px] pl-4 pr-4 rounded-lg',
-          disabled ? 'bg-gray-05' : 'bg-gray-02',
+        className={cn(
+          'flex w-full items-center gap-2 rounded-lg bg-gray-02 px-3 py-2 transition-colors',
+          'focus-within:ring-1 focus-within:ring-ring focus-within:border-primary-50',
+          disabled && 'cursor-not-allowed opacity-50 bg-gray-05',
+          !disabled && 'hover:bg-gray-03',
+          error &&
+            'border-error-60 focus-within:border-error-60 focus-within:ring-error-60',
         )}
       >
         <ReactDatePicker
           id={inputId}
           selected={dateValue}
-          onChange={onChange as any}
+          onChange={(date: Date | null) => onChange(date)}
           placeholderText={placeholder}
           disabled={disabled}
           name={name}
           onBlur={onBlur}
-          className="w-full border-0 bg-transparent text-black text-sm leading-[1.428] focus:outline-none placeholder:text-gray-30 disabled:text-primary-30"
+          className="w-full border-0 bg-transparent text-black text-sm leading-[1.428] focus:outline-none placeholder:text-gray-30 disabled:cursor-not-allowed"
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? errorId : undefined}
           autoComplete="off"

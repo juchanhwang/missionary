@@ -1,5 +1,5 @@
 import IconInputReset from '@assets/icons/icon-input-reset.svg';
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import React, { useId } from 'react';
 
 import type { InputHTMLAttributes } from 'react';
@@ -32,11 +32,11 @@ export function InputField({
   const showClearButton = hasValue && !disabled && onClear;
 
   return (
-    <div className={classnames('relative flex flex-col', className)}>
+    <div className={cn('relative flex flex-col', className)}>
       {label && (
         <label
           htmlFor={inputId}
-          className={classnames(
+          className={cn(
             'mb-1 text-xs font-normal leading-[1.833] text-gray-70',
             hideLabel && 'sr-only',
           )}
@@ -45,9 +45,13 @@ export function InputField({
         </label>
       )}
       <div
-        className={classnames(
-          'flex h-12 items-center gap-2.5 pt-[14px] pb-[14px] pl-4 pr-4 rounded-lg',
-          disabled ? 'bg-gray-05' : 'bg-gray-02',
+        className={cn(
+          'flex w-full items-center gap-2 rounded-lg bg-gray-02 px-3 py-2 transition-colors',
+          'focus-within:ring-1 focus-within:ring-ring focus-within:border-primary-50',
+          disabled && 'cursor-not-allowed opacity-50 bg-gray-05',
+          !disabled && 'hover:bg-gray-03',
+          error &&
+            'border-error-60 focus-within:border-error-60 focus-within:ring-error-60',
         )}
       >
         <input
@@ -57,17 +61,18 @@ export function InputField({
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
           ref={ref}
-          className="flex-1 border-0 bg-transparent text-black text-sm leading-[1.428] focus:outline-none placeholder:text-gray-30 disabled:text-primary-30"
+          className="flex-1 border-0 bg-transparent text-black text-sm leading-[1.428] focus:outline-none placeholder:text-gray-30 disabled:cursor-not-allowed"
           {...rest}
         />
         {showClearButton && (
           <button
             type="button"
             onClick={onClear}
-            className="shrink-0 flex items-center justify-center"
+            className="shrink-0 flex items-center justify-center focus:outline-none"
             aria-label="입력 내용 지우기"
+            tabIndex={-1}
           >
-            <IconInputReset className="w-5 h-5" />
+            <IconInputReset className="w-5 h-5 cursor-pointer" />
           </button>
         )}
       </div>
