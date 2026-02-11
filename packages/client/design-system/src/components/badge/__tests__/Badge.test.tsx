@@ -11,7 +11,7 @@ describe('Badge', () => {
   it('variant가 없으면 default variant가 적용된다', () => {
     render(<Badge>Default Badge</Badge>);
     const badge = screen.getByText('Default Badge');
-    expect(badge.className).toContain('bg-primary-80');
+    expect(badge.className).toContain('bg-gray-80');
   });
 
   it('success variant가 정상 적용된다', () => {
