@@ -6,6 +6,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { BoardModule } from './board/board.module';
 import { ChurchModule } from './church/church.module';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -39,6 +40,10 @@ import { UserModule } from './user/user.module';
   controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: RolesGuard,

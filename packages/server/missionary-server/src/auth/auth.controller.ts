@@ -12,12 +12,13 @@ import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
+import { Public } from '@/common/decorators/public.decorator';
+
 import { AuthService } from './auth.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { LoginDto } from './dto/login.dto';
 import { OAuthExceptionFilter } from './filters/oauth-exception.filter';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { KakaoAuthGuard } from './guards/kakao-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
@@ -58,6 +59,7 @@ export class AuthController {
     });
   }
 
+  @Public()
   @Post('login')
   @UseGuards(LocalAuthGuard)
   @ApiOperation({ summary: 'ID/PW 로그인' })
@@ -79,6 +81,7 @@ export class AuthController {
     return { message: '로그인 성공' };
   }
 
+  @Public()
   @Post('admin/login')
   @ApiOperation({ summary: '관리자 로그인 (loginId/password)' })
   async adminLogin(
@@ -92,6 +95,7 @@ export class AuthController {
     return { message: '관리자 로그인 성공' };
   }
 
+  @Public()
   @Get('google')
   @UseGuards(GoogleAuthGuard)
   @UseFilters(OAuthExceptionFilter)
@@ -100,6 +104,7 @@ export class AuthController {
     // GoogleAuthGuard가 리다이렉트 처리
   }
 
+  @Public()
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   @UseFilters(OAuthExceptionFilter)
@@ -122,6 +127,7 @@ export class AuthController {
     res.redirect(clientUrl);
   }
 
+  @Public()
   @Get('kakao')
   @UseGuards(KakaoAuthGuard)
   @UseFilters(OAuthExceptionFilter)
@@ -130,6 +136,7 @@ export class AuthController {
     // KakaoAuthGuard가 리다이렉트 처리
   }
 
+  @Public()
   @Get('kakao/callback')
   @UseGuards(KakaoAuthGuard)
   @UseFilters(OAuthExceptionFilter)
@@ -152,6 +159,7 @@ export class AuthController {
     res.redirect(clientUrl);
   }
 
+  @Public()
   @Post('refresh')
   @ApiOperation({ summary: '액세스 토큰 갱신' })
   async refresh(
@@ -173,12 +181,12 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '현재 로그인 사용자 정보 조회' })
   getMe(@Req() req: Request) {
     return req.user;
   }
 
+  @Public()
   @Post('logout')
   @ApiOperation({ summary: '로그아웃' })
   logout(@Res({ passthrough: true }) res: Response) {
