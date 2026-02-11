@@ -72,12 +72,12 @@
 
 ### Definition of Done
 
-- [ ] `pnpm test` (design-system) — 43+ tests, 0 failures
-- [ ] `pnpm build:ds` — exit 0, TypeScript 에러 없음
-- [ ] `pnpm build:admin` — exit 0, TypeScript 에러 없음
-- [ ] `pnpm type-check` — exit 0
-- [ ] `pnpm lint:all` — exit 0
-- [ ] `pnpm sb:ds` — Storybook 실행, 모든 스토리 렌더링 정상
+- [x] `pnpm test` (design-system) — 43+ tests, 0 failures
+- [x] `pnpm build:ds` — exit 0, TypeScript 에러 없음
+- [x] `pnpm build:admin` — exit 0, TypeScript 에러 없음
+- [x] `pnpm type-check` — exit 0
+- [x] `pnpm lint:all` — exit 0
+- [x] `pnpm sb:ds` — Storybook 실행, 모든 스토리 렌더링 정상
 
 ### Must Have
 
@@ -1044,8 +1044,8 @@ pnpm test --filter @samilhero/design-system 2>&1 | grep -c "uncontrolled"  # Exp
 
 ### Final Checklist
 
-- [ ] All "Must Have" present (focus rings, transitions, disabled states, Button padding, Select styling, cn())
-- [ ] All "Must NOT Have" absent (no @radix-ui, no theme.css color changes, no \_typography.scss changes)
-- [ ] All 43+ tests pass
-- [ ] All 21 Storybook stories render without errors
-- [ ] missionary-admin builds and runs without TypeScript errors
+- [x] All "Must Have" present (focus rings, transitions, disabled states, Button padding, Select styling, cn())
+- [x] All "Must NOT Have" absent (no @radix-ui, no theme.css color changes, no \_typography.scss changes)
+- [x] All 43+ tests pass
+- [x] All 21 Storybook stories render without errors
+- [x] missionary-admin builds and runs without TypeScript errors
