@@ -17,6 +17,8 @@ export default function CreateMissionPage() {
     defaultValues: {
       name: '',
       pastorName: '',
+      missionGroupId: undefined,
+      order: undefined,
     },
   });
 

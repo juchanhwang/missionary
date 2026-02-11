@@ -6,7 +6,13 @@ export function toMissionPayload(data: MissionFormData) {
     startDate: data.startDate.toISOString(),
     endDate: data.endDate.toISOString(),
     pastorName: data.pastorName,
-    participationStartDate: data.participationStartDate.toISOString(),
-    participationEndDate: data.participationEndDate.toISOString(),
+    ...(data.participationStartDate && {
+      participationStartDate: data.participationStartDate.toISOString(),
+    }),
+    ...(data.participationEndDate && {
+      participationEndDate: data.participationEndDate.toISOString(),
+    }),
+    missionGroupId: data.missionGroupId,
+    order: data.order,
   };
 }
