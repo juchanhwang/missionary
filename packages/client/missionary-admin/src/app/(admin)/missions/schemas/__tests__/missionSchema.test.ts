@@ -190,10 +190,10 @@ describe('missionSchema', () => {
       expect(result.data.participationEndDate).toBeInstanceOf(Date);
       expect(typeof result.data.startDate.getTime()).toBe('number');
       expect(typeof result.data.endDate.getTime()).toBe('number');
-      expect(typeof result.data.participationStartDate.getTime()).toBe(
+      expect(typeof result.data.participationStartDate?.getTime()).toBe(
         'number',
       );
-      expect(typeof result.data.participationEndDate.getTime()).toBe('number');
+      expect(typeof result.data.participationEndDate?.getTime()).toBe('number');
     }
   });
 });
