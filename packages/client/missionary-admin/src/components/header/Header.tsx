@@ -1,40 +1,47 @@
 'use client';
 
-import { IconButton } from '@samilhero/design-system';
-import { useAuth } from 'lib/auth/AuthContext';
+import { useState } from 'react';
 
 interface HeaderProps {
-  statusText?: string;
+  title?: string;
 }
 
-export function Header({
-  statusText = '진행중인 선교 : 선교를 생성 해주세요.',
-}: HeaderProps) {
-  const { user, logout } = useAuth();
+export function Header({ title = '대시보드' }: HeaderProps) {
+  const [searchValue, setSearchValue] = useState('');
 
   return (
-    <header className="relative flex items-center w-full h-16 bg-white border-b border-gray-10">
-      <span className="absolute left-10 top-1/2 -translate-y-1/2 text-lg font-semibold leading-snug text-gray-90">
-        {statusText}
-      </span>
-      <div className="absolute right-10 top-1/2 -translate-y-1/2 flex items-center gap-4">
-        {user && (
-          <span className="text-sm font-medium leading-normal text-gray-50">
-            {user.email}
-          </span>
-        )}
-        <button
-          type="button"
-          onClick={logout}
-          className="px-3 py-1.5 rounded-md border border-gray-30 text-sm text-gray-60 hover:bg-gray-10 transition-colors"
+    <header className="flex items-center justify-between w-full h-16 px-8 bg-white border-b border-gray-30">
+      <h1 className="text-xl font-semibold text-gray-90">{title}</h1>
+
+      <div className="relative w-64">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 18 18"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-50"
         >
-          로그아웃
-        </button>
-        <IconButton
-          type="button"
-          variant="ghost"
-          icon={<img src="/icon-home.svg" alt="" className="w-6 h-6" />}
-          label="홈으로"
+          <circle
+            cx="8"
+            cy="8"
+            r="5.25"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <path
+            d="M12 12L16 16"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+        <input
+          type="text"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          placeholder="검색..."
+          className="w-full h-10 pl-10 pr-4 rounded-lg bg-gray-10 text-sm text-gray-90 placeholder:text-gray-50 border border-transparent focus:border-gray-40 focus:outline-none transition-colors"
         />
       </div>
     </header>
