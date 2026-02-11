@@ -98,6 +98,24 @@ async function seedMissionaryRegions() {
   }
 }
 
+async function seedMissionGroups() {
+  const groups = [{ name: '군선교', type: 'DOMESTIC' as const }];
+
+  for (const data of groups) {
+    const existing = await prisma.missionGroup.findFirst({
+      where: { name: data.name, deletedAt: null },
+    });
+
+    if (existing) {
+      console.log(`  ✓ 선교 그룹 이미 존재: ${data.name}`);
+      continue;
+    }
+
+    await prisma.missionGroup.create({ data });
+    console.log(`  + 선교 그룹 생성: ${data.name}`);
+  }
+}
+
 async function main() {
   console.log('🌱 Seed 시작...\n');
 
@@ -109,6 +127,9 @@ async function main() {
 
   console.log('\n[선교 지역]');
   await seedMissionaryRegions();
+
+  console.log('\n[선교 그룹]');
+  await seedMissionGroups();
 
   console.log('\n✅ Seed 완료');
 }
