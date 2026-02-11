@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 
 import type { ReactNode } from 'react';
 
@@ -12,7 +12,7 @@ interface ChipsProps {
 export function Chips({ children, className }: ChipsProps) {
   return (
     <span
-      className={classnames(
+      className={cn(
         'inline-flex items-center px-3 py-1.5 rounded-2xl bg-gray-05 text-black text-sm leading-[1.429] whitespace-nowrap',
         className,
       )}

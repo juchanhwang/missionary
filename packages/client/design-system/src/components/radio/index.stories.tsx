@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import { useState } from 'react';
 
 import { Radio } from '.';
@@ -25,13 +25,13 @@ const RadioComponent = ({
         {...args}
         value="value1"
         onChange={(e) => setChecked(e.target.checked)}
-        className={classnames(
+        className={cn(
           'flex items-center w-[200px] cursor-pointer',
           args.disabled && 'cursor-not-allowed',
         )}
       >
         <span
-          className={classnames(
+          className={cn(
             'relative inline-block w-4 h-4 mr-2 border border-black rounded-full',
             checked &&
               "after:content-['v'] after:text-base after:font-bold after:w-4 after:h-4 after:text-center after:absolute after:left-0 after:top-0",

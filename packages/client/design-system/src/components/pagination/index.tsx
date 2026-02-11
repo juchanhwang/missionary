@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 
 interface PaginationProps {
   currentPage: number;
@@ -36,14 +36,14 @@ export function Pagination({
   const navButtonClass =
     'flex items-center justify-center w-8 h-8 p-0 border-0 rounded bg-transparent cursor-pointer text-gray-30 hover:bg-gray-02 disabled:cursor-default disabled:opacity-30 disabled:hover:bg-transparent';
   const pageNumberClass = (active: boolean) =>
-    classnames(
+    cn(
       'flex items-center justify-center w-8 h-8 p-0 border-0 rounded bg-transparent text-sm leading-[1.429] cursor-pointer hover:bg-gray-02',
       active ? 'text-black font-bold' : 'text-gray-30 font-normal',
     );
 
   return (
     <nav
-      className={classnames('flex items-center gap-1', className)}
+      className={cn('flex items-center gap-1', className)}
       aria-label="페이지 네비게이션"
     >
       <button

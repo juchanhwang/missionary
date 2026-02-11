@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import React from 'react';
 
 export interface NavItemProps {
@@ -33,21 +33,21 @@ export function NavItem({
   const baseClasses =
     'flex items-center justify-between w-full transition-colors duration-200 cursor-pointer text-left font-medium text-[15px] leading-[22px]';
 
-  const parentClasses = classnames(
+  const parentClasses = cn(
     'h-[55px] px-[20px] text-white border-b border-gray-05 hover:bg-white/5',
     {
       'bg-white/5': isActive,
     },
   );
 
-  const childClasses = classnames(
+  const childClasses = cn(
     'h-[55px] px-[24px] bg-secondary-10 text-primary-80 hover:bg-white/12',
     {
       'bg-white/12': isActive,
     },
   );
 
-  const classes = classnames(
+  const classes = cn(
     baseClasses,
     isParent ? parentClasses : childClasses,
     className,
@@ -63,7 +63,7 @@ export function NavItem({
           viewBox="0 0 20 20"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className={classnames('transition-transform duration-200', {
+          className={cn('transition-transform duration-200', {
             'rotate-180': isExpanded,
           })}
         >

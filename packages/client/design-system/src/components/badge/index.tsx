@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 
 import type { ReactNode } from 'react';
 
@@ -21,7 +21,7 @@ const variantClasses: Record<BadgeVariant, string> = {
 export function Badge({ variant, children, className }: BadgeProps) {
   return (
     <span
-      className={classnames(
+      className={cn(
         'inline-flex items-center px-2 py-1 rounded text-sm font-bold leading-[1.429] whitespace-nowrap',
         variantClasses[variant],
         className,

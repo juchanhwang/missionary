@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import { type ButtonHTMLAttributes } from 'react';
 
 type IconButtonSize = 'sm' | 'md' | 'lg';
@@ -43,7 +43,7 @@ export function IconButton({
 
   return (
     <button
-      className={classnames(
+      className={cn(
         'rounded-lg flex items-center justify-center transition-colors',
         sizeClasses[size],
         hasLabel ? 'w-auto px-3 gap-[4px]' : squareClasses[size],

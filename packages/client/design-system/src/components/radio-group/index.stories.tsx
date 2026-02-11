@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import { useState } from 'react';
 
 import { Radio } from '../radio';
@@ -32,7 +32,7 @@ const RadioGroupComponent = ({
           {...args}
           value={checked}
           onChange={(newChecked) => setChecked(newChecked)}
-          className={classnames(args.disabled && 'cursor-not-allowed')}
+          className={cn(args.disabled && 'cursor-not-allowed')}
         >
           <div className="flex flex-col gap-4">
             {dataList.map((data) => (
@@ -42,7 +42,7 @@ const RadioGroupComponent = ({
                 className="flex items-center w-[200px] cursor-pointer"
               >
                 <span
-                  className={classnames(
+                  className={cn(
                     'relative inline-block w-4 h-4 mr-2 border border-black rounded-full',
                     checked === data &&
                       "after:content-['v'] after:text-base after:font-bold after:w-4 after:h-4 after:text-center after:absolute after:left-0 after:top-0",

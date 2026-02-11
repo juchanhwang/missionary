@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 
 interface DividerProps {
   height?: 4 | 10 | 12 | 24;
@@ -17,11 +17,7 @@ const heightClasses: Record<number, string> = {
 export function Divider({ height = 4, className }: DividerProps) {
   return (
     <div
-      className={classnames(
-        'w-full bg-gray-05',
-        heightClasses[height],
-        className,
-      )}
+      className={cn('w-full bg-gray-05', heightClasses[height], className)}
     />
   );
 }

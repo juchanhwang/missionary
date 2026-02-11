@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 
 interface TopButtonProps {
   onClick?: () => void;
@@ -12,7 +12,7 @@ export function TopButton({ onClick, className }: TopButtonProps) {
     <button
       type="button"
       onClick={onClick}
-      className={classnames(
+      className={cn(
         'flex items-center justify-center w-12 h-12 p-0 border border-gray-05 rounded-full bg-white opacity-70 cursor-pointer hover:opacity-100',
         className,
       )}

@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import React from 'react';
 
 import type { ReactNode, CSSProperties } from 'react';
@@ -52,7 +52,7 @@ export const Text: TextComponent = <T extends React.ElementType = 'span'>({
   return (
     <Component
       ref={ref}
-      className={classnames(
+      className={cn(
         {
           [`typography-${typo}`]: typo,
         },

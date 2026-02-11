@@ -68,8 +68,10 @@
     "vitest": "^2.1.8"
   },
   "dependencies": {
-    "classnames": "^2.5.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "overlay-kit": "^1.8.6",
-    "react-datepicker": "^9.1.0"
+    "react-datepicker": "^9.1.0",
+    "tailwind-merge": "^3.4.0"
   }
 }

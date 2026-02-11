@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import { useState } from 'react';
 
 import { Text } from '../text';
@@ -34,7 +34,7 @@ export const Primary: Story = {
               <div className="flex flex-col gap-4">
                 <CheckboxGroup.Item value={'value1'}>
                   <span
-                    className={classnames(
+                    className={cn(
                       'relative inline-block w-4 h-4 mr-2 border border-black',
                       checked.includes('value1') &&
                         "after:content-['V'] after:text-base after:font-bold after:w-4 after:h-4 after:text-center after:absolute after:left-0 after:top-0",
@@ -44,7 +44,7 @@ export const Primary: Story = {
                 </CheckboxGroup.Item>
                 <CheckboxGroup.Item value={'value2'}>
                   <span
-                    className={classnames(
+                    className={cn(
                       'relative inline-block w-4 h-4 mr-2 border border-black',
                       checked.includes('value2') &&
                         "after:content-['V'] after:text-base after:font-bold after:w-4 after:h-4 after:text-center after:absolute after:left-0 after:top-0",

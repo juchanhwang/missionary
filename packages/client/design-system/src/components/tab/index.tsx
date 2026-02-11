@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import React from 'react';
 
 interface TabProps {
@@ -15,11 +15,11 @@ interface TabProps {
 
 export const Tab = ({ list, selectedValue, onChange, className }: TabProps) => {
   return (
-    <div className={classnames('flex', className)}>
+    <div className={cn('flex', className)}>
       {list.map((category) => (
         <div
           key={category.value}
-          className={classnames(
+          className={cn(
             'p-2.5 text-base font-bold leading-[22px] text-center cursor-pointer',
             category.value === selectedValue
               ? 'border-b border-primary-80 text-primary-80'

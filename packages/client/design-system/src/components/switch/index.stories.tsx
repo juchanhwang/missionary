@@ -1,4 +1,4 @@
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import { useState } from 'react';
 
 import { Switch } from '.';
@@ -26,13 +26,13 @@ export const Primary: Story = {
               setChecked(e.target.checked);
             }}
             value={'value'}
-            className={classnames(
+            className={cn(
               'relative inline-block w-[60px] h-[34px] rounded-[34px] cursor-pointer hover:bg-gray-50',
               checked ? 'bg-blue-50' : 'bg-gray-30',
             )}
           >
             <span
-              className={classnames(
+              className={cn(
                 'absolute inset-0 rounded-[34px] transition-all duration-400',
                 "before:content-[''] before:absolute before:bottom-1 before:left-1 before:w-[26px] before:h-[26px] before:rounded-full before:bg-white before:transition-all before:duration-400",
                 checked && 'before:translate-x-[26px]',
