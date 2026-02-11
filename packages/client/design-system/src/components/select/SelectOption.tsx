@@ -1,7 +1,8 @@
-import { useContextAction } from '@hooks';
+import { useContextAction, useContextData } from '@hooks';
+import { cn } from '@lib/utils';
 import React from 'react';
 
-import { SelectActionsContext } from './index';
+import { SelectActionsContext, SelectDataContext } from './index';
 
 import type { HTMLAttributes } from 'react';
 
@@ -17,11 +18,21 @@ export const SelectOption = ({
   ...props
 }: SelectOptionProps) => {
   const actions = useContextAction('Select.Option', SelectActionsContext);
+  const data = useContextData('Select.Option', SelectDataContext);
+
+  const isSelected = Array.isArray(data.selectedValue)
+    ? data.selectedValue.includes(item)
+    : data.selectedValue === item;
 
   return (
     <li
       ref={ref}
-      className={className}
+      className={cn(
+        'relative flex cursor-pointer select-none items-center px-4 py-2.5 text-sm transition-colors hover:bg-gray-02 active:bg-gray-05',
+        'data-[selected=true]:bg-primary-10 data-[selected=true]:text-primary-80',
+        className,
+      )}
+      data-selected={isSelected}
       onClick={() => {
         actions.handleSelectValue(item);
       }}

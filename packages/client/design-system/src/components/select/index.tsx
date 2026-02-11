@@ -1,7 +1,5 @@
 'use client';
 
-// TODO: (주찬) 아직 작업 중인 컴포넌트입니다. [24-03-30]
-
 import { useControllableState, useMergeRefs } from '@hooks';
 import React, {
   createContext,
@@ -55,9 +53,17 @@ const SelectRoot = ({
   const mergedRef = useMergeRefs(ref, selectRef);
   const onBlurRef = useRef(onBlur);
   const [open, setOpen] = useState(false);
+
+  // Normalize undefined value to null when onChange is present to prevent uncontrolled->controlled warning
+  // This is common with RHF which passes undefined as initial value
+  const effectiveControlledValue =
+    controlledValue === undefined && controlledOnChange
+      ? null
+      : controlledValue;
+
   const [selectedValue = multiple ? [] : undefined, setSelectedValue] =
     useControllableState<ValueType>(
-      controlledValue,
+      effectiveControlledValue,
       controlledOnChange,
       defaultValue,
     );
@@ -105,6 +111,17 @@ const SelectRoot = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && open) {
+        setOpen(false);
+        onBlurRef.current?.();
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [open]);
 
   const actions = useMemo(
     () => ({

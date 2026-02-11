@@ -1,6 +1,6 @@
 'use client';
 
-import classnames from 'classnames';
+import { cn } from '@lib/utils';
 import { type ButtonHTMLAttributes } from 'react';
 
 type ButtonColor = 'primary' | 'secondary';
@@ -47,8 +47,8 @@ export function Button({
 
   return (
     <button
-      className={classnames(
-        'text-base font-bold rounded-lg',
+      className={cn(
+        'text-base font-bold rounded-lg transition-colors',
         sizeClasses[size],
         variant === 'filled' ? filledColorClasses[color] : outlineClasses,
         className,

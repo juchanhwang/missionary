@@ -61,6 +61,10 @@ export default defineConfig({
         replacement: resolve(srcPath, 'hooks'),
       },
       {
+        find: '@lib',
+        replacement: resolve(srcPath, 'lib'),
+      },
+      {
         find: /^@styles\//,
         replacement: resolve(srcPath, 'styles/'),
       },
