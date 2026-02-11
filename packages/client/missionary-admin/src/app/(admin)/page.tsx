@@ -321,7 +321,7 @@ function MissionCardItem({ mission }: { mission: MissionCard }) {
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 p-8">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {STATS.map((stat) => (
           <div

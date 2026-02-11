@@ -1,12 +1,29 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
-interface HeaderProps {
-  title?: string;
+const PAGE_TITLES: Record<string, string> = {
+  '/': '대시보드',
+  '/missions': '선교 관리',
+  '/users': '유저 관리',
+  '/regions': '연계지 관리',
+  '/posts': '게시 관리',
+  '/terms': '약관 관리',
+  '/notices': '공지 관리',
+};
+
+function getPageTitle(pathname: string): string {
+  for (const [path, title] of Object.entries(PAGE_TITLES)) {
+    if (path === '/' && pathname === '/') return title;
+    if (path !== '/' && pathname.startsWith(path)) return title;
+  }
+  return '대시보드';
 }
 
-export function Header({ title = '대시보드' }: HeaderProps) {
+export function Header() {
+  const pathname = usePathname();
+  const title = getPageTitle(pathname);
   const [searchValue, setSearchValue] = useState('');
 
   return (
