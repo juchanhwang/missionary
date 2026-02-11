@@ -12,6 +12,7 @@ import { ChurchModule } from './church/church.module';
 import { RolesGuard } from './common/guards/roles.guard';
 import { BullModule } from './common/queue/bull.module';
 import { PrismaModule } from './database/prisma.module';
+import { MissionGroupModule } from './mission-group/mission-group.module';
 import { MissionaryModule } from './missionary/missionary.module';
 import { ParticipationModule } from './participation/participation.module';
 import { RegionModule } from './region/region.module';
@@ -29,6 +30,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     AuthModule,
     RegionModule,
+    MissionGroupModule,
     ChurchModule,
     MissionaryModule,
     StaffModule,

@@ -44,16 +44,20 @@ export class CreateMissionaryDto {
   @ApiProperty({
     example: '2024-06-01',
     description: '참가 신청 시작일',
+    required: false,
   })
+  @IsOptional()
   @IsDateString()
-  declare participationStartDate: string;
+  declare participationStartDate?: string;
 
   @ApiProperty({
     example: '2024-06-25',
     description: '참가 신청 종료일',
+    required: false,
   })
+  @IsOptional()
   @IsDateString()
-  declare participationEndDate: string;
+  declare participationEndDate?: string;
 
   @ApiProperty({
     example: 500000,
@@ -112,9 +116,29 @@ export class CreateMissionaryDto {
   @ApiProperty({
     example: 'uuid-string',
     description: '선교 지역 ID',
+    required: false,
   })
+  @IsOptional()
   @IsUUID()
-  declare regionId: string;
+  declare regionId?: string;
+
+  @ApiProperty({
+    example: 'uuid-string',
+    description: '선교 그룹 ID',
+    required: false,
+  })
+  @IsOptional()
+  @IsUUID()
+  declare missionGroupId?: string;
+
+  @ApiProperty({
+    example: 1,
+    description: '선교 차수 (그룹 내 순서)',
+    required: false,
+  })
+  @IsOptional()
+  @IsInt()
+  declare order?: number;
 
   @ApiProperty({
     enum: ['RECRUITING', 'IN_PROGRESS', 'COMPLETED'],

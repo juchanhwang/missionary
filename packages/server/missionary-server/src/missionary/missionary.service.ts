@@ -12,15 +12,53 @@ export class MissionaryService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(userId: string, dto: CreateMissionaryDto) {
+    let finalOrder = dto.order;
+    let finalName = dto.name;
+
+    if (dto.missionGroupId) {
+      // Verify MissionGroup exists
+      const group = await this.prisma.missionGroup.findUnique({
+        where: { id: dto.missionGroupId },
+      });
+
+      if (!group) {
+        throw new NotFoundException(
+          `MissionGroup with ID ${dto.missionGroupId} not found`,
+        );
+      }
+
+      // Auto-increment order if not provided
+      if (finalOrder === undefined || finalOrder === null) {
+        const maxOrder = await this.prisma.missionary.aggregate({
+          where: {
+            missionGroupId: dto.missionGroupId,
+          },
+          _max: {
+            order: true,
+          },
+        });
+        finalOrder = (maxOrder._max.order ?? 0) + 1;
+      }
+
+      // Auto-fill name if empty
+      if (!finalName || finalName.trim() === '') {
+        finalName = `${finalOrder}차 ${group.name}`;
+      }
+    }
+
     return this.prisma.missionary.create({
       data: {
-        name: dto.name,
+        name: finalName,
         startDate: new Date(dto.startDate),
         endDate: new Date(dto.endDate),
         pastorName: dto.pastorName,
         pastorPhone: dto.pastorPhone,
-        participationStartDate: new Date(dto.participationStartDate),
-        participationEndDate: new Date(dto.participationEndDate),
+        participationStartDate: dto.participationStartDate
+          ? new Date(dto.participationStartDate)
+          : null,
+        participationEndDate: dto.participationEndDate
+          ? new Date(dto.participationEndDate)
+          : null,
         price: dto.price,
         description: dto.description,
         maximumParticipantCount: dto.maximumParticipantCount,
@@ -28,11 +66,14 @@ export class MissionaryService {
         bankAccountHolder: dto.bankAccountHolder,
         bankAccountNumber: dto.bankAccountNumber,
         regionId: dto.regionId,
+        missionGroupId: dto.missionGroupId,
+        order: finalOrder,
         createdById: userId,
         status: dto.status,
       },
       include: {
         region: true,
+        missionGroup: true,
       },
     });
   }
@@ -44,6 +85,7 @@ export class MissionaryService {
       },
       include: {
         region: true,
+        missionGroup: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -56,6 +98,7 @@ export class MissionaryService {
       where: { id },
       include: {
         region: true,
+        missionGroup: true,
         posters: true,
         churches: true,
       },

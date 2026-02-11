@@ -92,12 +92,27 @@ export class PrismaService
   }
 
   async onModuleInit() {
-    try {
-      await this.$connect();
-      this.logger.log('Database connection established');
-    } catch (error) {
-      this.logger.error('Failed to connect to database', error);
-      throw error;
+    const MAX_RETRIES = 5;
+    const RETRY_DELAY_MS = 2_000;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        await this.$connect();
+        this.logger.log('Database connection established');
+        return;
+      } catch (error) {
+        if (attempt === MAX_RETRIES) {
+          this.logger.error(
+            `Failed to connect to database after ${MAX_RETRIES} attempts`,
+            error,
+          );
+          throw error;
+        }
+        this.logger.warn(
+          `Database connection attempt ${attempt}/${MAX_RETRIES} failed. Retrying in ${RETRY_DELAY_MS / 1_000}s...`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      }
     }
   }
 
