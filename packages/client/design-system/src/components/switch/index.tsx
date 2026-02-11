@@ -1,6 +1,7 @@
 'use client';
 
 import { useControllableState, useMergeRefs } from '@hooks';
+import { cn } from '@lib/utils';
 import React, { createContext, useMemo, useRef } from 'react';
 
 export const SwitchActionsContext = createContext<{
@@ -25,6 +26,7 @@ interface SwitchProps extends Omit<
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
+  label?: string;
   ref?: React.Ref<HTMLInputElement>;
   focus?: boolean;
 }
@@ -37,6 +39,7 @@ export function Switch({
   disabled,
   className,
   children,
+  label,
   name,
   ref,
   ...props
@@ -74,6 +77,30 @@ export function Switch({
     internalRef.current?.click();
   };
 
+  const defaultVisual = !children && (
+    <label
+      className={cn(
+        'inline-flex items-center gap-2',
+        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+      )}
+    >
+      <span
+        className={cn(
+          'relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors',
+          checked ? 'bg-primary-80' : 'bg-gray-20',
+        )}
+      >
+        <span
+          className={cn(
+            'inline-block h-4 w-4 rounded-full bg-white shadow transition-transform',
+            checked ? 'translate-x-4' : 'translate-x-0.5',
+          )}
+        />
+      </span>
+      {label && <span className="text-sm">{label}</span>}
+    </label>
+  );
+
   return (
     <SwitchActionsContext.Provider value={actions}>
       <SwitchDataContext.Provider value={data}>
@@ -93,7 +120,7 @@ export function Switch({
           onClick={disabled ? undefined : handleClick}
           {...props}
         >
-          {children}
+          {children || defaultVisual}
         </div>
       </SwitchDataContext.Provider>
     </SwitchActionsContext.Provider>

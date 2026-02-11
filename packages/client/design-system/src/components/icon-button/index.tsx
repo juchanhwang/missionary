@@ -1,34 +1,44 @@
 'use client';
 
 import { cn } from '@lib/utils';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { type ButtonHTMLAttributes } from 'react';
 
-type IconButtonSize = 'sm' | 'md' | 'lg';
-type IconButtonVariant = 'filled' | 'ghost';
+const iconButtonVariants = cva(
+  'rounded-lg flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  {
+    variants: {
+      variant: {
+        ghost: 'bg-transparent hover:bg-gray-02',
+        filled: 'bg-primary-80 text-white hover:bg-primary-60',
+        outline: 'border border-gray-20 bg-transparent hover:bg-gray-02',
+      },
+      size: {
+        sm: 'h-8',
+        md: 'h-10',
+        lg: 'h-12',
+      },
+    },
+    defaultVariants: {
+      variant: 'ghost',
+      size: 'md',
+    },
+  },
+);
 
-export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  icon: React.ReactNode;
-  label?: string;
-  size?: IconButtonSize;
-  variant?: IconButtonVariant;
-}
-
-const sizeClasses: Record<IconButtonSize, string> = {
-  sm: 'h-8',
-  md: 'h-10',
-  lg: 'h-12',
-};
-
-const squareClasses: Record<IconButtonSize, string> = {
+const squareClasses: Record<'sm' | 'md' | 'lg', string> = {
   sm: 'w-8',
   md: 'w-10',
   lg: 'w-12',
 };
 
-const variantClasses: Record<IconButtonVariant, string> = {
-  ghost: 'bg-transparent hover:bg-gray-02',
-  filled: 'bg-primary-80 text-white hover:bg-primary-60',
-};
+export interface IconButtonProps
+  extends
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof iconButtonVariants> {
+  icon: React.ReactNode;
+  label?: string;
+}
 
 export function IconButton({
   icon,
@@ -36,7 +46,6 @@ export function IconButton({
   size = 'md',
   variant = 'ghost',
   className,
-  style,
   ...props
 }: IconButtonProps) {
   const hasLabel = !!label;
@@ -44,13 +53,10 @@ export function IconButton({
   return (
     <button
       className={cn(
-        'rounded-lg flex items-center justify-center transition-colors',
-        sizeClasses[size],
-        hasLabel ? 'w-auto px-3 gap-[4px]' : squareClasses[size],
-        variantClasses[variant],
+        iconButtonVariants({ variant, size }),
+        hasLabel ? 'w-auto px-3 gap-1' : squareClasses[size!],
         className,
       )}
-      style={style}
       {...props}
     >
       {icon}

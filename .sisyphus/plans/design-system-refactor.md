@@ -275,7 +275,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 2. Button 완전 리팩토링 — Shadcn 스타일 + admin 소비 코드 업데이트
+- [x] 2. Button 완전 리팩토링 — Shadcn 스타일 + admin 소비 코드 업데이트
 
   **What to do**:
   - `cva`로 Button variant 시스템 재구축:
@@ -426,7 +426,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 3. Select 리팩토링 — 스타일링 + 타입 에러 수정
+- [x] 3. Select 리팩토링 — 스타일링 + 타입 에러 수정
 
   **What to do**:
   - WIP TODO 주석 제거 (`// TODO: (주찬) 아직 작업 중인 컴포넌트입니다.`)
@@ -526,7 +526,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 4. Input 패밀리 개선 — Input, InputField, DatePicker, SearchBox
+- [x] 4. Input 패밀리 개선 — Input, InputField, DatePicker, SearchBox
 
   **What to do**:
   - **Input 리팩토링** (가장 문제 많음):
@@ -624,7 +624,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 5. Badge + IconButton + Chips 현대화
+- [x] 5. Badge + IconButton + Chips 현대화
 
   **What to do**:
   - **Badge**:
@@ -701,7 +701,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 6. Form Controls 비주얼 추가 — Checkbox, Radio, Switch + Groups
+- [x] 6. Form Controls 비주얼 추가 — Checkbox, Radio, Switch + Groups
 
   **What to do**:
   - **Checkbox 기본 비주얼 추가**:
@@ -797,7 +797,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 7. 나머지 컴포넌트 현대화 — Tab, Tooltip, NavItem, Pagination, Divider, Text, TopButton
+- [x] 7. 나머지 컴포넌트 현대화 — Tab, Tooltip, NavItem, Pagination, Divider, Text, TopButton
 
   **What to do**:
   - **Tab 현대화**:

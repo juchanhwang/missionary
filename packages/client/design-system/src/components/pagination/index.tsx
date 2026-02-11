@@ -34,11 +34,13 @@ export function Pagination({
   const hasNext = currentPage < totalPages;
 
   const navButtonClass =
-    'flex items-center justify-center w-8 h-8 p-0 border-0 rounded bg-transparent cursor-pointer text-gray-30 hover:bg-gray-02 disabled:cursor-default disabled:opacity-30 disabled:hover:bg-transparent';
+    'flex items-center justify-center w-8 h-8 p-0 border-0 rounded bg-transparent cursor-pointer text-gray-30 transition-colors hover:bg-gray-02 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-default disabled:opacity-30 disabled:hover:bg-transparent';
   const pageNumberClass = (active: boolean) =>
     cn(
-      'flex items-center justify-center w-8 h-8 p-0 border-0 rounded bg-transparent text-sm leading-[1.429] cursor-pointer hover:bg-gray-02',
-      active ? 'text-black font-bold' : 'text-gray-30 font-normal',
+      'flex items-center justify-center w-8 h-8 p-0 border-0 rounded text-sm leading-[1.429] cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+      active
+        ? 'bg-primary-80 text-white font-bold hover:bg-primary-60'
+        : 'bg-transparent text-gray-30 font-normal hover:bg-gray-02',
     );
 
   return (

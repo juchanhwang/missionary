@@ -31,7 +31,7 @@ export function NavItem({
   const isParent = depth === 0;
 
   const baseClasses =
-    'flex items-center justify-between w-full transition-colors duration-200 cursor-pointer text-left font-medium text-[15px] leading-[22px]';
+    'flex items-center justify-between w-full transition-colors duration-200 cursor-pointer text-left font-medium text-[15px] leading-[22px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring';
 
   const parentClasses = cn(
     'h-[55px] px-[20px] text-white border-b border-gray-05 hover:bg-white/5',

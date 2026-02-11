@@ -1,6 +1,7 @@
 'use client';
 
 import { useControllableState, useMergeRefs } from '@hooks';
+import { cn } from '@lib/utils';
 import React, { useContext, createContext, useMemo, useRef } from 'react';
 
 import { CheckboxGroupActionsContext } from '../checkbox-group/checkboxGroupContext';
@@ -27,6 +28,7 @@ interface CheckboxProps extends Omit<
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
+  label?: string;
   ref?: React.Ref<HTMLInputElement>;
 }
 
@@ -38,6 +40,7 @@ export function Checkbox({
   disabled,
   className,
   children,
+  label,
   name,
   ref,
   ...props
@@ -79,6 +82,39 @@ export function Checkbox({
     internalRef.current?.click();
   };
 
+  const defaultVisual = !children && (
+    <label
+      className={cn(
+        'inline-flex items-center gap-2',
+        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+      )}
+    >
+      <span
+        className={cn(
+          'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors',
+          checked
+            ? 'border-primary-80 bg-primary-80'
+            : 'border-gray-30 bg-white',
+        )}
+      >
+        {checked && (
+          <svg
+            className="h-3 w-3 text-white"
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M2.5 6L5 8.5L9.5 3.5" />
+          </svg>
+        )}
+      </span>
+      {label && <span className="text-sm">{label}</span>}
+    </label>
+  );
+
   return (
     <CheckboxActionsContext.Provider value={actions}>
       <CheckboxDataContext.Provider value={data}>
@@ -98,7 +134,7 @@ export function Checkbox({
           onClick={disabled ? undefined : handleClick}
           {...props}
         >
-          {children}
+          {children || defaultVisual}
         </div>
       </CheckboxDataContext.Provider>
     </CheckboxActionsContext.Provider>

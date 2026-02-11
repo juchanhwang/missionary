@@ -1,4 +1,3 @@
-import { cn } from '@lib/utils';
 import { useState } from 'react';
 
 import { Switch } from '.';
@@ -7,40 +6,49 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta<typeof Switch> = {
   component: Switch,
+  title: 'Components/Switch',
+  parameters: { layout: 'centered' },
+  tags: ['autodocs'],
 };
 
 export default meta;
 type Story = StoryObj<typeof Switch>;
 
-export const Primary: Story = {
-  render: (args) =>
-    (() => {
-      const [checked, setChecked] = useState(false);
+function DefaultSwitch() {
+  const [checked, setChecked] = useState(false);
+  return (
+    <Switch
+      checked={checked}
+      onChange={(e) => setChecked(e.target.checked)}
+      label="Enable notifications"
+    />
+  );
+}
 
-      return (
-        <div className="relative flex items-center">
-          <Switch
-            {...args}
-            checked={checked}
-            onChange={(e) => {
-              setChecked(e.target.checked);
-            }}
-            value={'value'}
-            className={cn(
-              'relative inline-block w-[60px] h-[34px] rounded-[34px] cursor-pointer hover:bg-gray-50',
-              checked ? 'bg-blue-50' : 'bg-gray-30',
-            )}
-          >
-            <span
-              className={cn(
-                'absolute inset-0 rounded-[34px] transition-all duration-400',
-                "before:content-[''] before:absolute before:bottom-1 before:left-1 before:w-[26px] before:h-[26px] before:rounded-full before:bg-white before:transition-all before:duration-400",
-                checked && 'before:translate-x-[26px]',
-              )}
-            />
-          </Switch>
-        </div>
-      );
-    })(),
-  args: {},
+export const Default: Story = {
+  render: () => <DefaultSwitch />,
+};
+
+function CheckedSwitch() {
+  const [checked, setChecked] = useState(true);
+  return (
+    <Switch
+      checked={checked}
+      onChange={(e) => setChecked(e.target.checked)}
+      label="Dark mode"
+    />
+  );
+}
+
+export const Checked: Story = {
+  render: () => <CheckedSwitch />,
+};
+
+export const Disabled: Story = {
+  render: () => (
+    <div className="flex flex-col gap-3">
+      <Switch checked={false} disabled label="Disabled off" />
+      <Switch checked={true} disabled label="Disabled on" />
+    </div>
+  ),
 };

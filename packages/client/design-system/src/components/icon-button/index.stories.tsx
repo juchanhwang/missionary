@@ -33,7 +33,7 @@ const meta: Meta<typeof IconButton> = {
     },
     variant: {
       control: { type: 'select' },
-      options: ['filled', 'ghost'],
+      options: ['filled', 'ghost', 'outline'],
     },
     label: {
       control: { type: 'text' },
@@ -75,6 +75,7 @@ export const Variants: Story = {
     <div className="flex items-center gap-4 p-4 rounded">
       <IconButton {...args} variant="ghost" label="Ghost" />
       <IconButton {...args} variant="filled" label="Filled" />
+      <IconButton {...args} variant="outline" label="Outline" />
     </div>
   ),
   args: {
@@ -89,10 +90,19 @@ export const Filled: Story = {
   },
 };
 
-export const FilledWithLabel: Story = {
+export const Outline: Story = {
   args: {
     icon: <SearchIcon />,
-    label: 'Search',
-    variant: 'filled',
+    variant: 'outline',
   },
+};
+
+export const Disabled: Story = {
+  render: () => (
+    <div className="flex items-center gap-4">
+      <IconButton icon={<SearchIcon />} variant="ghost" disabled />
+      <IconButton icon={<SearchIcon />} variant="filled" disabled />
+      <IconButton icon={<SearchIcon />} variant="outline" disabled />
+    </div>
+  ),
 };

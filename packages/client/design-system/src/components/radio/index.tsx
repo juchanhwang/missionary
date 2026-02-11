@@ -1,6 +1,7 @@
 'use client';
 
 import { useControllableState, useMergeRefs } from '@hooks';
+import { cn } from '@lib/utils';
 import React, { useContext, createContext, useMemo, useRef } from 'react';
 
 import { RadioGroupActionsContext } from '../radio-group/radioGroupContext';
@@ -27,6 +28,7 @@ interface RadioProps extends Omit<
   disabled?: boolean;
   className?: string;
   children?: React.ReactNode;
+  label?: string;
   ref?: React.Ref<HTMLInputElement>;
 }
 
@@ -38,6 +40,7 @@ export function Radio({
   disabled,
   className,
   children,
+  label,
   name,
   ref,
   ...props
@@ -79,6 +82,25 @@ export function Radio({
     internalRef.current?.click();
   };
 
+  const defaultVisual = !children && (
+    <label
+      className={cn(
+        'inline-flex items-center gap-2',
+        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+      )}
+    >
+      <span
+        className={cn(
+          'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors',
+          checked ? 'border-primary-80' : 'border-gray-30',
+        )}
+      >
+        {checked && <span className="h-2 w-2 rounded-full bg-primary-80" />}
+      </span>
+      {label && <span className="text-sm">{label}</span>}
+    </label>
+  );
+
   return (
     <RadioActionsContext.Provider value={actions}>
       <RadioDataContext.Provider value={data}>
@@ -98,7 +120,7 @@ export function Radio({
           onClick={disabled ? undefined : handleClick}
           {...props}
         >
-          {children}
+          {children || defaultVisual}
         </div>
       </RadioDataContext.Provider>
     </RadioActionsContext.Provider>

@@ -1,8 +1,6 @@
-import { cn } from '@lib/utils';
 import { useState } from 'react';
 
 import { Radio } from '../radio';
-import { Text } from '../text';
 
 import { RadioGroup } from '.';
 
@@ -12,55 +10,27 @@ const dataList = ['짜장면', '짬뽕', '탕수육'];
 
 const meta: Meta<typeof RadioGroup> = {
   component: RadioGroup,
+  title: 'Components/RadioGroup',
+  parameters: { layout: 'centered' },
+  tags: ['autodocs'],
 };
 
 export default meta;
 type Story = StoryObj<typeof RadioGroup>;
 
-const RadioGroupComponent = ({
-  args,
-}: {
-  args: React.ComponentProps<typeof RadioGroup>;
-}) => {
-  const [checked, setChecked] = useState<string>(dataList[1]);
-
+function DefaultRadioGroup() {
+  const [selected, setSelected] = useState<string>(dataList[1]);
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex flex-col gap-4">
-        <Text typo="h2">제어 컴포넌트</Text>
-        <RadioGroup
-          {...args}
-          value={checked}
-          onChange={(newChecked) => setChecked(newChecked)}
-          className={cn(args.disabled && 'cursor-not-allowed')}
-        >
-          <div className="flex flex-col gap-4">
-            {dataList.map((data) => (
-              <Radio
-                key={data}
-                value={data}
-                className="flex items-center w-[200px] cursor-pointer"
-              >
-                <span
-                  className={cn(
-                    'relative inline-block w-4 h-4 mr-2 border border-black rounded-full',
-                    checked === data &&
-                      "after:content-['v'] after:text-base after:font-bold after:w-4 after:h-4 after:text-center after:absolute after:left-0 after:top-0",
-                  )}
-                />
-                {data}
-              </Radio>
-            ))}
-          </div>
-        </RadioGroup>
+    <RadioGroup value={selected} onChange={(newValue) => setSelected(newValue)}>
+      <div className="flex flex-col gap-3">
+        {dataList.map((data) => (
+          <Radio key={data} value={data} label={data} />
+        ))}
       </div>
-    </div>
+    </RadioGroup>
   );
-};
+}
 
-export const Primary: Story = {
-  render: (args) => <RadioGroupComponent args={args} />,
-  args: {
-    disabled: false,
-  },
+export const Default: Story = {
+  render: () => <DefaultRadioGroup />,
 };

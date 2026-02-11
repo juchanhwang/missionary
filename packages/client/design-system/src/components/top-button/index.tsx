@@ -13,7 +13,7 @@ export function TopButton({ onClick, className }: TopButtonProps) {
       type="button"
       onClick={onClick}
       className={cn(
-        'flex items-center justify-center w-12 h-12 p-0 border border-gray-05 rounded-full bg-white opacity-70 cursor-pointer hover:opacity-100',
+        'flex items-center justify-center w-12 h-12 p-0 border border-gray-05 rounded-full bg-white shadow-md opacity-70 cursor-pointer transition-all hover:opacity-100 hover:shadow-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
         className,
       )}
       aria-label="맨 위로 이동"

@@ -4,12 +4,15 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta<typeof Divider> = {
   component: Divider,
+  title: 'Components/Divider',
+  parameters: { layout: 'centered' },
+  tags: ['autodocs'],
 };
 
 export default meta;
 type Story = StoryObj<typeof Divider>;
 
-export const Default: Story = {
+export const Horizontal: Story = {
   render: () => (
     <div
       style={{
@@ -23,6 +26,25 @@ export const Default: Story = {
       <Divider height={10} />
       <Divider height={12} />
       <Divider height={24} />
+    </div>
+  ),
+};
+
+export const Vertical: Story = {
+  render: () => (
+    <div
+      style={{
+        display: 'flex',
+        gap: '16px',
+        height: '100px',
+        alignItems: 'center',
+      }}
+    >
+      <span>Left</span>
+      <Divider orientation="vertical" />
+      <span>Center</span>
+      <Divider orientation="vertical" />
+      <span>Right</span>
     </div>
   ),
 };
