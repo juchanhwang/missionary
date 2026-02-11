@@ -70,12 +70,12 @@
 
 ### Definition of Done
 
-- [ ] `pnpm build:ds && pnpm build:admin && pnpm build:app` → exit code 0
-- [ ] `pnpm type-check` → exit code 0
-- [ ] theme.css에 warning 팔레트 9단계 존재
-- [ ] DatePickerStyles.css에 하드코딩 hex 값 0개
-- [ ] SVG 아이콘에 이전 error 색상(#EBBB13) 없음
-- [ ] Storybook에서 주요 컴포넌트 시각 확인 완료
+- [x] `pnpm build:ds && pnpm build:admin && pnpm build:app` → exit code 0
+- [x] `pnpm type-check` → exit code 0
+- [x] theme.css에 warning 팔레트 9단계 존재
+- [x] DatePickerStyles.css에 하드코딩 hex 값 0개
+- [x] SVG 아이콘에 이전 error 색상(#EBBB13) 없음
+- [x] Storybook에서 주요 컴포넌트 시각 확인 완료
 
 ### Must Have
 
@@ -365,7 +365,7 @@ Parallel Speedup: ~30% faster than sequential
 
 ---
 
-- [ ] 3. DatePicker 하드코딩 색상 → CSS variable 마이그레이션
+- [x] 3. DatePicker 하드코딩 색상 → CSS variable 마이그레이션
 
   **What to do**:
   `DatePickerStyles.css`의 하드코딩된 11개 hex 값을 새 테마 토큰에 맞는 CSS variable로 교체한다.
@@ -446,7 +446,7 @@ Parallel Speedup: ~30% faster than sequential
 
 ---
 
-- [ ] 4. SVG 아이콘 하드코딩 색상 수정
+- [x] 4. SVG 아이콘 하드코딩 색상 수정
 
   **What to do**:
   2개 SVG 아이콘의 하드코딩 fill 색상을 새 팔레트에 맞게 수정한다.
@@ -504,7 +504,7 @@ Parallel Speedup: ~30% faster than sequential
 
 ---
 
-- [ ] 5. Badge 컴포넌트 warning variant 토큰 참조 수정
+- [x] 5. Badge 컴포넌트 warning variant 토큰 참조 수정
 
   **What to do**:
   Badge 컴포넌트의 `warning` variant가 현재 `error-*` 토큰을 참조하고 있는데, 이를 새로 추가된 `warning-*` 토큰으로 변경한다.
@@ -732,8 +732,8 @@ grep "warning:" packages/client/design-system/src/components/badge/index.tsx | g
 
 ### Final Checklist
 
-- [ ] 모든 "Must Have" 충족
-- [ ] 모든 "Must NOT Have" 위반 없음
-- [ ] 4개 빌드 (ds, admin, app, type-check) 성공
-- [ ] Storybook 주요 컴포넌트 스크린샷 확보
-- [ ] 2개 커밋 생성 완료
+- [x] 모든 "Must Have" 충족
+- [x] 모든 "Must NOT Have" 위반 없음
+- [x] 4개 빌드 (ds, admin, app, type-check) 성공
+- [x] Storybook 주요 컴포넌트 스크린샷 확보
+- [x] 2개 커밋 생성 완료
