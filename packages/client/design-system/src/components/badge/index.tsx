@@ -14,7 +14,7 @@ interface BadgeProps {
 
 const variantClasses: Record<BadgeVariant, string> = {
   success: 'bg-green-10 text-green-50',
-  warning: 'bg-error-10 text-error-70',
+  warning: 'bg-warning-10 text-warning-70',
   info: 'bg-primary-10 text-primary-80',
 };
 
