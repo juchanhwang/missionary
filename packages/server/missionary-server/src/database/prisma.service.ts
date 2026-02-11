@@ -8,6 +8,10 @@ import { PrismaPg } from '@prisma/adapter-pg';
 
 import { PrismaClient } from '../../prisma/generated/prisma';
 
+const POOL_MAX = 10;
+const IDLE_TIMEOUT_MS = 30_000;
+const CONNECTION_TIMEOUT_MS = 10_000;
+
 @Injectable()
 export class PrismaService
   extends PrismaClient
@@ -16,9 +20,24 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
-    const adapter = new PrismaPg({
-      connectionString: process.env.DATABASE_URL,
-    });
+    const adapter = new PrismaPg(
+      {
+        connectionString: process.env.DATABASE_URL,
+        max: POOL_MAX,
+        idleTimeoutMillis: IDLE_TIMEOUT_MS,
+        connectionTimeoutMillis: CONNECTION_TIMEOUT_MS,
+        keepAlive: true,
+      },
+      {
+        onPoolError: (err: Error) => {
+          Logger.error(
+            `Database pool error: ${err.message}`,
+            err.stack,
+            PrismaService.name,
+          );
+        },
+      },
+    );
 
     super({
       adapter,

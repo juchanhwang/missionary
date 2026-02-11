@@ -1,5 +1,5 @@
 ---
-name: performance
+name: client-performance
 description: React 성능 코딩 가이드라인을 제공한다. 불필요한 리렌더링 방지, 번들 크기 관리, 로딩 성능 최적화 규칙을 포함한다. React 컴포넌트 작성·리뷰, 렌더링 최적화, 번들 크기 관리, 메모리 누수 해결 시 사용한다.
 ---
 

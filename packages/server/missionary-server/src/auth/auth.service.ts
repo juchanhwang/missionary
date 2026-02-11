@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
+import { withDbRetry } from '@/common/utils/retry';
 import { UserService } from '@/user/user.service';
 
 import type { AdminLoginDto } from './dto/admin-login.dto';
@@ -43,27 +44,29 @@ export class AuthService {
     email: string,
     name?: string,
   ) {
-    const existingByProvider = await this.userService.findByProvider(
-      provider,
-      providerId,
-    );
+    return withDbRetry(async () => {
+      const existingByProvider = await this.userService.findByProvider(
+        provider,
+        providerId,
+      );
 
-    if (existingByProvider) {
-      return existingByProvider;
-    }
+      if (existingByProvider) {
+        return existingByProvider;
+      }
 
-    const existingByEmail = await this.userService.findByEmail(email);
+      const existingByEmail = await this.userService.findByEmail(email);
 
-    if (existingByEmail) {
-      return existingByEmail;
-    }
+      if (existingByEmail) {
+        return existingByEmail;
+      }
 
-    return this.userService.createOAuthUser({
-      email,
-      name,
-      provider,
-      providerId,
-    });
+      return this.userService.createOAuthUser({
+        email,
+        name,
+        provider,
+        providerId,
+      });
+    }, `OAuth:${provider}`);
   }
 
   generateTokens(user: {
