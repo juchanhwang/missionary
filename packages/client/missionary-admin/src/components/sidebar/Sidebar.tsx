@@ -77,16 +77,12 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed top-0 left-0 z-10 flex flex-col w-[260px] h-screen bg-primary-70">
-      <div className="w-[260px] h-[100px]">
-        <img
-          src="/logo-sidebar.svg"
-          alt="선교 상륙 작전"
-          className="w-full h-full"
-        />
+    <aside className="fixed top-0 left-0 z-10 flex flex-col w-[260px] h-screen bg-gray-90">
+      <div className="flex items-center w-[260px] h-16 px-5">
+        <img src="/logo-sidebar.svg" alt="선교 상륙 작전" className="h-8" />
       </div>
-      <div className="w-[260px] h-[4px] bg-gray-05" />
-      <nav className="flex flex-col flex-1 overflow-y-auto">
+      <div className="w-[260px] h-px bg-white/10" />
+      <nav className="flex flex-col flex-1 overflow-y-auto py-2">
         {MENU_DATA.map((group) => {
           const expanded = expandedMenus.has(group.label);
 
@@ -98,7 +94,7 @@ export function Sidebar() {
                 hasChildren={group.subMenus.length > 0}
                 isExpanded={expanded}
                 depth={0}
-                className="w-[260px] border-b border-gray-05"
+                className="w-[260px]"
               />
               {expanded &&
                 group.subMenus.map((sub) => (
@@ -107,7 +103,7 @@ export function Sidebar() {
                     label={sub.label}
                     href={sub.href}
                     depth={1}
-                    className="w-[260px] border-b border-gray-05"
+                    className="w-[260px]"
                   />
                 ))}
             </div>

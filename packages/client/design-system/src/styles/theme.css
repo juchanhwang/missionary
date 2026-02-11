@@ -1,33 +1,28 @@
 @theme {
   --color-white: #fff;
   --color-black: #000;
-  --color-primary-10: #fff8f6;
-  --color-primary-20: #ffe4e2;
-  --color-primary-30: #ffc9c6;
-  --color-primary-40: #ff9b99;
-  --color-primary-50: #ec2327;
-  --color-primary-60: #c91519;
-  --color-primary-70: #a60f12;
-  --color-primary-80: #850a0d;
-  --color-primary-90: #520507;
-  --color-secondary-10: #f4f6f8;
-  --color-secondary-20: #e3e7ed;
-  --color-secondary-30: #c1c9d6;
-  --color-secondary-40: #9aa7b8;
-  --color-secondary-50: #748599;
-  --color-secondary-60: #526375;
-  --color-secondary-70: #384859;
-  --color-secondary-80: #2c3e50;
-  --color-secondary-90: #1a2530;
-  --color-error-10: #fef2f2;
-  --color-error-20: #fee2e2;
-  --color-error-30: #fecaca;
-  --color-error-40: #f87171;
-  --color-error-50: #ef4444;
-  --color-error-60: #dc2626;
-  --color-error-70: #b91c1c;
-  --color-error-80: #991b1b;
-  --color-error-90: #7f1d1d;
+
+  /* Primary — #E60012 기반. CTA 버튼, 중요 액션에만 사용 */
+  --color-primary-10: #fff5f5;
+  --color-primary-20: #ffe0e0;
+  --color-primary-30: #ffb3b3;
+  --color-primary-40: #ff7a7a;
+  --color-primary-50: #e60012;
+  --color-primary-60: #cc0010;
+  --color-primary-70: #a3000d;
+  --color-primary-80: #80000a;
+  --color-primary-90: #590007;
+
+  /* Error — primary와 구분되는 오렌지-레드 계열 */
+  --color-error-10: #fff7ed;
+  --color-error-20: #ffedd5;
+  --color-error-30: #fed7aa;
+  --color-error-40: #fb923c;
+  --color-error-50: #f97316;
+  --color-error-60: #ea580c;
+  --color-error-70: #c2410c;
+  --color-error-80: #9a3412;
+  --color-error-90: #7c2d12;
   --color-warning-10: #fffbeb;
   --color-warning-20: #fef3c7;
   --color-warning-30: #fde68a;
@@ -37,6 +32,8 @@
   --color-warning-70: #b45309;
   --color-warning-80: #92400e;
   --color-warning-90: #78350f;
+
+  /* Blue — 링크, 포커스 링, 정보성 강조 */
   --color-blue-10: #eff6ff;
   --color-blue-20: #dbeafe;
   --color-blue-30: #bfdbfe;
@@ -46,6 +43,8 @@
   --color-blue-70: #1d4ed8;
   --color-blue-80: #1e40af;
   --color-blue-90: #1e3a8a;
+
+  /* Green — 성공 상태 */
   --color-green-10: #f0fdf4;
   --color-green-20: #dcfce7;
   --color-green-30: #86efac;
@@ -55,15 +54,15 @@
   --color-green-70: #15803d;
   --color-green-80: #166534;
   --color-green-90: #14532d;
-  --color-gray-02: #faf9f8;
-  --color-gray-05: #f5f4f2;
-  --color-gray-10: #ebe9e6;
-  --color-gray-20: #dad6d2;
-  --color-gray-30: #bdb9b5;
-  --color-gray-40: #9e9a96;
-  --color-gray-50: #7f7b77;
-  --color-gray-60: #615e5a;
-  --color-gray-70: #45423e;
-  --color-gray-80: #2b2927;
-  --color-gray-90: #141312;
+
+  /* Gray — 쿨 뉴트럴 계열. UI 전반의 기본 톤 */
+  --color-gray-10: #fcfcfc;
+  --color-gray-20: #f5f5f5;
+  --color-gray-30: #ededed;
+  --color-gray-40: #e7e7e7;
+  --color-gray-50: #999;
+  --color-gray-60: #666;
+  --color-gray-70: #424042;
+  --color-gray-80: #2d2c2d;
+  --color-gray-90: #1a1a1a;
 }

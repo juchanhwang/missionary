@@ -7,7 +7,7 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
 
 interface AsyncBoundaryProps {
   children: ReactNode;
-  pendingFallback: ReactNode;
+  pendingFallback?: ReactNode;
   rejectedFallback?: ComponentType<FallbackProps>;
 }
 
@@ -38,7 +38,7 @@ function DefaultErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 
 export function AsyncBoundary({
   children,
-  pendingFallback,
+  pendingFallback = '...loading',
   rejectedFallback: RejectedFallback = DefaultErrorFallback,
 }: AsyncBoundaryProps) {
   return (

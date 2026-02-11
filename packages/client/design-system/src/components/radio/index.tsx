@@ -92,10 +92,10 @@ export function Radio({
       <span
         className={cn(
           'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors',
-          checked ? 'border-primary-80' : 'border-gray-30',
+          checked ? 'border-gray-80' : 'border-gray-40',
         )}
       >
-        {checked && <span className="h-2 w-2 rounded-full bg-primary-80" />}
+        {checked && <span className="h-2 w-2 rounded-full bg-gray-80" />}
       </span>
       {label && <span className="text-sm">{label}</span>}
     </label>

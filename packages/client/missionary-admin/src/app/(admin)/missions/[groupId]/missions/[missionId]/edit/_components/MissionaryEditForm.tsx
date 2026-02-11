@@ -7,13 +7,13 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { DeleteMissionSection } from './DeleteMissionSection';
-import { MissionForm } from '../../../../../components/MissionForm';
+import { MissionForm } from '../../../../../_components/MissionForm';
 import {
   missionSchema,
   type MissionFormData,
-} from '../../../../../schemas/missionSchema';
-import { toMissionPayload } from '../../../../../utils/toMissionPayload';
-import { useUpdateMissionary } from '../hooks/useUpdateMissionary';
+} from '../../../../../_schemas/missionSchema';
+import { toMissionPayload } from '../../../../../_utils/toMissionPayload';
+import { useUpdateMissionary } from '../_hooks/useUpdateMissionary';
 
 interface MissionaryEditFormProps {
   missionary: Missionary;

@@ -10,9 +10,9 @@ const chipsVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-gray-05 text-black',
-        secondary: 'bg-primary-10 text-primary-80',
-        outline: 'border border-gray-20 bg-transparent text-gray-80',
+        default: 'bg-gray-10 text-gray-80',
+        accent: 'bg-gray-80 text-white',
+        outline: 'border border-gray-30 bg-transparent text-gray-80',
       },
       size: {
         sm: 'px-2 py-1 text-xs',

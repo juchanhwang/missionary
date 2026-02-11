@@ -2,7 +2,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 
-import { type LoginFormData } from '../schemas/loginSchema';
+import { type LoginFormData } from '../_schemas/loginSchema';
 
 const OAUTH_ERROR_MESSAGE = '소셜 로그인에 실패했습니다. 다시 시도해주세요.';
 

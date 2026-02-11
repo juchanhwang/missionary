@@ -26,7 +26,7 @@ export const Variants: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
       <Chips variant="default">Default</Chips>
-      <Chips variant="secondary">Secondary</Chips>
+      <Chips variant="accent">Accent</Chips>
       <Chips variant="outline">Outline</Chips>
     </div>
   ),
@@ -45,8 +45,8 @@ export const WithDismiss: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '8px' }}>
       <Chips onDismiss={() => alert('Dismissed!')}>Dismissible</Chips>
-      <Chips variant="secondary" onDismiss={() => alert('Dismissed!')}>
-        Secondary
+      <Chips variant="accent" onDismiss={() => alert('Dismissed!')}>
+        Accent
       </Chips>
       <Chips variant="outline" size="sm" onDismiss={() => alert('Dismissed!')}>
         Small Outline

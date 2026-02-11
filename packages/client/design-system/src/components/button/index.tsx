@@ -3,16 +3,9 @@
 import { cn } from '@lib/utils';
 import { type ButtonHTMLAttributes } from 'react';
 
-type ButtonColor = 'primary' | 'secondary';
+type ButtonColor = 'primary' | 'neutral';
 type ButtonSize = 'sm' | 'md' | 'lg' | 'xlg' | 'xxlg';
 type ButtonVariant = 'filled' | 'outline';
-
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  width?: React.CSSProperties['width'];
-  size?: ButtonSize;
-  color?: ButtonColor;
-}
 
 const sizeClasses: Record<ButtonSize, string> = {
   sm: 'h-8',
@@ -24,13 +17,24 @@ const sizeClasses: Record<ButtonSize, string> = {
 
 const filledColorClasses: Record<ButtonColor, string> = {
   primary:
-    'bg-primary-80 text-white hover:bg-primary-60 active:bg-primary-90 disabled:bg-primary-40 disabled:text-primary-20',
-  secondary:
-    'bg-secondary-50 text-white hover:bg-secondary-40 active:bg-secondary-70 disabled:bg-secondary-20 disabled:text-secondary-30',
+    'bg-primary-50 text-white hover:bg-primary-60 active:bg-primary-70 disabled:bg-gray-30 disabled:text-gray-50 disabled:cursor-not-allowed',
+  neutral:
+    'bg-gray-80 text-white hover:bg-gray-70 active:bg-gray-90 disabled:bg-gray-30 disabled:text-gray-50 disabled:cursor-not-allowed',
 };
 
-const outlineClasses =
-  'border border-primary-80 bg-white text-primary-80 hover:bg-primary-10 active:bg-primary-20 disabled:border-primary-30 disabled:text-primary-30 disabled:cursor-not-allowed';
+const outlineColorClasses: Record<ButtonColor, string> = {
+  primary:
+    'border border-primary-50 bg-white text-primary-50 hover:bg-primary-10 active:bg-primary-20 disabled:border-gray-30 disabled:text-gray-40 disabled:cursor-not-allowed',
+  neutral:
+    'border border-gray-40 bg-white text-gray-80 hover:bg-gray-10 active:bg-gray-20 disabled:border-gray-30 disabled:text-gray-40 disabled:cursor-not-allowed',
+};
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  width?: React.CSSProperties['width'];
+  size?: ButtonSize;
+  color?: ButtonColor;
+}
 
 export function Button({
   variant = 'filled',
@@ -50,7 +54,9 @@ export function Button({
       className={cn(
         'text-base font-bold rounded-lg transition-colors',
         sizeClasses[size],
-        variant === 'filled' ? filledColorClasses[color] : outlineClasses,
+        variant === 'filled'
+          ? filledColorClasses[color]
+          : outlineColorClasses[color],
         className,
       )}
       style={{ ...widthStyle, ...style }}

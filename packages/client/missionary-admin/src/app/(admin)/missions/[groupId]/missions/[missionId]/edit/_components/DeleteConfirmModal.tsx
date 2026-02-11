@@ -33,15 +33,15 @@ export function DeleteConfirmModal({
       shouldCloseOnEsc={true}
       shouldCloseOnOverlayClick={true}
     >
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
-        <h2 className="text-lg font-bold text-gray-90 mb-4">선교 삭제</h2>
-        <p className="text-base text-gray-70 mb-6">
+      <div className="bg-white rounded-xl border border-gray-10 p-6 max-w-sm w-full">
+        <h2 className="text-lg font-bold text-gray-90 mb-3">선교 삭제</h2>
+        <p className="text-sm text-gray-50 mb-6">
           정말 &apos;{missionaryName}&apos; 선교를 삭제하시겠습니까?
         </p>
         <div className="flex gap-3 justify-end">
           <Button
             variant="outline"
-            color="secondary"
+            color="neutral"
             size="md"
             onClick={() => close(false)}
             disabled={isPending}

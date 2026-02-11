@@ -3,7 +3,7 @@
 import { Button, DatePicker, InputField } from '@samilhero/design-system';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 
-import { type MissionFormData } from '../schemas/missionSchema';
+import { type MissionFormData } from '../_schemas/missionSchema';
 
 interface MissionFormProps {
   form: UseFormReturn<MissionFormData>;
@@ -25,7 +25,7 @@ export function MissionForm({
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-5 rounded-xl bg-white border border-gray-10 p-6"
     >
       <div className="grid grid-cols-2 gap-4">
         <InputField
@@ -84,13 +84,13 @@ export function MissionForm({
         disabled={isPending}
       />
 
-      <div className="mt-4">
+      <div className="mt-2">
         <Button
           type="submit"
           disabled={isPending}
           size="lg"
           className="w-full"
-          color="primary"
+          color="neutral"
         >
           {isPending ? pendingLabel : submitLabel}
         </Button>

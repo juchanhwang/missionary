@@ -30,9 +30,9 @@ export function Input({
     <div className={cn('flex flex-col w-full', className)}>
       <div
         className={cn(
-          'flex w-full items-center gap-2 rounded-lg bg-gray-02 px-3 py-2 transition-colors',
-          'focus-within:ring-1 focus-within:ring-ring focus-within:border-primary-50',
-          disabled && 'cursor-not-allowed opacity-50 bg-gray-05',
+          'flex w-full items-center gap-2 rounded-lg bg-gray-10 px-3 py-2 transition-colors',
+          'focus-within:ring-1 focus-within:ring-gray-40 focus-within:border-gray-40',
+          disabled && 'cursor-not-allowed opacity-50 bg-gray-20',
           error &&
             'border-error-60 focus-within:border-error-60 focus-within:ring-error-60',
         )}

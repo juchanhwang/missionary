@@ -1,9 +1,15 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, InputField, Select } from '@samilhero/design-system';
-import { Controller, type UseFormReturn } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
 
-import { type MissionGroupSchemaType } from '../schemas/missionGroupSchema';
+import { useCreateMissionGroup } from '../_hooks/useCreateMissionGroup';
+import {
+  missionGroupSchema,
+  type MissionGroupSchemaType,
+} from '../_schemas/missionGroupSchema';
 
 const TYPE_LABELS: Record<string, string> = {
   DOMESTIC: '국내',
@@ -11,24 +17,42 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 interface MissionGroupFormProps {
-  form: UseFormReturn<MissionGroupSchemaType>;
-  onSubmit: (data: MissionGroupSchemaType) => void;
-  isPending: boolean;
   submitLabel: string;
   pendingLabel: string;
 }
 
 export function MissionGroupForm({
-  form,
-  onSubmit,
-  isPending,
   submitLabel,
   pendingLabel,
 }: MissionGroupFormProps) {
+  const router = useRouter();
+  const form = useForm<MissionGroupSchemaType>({
+    resolver: zodResolver(missionGroupSchema),
+    mode: 'onSubmit',
+    defaultValues: {
+      name: '',
+      description: '',
+      type: undefined,
+    },
+  });
+
+  const { mutate, isPending } = useCreateMissionGroup();
+
+  const onSubmit = (data: MissionGroupSchemaType) => {
+    mutate(data, {
+      onSuccess: () => {
+        router.push('/missions');
+      },
+      onError: (error) => {
+        console.error('Failed to create mission group:', error);
+      },
+    });
+  };
+
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-5 rounded-xl bg-white border border-gray-10 p-6"
     >
       <InputField
         label="선교 그룹명"
@@ -54,7 +78,7 @@ export function MissionGroupForm({
         )}
       />
       {form.formState.errors.type?.message && (
-        <span className="text-sm text-red-500">
+        <span className="text-sm text-error-50">
           {form.formState.errors.type.message}
         </span>
       )}
@@ -67,13 +91,13 @@ export function MissionGroupForm({
         disabled={isPending}
       />
 
-      <div className="mt-4">
+      <div className="mt-2">
         <Button
           type="submit"
           disabled={isPending}
           size="lg"
           className="w-full"
-          color="primary"
+          color="neutral"
         >
           {isPending ? pendingLabel : submitLabel}
         </Button>

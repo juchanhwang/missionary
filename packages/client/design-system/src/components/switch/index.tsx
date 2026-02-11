@@ -87,7 +87,7 @@ export function Switch({
       <span
         className={cn(
           'relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors',
-          checked ? 'bg-primary-80' : 'bg-gray-20',
+          checked ? 'bg-gray-80' : 'bg-gray-30',
         )}
       >
         <span

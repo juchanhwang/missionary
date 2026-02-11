@@ -50,9 +50,9 @@ src/
 │   └── (group)/
 │       └── <route>/
 │           ├── page.tsx        # 라우팅 진입점
-│           ├── hooks/          # 라우트 전용 Hook
-│           ├── components/     # 라우트 전용 컴포넌트
-│           └── types/          # 라우트 전용 타입
+│           ├── _hooks/          # 라우트 전용 Hook
+│           ├── _components/     # 라우트 전용 컴포넌트
+│           └── _types/          # 라우트 전용 타입
 ├── components/                 # 공통 UI (boundary, layout 등)
 ├── hooks/                      # 공통 Hook
 ├── lib/                        # 유틸, 설정 (QueryProvider 등)

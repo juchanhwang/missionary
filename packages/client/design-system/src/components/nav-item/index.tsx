@@ -34,16 +34,16 @@ export function NavItem({
     'flex items-center justify-between w-full transition-colors duration-200 cursor-pointer text-left font-medium text-[15px] leading-[22px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring';
 
   const parentClasses = cn(
-    'h-[55px] px-[20px] text-white border-b border-gray-05 hover:bg-white/5',
+    'h-11 px-5 text-white/80 hover:text-white hover:bg-white/8 rounded-md mx-2',
     {
-      'bg-white/5': isActive,
+      'bg-white/10 text-white': isActive,
     },
   );
 
   const childClasses = cn(
-    'h-[55px] px-[24px] bg-secondary-10 text-primary-80 hover:bg-white/12',
+    'h-10 px-5 pl-9 text-white/60 hover:text-white/90 hover:bg-white/5 rounded-md mx-2',
     {
-      'bg-white/12': isActive,
+      'bg-white/8 text-white/90': isActive,
     },
   );
 

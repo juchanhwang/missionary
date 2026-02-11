@@ -9,9 +9,9 @@ const iconButtonVariants = cva(
   {
     variants: {
       variant: {
-        ghost: 'bg-transparent hover:bg-gray-02',
-        filled: 'bg-primary-80 text-white hover:bg-primary-60',
-        outline: 'border border-gray-20 bg-transparent hover:bg-gray-02',
+        ghost: 'bg-transparent hover:bg-gray-10',
+        filled: 'bg-gray-80 text-white hover:bg-gray-70',
+        outline: 'border border-gray-30 bg-transparent hover:bg-gray-10',
       },
       size: {
         sm: 'h-8',

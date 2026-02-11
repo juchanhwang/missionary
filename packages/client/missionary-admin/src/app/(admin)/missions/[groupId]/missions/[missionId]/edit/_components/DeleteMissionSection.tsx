@@ -3,7 +3,7 @@
 import { Button, openOverlayAsync } from '@samilhero/design-system';
 
 import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { useDeleteMissionary } from '../hooks/useDeleteMissionary';
+import { useDeleteMissionary } from '../_hooks/useDeleteMissionary';
 
 interface DeleteMissionSectionProps {
   missionaryId: string;
@@ -39,7 +39,7 @@ export function DeleteMissionSection({
     <Button
       type="button"
       onClick={handleDelete}
-      color="secondary"
+      color="neutral"
       className="flex-1 bg-error-60 hover:bg-error-70 text-white"
       size="lg"
     >

@@ -5,14 +5,14 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useCreateMissionary } from './hooks/useCreateMissionary';
-import { MissionForm } from '../../../components/MissionForm';
+import { useCreateMissionary } from './_hooks/useCreateMissionary';
+import { MissionForm } from '../../../_components/MissionForm';
 import {
   missionSchema,
   type MissionFormData,
-} from '../../../schemas/missionSchema';
-import { toMissionPayload } from '../../../utils/toMissionPayload';
-import { useMissionGroup } from '../../hooks/useMissionGroup';
+} from '../../../_schemas/missionSchema';
+import { toMissionPayload } from '../../../_utils/toMissionPayload';
+import { useMissionGroup } from '../../_hooks/useMissionGroup';
 
 export default function CreateMissionPage() {
   const router = useRouter();
@@ -74,8 +74,10 @@ export default function CreateMissionPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-8">{group.name} - N차 선교 생성</h1>
+    <div className="max-w-2xl flex flex-col gap-4">
+      <h1 className="text-xl font-bold text-gray-90 mb-2">
+        {group.name} - N차 선교 생성
+      </h1>
       <MissionForm
         form={form}
         onSubmit={onSubmit}

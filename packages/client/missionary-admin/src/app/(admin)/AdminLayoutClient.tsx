@@ -28,9 +28,9 @@ export function AdminLayoutClient({
         <AuthProvider>
           <div className="flex min-h-screen">
             <Sidebar />
-            <div className="flex flex-col flex-1 ml-[260px] bg-primary-10">
+            <div className="flex flex-col flex-1 ml-[260px] bg-gray-02">
               <Header />
-              <main className="flex-1 p-[40px_60px]">{children}</main>
+              <main className="flex-1 p-10">{children}</main>
             </div>
           </div>
         </AuthProvider>

@@ -35,7 +35,7 @@ export const SelectTrigger = ({
       data-state={data.open ? 'open' : 'closed'}
       className={cn(
         'flex h-12 w-full items-center justify-between rounded-lg border border-gray-20 bg-white px-4 py-2 text-sm transition-colors hover:border-gray-40 focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
-        'data-[state=open]:border-primary-50',
+        'data-[state=open]:border-gray-80',
         isEmpty ? 'text-gray-30' : 'text-gray-90',
         className,
       )}

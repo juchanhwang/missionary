@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
-import { useLogin } from '../hooks/useLogin';
+import { useLogin } from '../_hooks/useLogin';
 import LoginPage from '../page';
 
 vi.mock('../hooks/useLogin', () => ({

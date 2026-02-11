@@ -28,8 +28,8 @@ export const SelectOption = ({
     <li
       ref={ref}
       className={cn(
-        'relative flex cursor-pointer select-none items-center px-4 py-2.5 text-sm transition-colors hover:bg-gray-02 active:bg-gray-05',
-        'data-[selected=true]:bg-primary-10 data-[selected=true]:text-primary-80',
+        'relative flex cursor-pointer select-none items-center px-4 py-2.5 text-sm transition-colors hover:bg-gray-10 active:bg-gray-20',
+        'data-[selected=true]:bg-gray-10 data-[selected=true]:text-gray-90 data-[selected=true]:font-medium',
         className,
       )}
       data-selected={isSelected}

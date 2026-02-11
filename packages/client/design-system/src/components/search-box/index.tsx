@@ -21,9 +21,9 @@ export function SearchBox({
   return (
     <div
       className={cn(
-        'flex w-full items-center px-4 py-2.5 rounded-lg bg-gray-02 transition-colors',
-        'focus-within:ring-1 focus-within:ring-ring focus-within:border-primary-50',
-        'hover:bg-gray-03',
+        'flex w-full items-center px-4 py-2.5 rounded-lg bg-gray-10 transition-colors',
+        'focus-within:ring-1 focus-within:ring-gray-40 focus-within:border-gray-40',
+        'hover:bg-gray-20',
         className,
       )}
     >

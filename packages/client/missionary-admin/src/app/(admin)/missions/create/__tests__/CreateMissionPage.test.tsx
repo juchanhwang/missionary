@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
-import { useRegions } from '../../hooks/useRegions';
-import { useCreateMissionary } from '../hooks/useCreateMissionary';
+import { useRegions } from '../../_hooks/useRegions';
+import { useCreateMissionary } from '../_hooks/useCreateMissionary';
 import CreateMissionPage from '../page';
 
 vi.mock('../hooks/useCreateMissionary', () => ({

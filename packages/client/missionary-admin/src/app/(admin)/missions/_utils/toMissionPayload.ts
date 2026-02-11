@@ -1,4 +1,4 @@
-import { type MissionFormData } from '../schemas/missionSchema';
+import { type MissionFormData } from '../_schemas/missionSchema';
 
 export function toMissionPayload(data: MissionFormData) {
   return {

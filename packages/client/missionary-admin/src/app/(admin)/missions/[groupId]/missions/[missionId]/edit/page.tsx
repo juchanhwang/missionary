@@ -2,8 +2,8 @@
 
 import { useParams } from 'next/navigation';
 
-import { MissionaryEditForm } from './components/MissionaryEditForm';
-import { useMissionary } from './hooks/useMissionary';
+import { MissionaryEditForm } from './_components/MissionaryEditForm';
+import { useMissionary } from './_hooks/useMissionary';
 
 export default function EditMissionPage() {
   const params = useParams();
@@ -26,8 +26,8 @@ export default function EditMissionPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-8">선교 수정</h1>
+    <div className="max-w-2xl flex flex-col gap-4">
+      <h1 className="text-xl font-bold text-gray-90 mb-2">선교 수정</h1>
       <MissionaryEditForm missionary={missionary} />
     </div>
   );

@@ -27,8 +27,8 @@ export const Tab = ({ list, selectedValue, onChange, className }: TabProps) => {
             className={cn(
               'px-4 py-2 text-base font-bold leading-[22px] text-center cursor-pointer transition-colors border-b-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
               isActive
-                ? 'border-primary-80 text-primary-80'
-                : 'border-transparent text-primary-30 hover:text-primary-50',
+                ? 'border-gray-90 text-gray-90'
+                : 'border-transparent text-gray-50 hover:text-gray-70',
             )}
             onClick={() => onChange(category.value)}
           >

@@ -3,9 +3,9 @@
 import { Button } from '@samilhero/design-system';
 import { useParams, useRouter } from 'next/navigation';
 
-import { MissionStatusBadge } from '../components/MissionStatusBadge';
-import { formatDate } from '../utils/formatDate';
-import { useMissionGroup } from './hooks/useMissionGroup';
+import { MissionStatusBadge } from '../_components/MissionStatusBadge';
+import { formatDate } from '../_utils/formatDate';
+import { useMissionGroup } from './_hooks/useMissionGroup';
 
 export default function MissionGroupDetailPage() {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function MissionGroupDetailPage() {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div>
       <div className="flex items-center gap-4 mb-6">
         <Button
           variant="outline"
@@ -38,10 +38,11 @@ export default function MissionGroupDetailPage() {
         >
           ← 목록
         </Button>
-        <h1 className="text-2xl font-bold">{group.name}</h1>
+        <h1 className="text-xl font-bold text-gray-90">{group.name}</h1>
         <div className="ml-auto">
           <Button
-            color="primary"
+            color="neutral"
+            size="md"
             onClick={() => router.push(`/missions/${groupId}/missions/create`)}
           >
             N차 선교 생성
@@ -49,34 +50,31 @@ export default function MissionGroupDetailPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-gray-10 bg-white">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="px-6 py-3 text-sm font-medium text-gray-500">
+          <thead>
+            <tr className="border-b border-gray-10">
+              <th className="px-6 py-3 text-xs font-semibold text-gray-40 uppercase tracking-wider">
                 선교명
               </th>
-              <th className="px-6 py-3 text-sm font-medium text-gray-500">
+              <th className="px-6 py-3 text-xs font-semibold text-gray-40 uppercase tracking-wider">
                 차수
               </th>
-              <th className="px-6 py-3 text-sm font-medium text-gray-500">
+              <th className="px-6 py-3 text-xs font-semibold text-gray-40 uppercase tracking-wider">
                 기간
               </th>
-              <th className="px-6 py-3 text-sm font-medium text-gray-500">
+              <th className="px-6 py-3 text-xs font-semibold text-gray-40 uppercase tracking-wider">
                 담당 교역자
               </th>
-              <th className="px-6 py-3 text-sm font-medium text-gray-500">
+              <th className="px-6 py-3 text-xs font-semibold text-gray-40 uppercase tracking-wider">
                 상태
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-20">
             {group.missionaries?.length === 0 ? (
               <tr>
-                <td
-                  colSpan={5}
-                  className="px-6 py-12 text-center text-gray-500"
-                >
+                <td colSpan={5} className="px-6 py-12 text-center text-gray-40">
                   등록된 선교가 없습니다.
                 </td>
               </tr>
@@ -84,24 +82,24 @@ export default function MissionGroupDetailPage() {
               group.missionaries?.map((mission) => (
                 <tr
                   key={mission.id}
-                  className="hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="hover:bg-gray-10 cursor-pointer transition-colors"
                   onClick={() =>
                     router.push(
                       `/missions/${groupId}/missions/${mission.id}/edit`,
                     )
                   }
                 >
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-90">
                     {mission.name}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-gray-50">
                     {mission.order}차
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-gray-50">
                     {formatDate(mission.startDate)} ~{' '}
                     {formatDate(mission.endDate)}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-gray-50">
                     {mission.pastorName}
                   </td>
                   <td className="px-6 py-4 text-sm">
