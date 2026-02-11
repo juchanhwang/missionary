@@ -1,7 +1,10 @@
 'use client';
 
 import { NavItem } from '@samilhero/design-system';
-import { useMissionaries } from 'hooks/missionary';
+import { type MissionGroup } from 'apis/missionGroup';
+import { useQuery } from '@tanstack/react-query';
+import { missionGroupApi } from 'apis/missionGroup';
+import { queryKeys } from 'lib/queryKeys';
 import { useState } from 'react';
 
 interface SubMenu {
@@ -11,37 +14,55 @@ interface SubMenu {
 
 interface MenuGroup {
   label: string;
+  href?: string;
   subMenus: SubMenu[];
 }
 
-const STATIC_MENU_DATA: MenuGroup[] = [
-  {
-    label: '해외선교',
-    subMenus: [],
-  },
-  {
-    label: '선교 관리',
-    subMenus: [],
-  },
-];
+function useSidebarMissionGroups() {
+  return useQuery({
+    queryKey: queryKeys.missionGroups.list(),
+    queryFn: async () => {
+      const response = await missionGroupApi.getMissionGroups();
+      return response.data;
+    },
+  });
+}
+
+function buildMenuFromGroups(groups: MissionGroup[] | undefined): MenuGroup[] {
+  const domesticGroups = groups?.filter((g) => g.type === 'DOMESTIC') ?? [];
+  const abroadGroups = groups?.filter((g) => g.type === 'ABROAD') ?? [];
+
+  return [
+    {
+      label: '국내선교',
+      href: '/missions',
+      subMenus: domesticGroups.map((g) => ({
+        label: g.name,
+        href: `/missions/${g.id}`,
+      })),
+    },
+    {
+      label: '해외선교',
+      href: '/missions',
+      subMenus: abroadGroups.map((g) => ({
+        label: g.name,
+        href: `/missions/${g.id}`,
+      })),
+    },
+    {
+      label: '선교 관리',
+      subMenus: [],
+    },
+  ];
+}
 
 export function Sidebar() {
-  const { data: missionaries } = useMissionaries();
+  const { data: missionGroups } = useSidebarMissionGroups();
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(
     new Set(['국내선교']),
   );
 
-  const MENU_DATA: MenuGroup[] = [
-    {
-      label: '국내선교',
-      subMenus:
-        missionaries?.map((m) => ({
-          label: m.name,
-          href: `/missions?name=${encodeURIComponent(m.name)}`,
-        })) ?? [],
-    },
-    ...STATIC_MENU_DATA,
-  ];
+  const MENU_DATA = buildMenuFromGroups(missionGroups);
 
   const toggleMenu = (label: string) => {
     setExpandedMenus((prev) => {

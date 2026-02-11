@@ -5,13 +5,13 @@ import { useParams } from 'next/navigation';
 import { MissionaryEditForm } from './components/MissionaryEditForm';
 import { useMissionary } from './hooks/useMissionary';
 
-export default function MissionaryEditPage() {
+export default function EditMissionPage() {
   const params = useParams();
-  const id = params.id as string;
+  const missionId = params.missionId as string;
 
-  const { data: missionary, isLoading: isMissionaryLoading } =
-    useMissionary(id);
-  if (isMissionaryLoading) {
+  const { data: missionary, isLoading } = useMissionary(missionId);
+
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-full">로딩 중...</div>
     );

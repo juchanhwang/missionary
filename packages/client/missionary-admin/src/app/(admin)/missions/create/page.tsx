@@ -4,41 +4,42 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
-import { MissionForm } from '../components/MissionForm';
-import { missionSchema, type MissionFormData } from '../schemas/missionSchema';
-import { toMissionPayload } from '../utils/toMissionPayload';
-import { useCreateMissionary } from './hooks/useCreateMissionary';
+import { MissionGroupForm } from '../components/MissionGroupForm';
+import { useCreateMissionGroup } from '../hooks/useCreateMissionGroup';
+import {
+  missionGroupSchema,
+  type MissionGroupSchemaType,
+} from '../schemas/missionGroupSchema';
 
-export default function CreateMissionPage() {
+export default function CreateMissionGroupPage() {
   const router = useRouter();
-  const form = useForm<MissionFormData>({
-    resolver: zodResolver(missionSchema),
+  const form = useForm<MissionGroupSchemaType>({
+    resolver: zodResolver(missionGroupSchema),
     mode: 'onSubmit',
     defaultValues: {
       name: '',
-      pastorName: '',
-      missionGroupId: undefined,
-      order: undefined,
+      description: '',
+      type: undefined,
     },
   });
 
-  const createMutation = useCreateMissionary();
+  const createMutation = useCreateMissionGroup();
 
-  const onSubmit = (data: MissionFormData) => {
-    createMutation.mutate(toMissionPayload(data), {
+  const onSubmit = (data: MissionGroupSchemaType) => {
+    createMutation.mutate(data, {
       onSuccess: () => {
         router.push('/missions');
       },
       onError: (error) => {
-        console.error('Failed to create missionary:', error);
+        console.error('Failed to create mission group:', error);
       },
     });
   };
 
   return (
     <div className="max-w-2xl mx-auto flex flex-col gap-4 py-8 px-4">
-      <h1 className="text-2xl font-bold mb-4">신규 국내선교 생성</h1>
-      <MissionForm
+      <h1 className="text-2xl font-bold mb-4">신규 선교 그룹 생성</h1>
+      <MissionGroupForm
         form={form}
         onSubmit={onSubmit}
         isPending={createMutation.isPending}

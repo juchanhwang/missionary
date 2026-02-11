@@ -12,7 +12,6 @@ export function toMissionPayload(data: MissionFormData) {
     ...(data.participationEndDate && {
       participationEndDate: data.participationEndDate.toISOString(),
     }),
-    missionGroupId: data.missionGroupId,
     order: data.order,
   };
 }

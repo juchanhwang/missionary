@@ -16,5 +16,7 @@ export const queryKeys = {
   missionGroups: {
     all: ['missionGroups'] as const,
     list: () => [...queryKeys.missionGroups.all, 'list'] as const,
+    detail: (id: string) =>
+      [...queryKeys.missionGroups.all, 'detail', id] as const,
   },
 } as const;

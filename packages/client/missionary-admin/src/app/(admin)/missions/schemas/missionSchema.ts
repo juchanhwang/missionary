@@ -11,7 +11,6 @@ export const missionSchema = z.object({
   participationEndDate: z
     .date({ message: '참가 신청 종료일을 선택해주세요' })
     .optional(),
-  missionGroupId: z.string().optional(),
   order: z
     .any()
     .optional()

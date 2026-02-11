@@ -17,14 +17,16 @@ export default function MainPage() {
           선교 관리
         </h2>
         <div className="flex flex-col gap-5">
-          <Link href="/missions/create">
+          <Link href="/missions">
             <Button size="xlg" width={240} color="primary">
-              신규 국내선교 생성
+              선교 그룹 관리
             </Button>
           </Link>
-          <Button size="xlg" width={240} color="primary" variant="outline">
-            신규 해외선교 생성
-          </Button>
+          <Link href="/missions/create">
+            <Button size="xlg" width={240} color="primary" variant="outline">
+              신규 선교 그룹 생성
+            </Button>
+          </Link>
         </div>
       </div>
     </>

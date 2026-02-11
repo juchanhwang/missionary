@@ -1,6 +1,6 @@
 import api from './instance';
-import { type Region } from './region';
 import { type MissionGroup } from './missionGroup';
+import { type Region } from './region';
 
 export interface Missionary {
   id: string;
