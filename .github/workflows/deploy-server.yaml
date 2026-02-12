@@ -1,0 +1,56 @@
+name: Deploy Server
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'packages/server/**'
+
+concurrency:
+  group: deploy-server-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    name: Test & Build Server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter missionary-server prisma:generate
+
+      - name: Test
+        run: pnpm --filter missionary-server test
+
+      - name: Build
+        run: pnpm --filter missionary-server build
+
+  deploy:
+    name: Deploy to EC2
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/missionary
+            git pull origin dev
+            cd packages/server/missionary-server
+            docker compose -f docker-compose.prod.yml build --no-cache
+            docker compose -f docker-compose.prod.yml run --rm missionary-server-dev npx prisma migrate deploy
+            docker compose -f docker-compose.prod.yml up -d
+            docker system prune -f

@@ -2,105 +2,80 @@ name: CI
 
 on:
   pull_request:
-    branches:
-      - dev
+    branches: [dev, prod]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  setup-and-lint:
+  lint:
+    name: Lint & Type Check
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
 
-      - uses: pnpm/action-setup@v3
-        name: Install pnpm
-        with:
-          version: 10.28.1
-          run_install: true
+      - run: pnpm install --frozen-lockfile
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - name: ESLint
+        run: pnpm lint
 
-      - uses: actions/cache@v4
-        id: pnpm-cache
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - if: steps.pnpm-cache.outputs.cache-hit == 'true'
-        run: echo 'pnpm cache hit!'
-      - if: steps.pnpm-cache.outputs.cache-hit != 'true'
-        run: echo 'pnpm cache missed!'
+      - name: Prettier
+        run: pnpm prettier
 
-      - name: Install dependencies
-        run: pnpm install
+      - name: Stylelint
+        run: pnpm stylelint
 
-      - name: Lint
-        run: |
-          pnpm lint
-          pnpm prettier
-          pnpm stylelint
+      - name: Type Check
+        run: pnpm type-check
 
-  build:
-    needs: setup-and-lint
+  build-client:
+    name: Build ${{ matrix.package }}
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        package:
-          [
-            'design-system',
-            'missionary-admin',
-            'missionary-app',
-            'missionary-server',
-          ]
+        package: [design-system, missionary-admin, missionary-app]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 10.28.1
+      - run: pnpm install --frozen-lockfile
 
-      - name: Build packages
-        run: |
-          pnpm install
-          pnpm recursive run --filter ${{ matrix.package }} build
+      - name: Build ${{ matrix.package }}
+        run: pnpm --filter ${{ matrix.package }} build
 
-  server-test:
-    needs: setup-and-lint
+  build-server:
+    name: Build Server
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 10.28.1
+      - run: pnpm install --frozen-lockfile
 
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Prisma Generate
+      - name: Generate Prisma Client
         run: pnpm --filter missionary-server prisma:generate
 
       - name: Test
