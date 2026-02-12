@@ -22,6 +22,7 @@
     "dev:app": "pnpm --filter missionary-app dev",
     "dev:ds": "pnpm --filter design-system storybook",
     "dev:server": "pnpm --filter missionary-server dev",
+    "dev:server:rds": "pnpm --filter missionary-server dev:rds",
     "dev:all": "pnpm dev:admin & pnpm dev:app & pnpm dev:ds & pnpm dev:server",
     "build:admin": "pnpm --filter @samilhero/design-system build && pnpm --filter missionary-admin build",
     "build:app": "pnpm --filter missionary-app build",
