@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_PROXY_API_URL ?? '',
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? '',
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
 });
@@ -16,7 +16,7 @@ api.interceptors.response.use(
 
       try {
         await axios.post(
-          `${process.env.NEXT_PUBLIC_PROXY_API_URL}/auth/refresh`,
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
           {},
           { withCredentials: true },
         );

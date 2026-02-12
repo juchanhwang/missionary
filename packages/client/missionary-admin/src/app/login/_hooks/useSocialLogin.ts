@@ -1,4 +1,4 @@
-const SOCIAL_AUTH_BASE_URL = process.env.NEXT_PUBLIC_PROXY_API_URL;
+const SOCIAL_AUTH_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export function useSocialLogin() {
   const loginGoogle = () => {
