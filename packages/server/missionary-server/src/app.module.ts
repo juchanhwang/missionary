@@ -26,7 +26,11 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate: validateEnv,
+      envFilePath: `.env.${process.env.NODE_ENV || 'dev'}`,
+    }),
     EncryptionModule,
     ScheduleModule.forRoot(),
     BullModule,

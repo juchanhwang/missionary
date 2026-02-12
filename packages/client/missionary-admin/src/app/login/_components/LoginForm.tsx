@@ -45,9 +45,9 @@ export function LoginForm() {
           className="w-[200px] h-auto mb-10"
         />
         <h1 className="mb-3 text-2xl font-bold leading-tight text-center text-gray-90">
-          삼일교회 선교 담당
+          선교 시스템
           <br />
-          교역자 로그인
+          관리자 로그인
         </h1>
         <p className="mb-10 text-sm font-normal leading-relaxed text-center text-gray-50">
           전달받은 선교 담당 계정으로

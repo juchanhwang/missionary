@@ -39,6 +39,8 @@ async function bootstrap() {
     .setTitle('Missionary API')
     .setDescription('Missionary Server API Documentation')
     .setVersion('0.1.0')
+    .addServer('http://localhost:3100', 'Local Development')
+    .addServer('https://missionary-api.duckdns.org', 'Production Server')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
