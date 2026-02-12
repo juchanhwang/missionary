@@ -38,6 +38,7 @@ WORKDIR /app
 
 COPY packages/server/missionary-server/package.json ./
 RUN npm install --omit=dev --ignore-scripts && \
+    npm install dotenv --ignore-scripts && \
     npm rebuild bcrypt
 
 # ============================================

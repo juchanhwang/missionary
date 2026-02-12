@@ -2,7 +2,7 @@ name: Deploy Server
 
 on:
   push:
-    branches: [dev]
+    branches: [main]
     paths:
       - 'packages/server/**'
 
@@ -48,7 +48,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ec2-user/missionary
-            git pull origin dev
+            git pull origin main
             cd packages/server/missionary-server
             docker compose -f docker-compose.prod.yml build --no-cache
             docker compose -f docker-compose.prod.yml run --rm missionary-server-dev npx prisma migrate deploy
