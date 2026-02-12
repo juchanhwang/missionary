@@ -1,0 +1,15 @@
+node_modules
+dist
+.env
+.env.*
+.git
+.gitignore
+*.md
+*.log
+.DS_Store
+.vscode
+.idea
+coverage
+.nyc_output
+docker-compose.yml
+pg_hba.conf
