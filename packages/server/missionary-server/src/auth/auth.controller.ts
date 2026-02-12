@@ -34,12 +34,11 @@ export class AuthController {
   ) {}
 
   private get cookieOptions() {
-    const isProduction =
-      this.configService.get<string>('NODE_ENV') === 'production';
+    const isSecure = this.configService.get<string>('COOKIE_SECURE') === 'true';
 
     return {
       httpOnly: true,
-      secure: isProduction,
+      secure: isSecure,
       sameSite: 'lax' as const,
       path: '/',
     };

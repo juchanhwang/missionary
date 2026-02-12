@@ -21,7 +21,7 @@ jobs:
       - uses: pnpm/action-setup@v3
         name: Install pnpm
         with:
-          version: 8
+          version: 10.28.1
           run_install: true
 
       - name: Get pnpm store directory
@@ -56,7 +56,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: [ 'design-system', 'missionary-admin', 'missionary-app' ]
+        package:
+          [
+            'design-system',
+            'missionary-admin',
+            'missionary-app',
+            'missionary-server',
+          ]
     steps:
       - uses: actions/checkout@v4
 
@@ -68,10 +74,37 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 8
+          version: 10.28.1
 
       - name: Build packages
         run: |
           pnpm install
           pnpm recursive run --filter ${{ matrix.package }} build
 
+  server-test:
+    needs: setup-and-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.28.1
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Prisma Generate
+        run: pnpm --filter missionary-server prisma:generate
+
+      - name: Test
+        run: pnpm --filter missionary-server test
+
+      - name: Build
+        run: pnpm --filter missionary-server build
