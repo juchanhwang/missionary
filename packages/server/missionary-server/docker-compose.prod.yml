@@ -1,0 +1,35 @@
+services:
+  missionary-server-dev:
+    build:
+      context: ../../../
+      dockerfile: packages/server/missionary-server/Dockerfile
+    container_name: missionary-server-dev
+    restart: unless-stopped
+    ports:
+      - '3100:3100'
+    env_file:
+      - .env.dev
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:3100/health || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  redis:
+    image: redis:7-alpine
+    container_name: missionary-redis-dev
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli ping || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
