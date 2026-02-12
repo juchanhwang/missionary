@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { missionaryApi } from 'apis/missionary';
 import { vi } from 'vitest';
 
-import { useMissionaries } from '../useMissionaries';
+import { useGetMissionaries } from '../useGetMissionaries';
 
 import type { ReactNode } from 'react';
 
@@ -13,7 +13,7 @@ vi.mock('apis/missionary', () => ({
   },
 }));
 
-describe('useMissionaries', () => {
+describe('useGetMissionaries', () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe('useMissionaries', () => {
       data: mockMissionaries,
     } as any);
 
-    const { result } = renderHook(() => useMissionaries(), { wrapper });
+    const { result } = renderHook(() => useGetMissionaries(), { wrapper });
 
     expect(result.current.isLoading).toBe(true);
 
@@ -71,7 +71,7 @@ describe('useMissionaries', () => {
     const error = new Error('Failed to fetch missionaries');
     vi.mocked(missionaryApi.getMissionaries).mockRejectedValue(error);
 
-    const { result } = renderHook(() => useMissionaries(), { wrapper });
+    const { result } = renderHook(() => useGetMissionaries(), { wrapper });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
 

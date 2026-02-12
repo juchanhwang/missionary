@@ -1,7 +1,7 @@
 'use client';
 
 import { type AuthUser } from 'apis/auth';
-import { useLogout, useSuspenseMe } from 'hooks/auth';
+import { useLogoutAction, useSuspenseGetMe } from 'hooks/auth';
 import { createContext, useContext } from 'react';
 
 interface AuthContextValue {
@@ -12,8 +12,8 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { data: user } = useSuspenseMe();
-  const logoutMutation = useLogout();
+  const { data: user } = useSuspenseGetMe();
+  const logoutMutation = useLogoutAction();
 
   const logout = () => {
     logoutMutation.mutate();

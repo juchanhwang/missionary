@@ -2,9 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@samilhero/design-system';
-import { type Missionary } from 'apis/missionary';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { DeleteMissionSection } from './DeleteMissionSection';
@@ -14,27 +12,20 @@ import {
   type MissionFormData,
 } from '../../../../_schemas/missionSchema';
 import { toMissionPayload } from '../../../../_utils/toMissionPayload';
-import { useUpdateMissionary } from '../_hooks/useUpdateMissionary';
+import { useSuspenseGetMissionary } from '../_hooks/useSuspenseGetMissionary';
+import { useUpdateMissionaryAction } from '../_hooks/useUpdateMissionaryAction';
 
-interface MissionaryEditFormProps {
-  missionary: Missionary;
-}
-
-export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
+export function MissionaryEditForm() {
   const router = useRouter();
-  const updateMutation = useUpdateMissionary(missionary.id);
+  const params = useParams();
+  const missionId = params.missionId as string;
+  const { data: missionary } = useSuspenseGetMissionary(missionId);
+  const updateMutation = useUpdateMissionaryAction(missionary.id);
 
   const form = useForm<MissionFormData>({
     resolver: zodResolver(missionSchema),
     mode: 'onSubmit',
     defaultValues: {
-      name: '',
-      pastorName: '',
-    },
-  });
-
-  useEffect(() => {
-    form.reset({
       name: missionary.name,
       startDate: new Date(missionary.startDate),
       endDate: new Date(missionary.endDate),
@@ -46,8 +37,8 @@ export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
         ? new Date(missionary.participationEndDate)
         : undefined,
       order: missionary.order,
-    });
-  }, [missionary, form]);
+    },
+  });
 
   const onSubmit = (data: MissionFormData) => {
     const payload = {

@@ -3,7 +3,7 @@
 import { Button, openOverlayAsync } from '@samilhero/design-system';
 
 import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { useDeleteMissionary } from '../_hooks/useDeleteMissionary';
+import { useDeleteMissionaryAction } from '../_hooks/useDeleteMissionaryAction';
 
 interface DeleteMissionSectionProps {
   missionaryId: string;
@@ -16,7 +16,7 @@ export function DeleteMissionSection({
   missionaryName,
   onDeleteSuccess,
 }: DeleteMissionSectionProps) {
-  const deleteMutation = useDeleteMissionary(missionaryId);
+  const deleteMutation = useDeleteMissionaryAction(missionaryId);
 
   const handleDelete = async () => {
     const confirmed = await openOverlayAsync<boolean>(({ isOpen, close }) => (

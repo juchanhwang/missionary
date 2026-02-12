@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, InputField } from '@samilhero/design-system';
 import { useForm } from 'react-hook-form';
 
-import { useLogin } from '../_hooks/useLogin';
+import { useLoginAction } from '../_hooks/useLoginAction';
 import { useOAuthError } from '../_hooks/useOAuthError';
 import { useSocialLogin } from '../_hooks/useSocialLogin';
 import { loginSchema, type LoginFormData } from '../_schemas/loginSchema';
@@ -19,7 +19,7 @@ export function LoginForm() {
     },
   });
 
-  const loginMutation = useLogin();
+  const loginMutation = useLoginAction();
   const { loginGoogle, loginKakao } = useSocialLogin();
   useOAuthError(form);
 

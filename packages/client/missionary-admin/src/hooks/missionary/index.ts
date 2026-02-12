@@ -1,1 +1,1 @@
-export { useMissionaries } from './useMissionaries';
+export { useGetMissionaries } from './useGetMissionaries';

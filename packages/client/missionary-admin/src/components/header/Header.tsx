@@ -41,6 +41,7 @@ export function Header() {
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           placeholder="검색..."
+          aria-label="검색"
           className="w-full h-10 pl-10 pr-4 rounded-lg bg-gray-10 text-sm text-gray-90 placeholder:text-gray-50 border border-transparent focus:border-gray-40 focus:outline-none transition-colors"
         />
       </div>

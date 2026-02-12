@@ -5,6 +5,8 @@ import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { type ComponentType, type ReactNode, Suspense } from 'react';
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
 
+import { LoadingSpinner } from '../loading/LoadingSpinner';
+
 interface AsyncBoundaryProps {
   children: ReactNode;
   pendingFallback?: ReactNode;
@@ -38,7 +40,7 @@ function DefaultErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
 
 export function AsyncBoundary({
   children,
-  pendingFallback = '...loading',
+  pendingFallback = <LoadingSpinner />,
   rejectedFallback: RejectedFallback = DefaultErrorFallback,
 }: AsyncBoundaryProps) {
   return (

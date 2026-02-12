@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
-import { useMissionGroups } from '../_hooks/useMissionGroups';
+import { useGetMissionGroups } from '../_hooks/useGetMissionGroups';
 
 type GroupFilter = 'ALL' | 'DOMESTIC' | 'ABROAD';
 
@@ -16,7 +16,7 @@ const FILTER_TABS: { label: string; value: GroupFilter }[] = [
 ];
 
 export function GroupPanel() {
-  const { data: groups, isLoading } = useMissionGroups();
+  const { data: groups, isLoading } = useGetMissionGroups();
   const params = useParams();
   const pathname = usePathname();
   const activeGroupId = params.groupId as string | undefined;
@@ -59,6 +59,7 @@ export function GroupPanel() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="그룹 검색..."
+            aria-label="그룹 검색"
             className="w-full h-8 pl-8 pr-3 rounded-md border border-gray-30 bg-white text-xs text-gray-90 placeholder:text-gray-50 focus:border-gray-40 focus:outline-none transition-colors"
           />
         </div>

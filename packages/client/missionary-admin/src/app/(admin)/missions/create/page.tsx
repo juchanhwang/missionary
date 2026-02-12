@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { MissionGroupForm } from '../_components/MissionGroupForm';
-import { useCreateMissionGroup } from '../_hooks/useCreateMissionGroup';
+import { useCreateMissionGroupAction } from '../_hooks/useCreateMissionGroupAction';
 import {
   missionGroupSchema,
   type MissionGroupSchemaType,
@@ -19,7 +19,7 @@ export default function CreateMissionGroupPage() {
     mode: 'onSubmit',
     defaultValues: { name: '', description: '', type: undefined },
   });
-  const { mutate, isPending } = useCreateMissionGroup();
+  const { mutate, isPending } = useCreateMissionGroupAction();
 
   const onSubmit = (data: MissionGroupSchemaType) => {
     mutate(data, {

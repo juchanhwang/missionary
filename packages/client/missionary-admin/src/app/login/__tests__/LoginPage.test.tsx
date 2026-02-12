@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 
-import { useLogin } from '../_hooks/useLogin';
+import { useLoginAction } from '../_hooks/useLoginAction';
 import LoginPage from '../page';
 
-vi.mock('../hooks/useLogin', () => ({
-  useLogin: vi.fn(),
+vi.mock('../_hooks/useLoginAction', () => ({
+  useLoginAction: vi.fn(),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -14,7 +14,7 @@ vi.mock('next/navigation', () => ({
 
 describe('LoginPage', () => {
   const mockMutate = vi.fn();
-  const mockUseLogin = vi.mocked(useLogin);
+  const mockUseLogin = vi.mocked(useLoginAction);
 
   beforeEach(() => {
     mockUseLogin.mockReturnValue({
