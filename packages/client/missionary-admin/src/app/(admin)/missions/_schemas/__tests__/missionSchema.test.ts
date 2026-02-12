@@ -9,7 +9,6 @@ describe('missionSchema', () => {
       startDate: new Date('2024-07-01'),
       endDate: new Date('2024-07-15'),
       pastorName: '김목사',
-      regionId: 'region-1',
       participationStartDate: new Date('2024-05-01'),
       participationEndDate: new Date('2024-06-30'),
     };
@@ -32,7 +31,6 @@ describe('missionSchema', () => {
       startDate: new Date('2024-07-01'),
       endDate: new Date('2024-07-15'),
       pastorName: '김목사',
-      regionId: 'region-1',
       participationStartDate: new Date('2024-05-01'),
       participationEndDate: new Date('2024-06-30'),
     };
@@ -50,7 +48,6 @@ describe('missionSchema', () => {
       name: '2024 여름 단기선교',
       endDate: new Date('2024-07-15'),
       pastorName: '김목사',
-      regionId: 'region-1',
       participationStartDate: new Date('2024-05-01'),
       participationEndDate: new Date('2024-06-30'),
     };
@@ -71,7 +68,6 @@ describe('missionSchema', () => {
       name: '2024 여름 단기선교',
       startDate: new Date('2024-07-01'),
       pastorName: '김목사',
-      regionId: 'region-1',
       participationStartDate: new Date('2024-05-01'),
       participationEndDate: new Date('2024-06-30'),
     };
@@ -93,7 +89,6 @@ describe('missionSchema', () => {
       startDate: new Date('2024-07-01'),
       endDate: new Date('2024-07-15'),
       pastorName: '',
-      regionId: 'region-1',
       participationStartDate: new Date('2024-05-01'),
       participationEndDate: new Date('2024-06-30'),
     };
@@ -106,67 +101,32 @@ describe('missionSchema', () => {
     }
   });
 
-  it('빈 지역을 거부하고 에러 메시지를 반환한다', () => {
-    const invalidData = {
+  it('participationStartDate가 없어도 유효하다 (선택 필드)', () => {
+    const data = {
       name: '2024 여름 단기선교',
       startDate: new Date('2024-07-01'),
       endDate: new Date('2024-07-15'),
       pastorName: '김목사',
-      regionId: '',
-      participationStartDate: new Date('2024-05-01'),
       participationEndDate: new Date('2024-06-30'),
     };
 
-    const result = missionSchema.safeParse(invalidData);
+    const result = missionSchema.safeParse(data);
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues[0].message).toBe('지역을 선택해주세요');
-    }
+    expect(result.success).toBe(true);
   });
 
-  it('참가 신청 시작일이 없으면 에러 메시지를 반환한다', () => {
-    const invalidData = {
+  it('participationEndDate가 없어도 유효하다 (선택 필드)', () => {
+    const data = {
       name: '2024 여름 단기선교',
       startDate: new Date('2024-07-01'),
       endDate: new Date('2024-07-15'),
       pastorName: '김목사',
-      regionId: 'region-1',
-      participationEndDate: new Date('2024-06-30'),
-    };
-
-    const result = missionSchema.safeParse(invalidData);
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(
-        result.error.issues.find(
-          (issue) => issue.path[0] === 'participationStartDate',
-        )?.message,
-      ).toBe('참가 신청 시작일을 선택해주세요');
-    }
-  });
-
-  it('참가 신청 종료일이 없으면 에러 메시지를 반환한다', () => {
-    const invalidData = {
-      name: '2024 여름 단기선교',
-      startDate: new Date('2024-07-01'),
-      endDate: new Date('2024-07-15'),
-      pastorName: '김목사',
-      regionId: 'region-1',
       participationStartDate: new Date('2024-05-01'),
     };
 
-    const result = missionSchema.safeParse(invalidData);
+    const result = missionSchema.safeParse(data);
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(
-        result.error.issues.find(
-          (issue) => issue.path[0] === 'participationEndDate',
-        )?.message,
-      ).toBe('참가 신청 종료일을 선택해주세요');
-    }
+    expect(result.success).toBe(true);
   });
 
   it('날짜 필드가 Date 객체로 유지된다', () => {
@@ -175,7 +135,6 @@ describe('missionSchema', () => {
       startDate: new Date('2024-07-01'),
       endDate: new Date('2024-07-15'),
       pastorName: '김목사',
-      regionId: 'region-1',
       participationStartDate: new Date('2024-05-01'),
       participationEndDate: new Date('2024-06-30'),
     };

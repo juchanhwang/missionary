@@ -1,6 +1,5 @@
 import api from './instance';
 import { type MissionGroup } from './missionGroup';
-import { type Region } from './region';
 
 export interface Missionary {
   id: string;
@@ -17,8 +16,6 @@ export interface Missionary {
   bankName?: string;
   bankAccountHolder?: string;
   bankAccountNumber?: string;
-  regionId: string;
-  region?: Region;
   missionGroupId?: string;
   order?: number;
   missionGroup?: MissionGroup;
@@ -40,7 +37,6 @@ export interface CreateMissionaryPayload {
   bankName?: string;
   bankAccountHolder?: string;
   bankAccountNumber?: string;
-  regionId?: string;
   missionGroupId?: string;
   order?: number;
   status?: 'RECRUITING' | 'IN_PROGRESS' | 'COMPLETED';
@@ -60,7 +56,6 @@ export interface UpdateMissionaryPayload {
   bankName?: string;
   bankAccountHolder?: string;
   bankAccountNumber?: string;
-  regionId?: string;
   status?: 'RECRUITING' | 'IN_PROGRESS' | 'COMPLETED';
 }
 

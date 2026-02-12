@@ -38,7 +38,6 @@ describe('useGetMissionaries', () => {
         endDate: '2024-07-07',
         participationStartDate: '2024-06-01',
         participationEndDate: '2024-06-25',
-        regionId: 'region-1',
         status: 'RECRUITING',
       },
       {
@@ -48,7 +47,6 @@ describe('useGetMissionaries', () => {
         endDate: '2024-08-07',
         participationStartDate: '2024-07-01',
         participationEndDate: '2024-07-25',
-        regionId: 'region-2',
         status: 'RECRUITING',
       },
     ];

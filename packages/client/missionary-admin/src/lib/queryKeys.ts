@@ -9,10 +9,6 @@ export const queryKeys = {
     detail: (id: string) =>
       [...queryKeys.missionaries.all, 'detail', id] as const,
   },
-  regions: {
-    all: ['regions'] as const,
-    list: () => [...queryKeys.regions.all, 'list'] as const,
-  },
   missionGroups: {
     all: ['missionGroups'] as const,
     list: () => [...queryKeys.missionGroups.all, 'list'] as const,

@@ -15,7 +15,7 @@ import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums/user-role.enum';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 
-import { CreateMissionaryChurchDto } from './dto/create-missionary-church.dto';
+import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
@@ -65,30 +65,30 @@ export class MissionaryController {
     return this.missionaryService.remove(id);
   }
 
-  @Post(':id/churches')
+  @Post(':id/regions')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: '선교 교회 추가 (관리자 전용)' })
-  addChurch(
+  @ApiOperation({ summary: '선교 연계지 추가 (관리자 전용)' })
+  addRegion(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: CreateMissionaryChurchDto,
+    @Body() dto: CreateMissionaryRegionDto,
   ) {
-    return this.missionaryService.addChurch(id, dto);
+    return this.missionaryService.addRegion(id, dto);
   }
 
-  @Get(':id/churches')
-  @ApiOperation({ summary: '선교 교회 목록 조회' })
-  getChurches(@Param('id', ParseUUIDPipe) id: string) {
-    return this.missionaryService.getChurches(id);
+  @Get(':id/regions')
+  @ApiOperation({ summary: '선교 연계지 목록 조회' })
+  getRegions(@Param('id', ParseUUIDPipe) id: string) {
+    return this.missionaryService.getRegions(id);
   }
 
-  @Delete(':id/churches/:churchId')
+  @Delete(':id/regions/:regionId')
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: '선교 교회 제거 (관리자 전용)' })
-  removeChurch(
+  @ApiOperation({ summary: '선교 연계지 제거 (관리자 전용)' })
+  removeRegion(
     @Param('id', ParseUUIDPipe) id: string,
-    @Param('churchId', ParseUUIDPipe) churchId: string,
+    @Param('regionId', ParseUUIDPipe) regionId: string,
   ) {
-    return this.missionaryService.removeChurch(id, churchId);
+    return this.missionaryService.removeRegion(id, regionId);
   }
 
   @Post(':id/posters')

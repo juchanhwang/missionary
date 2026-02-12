@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class CreateMissionaryChurchDto {
-  @ApiProperty({ example: '새일교회 제주지교회', description: '교회 이름' })
+export class CreateMissionaryRegionDto {
+  @ApiProperty({ example: '새일교회 제주지교회', description: '연계지 이름' })
   @IsString()
   @IsNotEmpty()
   declare name: string;

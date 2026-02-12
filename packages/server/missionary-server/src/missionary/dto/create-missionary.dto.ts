@@ -115,15 +115,6 @@ export class CreateMissionaryDto {
 
   @ApiProperty({
     example: 'uuid-string',
-    description: '선교 지역 ID',
-    required: false,
-  })
-  @IsOptional()
-  @IsUUID()
-  declare regionId?: string;
-
-  @ApiProperty({
-    example: 'uuid-string',
     description: '선교 그룹 ID',
     required: false,
   })

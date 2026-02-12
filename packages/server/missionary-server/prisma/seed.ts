@@ -77,29 +77,8 @@ async function seedTerms() {
   }
 }
 
-async function seedMissionaryRegions() {
-  const regions = [
-    { name: '국내', type: 'DOMESTIC' as const },
-    { name: '해외', type: 'ABROAD' as const },
-  ];
-
-  for (const data of regions) {
-    const existing = await prisma.missionaryRegion.findFirst({
-      where: { name: data.name, deletedAt: null },
-    });
-
-    if (existing) {
-      console.log(`  ✓ 선교 지역 이미 존재: ${data.name}`);
-      continue;
-    }
-
-    await prisma.missionaryRegion.create({ data });
-    console.log(`  + 선교 지역 생성: ${data.name}`);
-  }
-}
-
 async function seedMissionGroups() {
-  const groups = [{ name: '군선교', type: 'DOMESTIC' as const }];
+  const groups = [{ name: '군선교', category: 'DOMESTIC' as const }];
 
   for (const data of groups) {
     const existing = await prisma.missionGroup.findFirst({
@@ -124,9 +103,6 @@ async function main() {
 
   console.log('\n[약관]');
   await seedTerms();
-
-  console.log('\n[선교 지역]');
-  await seedMissionaryRegions();
 
   console.log('\n[선교 그룹]');
   await seedMissionGroups();

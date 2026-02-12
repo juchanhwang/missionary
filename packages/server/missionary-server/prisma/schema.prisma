@@ -23,9 +23,11 @@ enum UserRole {
   STAFF
 }
 
-enum MissionaryRegionType {
+enum MissionaryCategory {
   DOMESTIC
   ABROAD
+
+  @@map("MissionaryRegionType")
 }
 
 enum MissionaryBoardType {
@@ -101,32 +103,14 @@ model User {
 // MODELS - MISSIONARY DOMAIN
 // ============================================
 
-model MissionaryRegion {
-  id        String                @id @default(uuid())
-  name      String
-  type      MissionaryRegionType
-
-  // Audit fields
-  createdAt DateTime              @default(now()) @map("created_at")
-  updatedAt DateTime              @updatedAt @map("updated_at")
-  createdBy String?               @map("created_by")
-  updatedBy String?               @map("updated_by")
-  version   Int                   @default(0)
-
-  // Soft delete
-  deletedAt DateTime?             @map("deleted_at")
-
-  // Relations
-  missionaries Missionary[]
-
-  @@map("missionary_region")
-}
+// MissionaryRegion (구 missionary_region 테이블 - 국내/해외) 제거됨
+// 국내/해외 구분은 MissionGroup.category enum으로 대체
 
 model MissionGroup {
   id          String                @id @default(uuid())
   name        String
   description String?               @db.Text
-  type        MissionaryRegionType
+  category    MissionaryCategory   @map("type")
 
   // Audit fields
   createdAt DateTime              @default(now()) @map("created_at")
@@ -173,7 +157,6 @@ model Missionary {
   status MissionStatus @default(RECRUITING)
 
   // Foreign keys
-  regionId   String?  @map("region_id")
   missionGroupId String? @map("mission_group_id")
   createdById String @map("created_by_id")
   order      Int?
@@ -189,12 +172,11 @@ model Missionary {
   deletedAt DateTime? @map("deleted_at")
 
   // Relations
-  region          MissionaryRegion?     @relation(fields: [regionId], references: [id])
   missionGroup    MissionGroup?         @relation(fields: [missionGroupId], references: [id])
   creator         User                  @relation("MissionaryCreator", fields: [createdById], references: [id])
   posters         MissionaryPoster[]
   staff           MissionaryStaff[]
-  churches        MissionaryChurch[]
+  regions         MissionaryRegion[]
   boards          MissionaryBoard[]
   participations  Participation[]
   teams           Team[]
@@ -253,7 +235,7 @@ model MissionaryStaff {
   @@map("missionary_staff")
 }
 
-model MissionaryChurch {
+model MissionaryRegion {
   id   String @id @default(uuid())
   name String
 
@@ -283,7 +265,7 @@ model MissionaryChurch {
   // Relations
   missionary Missionary @relation(fields: [missionaryId], references: [id])
 
-  @@map("missionary_church")
+  @@map("missionary_region")
 }
 
 model MissionaryBoard {

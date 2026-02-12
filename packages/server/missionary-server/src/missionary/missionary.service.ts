@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '@/database/prisma.service';
 
-import { CreateMissionaryChurchDto } from './dto/create-missionary-church.dto';
+import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
@@ -66,14 +66,12 @@ export class MissionaryService {
         bankName: dto.bankName,
         bankAccountHolder: dto.bankAccountHolder,
         bankAccountNumber: dto.bankAccountNumber,
-        regionId: dto.regionId,
         missionGroupId: dto.missionGroupId,
         order: finalOrder,
         createdById: userId,
         status: dto.status,
       },
       include: {
-        region: true,
         missionGroup: true,
       },
     });
@@ -82,7 +80,6 @@ export class MissionaryService {
   async findAll() {
     return this.prisma.missionary.findMany({
       include: {
-        region: true,
         missionGroup: true,
       },
       orderBy: {
@@ -95,10 +92,9 @@ export class MissionaryService {
     const missionary = await this.prisma.missionary.findUnique({
       where: { id },
       include: {
-        region: true,
         missionGroup: true,
         posters: true,
-        churches: true,
+        regions: true,
       },
     });
 
@@ -132,14 +128,13 @@ export class MissionaryService {
       data.bankAccountHolder = dto.bankAccountHolder;
     if (dto.bankAccountNumber !== undefined)
       data.bankAccountNumber = dto.bankAccountNumber;
-    if (dto.regionId !== undefined) data.regionId = dto.regionId;
     if (dto.status !== undefined) data.status = dto.status;
 
     return this.prisma.missionary.update({
       where: { id },
       data,
       include: {
-        region: true,
+        missionGroup: true,
       },
     });
   }
@@ -152,10 +147,10 @@ export class MissionaryService {
     });
   }
 
-  async addChurch(missionaryId: string, dto: CreateMissionaryChurchDto) {
+  async addRegion(missionaryId: string, dto: CreateMissionaryRegionDto) {
     await this.findOne(missionaryId);
 
-    return this.prisma.missionaryChurch.create({
+    return this.prisma.missionaryRegion.create({
       data: {
         missionaryId,
         name: dto.name,
@@ -168,10 +163,10 @@ export class MissionaryService {
     });
   }
 
-  async getChurches(missionaryId: string) {
+  async getRegions(missionaryId: string) {
     await this.findOne(missionaryId);
 
-    return this.prisma.missionaryChurch.findMany({
+    return this.prisma.missionaryRegion.findMany({
       where: { missionaryId },
       orderBy: {
         createdAt: 'desc',
@@ -179,24 +174,24 @@ export class MissionaryService {
     });
   }
 
-  async removeChurch(missionaryId: string, churchId: string) {
+  async removeRegion(missionaryId: string, regionId: string) {
     await this.findOne(missionaryId);
 
-    const church = await this.prisma.missionaryChurch.findFirst({
+    const region = await this.prisma.missionaryRegion.findFirst({
       where: {
-        id: churchId,
+        id: regionId,
         missionaryId,
       },
     });
 
-    if (!church) {
+    if (!region) {
       throw new NotFoundException(
-        `MissionaryChurch with ID ${churchId} not found for missionary ${missionaryId}`,
+        `MissionaryRegion with ID ${regionId} not found for missionary ${missionaryId}`,
       );
     }
 
-    return this.prisma.missionaryChurch.delete({
-      where: { id: churchId },
+    return this.prisma.missionaryRegion.delete({
+      where: { id: regionId },
     });
   }
 

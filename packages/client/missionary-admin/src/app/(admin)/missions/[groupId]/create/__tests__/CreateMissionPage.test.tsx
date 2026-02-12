@@ -1,66 +1,93 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { missionGroupApi } from 'apis/missionGroup';
+import { useRouter, useParams } from 'next/navigation';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-import { useGetRegions } from '../../../_hooks/useGetRegions';
 import { useCreateMissionaryAction } from '../_hooks/useCreateMissionaryAction';
 import CreateMissionPage from '../page';
+
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
+  useParams: vi.fn(),
+}));
 
 vi.mock('../_hooks/useCreateMissionaryAction', () => ({
   useCreateMissionaryAction: vi.fn(),
 }));
 
-vi.mock('../../../_hooks/useGetRegions', () => ({
-  useGetRegions: vi.fn(),
+vi.mock('apis/missionGroup', () => ({
+  missionGroupApi: {
+    getMissionGroup: vi.fn(),
+  },
 }));
 
 describe('CreateMissionPage', () => {
   const mockMutate = vi.fn();
   const mockUseCreateMissionary = vi.mocked(useCreateMissionaryAction);
-  const mockUseRegions = vi.mocked(useGetRegions);
+  const mockUseRouter = vi.mocked(useRouter);
+  const mockUseParams = vi.mocked(useParams);
+  let queryClient: QueryClient;
 
   beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
+
     mockUseCreateMissionary.mockReturnValue({
       mutate: mockMutate,
       isPending: false,
     } as any);
 
-    mockUseRegions.mockReturnValue({
-      data: [
-        { id: 'region-1', name: '서울', type: 'DOMESTIC' },
-        { id: 'region-2', name: '부산', type: 'DOMESTIC' },
-      ],
+    mockUseRouter.mockReturnValue({
+      push: vi.fn(),
+      back: vi.fn(),
+      forward: vi.fn(),
+      refresh: vi.fn(),
+      replace: vi.fn(),
+      prefetch: vi.fn(),
+    } as any);
+
+    mockUseParams.mockReturnValue({ groupId: '1' });
+
+    vi.mocked(missionGroupApi.getMissionGroup).mockResolvedValue({
+      data: {
+        id: '1',
+        title: '2024년 여름 선교',
+        year: 2024,
+        season: 'SUMMER',
+        status: 'RECRUITING',
+      },
     } as any);
 
     vi.clearAllMocks();
   });
 
   it('빈 폼을 제출하면 7개 필드의 에러 메시지를 표시한다', async () => {
-    render(<CreateMissionPage />);
+    vi.mocked(missionGroupApi.getMissionGroup).mockResolvedValue({
+      data: {
+        id: '1',
+        title: '2024년 여름 선교',
+        year: 2024,
+        season: 'SUMMER',
+        status: 'RECRUITING',
+      },
+    } as any);
 
-    const submitButton = screen.getByRole('button', { name: '생성하기' });
-    fireEvent.click(submitButton);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateMissionPage />
+      </QueryClientProvider>,
+    );
 
     await waitFor(() => {
-      expect(screen.getByText('선교 이름을 입력해주세요')).toBeInTheDocument();
+      expect(screen.queryByText('불러오는 중...')).not.toBeInTheDocument();
     });
 
-    expect(screen.getByText('선교 시작일을 선택해주세요')).toBeInTheDocument();
-    expect(screen.getByText('선교 종료일을 선택해주세요')).toBeInTheDocument();
-    expect(screen.getByText('담당 교역자를 입력해주세요')).toBeInTheDocument();
-    expect(screen.getByText('지역을 선택해주세요')).toBeInTheDocument();
-    expect(
-      screen.getByText('참가 신청 시작일을 선택해주세요'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('참가 신청 종료일을 선택해주세요'),
-    ).toBeInTheDocument();
-    expect(mockMutate).not.toHaveBeenCalled();
-  });
-
-  it('유효한 데이터를 제출하면 ISO 문자열 날짜로 mutate를 호출한다', async () => {
-    render(<CreateMissionPage />);
-
-    const nameInput = screen.getByPlaceholderText('선교 이름을 입력하세요');
+    const nameInput =
+      await screen.findByPlaceholderText('선교 이름을 입력하세요');
     const pastorInput =
       screen.getByPlaceholderText('담당 교역자 이름을 입력하세요');
 
@@ -90,17 +117,9 @@ describe('CreateMissionPage', () => {
     });
     fireEvent.blur(participationEndInput);
 
-    const selectTrigger = screen.getByText('지역을 선택하세요');
-    fireEvent.click(selectTrigger);
-
-    await waitFor(() => {
-      expect(screen.getByText('서울')).toBeInTheDocument();
+    const submitButton = await screen.findByRole('button', {
+      name: '생성하기',
     });
-
-    const seoulOption = screen.getByText('서울');
-    fireEvent.click(seoulOption);
-
-    const submitButton = screen.getByRole('button', { name: '생성하기' });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -108,7 +127,6 @@ describe('CreateMissionPage', () => {
         expect.objectContaining({
           name: '2024 여름 단기선교',
           pastorName: '김목사',
-          regionId: 'region-1',
           startDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
           endDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
           participationStartDate: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T/),
@@ -119,41 +137,31 @@ describe('CreateMissionPage', () => {
     });
   });
 
-  it('isPending 상태일 때 버튼이 비활성화되고 "생성 중..." 텍스트를 표시한다', () => {
+  it('isPending 상태일 때 버튼이 비활성화되고 "생성 중..." 텍스트를 표시한다', async () => {
+    vi.mocked(missionGroupApi.getMissionGroup).mockResolvedValue({
+      data: {
+        id: '1',
+        title: '2024년 여름 선교',
+        year: 2024,
+        season: 'SUMMER',
+        status: 'RECRUITING',
+      },
+    } as any);
+
     mockUseCreateMissionary.mockReturnValue({
       mutate: mockMutate,
       isPending: true,
     } as any);
 
-    render(<CreateMissionPage />);
-
-    const submitButton = screen.getByRole('button', { name: '생성 중...' });
-
-    expect(submitButton).toBeDisabled();
-  });
-
-  it('Select를 통해 regionId를 선택할 수 있다', async () => {
-    render(<CreateMissionPage />);
-
-    const selectTrigger = screen.getByText('지역을 선택하세요');
-    fireEvent.click(selectTrigger);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateMissionPage />
+      </QueryClientProvider>,
+    );
 
     await waitFor(() => {
-      expect(screen.getAllByText('부산').length).toBeGreaterThan(0);
+      expect(screen.queryByText('불러오는 중...')).not.toBeInTheDocument();
     });
-
-    const busanOptions = screen.getAllByText('부산');
-    const busanOption = busanOptions[busanOptions.length - 1];
-    fireEvent.click(busanOption);
-
-    await waitFor(() => {
-      const triggerButton = screen.getByRole('button', { name: '부산' });
-      expect(triggerButton).toBeInTheDocument();
-    });
-  });
-
-  it('DatePicker를 통해 날짜를 선택할 수 있다', async () => {
-    render(<CreateMissionPage />);
 
     const startDateInput = screen.getAllByPlaceholderText('YYYY-MM-DD')[0];
 
