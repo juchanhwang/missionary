@@ -20,8 +20,13 @@ async function bootstrap() {
         'CORS_ORIGINS',
         'http://localhost:3000,http://localhost:3001',
       )
-      .split(','),
+      .split(',')
+      .map((o) => o.trim()),
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    exposedHeaders: ['Set-Cookie'],
+    maxAge: 86400,
   });
 
   app.useGlobalPipes(
