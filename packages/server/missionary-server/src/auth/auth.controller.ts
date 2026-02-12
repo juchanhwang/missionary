@@ -39,7 +39,7 @@ export class AuthController {
     return {
       httpOnly: true,
       secure: isSecure,
-      sameSite: 'lax' as const,
+      sameSite: isSecure ? ('none' as const) : ('lax' as const),
       path: '/',
     };
   }
