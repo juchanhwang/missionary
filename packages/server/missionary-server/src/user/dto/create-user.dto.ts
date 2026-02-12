@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  MinLength,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -13,6 +14,12 @@ export class CreateUserDto {
   @IsEmail()
   @IsNotEmpty()
   declare email: string;
+
+  @ApiProperty({ example: 'password123', description: '비밀번호 (최소 8자)' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  declare password: string;
 
   @ApiProperty({
     example: '홍길동',

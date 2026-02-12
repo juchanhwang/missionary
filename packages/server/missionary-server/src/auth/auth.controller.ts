@@ -1,13 +1,14 @@
 import {
+  Body,
   Controller,
   Get,
+  Patch,
   Post,
   Req,
   Res,
+  UnauthorizedException,
   UseFilters,
   UseGuards,
-  Body,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -19,6 +20,7 @@ import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.i
 
 import { AuthService } from './auth.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { OAuthExceptionFilter } from './filters/oauth-exception.filter';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
@@ -105,15 +107,26 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @UseFilters(OAuthExceptionFilter)
   @ApiOperation({ summary: 'Google OAuth 콜백' })
-  googleCallback(@CurrentUser() user: AuthenticatedUser, @Res() res: Response) {
+  googleCallback(
+    @CurrentUser() user: AuthenticatedUser,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
     const tokens = this.authService.generateTokens(user);
 
     this.setTokenCookies(res, tokens);
 
-    const clientUrl = this.configService.get<string>(
-      'ADMIN_CLIENT_URL',
-      'http://localhost:3001',
-    );
+    const state = req.query.state as string | undefined;
+    const clientUrl =
+      state === 'app'
+        ? this.configService.get<string>(
+            'APP_CLIENT_URL',
+            'http://localhost:3000',
+          )
+        : this.configService.get<string>(
+            'ADMIN_CLIENT_URL',
+            'http://localhost:3001',
+          );
     res.redirect(clientUrl);
   }
 
@@ -131,15 +144,26 @@ export class AuthController {
   @UseGuards(KakaoAuthGuard)
   @UseFilters(OAuthExceptionFilter)
   @ApiOperation({ summary: 'Kakao OAuth 콜백' })
-  kakaoCallback(@CurrentUser() user: AuthenticatedUser, @Res() res: Response) {
+  kakaoCallback(
+    @CurrentUser() user: AuthenticatedUser,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
     const tokens = this.authService.generateTokens(user);
 
     this.setTokenCookies(res, tokens);
 
-    const clientUrl = this.configService.get<string>(
-      'ADMIN_CLIENT_URL',
-      'http://localhost:3001',
-    );
+    const state = req.query.state as string | undefined;
+    const clientUrl =
+      state === 'app'
+        ? this.configService.get<string>(
+            'APP_CLIENT_URL',
+            'http://localhost:3000',
+          )
+        : this.configService.get<string>(
+            'ADMIN_CLIENT_URL',
+            'http://localhost:3001',
+          );
     res.redirect(clientUrl);
   }
 
@@ -161,6 +185,15 @@ export class AuthController {
     this.setTokenCookies(res, tokens);
 
     return { message: '토큰 갱신 성공' };
+  }
+
+  @Patch('change-password')
+  @ApiOperation({ summary: '비밀번호 변경' })
+  changePassword(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(user.id, dto);
   }
 
   @Get('me')

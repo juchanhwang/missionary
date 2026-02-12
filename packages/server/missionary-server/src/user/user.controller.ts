@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { Public } from '@/common/decorators/public.decorator';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums/user-role.enum';
 
@@ -22,8 +23,9 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Public()
   @Post()
-  @ApiOperation({ summary: '사용자 생성' })
+  @ApiOperation({ summary: '사용자 생성 (회원가입)' })
   create(@Body() dto: CreateUserDto) {
     return this.userService.create(dto);
   }

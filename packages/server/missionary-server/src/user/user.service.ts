@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 import { EncryptionService } from '@/common/encryption/encryption.service';
 import { PrismaService } from '@/database/prisma.service';
@@ -52,8 +53,11 @@ export class UserService {
       throw new ConflictException('이미 존재하는 이메일입니다');
     }
 
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
     const data = {
       ...dto,
+      password: hashedPassword,
       birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
       baptizedAt: dto.baptizedAt ? new Date(dto.baptizedAt) : undefined,
       identityNumber: this.encryptIdentityNumber(dto.identityNumber),
@@ -112,8 +116,10 @@ export class UserService {
   async update(id: string, dto: UpdateUserDto) {
     await this.findOne(id);
 
+    const { password, ...rest } = dto;
+
     const data = {
-      ...dto,
+      ...rest,
       birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
       baptizedAt: dto.baptizedAt ? new Date(dto.baptizedAt) : undefined,
       identityNumber: this.encryptIdentityNumber(dto.identityNumber),
@@ -125,6 +131,15 @@ export class UserService {
     });
 
     return this.decryptIdentityNumber(user);
+  }
+
+  async updatePassword(id: string, hashedPassword: string) {
+    await this.findOne(id);
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { password: hashedPassword },
+    });
   }
 
   async remove(id: string) {

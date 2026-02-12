@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -7,6 +11,7 @@ import { withDbRetry } from '@/common/utils/retry';
 import { UserService } from '@/user/user.service';
 
 import type { AdminLoginDto } from './dto/admin-login.dto';
+import type { ChangePasswordDto } from './dto/change-password.dto';
 import type { JwtPayload } from './interfaces/jwt-payload.interface';
 import type { AuthProvider } from '../../prisma/generated/prisma/client';
 
@@ -110,6 +115,30 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException('리프레시 토큰이 유효하지 않습니다');
     }
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.userService.findOne(userId);
+
+    if (!user.password) {
+      throw new BadRequestException(
+        'OAuth 계정은 비밀번호를 변경할 수 없습니다',
+      );
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      dto.currentPassword,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('현재 비밀번호가 올바르지 않습니다');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+    await this.userService.updatePassword(userId, hashedPassword);
+
+    return { message: '비밀번호가 변경되었습니다' };
   }
 
   async loginAdmin(adminLoginDto: AdminLoginDto) {

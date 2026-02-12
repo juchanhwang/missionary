@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 @Injectable()
 export class GoogleAuthGuard extends AuthGuard('google') {
@@ -23,5 +24,11 @@ export class GoogleAuthGuard extends AuthGuard('google') {
     }
 
     return super.canActivate(context);
+  }
+
+  getAuthenticateOptions(context: ExecutionContext) {
+    const request = context.switchToHttp().getRequest<Request>();
+    const client = (request.query.client as string) || 'admin';
+    return { state: client };
   }
 }

@@ -7,7 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 function isDbConnectionError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
@@ -29,7 +29,9 @@ export class OAuthExceptionFilter implements ExceptionFilter {
   constructor(private readonly configService: ConfigService) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
-    const res = host.switchToHttp().getResponse<Response>();
+    const ctx = host.switchToHttp();
+    const req = ctx.getRequest<Request>();
+    const res = ctx.getResponse<Response>();
 
     let message: string;
 
@@ -50,10 +52,17 @@ export class OAuthExceptionFilter implements ExceptionFilter {
       );
     }
 
-    const clientUrl = this.configService.get<string>(
-      'ADMIN_CLIENT_URL',
-      'http://localhost:3001',
-    );
+    const state = req.query?.state as string | undefined;
+    const clientUrl =
+      state === 'app'
+        ? this.configService.get<string>(
+            'APP_CLIENT_URL',
+            'http://localhost:3000',
+          )
+        : this.configService.get<string>(
+            'ADMIN_CLIENT_URL',
+            'http://localhost:3001',
+          );
 
     const errorParam = encodeURIComponent(message);
     res.redirect(`${clientUrl}/login?error=${errorParam}`);
