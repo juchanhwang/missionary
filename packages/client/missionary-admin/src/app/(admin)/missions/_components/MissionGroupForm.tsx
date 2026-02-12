@@ -30,7 +30,12 @@ export function MissionGroupForm({ form, isPending }: MissionGroupFormProps) {
         name="type"
         control={form.control}
         render={({ field }) => (
-          <Select value={field.value} onChange={field.onChange}>
+          <Select
+            value={field.value}
+            onChange={field.onChange}
+            label="선교 유형"
+            error={form.formState.errors.type?.message}
+          >
             <Select.Trigger disabled={isPending}>
               {field.value ? TYPE_LABELS[field.value] : '선교 유형 선택'}
             </Select.Trigger>
@@ -41,11 +46,6 @@ export function MissionGroupForm({ form, isPending }: MissionGroupFormProps) {
           </Select>
         )}
       />
-      {form.formState.errors.type?.message && (
-        <span className="text-sm text-error-50">
-          {form.formState.errors.type.message}
-        </span>
-      )}
 
       <InputField
         label="설명"

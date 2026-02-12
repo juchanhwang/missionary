@@ -3,6 +3,8 @@ import { cn } from '@lib/utils';
 import { ChevronDown } from 'lucide-react';
 import React, { useCallback } from 'react';
 
+import { formSizeClasses } from '../form-size';
+
 import { SelectActionsContext, SelectDataContext } from './index';
 
 import type { ButtonHTMLAttributes } from 'react';
@@ -18,6 +20,7 @@ export const SelectTrigger = ({
 }: TriggerProps) => {
   const actions = useContextAction('Select.Trigger', SelectActionsContext);
   const data = useContextData('Select.Trigger', SelectDataContext);
+  const sizeClass = formSizeClasses[data.size];
 
   const handleOnClick = useCallback(() => {
     actions.setOpen((prevOpen) => !prevOpen);
@@ -35,7 +38,9 @@ export const SelectTrigger = ({
       type="button"
       data-state={data.open ? 'open' : 'closed'}
       className={cn(
-        'flex h-12 w-full items-center justify-between rounded-lg border border-gray-30 bg-gray-10 px-4 py-2 text-sm transition-colors hover:border-gray-40 focus:outline-none focus:ring-1 focus:ring-gray-50 disabled:cursor-not-allowed disabled:opacity-50',
+        'flex w-full items-center justify-between rounded-lg border border-gray-30 bg-gray-10 transition-colors hover:border-gray-40 focus:outline-none focus:ring-1 focus:ring-gray-50 disabled:cursor-not-allowed disabled:opacity-50',
+        sizeClass.container,
+        sizeClass.text,
         'data-[state=open]:border-gray-50 data-[state=open]:ring-1 data-[state=open]:ring-gray-50',
         isEmpty ? 'text-gray-50' : 'text-gray-90',
         className,
@@ -44,14 +49,11 @@ export const SelectTrigger = ({
     >
       <span className="truncate">{children}</span>
       <ChevronDown
-        size={20}
+        size={sizeClass.icon}
         strokeWidth={1.5}
-        className={cn(
-          'ml-2 h-5 w-5 shrink-0 transition-transform duration-200',
-          {
-            'rotate-180': data.open,
-          },
-        )}
+        className={cn('ml-2 shrink-0 transition-transform duration-200', {
+          'rotate-180': data.open,
+        })}
       />
     </button>
   );

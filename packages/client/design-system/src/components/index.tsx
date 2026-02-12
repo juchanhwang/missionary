@@ -19,3 +19,5 @@ export { Pagination } from './pagination';
 export { IconButton } from './icon-button';
 export { NavItem } from './nav-item';
 export { DatePicker } from './date-picker';
+
+export type { FormSize } from './form-size';

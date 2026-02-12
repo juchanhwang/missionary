@@ -4,6 +4,10 @@ import { cn } from '@lib/utils';
 import React, { useId } from 'react';
 import ReactDatePicker from 'react-datepicker';
 
+import { formSizeClasses } from '../form-size';
+
+import type { FormSize } from '../form-size';
+
 import 'react-datepicker/dist/react-datepicker.css';
 import './DatePickerStyles.css';
 
@@ -19,6 +23,7 @@ export interface DatePickerProps {
   className?: string;
   id?: string;
   name?: string;
+  size?: FormSize;
   onBlur?: () => void;
   ref?: React.Ref<HTMLInputElement>;
   // Range & Common props
@@ -48,6 +53,7 @@ export function DatePicker({
   className,
   id: providedId,
   name,
+  size = 'md',
   onBlur,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ref,
@@ -58,6 +64,7 @@ export function DatePicker({
   const errorId = `${inputId}-error`;
 
   const dateValue = value ?? selected;
+  const sizeClass = formSizeClasses[size];
 
   return (
     <div className={cn('relative flex flex-col', className)}>
@@ -74,7 +81,8 @@ export function DatePicker({
       )}
       <div
         className={cn(
-          'flex w-full items-center gap-2 rounded-lg border border-gray-30 bg-gray-10 px-3 py-2 transition-colors',
+          'flex w-full items-center rounded-lg border border-gray-30 bg-gray-10 transition-colors',
+          sizeClass.container,
           'focus-within:ring-1 focus-within:ring-gray-50 focus-within:border-gray-50',
           disabled && 'cursor-not-allowed opacity-50 bg-gray-20 border-gray-20',
           !disabled && 'hover:border-gray-40',
@@ -90,7 +98,10 @@ export function DatePicker({
           disabled={disabled}
           name={name}
           onBlur={onBlur}
-          className="w-full border-0 bg-transparent text-black text-sm leading-[1.428] focus:outline-none placeholder:text-gray-50 disabled:cursor-not-allowed"
+          className={cn(
+            'w-full border-0 bg-transparent text-black leading-[1.428] focus:outline-none placeholder:text-gray-50 disabled:cursor-not-allowed',
+            sizeClass.text,
+          )}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? errorId : undefined}
           autoComplete="off"

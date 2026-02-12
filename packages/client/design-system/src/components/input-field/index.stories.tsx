@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { InputField } from './index';
 
+import type { FormSize } from '../form-size';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta<typeof InputField> = {
@@ -29,6 +30,34 @@ function DefaultStory() {
 
 export const Default: Story = {
   render: () => <DefaultStory />,
+};
+
+function SizesStory() {
+  const sizes: FormSize[] = ['sm', 'md', 'lg'];
+
+  return (
+    <div
+      style={{
+        width: '320px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}
+    >
+      {sizes.map((size) => (
+        <InputField
+          key={size}
+          label={`Size: ${size}`}
+          size={size}
+          placeholder={`${size} 사이즈 인풋`}
+        />
+      ))}
+    </div>
+  );
+}
+
+export const Sizes: Story = {
+  render: () => <SizesStory />,
 };
 
 function WithClearButtonStory() {

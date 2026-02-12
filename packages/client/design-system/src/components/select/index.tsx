@@ -1,10 +1,12 @@
 'use client';
 
 import { useControllableState, useMergeRefs } from '@hooks';
+import { cn } from '@lib/utils';
 import React, {
   createContext,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -14,6 +16,8 @@ import { SelectOption } from './SelectOption';
 import { SelectOptions } from './SelectOptions';
 import { SelectSearchInput } from './SelectSearchInput';
 import { SelectTrigger } from './Trigger';
+
+import type { FormSize } from '../form-size';
 
 type ValueType = string | string[] | undefined | null;
 export const SelectActionsContext = createContext<{
@@ -25,6 +29,7 @@ SelectActionsContext.displayName = 'SelectActionsContext';
 export const SelectDataContext = createContext<{
   open: boolean;
   selectedValue?: ValueType;
+  size: FormSize;
 } | null>(null);
 SelectDataContext.displayName = 'SelectDataContext';
 
@@ -37,6 +42,10 @@ interface SelectRootProps {
   onChange?(value?: ValueType): void;
   onBlur?: () => void;
   name?: string;
+  size?: FormSize;
+  label?: string;
+  hideLabel?: boolean;
+  error?: string;
   ref?: React.Ref<HTMLDivElement>;
 }
 const SelectRoot = ({
@@ -47,6 +56,10 @@ const SelectRoot = ({
   multiple = false,
   onBlur,
   name,
+  size = 'md',
+  label,
+  hideLabel = false,
+  error,
   ref,
 }: SelectRootProps) => {
   const selectRef = useRef<HTMLDivElement>(null);
@@ -131,18 +144,51 @@ const SelectRoot = ({
     [handleSelectValue],
   );
 
+  const generatedId = useId();
+  const selectId = `select-${generatedId}`;
+  const errorId = `${selectId}-error`;
+
   const data = useMemo(
     () => ({
       open,
       selectedValue,
+      size,
     }),
-    [open, selectedValue],
+    [open, selectedValue, size],
   );
   return (
     <SelectActionsContext.Provider value={actions}>
       <SelectDataContext.Provider value={data}>
-        <div ref={mergedRef} data-name={name} style={{ position: 'relative' }}>
-          {children}
+        <div className={cn('relative flex flex-col')}>
+          {label && (
+            <label
+              htmlFor={selectId}
+              className={cn(
+                'mb-1 text-xs font-normal leading-[1.833] text-gray-70',
+                hideLabel && 'sr-only',
+              )}
+            >
+              {label}
+            </label>
+          )}
+          <div
+            ref={mergedRef}
+            data-name={name}
+            id={selectId}
+            style={{ position: 'relative' }}
+          >
+            {children}
+          </div>
+          {error && (
+            <div
+              id={errorId}
+              role="alert"
+              aria-live="polite"
+              className="mt-1 text-error-60 text-xs leading-[1.5]"
+            >
+              {error}
+            </div>
+          )}
         </div>
       </SelectDataContext.Provider>
     </SelectActionsContext.Provider>

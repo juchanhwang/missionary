@@ -2,13 +2,20 @@ import IconInputReset from '@assets/icons/icon-input-reset.svg';
 import { cn } from '@lib/utils';
 import React, { useId } from 'react';
 
+import { formSizeClasses } from '../form-size';
+
+import type { FormSize } from '../form-size';
 import type { InputHTMLAttributes } from 'react';
 
-interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputFieldProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'size'
+> {
   label?: string;
   hideLabel?: boolean;
   error?: string;
   onClear?: () => void;
+  size?: FormSize;
   ref?: React.Ref<HTMLInputElement>;
 }
 
@@ -21,6 +28,7 @@ export function InputField({
   disabled,
   className,
   id: providedId,
+  size = 'md',
   ref,
   ...rest
 }: InputFieldProps) {
@@ -30,6 +38,7 @@ export function InputField({
 
   const hasValue = typeof value === 'string' ? value.length > 0 : !!value;
   const showClearButton = hasValue && !disabled && onClear;
+  const sizeClass = formSizeClasses[size];
 
   return (
     <div className={cn('relative flex flex-col', className)}>
@@ -46,7 +55,8 @@ export function InputField({
       )}
       <div
         className={cn(
-          'flex w-full items-center gap-2 rounded-lg border border-gray-30 bg-gray-10 px-3 py-2 transition-colors',
+          'flex w-full items-center rounded-lg border border-gray-30 bg-gray-10 transition-colors',
+          sizeClass.container,
           'focus-within:ring-1 focus-within:ring-gray-50 focus-within:border-gray-50',
           disabled && 'cursor-not-allowed opacity-50 bg-gray-20 border-gray-20',
           !disabled && 'hover:border-gray-40',
@@ -61,7 +71,10 @@ export function InputField({
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
           ref={ref}
-          className="flex-1 border-0 bg-transparent text-black text-sm leading-[1.428] focus:outline-none placeholder:text-gray-50 disabled:cursor-not-allowed"
+          className={cn(
+            'flex-1 border-0 bg-transparent text-black leading-[1.428] focus:outline-none placeholder:text-gray-50 disabled:cursor-not-allowed',
+            sizeClass.text,
+          )}
           {...rest}
         />
         {showClearButton && (
@@ -72,7 +85,10 @@ export function InputField({
             aria-label="입력 내용 지우기"
             tabIndex={-1}
           >
-            <IconInputReset className="w-5 h-5 cursor-pointer" />
+            <IconInputReset
+              className="cursor-pointer"
+              style={{ width: sizeClass.icon, height: sizeClass.icon }}
+            />
           </button>
         )}
       </div>
