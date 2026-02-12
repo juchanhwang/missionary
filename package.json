@@ -20,15 +20,14 @@
     "type-check": "tsc --noEmit -p packages/client/design-system && tsc --noEmit -p packages/client/missionary-admin && tsc --noEmit -p packages/client/missionary-app && tsc --noEmit -p packages/server/missionary-server",
     "dev:admin": "pnpm --filter missionary-admin dev",
     "dev:app": "pnpm --filter missionary-app dev",
-    "dev:ds": "pnpm --filter design-system dev",
+    "dev:ds": "pnpm --filter design-system storybook",
     "dev:server": "pnpm --filter missionary-server dev",
     "dev:all": "pnpm dev:admin & pnpm dev:app & pnpm dev:ds & pnpm dev:server",
-    "build:admin": "pnpm --filter missionary-admin build",
+    "build:admin": "pnpm --filter @samilhero/design-system build && pnpm --filter missionary-admin build",
     "build:app": "pnpm --filter missionary-app build",
     "build:ds": "pnpm --filter design-system build",
     "build:server": "pnpm --filter missionary-server build",
     "build:all": "pnpm build:admin & pnpm build:app & pnpm build:ds & pnpm build:server",
-    "sb:ds": "pnpm --filter design-system storybook",
     "prepare": "husky"
   },
   "dependencies": {
