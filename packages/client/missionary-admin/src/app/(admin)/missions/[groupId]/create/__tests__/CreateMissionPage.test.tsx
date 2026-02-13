@@ -65,7 +65,7 @@ describe('CreateMissionPage', () => {
     vi.clearAllMocks();
   });
 
-  it('빈 폼을 제출하면 7개 필드의 에러 메시지를 표시한다', async () => {
+  it('빈 폼을 제출하면 6개 필드의 에러 메시지를 표시한다', async () => {
     vi.mocked(missionGroupApi.getMissionGroup).mockResolvedValue({
       data: {
         id: '1',
@@ -151,6 +151,32 @@ describe('CreateMissionPage', () => {
     mockUseCreateMissionary.mockReturnValue({
       mutate: mockMutate,
       isPending: true,
+    } as any);
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <CreateMissionPage />
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText('불러오는 중...')).not.toBeInTheDocument();
+    });
+
+    const submitButton = screen.getByRole('button', { name: '생성 중...' });
+
+    expect(submitButton).toBeDisabled();
+  });
+
+  it('DatePicker를 통해 날짜를 선택할 수 있다', async () => {
+    vi.mocked(missionGroupApi.getMissionGroup).mockResolvedValue({
+      data: {
+        id: '1',
+        title: '2024년 여름 선교',
+        year: 2024,
+        season: 'SUMMER',
+        status: 'RECRUITING',
+      },
     } as any);
 
     render(

@@ -1,3 +1,5 @@
+'use client';
+
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { missionaryApi } from 'apis/missionary';
 import { queryKeys } from 'lib/queryKeys';

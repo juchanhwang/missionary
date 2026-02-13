@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '@/database/prisma.service';
 
-import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
+import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
 import { Prisma } from '../../prisma/generated/prisma';

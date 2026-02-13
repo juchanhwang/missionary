@@ -15,8 +15,8 @@ import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums/user-role.enum';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 
-import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
+import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
 import { MissionaryService } from './missionary.service';
