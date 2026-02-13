@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { userApi } from '../user';
+
 import api from '../instance';
+import { userApi } from '../user';
 
 vi.mock('../instance', () => ({
   default: {
