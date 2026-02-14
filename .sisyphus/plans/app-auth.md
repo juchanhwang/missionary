@@ -78,15 +78,15 @@ missionary-app에 완전한 인증 시스템 구축: 이메일 로그인, 전체
 
 ### Definition of Done
 
-- [ ] 이메일/비밀번호 로그인 성공 시 / 로 리다이렉트
-- [ ] 회원가입 후 로그인 페이지로 리다이렉트
-- [ ] Google OAuth 로그인 플로우 완동
-- [ ] Kakao OAuth 로그인 플로우 완동
-- [ ] 비인증 사용자 → /login 리다이렉트
-- [ ] 인증 사용자가 /login 접근 → / 리다이렉트
-- [ ] 비밀번호 변경 기능 동작
-- [ ] 로그아웃 기능 동작
-- [ ] 모든 TDD 테스트 통과
+- [x] 이메일/비밀번호 로그인 성공 시 / 로 리다이렉트
+- [x] 회원가입 후 로그인 페이지로 리다이렉트
+- [x] Google OAuth 로그인 플로우 완동
+- [x] Kakao OAuth 로그인 플로우 완동
+- [x] 비인증 사용자 → /login 리다이렉트
+- [x] 인증 사용자가 /login 접근 → / 리다이렉트
+- [x] 비밀번호 변경 기능 동작
+- [x] 로그아웃 기능 동작
+- [x] 모든 TDD 테스트 통과
 
 ### Must Have
 
@@ -189,7 +189,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ## TODOs
 
-- [ ] 1. 서버 Auth API 확장 (회원가입 공개 + OAuth state 라우팅 + 비밀번호 변경)
+- [x] 1. 서버 Auth API 확장 (회원가입 공개 + OAuth state 라우팅 + 비밀번호 변경)
 
   **What to do**:
   - `CreateUserDto`에 `password` 필드 추가 (`@IsString() @IsNotEmpty() @MinLength(8)`)
@@ -249,14 +249,14 @@ Parallel Speedup: ~50% faster than sequential
   **Acceptance Criteria**:
 
   **TDD:**
-  - [ ] 테스트: POST /users 비인증 요청 → 201 (password 포함)
-  - [ ] 테스트: POST /users 중복 이메일 → 409
-  - [ ] 테스트: 생성된 유저로 POST /auth/login → 성공
-  - [ ] 테스트: PATCH /auth/change-password 올바른 현재 비밀번호 → 200
-  - [ ] 테스트: PATCH /auth/change-password 틀린 현재 비밀번호 → 401
-  - [ ] 테스트: OAuth 콜백 state=app → APP_CLIENT_URL 리다이렉트
-  - [ ] 테스트: OAuth 콜백 state=admin → ADMIN_CLIENT_URL 리다이렉트
-  - [ ] 서버 빌드: `pnpm build:server` → 성공
+  - [x] 테스트: POST /users 비인증 요청 → 201 (password 포함)
+  - [x] 테스트: POST /users 중복 이메일 → 409
+  - [x] 테스트: 생성된 유저로 POST /auth/login → 성공
+  - [x] 테스트: PATCH /auth/change-password 올바른 현재 비밀번호 → 200
+  - [x] 테스트: PATCH /auth/change-password 틀린 현재 비밀번호 → 401
+  - [x] 테스트: OAuth 콜백 state=app → APP_CLIENT_URL 리다이렉트
+  - [x] 테스트: OAuth 콜백 state=admin → ADMIN_CLIENT_URL 리다이렉트
+  - [x] 서버 빌드: `pnpm build:server` → 성공
 
   **Agent-Executed QA Scenarios:**
 
@@ -299,7 +299,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 2. missionary-app 의존성 설치 + 테스트 환경 설정
+- [x] 2. missionary-app 의존성 설치 + 테스트 환경 설정
 
   **What to do**:
   - 의존성 설치 (pnpm add --filter missionary-app):
@@ -349,8 +349,8 @@ Parallel Speedup: ~50% faster than sequential
   - `packages/client/missionary-app/.env.example` — 환경변수 템플릿
 
   **Acceptance Criteria**:
-  - [ ] `pnpm --filter missionary-app exec vitest --run` → 테스트 환경 동작 확인
-  - [ ] `pnpm build:app` → 빌드 성공 (의존성 추가 후 에러 없음)
+  - [x] `pnpm --filter missionary-app exec vitest --run` → 테스트 환경 동작 확인
+  - [x] `pnpm build:app` → 빌드 성공 (의존성 추가 후 에러 없음)
 
   **Agent-Executed QA Scenarios:**
 
@@ -373,7 +373,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 3. API 클라이언트 (Axios instance + 인터셉터 + Auth API)
+- [x] 3. API 클라이언트 (Axios instance + 인터셉터 + Auth API)
 
   **What to do**:
   - TDD: 테스트 먼저 작성
@@ -430,11 +430,11 @@ Parallel Speedup: ~50% faster than sequential
   **Acceptance Criteria**:
 
   **TDD:**
-  - [ ] 테스트: instance가 NEXT_PUBLIC_API_URL을 baseURL로 사용
-  - [ ] 테스트: 401 인터셉터가 refresh 호출 후 원래 요청 재시도
-  - [ ] 테스트: authApi.login() 호출 시 POST /auth/login에 올바른 body 전달
-  - [ ] 테스트: userApi.signup() 호출 시 POST /users에 올바른 body 전달
-  - [ ] vitest 실행 → PASS
+  - [x] 테스트: instance가 NEXT_PUBLIC_API_URL을 baseURL로 사용
+  - [x] 테스트: 401 인터셉터가 refresh 호출 후 원래 요청 재시도
+  - [x] 테스트: authApi.login() 호출 시 POST /auth/login에 올바른 body 전달
+  - [x] 테스트: userApi.signup() 호출 시 POST /users에 올바른 body 전달
+  - [x] vitest 실행 → PASS
 
   **Commit**: YES
   - Message: `feat(app): API 클라이언트 및 인증/유저 API 모듈 구현`
@@ -443,7 +443,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 4. QueryProvider + queryKeys 설정
+- [x] 4. QueryProvider + queryKeys 설정
 
   **What to do**:
   - TDD: 테스트 먼저 작성
@@ -477,9 +477,9 @@ Parallel Speedup: ~50% faster than sequential
   **Acceptance Criteria**:
 
   **TDD:**
-  - [ ] 테스트: QueryProvider가 children을 렌더링
-  - [ ] 테스트: queryKeys.auth.me()가 ['auth', 'me'] 반환
-  - [ ] vitest 실행 → PASS
+  - [x] 테스트: QueryProvider가 children을 렌더링
+  - [x] 테스트: queryKeys.auth.me()가 ['auth', 'me'] 반환
+  - [x] vitest 실행 → PASS
 
   **Commit**: YES (groups with Task 3)
   - Message: `feat(app): QueryProvider 및 queryKeys 설정`
@@ -487,7 +487,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 5. Auth Context + Auth Hooks
+- [x] 5. Auth Context + Auth Hooks
 
   **What to do**:
   - TDD: 테스트 먼저 작성
@@ -527,10 +527,10 @@ Parallel Speedup: ~50% faster than sequential
   **Acceptance Criteria**:
 
   **TDD:**
-  - [ ] 테스트: AuthProvider가 user 데이터를 children에 전달
-  - [ ] 테스트: useAuth()가 Provider 외부에서 에러 throw
-  - [ ] 테스트: useLogoutAction이 authApi.logout() 호출
-  - [ ] vitest 실행 → PASS
+  - [x] 테스트: AuthProvider가 user 데이터를 children에 전달
+  - [x] 테스트: useAuth()가 Provider 외부에서 에러 throw
+  - [x] 테스트: useLogoutAction이 authApi.logout() 호출
+  - [x] vitest 실행 → PASS
 
   **Commit**: YES
   - Message: `feat(app): Auth Context 및 인증 hooks 구현`
@@ -538,7 +538,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 6. Boundary 컴포넌트 (AsyncBoundary + Fallbacks)
+- [x] 6. Boundary 컴포넌트 (AsyncBoundary + Fallbacks)
 
   **What to do**:
   - TDD: 테스트 먼저 작성
@@ -570,9 +570,9 @@ Parallel Speedup: ~50% faster than sequential
   **Acceptance Criteria**:
 
   **TDD:**
-  - [ ] 테스트: AsyncBoundary가 에러 시 errorFallback 렌더링
-  - [ ] 테스트: AsyncBoundary가 로딩 시 loadingFallback 렌더링
-  - [ ] vitest 실행 → PASS
+  - [x] 테스트: AsyncBoundary가 에러 시 errorFallback 렌더링
+  - [x] 테스트: AsyncBoundary가 로딩 시 loadingFallback 렌더링
+  - [x] vitest 실행 → PASS
 
   **Commit**: YES (groups with Task 5)
   - Message: `feat(app): Boundary 컴포넌트 (AsyncBoundary, Fallbacks) 구현`
@@ -580,7 +580,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 7. 로그인 페이지
+- [x] 7. 로그인 페이지
 
   **What to do**:
   - TDD: 테스트 먼저 작성
@@ -638,11 +638,11 @@ Parallel Speedup: ~50% faster than sequential
   **Acceptance Criteria**:
 
   **TDD:**
-  - [ ] 테스트: LoginForm 렌더링 (이메일, 비밀번호 필드, 로그인 버튼 존재)
-  - [ ] 테스트: 빈 필드 제출 시 검증 에러 표시
-  - [ ] 테스트: 유효한 데이터 제출 시 loginMutation.mutate() 호출
-  - [ ] 테스트: loginSchema — 유효한 데이터 통과, 빈 필드 거부, 잘못된 이메일 거부
-  - [ ] vitest 실행 → PASS
+  - [x] 테스트: LoginForm 렌더링 (이메일, 비밀번호 필드, 로그인 버튼 존재)
+  - [x] 테스트: 빈 필드 제출 시 검증 에러 표시
+  - [x] 테스트: 유효한 데이터 제출 시 loginMutation.mutate() 호출
+  - [x] 테스트: loginSchema — 유효한 데이터 통과, 빈 필드 거부, 잘못된 이메일 거부
+  - [x] vitest 실행 → PASS
 
   **Agent-Executed QA Scenarios:**
 
@@ -706,7 +706,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 8. 회원가입 페이지
+- [x] 8. 회원가입 페이지
 
   **What to do**:
   - TDD: 테스트 먼저 작성
@@ -768,11 +768,11 @@ Parallel Speedup: ~50% faster than sequential
   **Acceptance Criteria**:
 
   **TDD:**
-  - [ ] 테스트: SignupForm 렌더링 (모든 필수/선택 필드 존재)
-  - [ ] 테스트: 비밀번호 불일치 시 검증 에러
-  - [ ] 테스트: signupSchema — 유효 데이터 통과, 필수 필드 누락 거부, 비밀번호 불일치 거부
-  - [ ] 테스트: isBaptized=true일 때 baptizedAt 필드 표시
-  - [ ] vitest 실행 → PASS
+  - [x] 테스트: SignupForm 렌더링 (모든 필수/선택 필드 존재)
+  - [x] 테스트: 비밀번호 불일치 시 검증 에러
+  - [x] 테스트: signupSchema — 유효 데이터 통과, 필수 필드 누락 거부, 비밀번호 불일치 거부
+  - [x] 테스트: isBaptized=true일 때 baptizedAt 필드 표시
+  - [x] vitest 실행 → PASS
 
   **Agent-Executed QA Scenarios:**
 
@@ -829,7 +829,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 9. 비밀번호 변경 페이지
+- [x] 9. 비밀번호 변경 페이지
 
   **What to do**:
   - TDD: 테스트 먼저 작성
@@ -875,10 +875,10 @@ Parallel Speedup: ~50% faster than sequential
   **Acceptance Criteria**:
 
   **TDD:**
-  - [ ] 테스트: ChangePasswordForm 렌더링 (3개 필드 + 버튼 존재)
-  - [ ] 테스트: 새 비밀번호 불일치 시 검증 에러
-  - [ ] 테스트: changePasswordSchema 검증 규칙
-  - [ ] vitest 실행 → PASS
+  - [x] 테스트: ChangePasswordForm 렌더링 (3개 필드 + 버튼 존재)
+  - [x] 테스트: 새 비밀번호 불일치 시 검증 에러
+  - [x] 테스트: changePasswordSchema 검증 규칙
+  - [x] vitest 실행 → PASS
 
   **Agent-Executed QA Scenarios:**
 
@@ -919,7 +919,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 10. 미들웨어 (라우트 보호)
+- [x] 10. 미들웨어 (라우트 보호)
 
   **What to do**:
   - TDD: 테스트 먼저 작성
@@ -952,11 +952,11 @@ Parallel Speedup: ~50% faster than sequential
   **Acceptance Criteria**:
 
   **TDD:**
-  - [ ] 테스트: 쿠키 없이 / 요청 → /login 리다이렉트
-  - [ ] 테스트: 쿠키 있이 /login 요청 → / 리다이렉트
-  - [ ] 테스트: 쿠키 없이 /login 요청 → NextResponse.next()
-  - [ ] 테스트: 쿠키 없이 /signup 요청 → NextResponse.next()
-  - [ ] vitest 실행 → PASS
+  - [x] 테스트: 쿠키 없이 / 요청 → /login 리다이렉트
+  - [x] 테스트: 쿠키 있이 /login 요청 → / 리다이렉트
+  - [x] 테스트: 쿠키 없이 /login 요청 → NextResponse.next()
+  - [x] 테스트: 쿠키 없이 /signup 요청 → NextResponse.next()
+  - [x] vitest 실행 → PASS
 
   **Agent-Executed QA Scenarios:**
 
@@ -1004,7 +1004,7 @@ Parallel Speedup: ~50% faster than sequential
 
 ---
 
-- [ ] 11. 레이아웃 통합 (Root Layout + (main) 라우트 그룹)
+- [x] 11. 레이아웃 통합 (Root Layout + (main) 라우트 그룹)
 
   **What to do**:
   - `src/app/layout.tsx` 수정 — QueryProvider 래핑
@@ -1055,9 +1055,9 @@ Parallel Speedup: ~50% faster than sequential
   - `src/lib/auth/AuthContext.tsx` (Task 5에서 생성) — AuthProvider
 
   **Acceptance Criteria**:
-  - [ ] `pnpm build:app` → 빌드 성공
-  - [ ] (main) 라우트 그룹 페이지 접근 시 AuthProvider로 유저 데이터 로드
-  - [ ] 서버사이드 프리페치가 동작하여 클라이언트 측 워터폴 없음
+  - [x] `pnpm build:app` → 빌드 성공
+  - [x] (main) 라우트 그룹 페이지 접근 시 AuthProvider로 유저 데이터 로드
+  - [x] 서버사이드 프리페치가 동작하여 클라이언트 측 워터폴 없음
 
   **Agent-Executed QA Scenarios:**
 
@@ -1128,16 +1128,16 @@ pnpm --filter missionary-app exec vitest --run  # Expected: 모든 테스트 통
 
 ### Final Checklist
 
-- [ ] 이메일/비밀번호 로그인 동작
-- [ ] 회원가입 (전체 정보) 동작
-- [ ] Google OAuth 로그인 플로우 동작
-- [ ] Kakao OAuth 로그인 플로우 동작
-- [ ] 비밀번호 변경 동작
-- [ ] 미들웨어 라우트 보호 동작
-- [ ] 401 인터셉터 + 토큰 자동 갱신 동작
-- [ ] 로그아웃 동작
-- [ ] SSR 프리페치 동작 (워터폴 없음)
-- [ ] 모든 TDD 테스트 통과
-- [ ] `pnpm build:app` 성공
-- [ ] `pnpm build:server` 성공
-- [ ] Admin 앱 기존 기능 영향 없음
+- [x] 이메일/비밀번호 로그인 동작
+- [x] 회원가입 (전체 정보) 동작
+- [x] Google OAuth 로그인 플로우 동작
+- [x] Kakao OAuth 로그인 플로우 동작
+- [x] 비밀번호 변경 동작
+- [x] 미들웨어 라우트 보호 동작
+- [x] 401 인터셉터 + 토큰 자동 갱신 동작
+- [x] 로그아웃 동작
+- [x] SSR 프리페치 동작 (워터폴 없음)
+- [x] 모든 TDD 테스트 통과
+- [x] `pnpm build:app` 성공
+- [x] `pnpm build:server` 성공
+- [x] Admin 앱 기존 기능 영향 없음

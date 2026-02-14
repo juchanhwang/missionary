@@ -1,22 +1,23 @@
 'use client';
 
 import { Button, openOverlayAsync } from '@samilhero/design-system';
+import { useTransition } from 'react';
 
 import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { useDeleteMissionaryAction } from '../_hooks/useDeleteMissionaryAction';
+import { deleteMissionaryAction } from '../_actions/missionaryActions';
 
 interface DeleteMissionSectionProps {
   missionaryId: string;
   missionaryName: string;
-  onDeleteSuccess: () => void;
+  missionGroupId: string;
 }
 
 export function DeleteMissionSection({
   missionaryId,
   missionaryName,
-  onDeleteSuccess,
+  missionGroupId,
 }: DeleteMissionSectionProps) {
-  const deleteMutation = useDeleteMissionaryAction(missionaryId);
+  const [isPending, startTransition] = useTransition();
 
   const handleDelete = async () => {
     const confirmed = await openOverlayAsync<boolean>(({ isOpen, close }) => (
@@ -24,13 +25,13 @@ export function DeleteMissionSection({
         isOpen={isOpen}
         close={close}
         missionaryName={missionaryName}
-        isPending={deleteMutation.isPending}
+        isPending={isPending}
       />
     ));
 
     if (confirmed) {
-      deleteMutation.mutate(undefined, {
-        onSuccess: onDeleteSuccess,
+      startTransition(async () => {
+        await deleteMissionaryAction(missionaryId, missionGroupId);
       });
     }
   };

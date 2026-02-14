@@ -2,7 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@samilhero/design-system';
-import { useParams, useRouter } from 'next/navigation';
+import { type Missionary } from 'apis/missionary';
+import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { DeleteMissionSection } from './DeleteMissionSection';
@@ -12,15 +14,15 @@ import {
   type MissionFormData,
 } from '../../../../_schemas/missionSchema';
 import { toMissionPayload } from '../../../../_utils/toMissionPayload';
-import { useSuspenseGetMissionary } from '../_hooks/useSuspenseGetMissionary';
-import { useUpdateMissionaryAction } from '../_hooks/useUpdateMissionaryAction';
+import { updateMissionaryAction } from '../_actions/missionaryActions';
 
-export function MissionaryEditForm() {
+interface MissionaryEditFormProps {
+  missionary: Missionary;
+}
+
+export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
   const router = useRouter();
-  const params = useParams();
-  const missionId = params.missionId as string;
-  const { data: missionary } = useSuspenseGetMissionary(missionId);
-  const updateMutation = useUpdateMissionaryAction(missionary.id);
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<MissionFormData>({
     resolver: zodResolver(missionSchema),
@@ -46,13 +48,12 @@ export function MissionaryEditForm() {
       missionGroupId: missionary.missionGroupId,
     };
 
-    updateMutation.mutate(payload, {
-      onSuccess: () => {
-        router.push(`/missions/${missionary.missionGroupId}`);
-      },
-      onError: (error) => {
-        console.error('Failed to update missionary:', error);
-      },
+    startTransition(async () => {
+      await updateMissionaryAction(
+        missionary.id,
+        missionary.missionGroupId!,
+        payload,
+      );
     });
   };
 
@@ -69,16 +70,14 @@ export function MissionaryEditForm() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-30 shadow-sm p-6">
-        <MissionForm form={form} isPending={updateMutation.isPending} />
+        <MissionForm form={form} isPending={isPending} />
       </div>
 
       <div className="flex items-center justify-between">
         <DeleteMissionSection
           missionaryId={missionary.id}
           missionaryName={missionary.name}
-          onDeleteSuccess={() =>
-            router.push(`/missions/${missionary.missionGroupId}`)
-          }
+          missionGroupId={missionary.missionGroupId!}
         />
         <div className="flex items-center gap-3">
           <Button
@@ -92,8 +91,8 @@ export function MissionaryEditForm() {
           >
             취소
           </Button>
-          <Button type="submit" disabled={updateMutation.isPending} size="md">
-            {updateMutation.isPending ? '수정 중...' : '수정하기'}
+          <Button type="submit" disabled={isPending} size="md">
+            {isPending ? '수정 중...' : '수정하기'}
           </Button>
         </div>
       </div>

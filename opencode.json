@@ -8,6 +8,13 @@
     "figma": {
       "type": "local",
       "command": ["npx", "-y", "figma-developer-mcp", "--stdio"]
+    },
+    "postgres": {
+      "type": "local",
+      "command": ["uvx", "postgres-mcp"],
+      "environment": {
+        "DATABASE_URI": "postgresql://postgres:password@localhost:5432/missionary_db"
+      }
     }
   }
 }
