@@ -177,6 +177,11 @@ function MissionCardItem({ mission }: { mission: MissionCard }) {
         </div>
         <div className="w-full h-1.5 rounded-full bg-gray-20">
           <div
+            role="progressbar"
+            aria-label={`${mission.name} 참여율`}
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
             className={`h-full rounded-full transition-all ${
               mission.status === 'active' ? 'bg-green-50' : 'bg-gray-40'
             }`}

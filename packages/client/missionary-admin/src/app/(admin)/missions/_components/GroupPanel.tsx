@@ -65,11 +65,17 @@ export function GroupPanel() {
         </div>
       </div>
 
-      <div className="flex mx-3 mb-2 p-0.5 rounded-md bg-gray-30">
+      <div
+        role="tablist"
+        aria-label="선교 그룹 유형 필터"
+        className="flex mx-3 mb-2 p-0.5 rounded-md bg-gray-30"
+      >
         {FILTER_TABS.map((tab) => (
           <button
             key={tab.value}
             type="button"
+            role="tab"
+            aria-selected={filter === tab.value}
             onClick={() => setFilter(tab.value)}
             className={`flex-1 py-1 text-[11px] font-semibold rounded-[5px] transition-colors ${
               filter === tab.value
