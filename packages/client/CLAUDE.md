@@ -1,76 +1,77 @@
 # Client (Frontend) CLAUDE.md
 
-> **Global Rules**: Root `CLAUDE.md`의 Code Quality Rules와 Commit Convention을 따른다.
+이 파일은 `packages/client/**` 공통 규칙이다. 루트 규칙은 `../../CLAUDE.md`를 따른다.
 
-## Technology Stack
+## Scope
 
-- React 19, Next.js 16 (App Router, Turbopack)
-- TypeScript 5.9 (`moduleResolution: "bundler"`)
+다음 하위 패키지 전반에 적용된다.
+
+- `design-system`
+- `missionary-app`
+- `missionary-admin`
+
+## Child CLAUDE Files
+
+세부 규칙은 각 패키지 문서를 우선한다.
+
+- `./design-system/CLAUDE.md`
+- `./missionary-app/CLAUDE.md`
+- `./missionary-admin/CLAUDE.md`
+
+## Shared Stack
+
+- React 19
+- TypeScript 5.9 (`moduleResolution: bundler`)
 - Tailwind CSS 4
-- Storybook 8.6
+- Vitest + jsdom
 
-## Packages
+## Shared Architecture
 
-- **@samilhero/design-system** — 공유 UI 컴포넌트 라이브러리
-- **missionary-app** — 메인 사용자 앱
-- **missionary-admin** — 관리자 앱
+- Next 앱은 App Router + 라우트 코로케이션 패턴을 사용한다.
+- 라우트 전용 로직은 `app/**/_hooks`, `app/**/_components`, `app/**/_schemas`, `app/**/_types`에 둔다.
+- 공통 UI/경계 컴포넌트는 `components/`, 데이터 접근은 `apis/`, 상태/컨텍스트는 `lib/`/`hooks/`로 분리한다.
 
-## Styling
+## Shared Conventions
 
-Tailwind CSS 4 for styling. Utility-first CSS framework with PostCSS integration. Global styles and theme configuration in `tailwind.config.js` and `@tailwindcss/vite` plugin for design-system. Apps use `@tailwindcss/postcss` plugin.
+- 앱 패키지는 design-system 소스를 alias로 참조한다.
+  - `missionary-app`: `@* -> ../design-system/src/*`
+  - `missionary-admin`: `@* -> ../design-system/src/*`
+- Vitest 환경은 `jsdom` + `globals: true`를 사용한다.
+- 테스트 파일은 `__tests__` 디렉토리 또는 `*.test.ts(x)`를 사용한다.
+- React 19 기준으로 신규 컴포넌트는 `forwardRef`보다 `ref` prop 패턴을 우선한다.
 
-## Path Aliases
+## Where To Look
 
-All packages use `@*` path aliases (baseUrl: `./src`):
+| Task                 | Location                                                                                | Notes               |
+| -------------------- | --------------------------------------------------------------------------------------- | ------------------- |
+| Shared UI API        | `design-system/src/index.tsx`                                                           | export 경계         |
+| App routing          | `missionary-app/src/app`, `missionary-admin/src/app`                                    | 도메인 코로케이션   |
+| Frontend test setup  | `missionary-app/src/test`, `missionary-admin/src/test`, `design-system/vitest.setup.ts` | jsdom 공통          |
+| Query/Auth providers | `*/src/lib`                                                                             | app별 provider 분리 |
 
-- missionary-app: `"@*" → "../design-system/src/*"`
-- missionary-admin: `"@*" → "../design-system/src/*"`
-- design-system: `"@*" → "./*"` (local)
+## Anti-Patterns
 
-## Design System Component Pattern
+- `dist/`, `storybook-static/`를 수정 대상으로 취급하지 않는다.
+- 라우트 전용 코드(`app/**`)를 루트 공용 영역으로 무분별하게 끌어올리지 않는다.
+- alias 규칙을 깨고 상대경로 지옥을 만들지 않는다.
+- 클라이언트 패키지에서 서버 패키지 내부 구현을 직접 참조하지 않는다.
 
-Components follow a consistent structure:
+## Commands
 
-- `index.tsx` — component logic with Tailwind utility classes
-- `index.stories.tsx` — Storybook stories
-- Support both controlled and uncontrolled usage via `useControllableState`
-- Context pattern (`useSafeContext`, `useContextData`, `useContextAction`) for compound components
-- React 19: new components should use `ref` as a regular prop instead of `forwardRef`
+```bash
+# app
+pnpm --filter missionary-app dev
+pnpm --filter missionary-app test:run
 
-## Frontend App Pattern (missionary-app, missionary-admin)
+# admin
+pnpm --filter missionary-admin dev
+pnpm --filter missionary-admin test
 
-Next.js App Router 기반. **라우트 코로케이션** — 도메인 코드를 해당 라우트 디렉토리에 함께 배치한다 (응집도 원칙).
-
-**디렉토리 구조:**
-
-```
-src/
-├── app/                        # Next.js App Router + 도메인 코드 코로케이션
-│   ├── layout.tsx
-│   └── (group)/
-│       └── <route>/
-│           ├── page.tsx        # 라우팅 진입점
-│           ├── _hooks/          # 라우트 전용 Hook
-│           ├── _components/     # 라우트 전용 컴포넌트
-│           └── _types/          # 라우트 전용 타입
-├── components/                 # 공통 UI (boundary, layout 등)
-├── hooks/                      # 공통 Hook
-├── lib/                        # 유틸, 설정 (QueryProvider 등)
-├── apis/                       # API 인스턴스, 인터셉터, API 함수
-└── styles/                     # 글로벌 스타일
+# design system
+pnpm --filter design-system storybook
+pnpm --filter design-system test
 ```
 
-## Code Quality Rules
+## Quality Principle
 
-> **IMPORTANT**: For complex UI logic or refactoring, load the `client-code-quality` skill.
->
-> 출처: https://frontend-fundamentals.com/code-quality/code/
->
-> 좋은 코드란 "변경하기 쉬운 코드"이다. 4가지 원칙을 따른다:
->
-> 1. **가독성 (Readability)**: 맥락 줄이기, 이름 붙이기, 위에서 아래로 읽히게
-> 2. **예측 가능성 (Predictability)**: 이름 일관성, 반환 타입 통일, 숨은 로직 제거
-> 3. **응집도 (Cohesion)**: 함께 수정되는 코드는 함께 위치
-> 4. **결합도 (Coupling)**: 책임 분리, 중복 허용, Props Drilling 제거
->
-> 상세 규칙과 Before/After 예시는 `client-code-quality` 스킬 참조.
+복잡한 UI 변경 시 `frontend-code-quality` 스킬 기준(가독성, 예측 가능성, 응집도, 결합도)을 우선 적용한다.

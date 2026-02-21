@@ -1,119 +1,110 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file is the root knowledge base for this monorepo.
 
-## Project Overview
+**Generated:** 2026-02-22 00:04:03 KST  
+**Commit:** `86cf506`  
+**Branch:** `docs/update-claude-md`
 
-A pnpm monorepo ("missionary-client") with four packages:
+## Overview
 
-- **@samilhero/design-system** — Shared UI component library with Storybook
-- **missionary-app** — Main user-facing Next.js 16 application
-- **missionary-admin** — Admin Next.js 16 application
-- **missionary-server** — NestJS 11 API server
+`missionary`는 `pnpm` 워크스페이스 기반 모노레포다. 프런트엔드 3개 패키지(디자인시스템 + 2개 Next 앱)와 백엔드 1개 NestJS 패키지로 구성된다.
 
-Package manager: **pnpm 10.28.1**, Node 20.
+## CLAUDE Hierarchy
 
-### Key Dependencies
+하위 `CLAUDE.md`가 있으면 하위 규칙이 우선이고, 공통 규칙은 이 파일을 따른다.
 
-- React 19, Next.js 16 (Turbopack default)
-- TypeScript 5.9 (`moduleResolution: "bundler"`)
-- Tailwind CSS 4
-- Storybook 8.6
-- NestJS 11 (missionary-server, `moduleResolution: "node"`, CommonJS)
-- Prisma ORM + PostgreSQL (missionary-server)
+- `./CLAUDE.md` (root, global)
+- `./packages/client/CLAUDE.md` (frontend shared)
+- `./packages/client/design-system/CLAUDE.md` (design system local)
+- `./packages/client/missionary-app/CLAUDE.md` (app local)
+- `./packages/client/missionary-admin/CLAUDE.md` (admin local)
+- `./packages/server/CLAUDE.md` (backend shared)
+- `./packages/server/missionary-server/CLAUDE.md` (server local)
+
+## Structure
+
+```text
+main/
+├── packages/
+│   ├── client/
+│   │   ├── design-system/
+│   │   ├── missionary-app/
+│   │   └── missionary-admin/
+│   └── server/
+│       └── missionary-server/
+├── .github/workflows/
+├── .husky/
+└── eslint.config.mjs
+```
+
+## Where To Look
+
+| Task                  | Location                               | Notes                         |
+| --------------------- | -------------------------------------- | ----------------------------- |
+| Workspace scripts     | `package.json`, `pnpm-workspace.yaml`  | `pnpm --filter` 중심          |
+| Frontend shared rules | `packages/client/CLAUDE.md`            | Next app + DS 공통            |
+| Backend shared rules  | `packages/server/CLAUDE.md`            | NestJS + Prisma 공통          |
+| CI checks             | `.github/workflows/ci.yaml`            | PR: `dev`, `prod`             |
+| Server deploy         | `.github/workflows/deploy-server.yaml` | `main` + `packages/server/**` |
+| Git hooks             | `.husky/pre-commit`, `.husky/pre-push` | push 전 품질 게이트           |
+
+## Non-Obvious Conventions
+
+- Package manager는 `pnpm@10.28.1` 고정 (`packageManager` 필드).
+- 루트 `pnpm test`는 없다. 테스트는 반드시 패키지 단위(`pnpm --filter <pkg> test`)로 실행한다.
+- ESLint는 Flat Config(`eslint.config.mjs`)를 사용하고, 서버 코드(`packages/server/missionary-server/**`)는 Node globals 분기 규칙을 탄다.
+- `import/order`는 그룹/알파벳/newline 규칙이 강제된다.
+- Prettier는 `printWidth: 80`, `singleQuote: true`, `trailingComma: all`, `endOfLine: lf`를 사용한다.
+- Stylelint는 SCSS 표준을 기반으로 하되 Tailwind at-rule(`theme`, `tailwind`, `apply`, `layer`, `config`, `source`)을 허용한다.
+- CI는 서버 테스트를 실행하지만 프런트 테스트는 기본 PR 체인에 포함되지 않는다.
+
+## Worktree Workflow (Mandatory)
+
+- 이 프로젝트는 `git worktree` 기반으로 운영한다. 기능 작업은 전용 worktree에서만 수행한다.
+- `main` worktree는 `main` 브랜치 전용이다. 기능 브랜치 작업 경로로 사용하지 않는다.
+- 새 작업은 `scripts/wt`를 우선 사용한다 (`wt new <branch>`, `cd $(wt cd <branch>)`).
+- 코드 수정, 테스트, 커밋, PR 준비는 모두 해당 기능 worktree 경로에서 실행한다.
+- 잘못된 worktree에서 수정했다면 `git stash push -u`로 보관 후, 올바른 worktree에서 `git stash pop`으로 복원한다.
+- PR이 머지되면 `wt rm <branch>`로 해당 worktree를 정리한다.
+
+## Anti-Patterns
+
+- `dev` 브랜치에 직접 push 하지 않는다. PR 필수.
+- 생성 산출물(`storybook-static`, `dist`, `build`, `.next`, `coverage`)을 소스 오브 트루스로 취급하지 않는다.
+- 루트에서 범용 명령으로 해결하려 하지 말고 패키지 경계(`--filter`)를 먼저 확인한다.
+- `main` worktree에서 기능 브랜치 작업을 진행하지 않는다.
+- bare repo 루트(`.bare`가 위치한 디렉토리)에서 코드 수정이나 pnpm 명령을 실행하지 않는다. 반드시 worktree 내에서 실행한다.
 
 ## Commands
 
-### Development
-
 ```bash
-pnpm dev:app          # missionary-app dev server
-pnpm dev:admin        # missionary-admin dev server
-pnpm dev:ds           # design-system dev server
-pnpm dev:server       # missionary-server dev (port 3100)
-pnpm dev:all          # all four in parallel
-pnpm sb:ds            # Storybook for design-system (port 6006)
+# quality gates
+pnpm lint:all
+pnpm lint:fix:all
+pnpm type-check
+
+# package-focused workflows
+pnpm --filter missionary-app dev
+pnpm --filter missionary-admin dev
+pnpm --filter design-system build
+pnpm --filter missionary-server test
+pnpm --filter missionary-server prisma:generate
 ```
 
-### Build
+## Commit Convention (Global)
 
-```bash
-pnpm build:app        # build missionary-app
-pnpm build:admin      # build missionary-admin
-pnpm build:ds         # build design-system
-pnpm build:server     # build missionary-server
-pnpm build:all        # build all
-```
+커밋 메시지 형식:
 
-### Linting & Formatting
+- `type(scope): subject`
+- `[TICKET-ID] type(scope): subject`
 
-```bash
-pnpm lint:all         # ESLint + Prettier + Stylelint checks
-pnpm lint:fix:all     # auto-fix all
-pnpm type-check       # TypeScript type checking across packages
-```
+규칙:
 
-### Dependencies
+1. `subject`는 반드시 한글로 작성한다.
+2. 허용 타입: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `design`, `comment`, `rename`, `remove`, `perf`, `build`, `ci`, `revert`, `hotfix`.
 
-```bash
-pnpm add <pkg> --filter <package-name>   # add dependency to specific package
-```
-
-## Architecture
-
-### Monorepo Structure
-
-- `/packages/design-system/` — component library consumed by both apps
-- `/packages/missionary-app/` — main app, imports design-system via `workspace:*`
-- `/packages/missionary-admin/` — admin app, imports design-system via `workspace:*`
-- `/packages/missionary-server/` — NestJS API server (독립 tsconfig, base 미상속)
-
-### Lint & Formatting Config
-
-All config files are at the project root (single file each):
-
-- `eslint.config.mjs` — ESLint flat config (typescript-eslint + import order + react-hooks)
-  - `packages/missionary-server/**`는 별도 블록: react-hooks 비활성화, `globals.node` 적용
-- `.prettierrc` — Prettier settings
-- `.stylelintrc.json` — Stylelint for SCSS files only (`stylelint-config-standard-scss`)
-
-### Git Workflow
-
-- Branches: `dev` (primary), `prod` (production), feature branches as `feat/SMH-*`
-- Commits reference Jira tickets: `[SMH-XX] description`
-- PR template requires Jira link, background, feature description, and usage examples
-- Pre-commit hook runs `pnpm lint:fix:all && pnpm type-check`
-- Pre-push hook runs `pnpm lint:all`
-- CI runs lint and build matrix on PRs to `dev`
-- `dev` branch is protected — changes require PR (direct push not allowed)
-
-### Commit Message Convention (For AI Agent)
-
-When creating commits, the AI Agent must follow these rules strictly:
-
-**Format:** `type(scope): subject` or `[TICKET-ID] type(scope): subject`
-
-1.  **Subject Must Be Korean**: `subject` 부분은 반드시 한글로 작성한다.
-2.  **Allowed Types**:
-    - `feat`: 새로운 기능 추가
-    - `fix`: 버그 수정
-    - `docs`: 문서 수정
-    - `style`: 코드 포맷팅, 세미콜론 누락 등 코드 변경이 없는 경우
-    - `refactor`: 코드 리팩토링
-    - `test`: 테스트 코드, 리팩토링 테스트 코드 추가
-    - `chore`: 빌드 업무 수정, 패키지 매니저 수정
-    - `design`: 사용자 UI 디자인 변경
-    - `comment`: 필요한 주석 추가 및 변경
-    - `rename`: 파일 혹은 폴더명을 수정하거나 옮기는 경우
-    - `remove`: 파일을 삭제하는 작업만 수행하는 경우
-    - `perf`: 성능 개선
-    - `build`: 빌드 시스템이나 외부 종속성 변경
-    - `ci`: CI 설정 파일 수정
-    - `revert`: 이전 커밋 되돌리기
-    - `hotfix`: 급한 버그 수정
-
-**Examples:**
+예시:
 
 - `feat: 로그인 기능 구현`
 - `[SMH-123] fix: 회원가입 시 이메일 중복 체크 오류 수정`
-- `design: 메인 페이지 배너 스타일 변경`
