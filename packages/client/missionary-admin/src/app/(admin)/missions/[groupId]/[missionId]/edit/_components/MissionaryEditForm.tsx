@@ -32,13 +32,21 @@ export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
       startDate: new Date(missionary.startDate),
       endDate: new Date(missionary.endDate),
       pastorName: missionary.pastorName || '',
+      pastorPhone: missionary.pastorPhone || '',
       participationStartDate: missionary.participationStartDate
         ? new Date(missionary.participationStartDate)
         : undefined,
       participationEndDate: missionary.participationEndDate
         ? new Date(missionary.participationEndDate)
         : undefined,
+      price: missionary.price,
+      description: missionary.description || '',
+      maximumParticipantCount: missionary.maximumParticipantCount,
+      bankName: missionary.bankName || '',
+      bankAccountHolder: missionary.bankAccountHolder || '',
+      bankAccountNumber: missionary.bankAccountNumber || '',
       order: missionary.order,
+      status: missionary.status,
     },
   });
 
@@ -67,18 +75,18 @@ export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
           <h2 className="text-lg font-semibold text-gray-90">선교 수정</h2>
           <p className="text-sm text-gray-50">{missionary.name}</p>
         </div>
+        <DeleteMissionSection
+          missionaryId={missionary.id}
+          missionaryName={missionary.name}
+          missionGroupId={missionary.missionGroupId!}
+        />
       </div>
 
       <div className="bg-white rounded-xl border border-gray-30 shadow-sm p-6">
         <MissionForm form={form} isPending={isPending} />
       </div>
 
-      <div className="flex items-center justify-between">
-        <DeleteMissionSection
-          missionaryId={missionary.id}
-          missionaryName={missionary.name}
-          missionGroupId={missionary.missionGroupId!}
-        />
+      <div className="flex items-center justify-end">
         <div className="flex items-center gap-3">
           <Button
             type="button"
@@ -91,7 +99,11 @@ export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
           >
             취소
           </Button>
-          <Button type="submit" disabled={isPending} size="md">
+          <Button
+            type="submit"
+            disabled={!form.formState.isDirty || isPending}
+            size="md"
+          >
             {isPending ? '수정 중...' : '수정하기'}
           </Button>
         </div>
