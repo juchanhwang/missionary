@@ -29,7 +29,7 @@ export function EditMissionGroupForm() {
     defaultValues: {
       name: '',
       description: '',
-      type: undefined,
+      category: undefined,
     },
   });
 
@@ -38,7 +38,7 @@ export function EditMissionGroupForm() {
       form.reset({
         name: group.name,
         description: group.description || '',
-        type: group.type,
+        category: group.category,
       });
     }
   }, [group, form]);

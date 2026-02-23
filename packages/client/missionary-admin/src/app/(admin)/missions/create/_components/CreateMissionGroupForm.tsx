@@ -17,7 +17,7 @@ export function CreateMissionGroupForm() {
   const form = useForm<MissionGroupSchemaType>({
     resolver: zodResolver(missionGroupSchema),
     mode: 'onSubmit',
-    defaultValues: { name: '', description: '', type: undefined },
+    defaultValues: { name: '', description: '', category: undefined },
   });
   const { mutate, isPending } = useCreateMissionGroupAction();
 

@@ -28,7 +28,7 @@ export function GroupPanel() {
     if (!groups) return [];
     return groups.filter((g) => {
       const matchesSearch = g.name.toLowerCase().includes(search.toLowerCase());
-      const matchesFilter = filter === 'ALL' || g.type === filter;
+      const matchesFilter = filter === 'ALL' || g.category === filter;
       return matchesSearch && matchesFilter;
     });
   }, [groups, search, filter]);
@@ -127,12 +127,12 @@ export function GroupPanel() {
                 <div className="flex items-center gap-1.5">
                   <span
                     className={`text-[10px] font-semibold px-1.5 py-px rounded ${
-                      group.type === 'ABROAD'
+                      group.category === 'ABROAD'
                         ? 'bg-blue-10 text-blue-60'
                         : 'bg-green-10 text-green-60'
                     }`}
                   >
-                    {group.type === 'ABROAD' ? '해외' : '국내'}
+                    {group.category === 'ABROAD' ? '해외' : '국내'}
                   </span>
                 </div>
               </Link>
