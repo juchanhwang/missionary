@@ -24,6 +24,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Build Design System
+        run: pnpm --filter design-system build
+
+      - name: Generate Prisma Client
+        run: pnpm --filter missionary-server prisma:generate
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+
       - name: ESLint
         run: pnpm lint
 
