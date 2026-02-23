@@ -1,12 +1,13 @@
 #!/bin/bash
 # PostToolUse hook: auto-trigger code review after PR creation
-# Reads tool_input/tool_output from stdin (JSON), checks for gh pr create
+# Reads tool_input/tool_response from stdin (JSON), checks for gh pr create
 
 input=$(cat)
 
 tool_name=$(echo "$input" | jq -r '.tool_name // empty')
 command=$(echo "$input" | jq -r '.tool_input.command // empty')
-output=$(echo "$input" | jq -r '.tool_output // empty')
+# tool_response.output for Bash tool (CC PostToolUse JSON schema)
+output=$(echo "$input" | jq -r '.tool_response.output // .tool_response // empty')
 
 # Only trigger for Bash tool with gh pr create command
 if [ "$tool_name" != "Bash" ]; then
