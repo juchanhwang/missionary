@@ -64,6 +64,10 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Build Design System
+        if: matrix.package != 'design-system'
+        run: pnpm --filter design-system build
+
       - name: Build ${{ matrix.package }}
         run: pnpm --filter ${{ matrix.package }} build
 
