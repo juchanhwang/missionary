@@ -24,6 +24,10 @@ export class MaskingInterceptor implements NestInterceptor {
       return data;
     }
 
+    if (data instanceof Date) {
+      return data;
+    }
+
     if (Array.isArray(data)) {
       return data.map((item) => this.maskData(item));
     }
