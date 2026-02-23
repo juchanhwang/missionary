@@ -205,6 +205,81 @@ describe('MaskingInterceptor', () => {
         },
       });
     });
+
+    it('should preserve Date objects without converting to empty objects', (done) => {
+      const now = new Date('2026-01-15T00:00:00.000Z');
+      const responseData = {
+        name: 'Test',
+        startDate: now,
+        endDate: new Date('2026-06-15T00:00:00.000Z'),
+      };
+
+      mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
+
+      interceptor.intercept(createMockContext(), mockCallHandler).subscribe({
+        next: (data) => {
+          expect(data.name).toBe('Test');
+          expect(data.startDate).toBeInstanceOf(Date);
+          expect(data.startDate.toISOString()).toBe('2026-01-15T00:00:00.000Z');
+          expect(data.endDate).toBeInstanceOf(Date);
+          expect(data.endDate.toISOString()).toBe('2026-06-15T00:00:00.000Z');
+          done();
+        },
+      });
+    });
+
+    it('should preserve Date objects in nested structures', (done) => {
+      const responseData = {
+        missionary: {
+          name: 'Test Mission',
+          startDate: new Date('2026-03-01T00:00:00.000Z'),
+          participationEndDate: new Date('2026-05-01T00:00:00.000Z'),
+          phoneNumber: '010-1234-5678',
+        },
+      };
+
+      mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
+
+      interceptor.intercept(createMockContext(), mockCallHandler).subscribe({
+        next: (data) => {
+          expect(data.missionary.startDate).toBeInstanceOf(Date);
+          expect(data.missionary.startDate.toISOString()).toBe(
+            '2026-03-01T00:00:00.000Z',
+          );
+          expect(data.missionary.participationEndDate).toBeInstanceOf(Date);
+          expect(data.missionary.phoneNumber).toBe('010-123******');
+          done();
+        },
+      });
+    });
+
+    it('should preserve Date objects in arrays', (done) => {
+      const responseData = [
+        {
+          startDate: new Date('2026-01-01T00:00:00.000Z'),
+          phoneNumber: '010-1111-2222',
+        },
+        {
+          startDate: new Date('2026-07-01T00:00:00.000Z'),
+          phoneNumber: '010-3333-4444',
+        },
+      ];
+
+      mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
+
+      interceptor.intercept(createMockContext(), mockCallHandler).subscribe({
+        next: (data) => {
+          expect(data[0].startDate).toBeInstanceOf(Date);
+          expect(data[0].startDate.toISOString()).toBe(
+            '2026-01-01T00:00:00.000Z',
+          );
+          expect(data[0].phoneNumber).toBe('010-111******');
+          expect(data[1].startDate).toBeInstanceOf(Date);
+          expect(data[1].phoneNumber).toBe('010-333******');
+          done();
+        },
+      });
+    });
   });
 
   describe('maskLast6Chars', () => {

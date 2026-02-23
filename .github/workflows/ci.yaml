@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [dev, prod]
+    branches: [main, dev, prod]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -23,6 +23,14 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
+      - name: Build Design System
+        run: pnpm --filter design-system build
+
+      - name: Generate Prisma Client
+        run: pnpm --filter missionary-server prisma:generate
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
 
       - name: ESLint
         run: pnpm lint
@@ -55,6 +63,10 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
+      - name: Build Design System
+        if: matrix.package != 'design-system'
+        run: pnpm --filter design-system build
 
       - name: Build ${{ matrix.package }}
         run: pnpm --filter ${{ matrix.package }} build

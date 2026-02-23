@@ -45,7 +45,7 @@ main/
 | Workspace scripts     | `package.json`, `pnpm-workspace.yaml`  | `pnpm --filter` 중심          |
 | Frontend shared rules | `packages/client/CLAUDE.md`            | Next app + DS 공통            |
 | Backend shared rules  | `packages/server/CLAUDE.md`            | NestJS + Prisma 공통          |
-| CI checks             | `.github/workflows/ci.yaml`            | PR: `dev`, `prod`             |
+| CI checks             | `.github/workflows/ci.yaml`            | PR: `main`, `dev`, `prod`     |
 | Server deploy         | `.github/workflows/deploy-server.yaml` | `main` + `packages/server/**` |
 | Git hooks             | `.husky/pre-commit`, `.husky/pre-push` | push 전 품질 게이트           |
 

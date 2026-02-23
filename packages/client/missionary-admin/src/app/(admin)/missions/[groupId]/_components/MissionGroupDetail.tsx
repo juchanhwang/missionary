@@ -1,28 +1,22 @@
 'use client';
 
 import { Button } from '@samilhero/design-system';
+import { type MissionGroupDetail as MissionGroupDetailType } from 'apis/missionGroup';
 import { CalendarX, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 
 import { MissionStatusBadge } from '../../_components/MissionStatusBadge';
 import { formatDate } from '../../_utils/formatDate';
-import { useSuspenseGetMissionGroup } from '../_hooks/useSuspenseGetMissionGroup';
 
-export function MissionGroupDetail() {
+interface MissionGroupDetailProps {
+  group: MissionGroupDetailType;
+}
+
+export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
   const router = useRouter();
   const params = useParams();
   const groupId = params.groupId as string;
-
-  const { data: group } = useSuspenseGetMissionGroup(groupId);
-
-  if (!group) {
-    return (
-      <div className="flex items-center justify-center flex-1">
-        <p className="text-sm text-gray-50">그룹을 찾을 수 없습니다</p>
-      </div>
-    );
-  }
 
   const missionCount = group.missionaries?.length ?? 0;
 
