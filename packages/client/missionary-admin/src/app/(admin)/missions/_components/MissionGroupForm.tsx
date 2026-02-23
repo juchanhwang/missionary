@@ -27,14 +27,14 @@ export function MissionGroupForm({ form, isPending }: MissionGroupFormProps) {
       />
 
       <Controller
-        name="type"
+        name="category"
         control={form.control}
         render={({ field }) => (
           <Select
             value={field.value}
             onChange={field.onChange}
             label="선교 유형"
-            error={form.formState.errors.type?.message}
+            error={form.formState.errors.category?.message}
           >
             <Select.Trigger disabled={isPending}>
               {field.value ? TYPE_LABELS[field.value] : '선교 유형 선택'}

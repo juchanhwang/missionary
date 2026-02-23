@@ -5,7 +5,7 @@ export interface MissionGroup {
   id: string;
   name: string;
   description?: string;
-  type: 'DOMESTIC' | 'ABROAD';
+  category: 'DOMESTIC' | 'ABROAD';
   createdAt: string;
   _count?: { missionaries: number };
 }
@@ -17,13 +17,13 @@ export interface MissionGroupDetail extends MissionGroup {
 export interface CreateMissionGroupPayload {
   name: string;
   description?: string;
-  type: 'DOMESTIC' | 'ABROAD';
+  category: 'DOMESTIC' | 'ABROAD';
 }
 
 export interface UpdateMissionGroupPayload {
   name?: string;
   description?: string;
-  type?: 'DOMESTIC' | 'ABROAD';
+  category?: 'DOMESTIC' | 'ABROAD';
 }
 
 export const missionGroupApi = {
