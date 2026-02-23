@@ -28,7 +28,14 @@ export const missionSchema = z.object({
   bankName: z.string().optional(),
   bankAccountHolder: z.string().optional(),
   bankAccountNumber: z.string().optional(),
-  status: z.enum(['RECRUITING', 'IN_PROGRESS', 'COMPLETED']).optional(),
+  status: z
+    .enum([
+      'ENROLLMENT_OPENED',
+      'ENROLLMENT_CLOSED',
+      'IN_PROGRESS',
+      'COMPLETED',
+    ])
+    .optional(),
   order: optionalNumber,
 });
 

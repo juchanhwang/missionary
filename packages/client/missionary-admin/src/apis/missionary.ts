@@ -19,7 +19,11 @@ export interface Missionary {
   missionGroupId?: string;
   order?: number;
   missionGroup?: MissionGroup;
-  status: 'RECRUITING' | 'IN_PROGRESS' | 'COMPLETED';
+  status:
+    | 'ENROLLMENT_OPENED'
+    | 'ENROLLMENT_CLOSED'
+    | 'IN_PROGRESS'
+    | 'COMPLETED';
   createdAt: string;
 }
 
@@ -39,7 +43,11 @@ export interface CreateMissionaryPayload {
   bankAccountNumber?: string;
   missionGroupId?: string;
   order?: number;
-  status?: 'RECRUITING' | 'IN_PROGRESS' | 'COMPLETED';
+  status?:
+    | 'ENROLLMENT_OPENED'
+    | 'ENROLLMENT_CLOSED'
+    | 'IN_PROGRESS'
+    | 'COMPLETED';
 }
 
 export interface UpdateMissionaryPayload {
@@ -56,7 +64,11 @@ export interface UpdateMissionaryPayload {
   bankName?: string;
   bankAccountHolder?: string;
   bankAccountNumber?: string;
-  status?: 'RECRUITING' | 'IN_PROGRESS' | 'COMPLETED';
+  status?:
+    | 'ENROLLMENT_OPENED'
+    | 'ENROLLMENT_CLOSED'
+    | 'IN_PROGRESS'
+    | 'COMPLETED';
 }
 
 export const missionaryApi = {

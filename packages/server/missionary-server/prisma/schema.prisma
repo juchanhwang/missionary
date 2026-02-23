@@ -44,7 +44,8 @@ enum MissionaryStaffRole {
 }
 
 enum MissionStatus {
-  RECRUITING
+  ENROLLMENT_OPENED
+  ENROLLMENT_CLOSED
   IN_PROGRESS
   COMPLETED
 }
@@ -154,7 +155,7 @@ model Missionary {
   bankAccountNumber  String? @map("bank_account_number")
 
   // Status
-  status MissionStatus @default(RECRUITING)
+  status MissionStatus @default(ENROLLMENT_OPENED)
 
   // Foreign keys
   missionGroupId String? @map("mission_group_id")

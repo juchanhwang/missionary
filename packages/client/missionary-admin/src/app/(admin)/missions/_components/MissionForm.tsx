@@ -6,7 +6,8 @@ import { Controller, type UseFormReturn } from 'react-hook-form';
 import { type MissionFormData } from '../_schemas/missionSchema';
 
 const STATUS_LABELS: Record<string, string> = {
-  RECRUITING: '모집 중',
+  ENROLLMENT_OPENED: '모집 중',
+  ENROLLMENT_CLOSED: '모집 종료',
   IN_PROGRESS: '진행 중',
   COMPLETED: '완료',
 };
@@ -49,7 +50,12 @@ export function MissionForm({ form, isPending }: MissionFormProps) {
                     : '상태를 선택하세요'}
                 </Select.Trigger>
                 <Select.Options>
-                  <Select.Option item="RECRUITING">모집 중</Select.Option>
+                  <Select.Option item="ENROLLMENT_OPENED">
+                    모집 중
+                  </Select.Option>
+                  <Select.Option item="ENROLLMENT_CLOSED">
+                    모집 종료
+                  </Select.Option>
                   <Select.Option item="IN_PROGRESS">진행 중</Select.Option>
                   <Select.Option item="COMPLETED">완료</Select.Option>
                 </Select.Options>
