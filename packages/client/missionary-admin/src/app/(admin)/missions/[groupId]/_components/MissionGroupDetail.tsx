@@ -28,12 +28,12 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
             <h2 className="text-lg font-semibold text-gray-90">{group.name}</h2>
             <span
               className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
-                group.type === 'ABROAD'
+                group.category === 'ABROAD'
                   ? 'bg-blue-10 text-blue-60'
                   : 'bg-green-10 text-green-60'
               }`}
             >
-              {group.type === 'ABROAD' ? '해외' : '국내'}
+              {group.category === 'ABROAD' ? '해외' : '국내'}
             </span>
             <button
               type="button"
