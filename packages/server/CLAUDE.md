@@ -57,3 +57,15 @@ pnpm --filter missionary-server prisma:generate
 pnpm --filter missionary-server prisma:migrate:dev
 pnpm --filter missionary-server prisma:migrate:deploy
 ```
+
+## Skills
+
+이 영역에서 코드를 작성·리뷰·리팩토링할 때 관련 스킬을 반드시 로드한다.
+
+| 스킬 | 트리거 | 출처 |
+|---|---|---|
+| `nestjs-expert` | 모듈 아키텍처, DI, 가드/인터셉터, 테스트 전략 | 프로젝트 |
+| `server-api-design` | 엔드포인트 설계, DTO 작성, Controller/Service 분리 | 프로젝트 |
+| `security` | 인증/인가, 인젝션 방지, CORS, 입력 검증 | 프로젝트 |
+
+기능 구현 시 최소 `nestjs-expert`, `server-api-design`은 항상 참조한다.
