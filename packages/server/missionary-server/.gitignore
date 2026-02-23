@@ -1,4 +1,4 @@
 dist/
-.env.dev
+.env
 .env.production
 prisma/generated/

@@ -42,17 +42,17 @@ jobs:
     needs: test-and-build
     runs-on: ubuntu-latest
     steps:
-      - name: Write .env.dev to EC2
+      - name: Write .env to EC2
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: SERVER_ENV_DEV
+          envs: SERVER_ENV
           script: |
-            printf '%s\n' "$SERVER_ENV_DEV" > /home/ec2-user/missionary/packages/server/missionary-server/.env.dev
+            printf '%s\n' "$SERVER_ENV" > /home/ec2-user/missionary/packages/server/missionary-server/.env
         env:
-          SERVER_ENV_DEV: ${{ secrets.SERVER_ENV_DEV }}
+          SERVER_ENV: ${{ secrets.SERVER_ENV }}
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
