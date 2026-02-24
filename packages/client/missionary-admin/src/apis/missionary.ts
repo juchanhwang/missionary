@@ -1,6 +1,15 @@
 import api from './instance';
 import { type MissionGroup } from './missionGroup';
 
+export const MISSION_STATUSES = [
+  'ENROLLMENT_OPENED',
+  'ENROLLMENT_CLOSED',
+  'IN_PROGRESS',
+  'COMPLETED',
+] as const;
+
+export type MissionStatus = (typeof MISSION_STATUSES)[number];
+
 export interface Missionary {
   id: string;
   name: string;
@@ -19,11 +28,7 @@ export interface Missionary {
   missionGroupId?: string;
   order?: number;
   missionGroup?: MissionGroup;
-  status:
-    | 'ENROLLMENT_OPENED'
-    | 'ENROLLMENT_CLOSED'
-    | 'IN_PROGRESS'
-    | 'COMPLETED';
+  status: MissionStatus;
   createdAt: string;
 }
 
@@ -43,11 +48,7 @@ export interface CreateMissionaryPayload {
   bankAccountNumber?: string;
   missionGroupId?: string;
   order?: number;
-  status?:
-    | 'ENROLLMENT_OPENED'
-    | 'ENROLLMENT_CLOSED'
-    | 'IN_PROGRESS'
-    | 'COMPLETED';
+  status?: MissionStatus;
 }
 
 export interface UpdateMissionaryPayload {
@@ -64,11 +65,7 @@ export interface UpdateMissionaryPayload {
   bankName?: string;
   bankAccountHolder?: string;
   bankAccountNumber?: string;
-  status?:
-    | 'ENROLLMENT_OPENED'
-    | 'ENROLLMENT_CLOSED'
-    | 'IN_PROGRESS'
-    | 'COMPLETED';
+  status?: MissionStatus;
 }
 
 export const missionaryApi = {

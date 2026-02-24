@@ -1,11 +1,12 @@
 'use client';
 
 import { DatePicker, InputField, Select } from '@samilhero/design-system';
+import { type MissionStatus } from 'apis/missionary';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 
 import { type MissionFormData } from '../_schemas/missionSchema';
 
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS: Record<MissionStatus, string> = {
   ENROLLMENT_OPENED: '모집 중',
   ENROLLMENT_CLOSED: '모집 종료',
   IN_PROGRESS: '진행 중',

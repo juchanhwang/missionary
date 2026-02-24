@@ -1,7 +1,5 @@
 import { Badge } from '@samilhero/design-system';
-import { type Missionary } from 'apis/missionary';
-
-type MissionStatus = Missionary['status'];
+import { type MissionStatus } from 'apis/missionary';
 
 const STATUS_CONFIG: Record<
   MissionStatus,
