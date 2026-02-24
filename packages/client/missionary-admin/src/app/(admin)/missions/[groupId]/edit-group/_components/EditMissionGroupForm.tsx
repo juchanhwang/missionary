@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@samilhero/design-system';
+import { LoadingSpinner } from 'components/loading/LoadingSpinner';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -55,14 +56,7 @@ export function EditMissionGroupForm() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center flex-1">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-gray-30 border-t-gray-60 rounded-full animate-spin" />
-          <p className="text-sm text-gray-50">불러오는 중...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!group) {
