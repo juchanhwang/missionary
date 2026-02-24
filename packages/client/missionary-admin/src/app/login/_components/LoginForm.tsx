@@ -10,7 +10,6 @@ import { useOAuthError } from '../_hooks/useOAuthError';
 import { useSocialLogin } from '../_hooks/useSocialLogin';
 import { loginSchema, type LoginFormData } from '../_schemas/loginSchema';
 
-
 export function LoginForm() {
   const router = useRouter();
 
