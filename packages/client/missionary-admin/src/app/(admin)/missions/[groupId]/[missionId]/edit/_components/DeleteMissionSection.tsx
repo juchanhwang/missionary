@@ -1,6 +1,6 @@
 'use client';
 
-import { openOverlayAsync } from '@samilhero/design-system';
+import { overlay } from '@samilhero/design-system';
 import { Ellipsis, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 
@@ -54,11 +54,14 @@ export function DeleteMissionSection({
   const handleDelete = async () => {
     setIsMenuOpen(false);
 
-    const confirmed = await openOverlayAsync<boolean>(
-      ({ isOpen: isModalOpen, close }) => (
+    const confirmed = await overlay.openAsync<boolean>(
+      ({ isOpen: isModalOpen, close, unmount }) => (
         <DeleteConfirmModal
           isOpen={isModalOpen}
-          close={close}
+          close={(result) => {
+            close(result);
+            setTimeout(unmount, 300);
+          }}
           missionaryName={missionaryName}
           isPending={isPending}
         />
