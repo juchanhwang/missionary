@@ -16,7 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # PR이 열리거나 ready_for_review 될 때 자동 리뷰
   auto-review:
     if: >
       github.event_name == 'pull_request' &&
@@ -36,33 +35,24 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           use_sticky_comment: true
           prompt: |
-            REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+            Repository: ${{ github.repository }}
+            PR: #${{ github.event.pull_request.number }}
 
-            이 PR을 코드리뷰해주세요. 한국어로 작성합니다.
+            `gh pr diff`와 `gh pr view`로 변경 사항을 확인한 뒤, 한국어로 코드리뷰한다.
+            CLAUDE.md가 있으면 읽고 프로젝트 컨벤션을 따른다.
 
-            ## 리뷰 기준
-            - 버그 가능성 및 엣지 케이스
+            리뷰 기준:
+            - 버그 가능성, 엣지 케이스
             - 보안 취약점
-            - 성능 문제
-            - 코드 가독성 및 유지보수성
+            - 성능 병목
 
-            ## 프로젝트 컨텍스트
-            - pnpm 모노레포 (design-system, missionary-app, missionary-admin, missionary-server)
-            - 프론트엔드: Next.js + TypeScript
-            - 백엔드: NestJS + Prisma
-            - 커밋 컨벤션: `type(scope): 한글 제목`
-
-            ## 출력 규칙
-            - 사소한 스타일 지적은 생략 (ESLint/Prettier가 담당)
-            - 실질적인 문제만 코멘트
-            - 인라인 코멘트로 구체적 위치 지적
-            - 전체 요약은 `gh pr comment`로 작성
+            규칙:
+            - 포맷/스타일 지적 생략 (ESLint/Prettier가 담당)
+            - 구체적 이슈는 인라인 코멘트, 전체 요약은 PR 코멘트로 작성
 
           claude_args: |
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Glob,Grep"
 
-  # @claude 멘션 시 대화형 응답
   mention:
     if: >
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
