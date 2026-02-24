@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, InputField } from '@samilhero/design-system';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { useLoginAction } from '../_hooks/useLoginAction';
@@ -9,7 +10,10 @@ import { useOAuthError } from '../_hooks/useOAuthError';
 import { useSocialLogin } from '../_hooks/useSocialLogin';
 import { loginSchema, type LoginFormData } from '../_schemas/loginSchema';
 
+
 export function LoginForm() {
+  const router = useRouter();
+
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: 'onSubmit',
@@ -29,6 +33,9 @@ export function LoginForm() {
         form.setError('root.serverError', {
           message: '이메일 또는 비밀번호가 올바르지 않습니다.',
         });
+      },
+      onSuccess: () => {
+        router.push('/');
       },
     });
   };
