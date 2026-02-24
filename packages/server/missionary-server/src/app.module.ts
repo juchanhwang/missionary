@@ -28,7 +28,7 @@ import { UserModule } from './user/user.module';
     ConfigModule.forRoot({
       isGlobal: true,
       validate: validateEnv,
-      envFilePath: `.env.${process.env.NODE_ENV || 'dev'}`,
+      envFilePath: '.env',
     }),
     EncryptionModule,
     ScheduleModule.forRoot(),

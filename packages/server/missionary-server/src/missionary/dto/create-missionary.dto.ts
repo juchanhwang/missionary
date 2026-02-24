@@ -132,12 +132,26 @@ export class CreateMissionaryDto {
   declare order?: number;
 
   @ApiProperty({
-    enum: ['RECRUITING', 'IN_PROGRESS', 'COMPLETED'],
+    enum: [
+      'ENROLLMENT_OPENED',
+      'ENROLLMENT_CLOSED',
+      'IN_PROGRESS',
+      'COMPLETED',
+    ],
     description: '선교 상태',
     required: false,
-    default: 'RECRUITING',
+    default: 'ENROLLMENT_OPENED',
   })
   @IsOptional()
-  @IsEnum(['RECRUITING', 'IN_PROGRESS', 'COMPLETED'])
-  declare status?: 'RECRUITING' | 'IN_PROGRESS' | 'COMPLETED';
+  @IsEnum([
+    'ENROLLMENT_OPENED',
+    'ENROLLMENT_CLOSED',
+    'IN_PROGRESS',
+    'COMPLETED',
+  ])
+  declare status?:
+    | 'ENROLLMENT_OPENED'
+    | 'ENROLLMENT_CLOSED'
+    | 'IN_PROGRESS'
+    | 'COMPLETED';
 }

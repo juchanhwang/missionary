@@ -38,7 +38,7 @@ describe('useGetMissionaries', () => {
         endDate: '2024-07-07',
         participationStartDate: '2024-06-01',
         participationEndDate: '2024-06-25',
-        status: 'RECRUITING',
+        status: 'ENROLLMENT_OPENED',
       },
       {
         id: '2',
@@ -47,7 +47,7 @@ describe('useGetMissionaries', () => {
         endDate: '2024-08-07',
         participationStartDate: '2024-07-01',
         participationEndDate: '2024-07-25',
-        status: 'RECRUITING',
+        status: 'ENROLLMENT_OPENED',
       },
     ];
 

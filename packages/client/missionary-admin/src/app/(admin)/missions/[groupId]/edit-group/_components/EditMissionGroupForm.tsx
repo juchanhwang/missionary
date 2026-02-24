@@ -99,7 +99,11 @@ export function EditMissionGroupForm() {
         >
           취소
         </Button>
-        <Button type="submit" disabled={isPending} size="md">
+        <Button
+          type="submit"
+          disabled={!form.formState.isDirty || isPending}
+          size="md"
+        >
           {isPending ? '수정 중...' : '수정하기'}
         </Button>
       </div>

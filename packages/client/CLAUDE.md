@@ -77,12 +77,11 @@ pnpm --filter design-system test
 이 영역에서 코드를 작성·리뷰·리팩토링할 때 관련 스킬을 반드시 로드한다.
 
 | 스킬 | 트리거 | 출처 |
-|---|---|---|
+|---|---|----|
+| `vercel-react-best-practices` | React/Next.js 성능 최적화, 데이터 패칭 |  글로벌 |
 | `frontend-code-quality` | 컴포넌트 설계, 코드 리뷰, 리팩토링 | 글로벌 |
-| `react-state-colocation` | 상태 관리 설계, prop drilling, Context 결정 | 글로벌 |
 | `structuring-react-layers` | 페이지/컴포넌트/훅 구조 설계 | 글로벌 |
-| `vercel-react-best-practices` | React/Next.js 성능 최적화, 데이터 패칭 | 글로벌 |
-| `client-a11y` | UI 컴포넌트 작성, ARIA 속성, 키보드 접근성 | 프로젝트 |
+| `react-state-colocation` | 상태 관리 설계, prop drilling, Context 결정 | 글로벌 |
 | `security` | 사용자 입력 처리, 민감 정보, XSS 방지 | 프로젝트 |
 | `frontend-design` | UI 디자인, 스타일링 작업 | 글로벌 |
 | `web-design-guidelines` | UI 리뷰, 접근성 감사 | 글로벌 |

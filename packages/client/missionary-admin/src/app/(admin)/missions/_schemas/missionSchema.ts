@@ -1,3 +1,4 @@
+import { MISSION_STATUSES } from 'apis/missionary';
 import { z } from 'zod';
 
 const optionalNumber = z
@@ -28,7 +29,7 @@ export const missionSchema = z.object({
   bankName: z.string().optional(),
   bankAccountHolder: z.string().optional(),
   bankAccountNumber: z.string().optional(),
-  status: z.enum(['RECRUITING', 'IN_PROGRESS', 'COMPLETED']).optional(),
+  status: z.enum(MISSION_STATUSES).optional(),
   order: optionalNumber,
 });
 
