@@ -58,7 +58,7 @@ describe('CreateMissionPage', () => {
         title: '2024년 여름 선교',
         year: 2024,
         season: 'SUMMER',
-        status: 'RECRUITING',
+        status: 'ENROLLMENT_OPENED',
       },
     } as any);
 
@@ -72,7 +72,7 @@ describe('CreateMissionPage', () => {
         title: '2024년 여름 선교',
         year: 2024,
         season: 'SUMMER',
-        status: 'RECRUITING',
+        status: 'ENROLLMENT_OPENED',
       },
     } as any);
 
@@ -144,7 +144,7 @@ describe('CreateMissionPage', () => {
         title: '2024년 여름 선교',
         year: 2024,
         season: 'SUMMER',
-        status: 'RECRUITING',
+        status: 'ENROLLMENT_OPENED',
       },
     } as any);
 
@@ -175,7 +175,7 @@ describe('CreateMissionPage', () => {
         title: '2024년 여름 선교',
         year: 2024,
         season: 'SUMMER',
-        status: 'RECRUITING',
+        status: 'ENROLLMENT_OPENED',
       },
     } as any);
 

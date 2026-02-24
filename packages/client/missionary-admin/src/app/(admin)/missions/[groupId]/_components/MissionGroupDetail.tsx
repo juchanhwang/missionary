@@ -95,10 +95,10 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
                 <td colSpan={6} className="px-5 py-16 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <CalendarX size={32} className="text-gray-40" />
-                    <p className="text-sm text-gray-50">
+                    <p className="text-sm text-gray-60">
                       등록된 선교가 없습니다
                     </p>
-                    <p className="text-xs text-gray-40">
+                    <p className="text-xs text-gray-50">
                       &apos;선교 추가&apos; 버튼으로 새 선교를 등록하세요
                     </p>
                   </div>

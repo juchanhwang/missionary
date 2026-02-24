@@ -1,13 +1,16 @@
 import { Badge } from '@samilhero/design-system';
-import { type Missionary } from 'apis/missionary';
-
-type MissionStatus = Missionary['status'];
+import { type MissionStatus } from 'apis/missionary';
 
 const STATUS_CONFIG: Record<
   MissionStatus,
   { variant: 'info' | 'success'; label: string; className?: string }
 > = {
-  RECRUITING: { variant: 'info', label: '모집중' },
+  ENROLLMENT_OPENED: { variant: 'info', label: '모집중' },
+  ENROLLMENT_CLOSED: {
+    variant: 'info',
+    label: '모집종료',
+    className: 'bg-gray-100 text-gray-600',
+  },
   IN_PROGRESS: { variant: 'success', label: '진행중' },
   COMPLETED: {
     variant: 'info',
