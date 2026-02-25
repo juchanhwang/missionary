@@ -1,12 +1,7 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { useSafeContext } from '@samilhero/design-system';
+import { createContext, useCallback, useEffect, useState } from 'react';
 
 interface SidebarContextValue {
   isOpen: boolean;
@@ -15,6 +10,7 @@ interface SidebarContextValue {
 }
 
 const SidebarContext = createContext<SidebarContextValue | null>(null);
+SidebarContext.displayName = 'SidebarContext';
 
 const LG_BREAKPOINT = 1024;
 
@@ -46,9 +42,5 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useSidebar() {
-  const ctx = useContext(SidebarContext);
-  if (!ctx) {
-    throw new Error('useSidebar must be used within SidebarProvider');
-  }
-  return ctx;
+  return useSafeContext(SidebarContext, 'useSidebar');
 }
