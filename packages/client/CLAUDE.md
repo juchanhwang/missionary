@@ -82,8 +82,9 @@ pnpm --filter design-system test
 | `frontend-code-quality` | 컴포넌트 설계, 코드 리뷰, 리팩토링 | 글로벌 |
 | `structuring-react-layers` | 페이지/컴포넌트/훅 구조 설계 | 글로벌 |
 | `react-state-colocation` | 상태 관리 설계, prop drilling, Context 결정 | 글로벌 |
+| `react-nextjs-testing` | 테스트 코드 작성, Vitest/RTL/MSW/Playwright | 글로벌 |
 | `security` | 사용자 입력 처리, 민감 정보, XSS 방지 | 프로젝트 |
 | `frontend-design` | UI 디자인, 스타일링 작업 | 글로벌 |
 | `web-design-guidelines` | UI 리뷰, 접근성 감사 | 글로벌 |
 
-기능 구현 시 최소 `frontend-code-quality`, `structuring-react-layers`, `client-a11y`는 항상 참조한다.
+기능 구현 시 최소 `frontend-code-quality`, `structuring-react-layers`는 항상 참조한다. 테스트 작성 시 `react-nextjs-testing`을 반드시 로드한다.
