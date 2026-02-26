@@ -21,13 +21,17 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor(private readonly configService: ConfigService) {
+    const dbUrl = configService.get<string>('DATABASE_URL') ?? '';
+    const needsSsl = /sslmode=require/.test(dbUrl);
+
     const adapter = new PrismaPg(
       {
-        connectionString: configService.get<string>('DATABASE_URL'),
+        connectionString: dbUrl,
         max: POOL_MAX,
         idleTimeoutMillis: IDLE_TIMEOUT_MS,
         connectionTimeoutMillis: CONNECTION_TIMEOUT_MS,
         keepAlive: true,
+        ...(needsSsl && { ssl: { rejectUnauthorized: false } }),
       },
       {
         onPoolError: (err: Error) => {
