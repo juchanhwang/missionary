@@ -21,12 +21,16 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor(private readonly configService: ConfigService) {
-    const dbUrl = configService.get<string>('DATABASE_URL') ?? '';
-    const needsSsl = /sslmode=require/.test(dbUrl);
+    const rawUrl = configService.get<string>('DATABASE_URL') ?? '';
+    const needsSsl = /sslmode=require/.test(rawUrl);
+    // pg 모듈에 ssl 옵션을 직접 전달하므로 connection string에서 sslmode 제거
+    const dbUrl = rawUrl.replace(/[?&]sslmode=require/g, (match) =>
+      match.startsWith('?') ? '?' : '',
+    );
 
     const adapter = new PrismaPg(
       {
-        connectionString: dbUrl,
+        connectionString: dbUrl.replace(/\?$/, ''),
         max: POOL_MAX,
         idleTimeoutMillis: IDLE_TIMEOUT_MS,
         connectionTimeoutMillis: CONNECTION_TIMEOUT_MS,

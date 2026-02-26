@@ -16,6 +16,7 @@ export class AppService {
 
   async checkDb() {
     const dbUrl = this.configService.get<string>('DATABASE_URL') ?? '';
+    const hasSslMode = /sslmode=require/.test(dbUrl);
     let maskedUrl = '';
     try {
       const url = new URL(dbUrl);
@@ -26,12 +27,13 @@ export class AppService {
 
     try {
       const result = await this.prisma.$queryRawUnsafe('SELECT 1 AS ok');
-      return { status: 'connected', maskedUrl, result };
+      return { status: 'connected', maskedUrl, hasSslMode, result };
     } catch (error: unknown) {
       const err = error as Error & { code?: string; meta?: unknown };
       return {
         status: 'error',
         maskedUrl,
+        hasSslMode,
         errorName: err.name,
         errorMessage: err.message,
         errorCode: err.code,
