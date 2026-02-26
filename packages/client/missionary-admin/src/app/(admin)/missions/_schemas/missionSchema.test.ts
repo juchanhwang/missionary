@@ -1,6 +1,4 @@
-import { describe, it, expect } from 'vitest';
-
-import { missionSchema } from '../missionSchema';
+import { missionSchema } from './missionSchema';
 
 describe('missionSchema', () => {
   it('유효한 데이터를 통과시킨다', () => {

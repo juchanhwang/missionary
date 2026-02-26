@@ -1,6 +1,4 @@
-import { describe, it, expect } from 'vitest';
-
-import { loginSchema } from '../loginSchema';
+import { loginSchema } from './loginSchema';
 
 describe('loginSchema', () => {
   it('유효한 이메일과 비밀번호를 통과시킨다', () => {
