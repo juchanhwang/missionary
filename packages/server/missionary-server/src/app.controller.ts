@@ -15,11 +15,4 @@ export class AppController {
   getHealth() {
     return this.appService.getHealth();
   }
-
-  @Public()
-  @Get('health/db')
-  @ApiOperation({ summary: 'DB 연결 진단 (임시)' })
-  checkDb() {
-    return this.appService.checkDb();
-  }
 }
