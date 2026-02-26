@@ -9,6 +9,7 @@ import {
   type RenderOptions,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 
 function createTestQueryClient() {
   return new QueryClient({
@@ -20,7 +21,7 @@ function createTestQueryClient() {
 }
 
 function AllProviders({ children }: { children: React.ReactNode }) {
-  const queryClient = createTestQueryClient();
+  const [queryClient] = useState(() => createTestQueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

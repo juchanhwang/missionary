@@ -1,5 +1,5 @@
-import { type Missionary } from 'apis/missionary';
 import { useRouter } from 'next/navigation';
+import { createMockMissionary } from 'test/mocks/data';
 import { render, screen } from 'test/test-utils';
 import { vi } from 'vitest';
 
@@ -14,22 +14,7 @@ vi.mock('../_actions/missionaryActions', () => ({
   deleteMissionaryAction: vi.fn(),
 }));
 
-function createMockMissionary(overrides: Partial<Missionary> = {}): Missionary {
-  return {
-    id: 'mission-1',
-    name: '1차 필리핀 선교',
-    startDate: '2024-07-01',
-    endDate: '2024-07-15',
-    participationStartDate: '2024-05-01',
-    participationEndDate: '2024-06-30',
-    pastorName: '김목사',
-    status: 'ENROLLMENT_OPENED',
-    order: 1,
-    missionGroupId: 'group-1',
-    createdAt: '2024-01-01T00:00:00.000Z',
-    ...overrides,
-  };
-}
+const MISSIONARY_OVERRIDES = { name: '1차 필리핀 선교' };
 
 describe('MissionaryEditForm', () => {
   const mockPush = vi.fn();
@@ -42,14 +27,22 @@ describe('MissionaryEditForm', () => {
   });
 
   it('제목에 선교명을 표시한다', () => {
-    render(<MissionaryEditForm missionary={createMockMissionary()} />);
+    render(
+      <MissionaryEditForm
+        missionary={createMockMissionary(MISSIONARY_OVERRIDES)}
+      />,
+    );
 
     expect(screen.getByText('선교 수정')).toBeInTheDocument();
     expect(screen.getByText('1차 필리핀 선교')).toBeInTheDocument();
   });
 
   it('기존 선교 데이터를 폼에 표시한다', () => {
-    render(<MissionaryEditForm missionary={createMockMissionary()} />);
+    render(
+      <MissionaryEditForm
+        missionary={createMockMissionary(MISSIONARY_OVERRIDES)}
+      />,
+    );
 
     expect(screen.getByLabelText('선교 이름')).toHaveValue('1차 필리핀 선교');
     expect(screen.getByLabelText('담당 교역자')).toHaveValue('김목사');
@@ -57,14 +50,20 @@ describe('MissionaryEditForm', () => {
   });
 
   it('폼이 변경되지 않으면 수정하기 버튼이 비활성화된다', () => {
-    render(<MissionaryEditForm missionary={createMockMissionary()} />);
+    render(
+      <MissionaryEditForm
+        missionary={createMockMissionary(MISSIONARY_OVERRIDES)}
+      />,
+    );
 
     expect(screen.getByRole('button', { name: '수정하기' })).toBeDisabled();
   });
 
   it('취소 버튼을 클릭하면 그룹 상세로 이동한다', async () => {
     const { user } = render(
-      <MissionaryEditForm missionary={createMockMissionary()} />,
+      <MissionaryEditForm
+        missionary={createMockMissionary(MISSIONARY_OVERRIDES)}
+      />,
     );
 
     await user.click(screen.getByRole('button', { name: '취소' }));
@@ -73,7 +72,11 @@ describe('MissionaryEditForm', () => {
   });
 
   it('더보기 버튼이 존재한다', () => {
-    render(<MissionaryEditForm missionary={createMockMissionary()} />);
+    render(
+      <MissionaryEditForm
+        missionary={createMockMissionary(MISSIONARY_OVERRIDES)}
+      />,
+    );
 
     expect(screen.getByRole('button', { name: '더보기' })).toBeInTheDocument();
   });

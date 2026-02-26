@@ -50,8 +50,10 @@ export function createMockMissionary(
     endDate: '2024-07-15',
     participationStartDate: '2024-05-01',
     participationEndDate: '2024-06-30',
+    pastorName: '김목사',
     status: 'ENROLLMENT_OPENED',
     order: 1,
+    missionGroupId: 'group-1',
     createdAt: '2024-01-01T00:00:00.000Z',
     ...overrides,
   };
