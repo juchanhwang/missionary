@@ -61,7 +61,7 @@ main/
 
 ## Worktree Workflow (Mandatory)
 
-- 이 프로젝트는 `git worktree` 기반으로 운영한다. 기능 작업은 전용 worktree에서만 수행한다.
+- 이 프로젝트는 `git worktree` 기반으로 운영한다. 모든 작업은 전용 worktree에서만 수행한다.
 - `main` worktree는 `main` 브랜치 전용이다. 기능 브랜치 작업 경로로 사용하지 않는다.
 - 새 작업은 `scripts/wt`를 우선 사용한다 (`wt new <branch>`, `cd $(wt cd <branch>)`).
 - 코드 수정, 테스트, 커밋, PR 준비는 모두 해당 기능 worktree 경로에서 실행한다.
@@ -91,6 +91,20 @@ pnpm --filter design-system build
 pnpm --filter missionary-server test
 pnpm --filter missionary-server prisma:generate
 ```
+
+## PR Convention (Global)
+
+PR 생성 시 반드시 `.github/pull_request_template.md` 템플릿을 따른다.
+
+필수 섹션:
+
+1. **배경** — 이 변경이 필요한 이유
+2. **변경 사항** — 주요 변경 내용 목록
+3. **테스트** — 검증 방법
+4. **스크린샷** — UI 변경 시 Before/After (없으면 섹션 삭제)
+5. **리뷰 포인트** — 리뷰어 중점 확인 사항 (없으면 섹션 삭제)
+
+`gh pr create` 시 `--body` 내용을 위 템플릿 구조에 맞춰 작성한다. 자체 포맷을 사용하지 않는다.
 
 ## Commit Convention (Global)
 
