@@ -1,4 +1,7 @@
-const SOCIAL_AUTH_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const SOCIAL_AUTH_BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? '/api'
+    : (process.env.NEXT_PUBLIC_API_URL ?? '/api');
 
 export function useSocialLogin() {
   const loginGoogle = () => {
