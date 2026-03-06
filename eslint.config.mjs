@@ -26,7 +26,7 @@ export default tseslint.config([
       globals: globals.browser,
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
+      ...reactHooks.configs['recommended-latest'].rules,
 
       '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',

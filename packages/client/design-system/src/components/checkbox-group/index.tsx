@@ -54,7 +54,7 @@ function CheckboxGroupRoot({
 
       onChange?.(updatedCheckedList);
     },
-    [checkedValues],
+    [checkedValues, onChange],
   );
 
   const actions = useMemo(

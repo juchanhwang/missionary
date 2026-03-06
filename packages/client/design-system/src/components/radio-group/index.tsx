@@ -48,7 +48,7 @@ export function RadioGroup({
       }
       onChange?.(changedValue);
     },
-    [disabled],
+    [disabled, onChange],
   );
 
   const actions = useMemo(
