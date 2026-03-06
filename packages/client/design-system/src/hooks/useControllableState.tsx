@@ -37,6 +37,7 @@ export const useControllableState = <T,>(
       );
     }
 
+    // isControlled 변경 시에만 이 effect가 실행되므로, 조건문 외부에서 항상 동기화해도 동작은 동일
     wasControlled.current = isControlled;
   }, [isControlled]);
 
