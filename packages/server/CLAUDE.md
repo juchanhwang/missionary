@@ -67,5 +67,6 @@ pnpm --filter missionary-server prisma:migrate:deploy
 | `nestjs-expert` | 모듈 아키텍처, DI, 가드/인터셉터, 테스트 전략 | 프로젝트 |
 | `server-api-design` | 엔드포인트 설계, DTO 작성, Controller/Service 분리 | 프로젝트 |
 | `security` | 인증/인가, 인젝션 방지, CORS, 입력 검증 | 프로젝트 |
+| `nestjs-testing` | 테스트 코드 작성, *.spec.ts, mock 전략, E2E 테스트 | 글로벌 |
 
 기능 구현 시 최소 `nestjs-expert`, `server-api-design`은 항상 참조한다.

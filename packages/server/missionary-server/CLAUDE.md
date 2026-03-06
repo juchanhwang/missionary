@@ -23,6 +23,11 @@
 ## Test And Build
 
 - Jest 설정은 `jest.config.ts` 기준(`rootDir: src`, `testRegex: .*\.spec\.ts$`).
+- 테스트 코드를 작성·수정할 때는 반드시 `nestjs-testing` 스킬을 로드하고 따른다.
+- 핵심 원칙: 계약(행동)을 테스트하고, 구현 세부사항을 테스트하지 않는다.
+- Mock 전략: Repository는 Fake(InMemory 구현) 선호, 외부 서비스(이메일 등)만 Stub/Mock 사용.
+- 복잡한 비즈니스 로직은 순수 함수로 추출(Functional Core)하여 Mock 없이 테스트한다.
+- 테스트 이름은 행동 기반 한글 서술: `it('중복 이메일로 등록하면 ConflictException을 던진다')`.
 - 빌드 산출물은 `dist/`이며 실행 엔트리는 `node dist/main`.
 - Prisma client/migration은 패키지 스크립트를 사용한다.
 
