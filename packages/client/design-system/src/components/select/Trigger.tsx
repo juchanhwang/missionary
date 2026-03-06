@@ -24,7 +24,7 @@ export const SelectTrigger = ({
 
   const handleOnClick = useCallback(() => {
     actions.setOpen((prevOpen) => !prevOpen);
-  }, [actions.setOpen]);
+  }, [actions]);
 
   const isEmpty =
     data.selectedValue === undefined ||
