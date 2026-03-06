@@ -22,9 +22,13 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        await axios.post(`${BASE_URL}/auth/refresh`, {}, {
-          withCredentials: true,
-        });
+        await axios.post(
+          `${BASE_URL}/auth/refresh`,
+          {},
+          {
+            withCredentials: true,
+          },
+        );
 
         return api(originalRequest);
       } catch {
