@@ -1,83 +1,35 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-
-import { PrismaService } from '@/database/prisma.service';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { AddMembersDto } from './dto/add-members.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { Prisma } from '../../prisma/generated/prisma';
+import { TEAM_REPOSITORY } from './repositories';
+
+import type { TeamRepository, TeamUpdateInput } from './repositories';
 
 @Injectable()
 export class TeamService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(TEAM_REPOSITORY)
+    private readonly teamRepository: TeamRepository,
+  ) {}
 
   async create(dto: CreateTeamDto) {
-    return this.prisma.team.create({
-      data: {
-        missionaryId: dto.missionaryId,
-        churchId: dto.churchId,
-        leaderUserId: dto.leaderUserId,
-        leaderUserName: dto.leaderUserName,
-        teamName: dto.teamName,
-      },
-      include: {
-        missionary: true,
-        church: true,
-        teamMembers: {
-          where: {
-            deletedAt: null,
-          },
-          include: {
-            user: true,
-          },
-        },
-      },
+    return this.teamRepository.createWithRelations({
+      missionaryId: dto.missionaryId,
+      churchId: dto.churchId,
+      leaderUserId: dto.leaderUserId,
+      leaderUserName: dto.leaderUserName,
+      teamName: dto.teamName,
     });
   }
 
   async findAll(missionaryId?: string) {
-    const where: Prisma.TeamWhereInput = {};
-
-    if (missionaryId) {
-      where.missionaryId = missionaryId;
-    }
-
-    return this.prisma.team.findMany({
-      where,
-      include: {
-        missionary: true,
-        church: true,
-        teamMembers: {
-          where: {
-            deletedAt: null,
-          },
-          include: {
-            user: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    return this.teamRepository.findAll(missionaryId);
   }
 
   async findOne(id: string) {
-    const team = await this.prisma.team.findUnique({
-      where: { id },
-      include: {
-        missionary: true,
-        church: true,
-        teamMembers: {
-          where: {
-            deletedAt: null,
-          },
-          include: {
-            user: true,
-          },
-        },
-      },
-    });
+    const team = await this.teamRepository.findWithMembers(id);
 
     if (!team) {
       throw new NotFoundException(`Team with ID ${id} not found`);
@@ -89,7 +41,7 @@ export class TeamService {
   async update(id: string, dto: UpdateTeamDto) {
     await this.findOne(id);
 
-    const data: Prisma.TeamUpdateInput = {};
+    const data: TeamUpdateInput = {};
 
     if (dto.missionaryId !== undefined) {
       data.missionary = { connect: { id: dto.missionaryId } };
@@ -104,45 +56,19 @@ export class TeamService {
       data.leaderUserName = dto.leaderUserName;
     if (dto.teamName !== undefined) data.teamName = dto.teamName;
 
-    return this.prisma.team.update({
-      where: { id },
-      data,
-      include: {
-        missionary: true,
-        church: true,
-        teamMembers: {
-          where: {
-            deletedAt: null,
-          },
-          include: {
-            user: true,
-          },
-        },
-      },
-    });
+    return this.teamRepository.updateWithRelations(id, data);
   }
 
   async remove(id: string) {
     await this.findOne(id);
 
-    return this.prisma.team.delete({
-      where: { id },
-    });
+    return this.teamRepository.delete({ id });
   }
 
   async addMembers(teamId: string, dto: AddMembersDto) {
     await this.findOne(teamId);
 
-    const createPromises = dto.userIds.map((userId) =>
-      this.prisma.teamMember.create({
-        data: {
-          teamId,
-          userId,
-        },
-      }),
-    );
-
-    await Promise.all(createPromises);
+    await this.teamRepository.addMembers(teamId, dto.userIds);
 
     return this.findOne(teamId);
   }
@@ -150,20 +76,7 @@ export class TeamService {
   async removeMembers(teamId: string, dto: AddMembersDto) {
     await this.findOne(teamId);
 
-    const updatePromises = dto.userIds.map((userId) =>
-      this.prisma.teamMember.updateMany({
-        where: {
-          teamId,
-          userId,
-          deletedAt: null,
-        },
-        data: {
-          deletedAt: new Date(),
-        },
-      }),
-    );
-
-    await Promise.all(updatePromises);
+    await this.teamRepository.softDeleteMembers(teamId, dto.userIds);
 
     return this.findOne(teamId);
   }

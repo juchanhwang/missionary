@@ -1,12 +1,16 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 
+import {
+  PASSWORD_HASHER,
+  PasswordHasher,
+} from '@/common/interfaces/password-hasher.interface';
 import { withDbRetry } from '@/common/utils/retry';
 import { UserService } from '@/user/user.service';
 
@@ -21,6 +25,8 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    @Inject(PASSWORD_HASHER)
+    private readonly passwordHasher: PasswordHasher,
   ) {}
 
   async validateLocalUser(email: string, password: string) {
@@ -32,7 +38,10 @@ export class AuthService {
       );
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await this.passwordHasher.compare(
+      password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException(
@@ -126,7 +135,7 @@ export class AuthService {
       );
     }
 
-    const isPasswordValid = await bcrypt.compare(
+    const isPasswordValid = await this.passwordHasher.compare(
       dto.currentPassword,
       user.password,
     );
@@ -135,7 +144,7 @@ export class AuthService {
       throw new UnauthorizedException('현재 비밀번호가 올바르지 않습니다');
     }
 
-    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+    const hashedPassword = await this.passwordHasher.hash(dto.newPassword);
     await this.userService.updatePassword(userId, hashedPassword);
 
     return { message: '비밀번호가 변경되었습니다' };
@@ -151,7 +160,7 @@ export class AuthService {
       throw new UnauthorizedException('관리자 인증에 실패했습니다');
     }
 
-    const isPasswordValid = await bcrypt.compare(
+    const isPasswordValid = await this.passwordHasher.compare(
       adminLoginDto.password,
       user.password,
     );

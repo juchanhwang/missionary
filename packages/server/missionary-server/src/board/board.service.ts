@@ -1,52 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { MissionaryBoardType } from '@/common/enums/missionary-board-type.enum';
-import { PrismaService } from '@/database/prisma.service';
 
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
-import { Prisma } from '../../prisma/generated/prisma';
+import {
+  BOARD_REPOSITORY,
+  type BoardRepository,
+  type BoardUpdateInput,
+} from './repositories/board-repository.interface';
 
 @Injectable()
 export class BoardService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(BOARD_REPOSITORY)
+    private readonly boardRepository: BoardRepository,
+  ) {}
 
   async create(dto: CreateBoardDto) {
-    return this.prisma.missionaryBoard.create({
-      data: {
-        missionaryId: dto.missionaryId,
-        type: dto.type,
-        title: dto.title,
-        content: dto.content,
-      },
-      include: {
-        missionary: true,
-      },
+    return this.boardRepository.createWithRelations({
+      missionaryId: dto.missionaryId,
+      type: dto.type,
+      title: dto.title,
+      content: dto.content,
     });
   }
 
   async findByMissionary(missionaryId: string, type?: MissionaryBoardType) {
-    return this.prisma.missionaryBoard.findMany({
-      where: {
-        missionaryId,
-        type,
-      },
-      include: {
-        missionary: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    return this.boardRepository.findByMissionary(missionaryId, type);
   }
 
   async findOne(id: string) {
-    const board = await this.prisma.missionaryBoard.findUnique({
-      where: { id },
-      include: {
-        missionary: true,
-      },
-    });
+    const board = await this.boardRepository.findByIdWithRelations(id);
 
     if (!board) {
       throw new NotFoundException(`Board with ID ${id} not found`);
@@ -58,29 +43,18 @@ export class BoardService {
   async update(id: string, dto: UpdateBoardDto) {
     await this.findOne(id);
 
-    const data: Prisma.MissionaryBoardUncheckedUpdateInput = {};
+    const data: BoardUpdateInput = {};
 
     if (dto.type !== undefined) data.type = dto.type;
     if (dto.title !== undefined) data.title = dto.title;
     if (dto.content !== undefined) data.content = dto.content;
 
-    return this.prisma.missionaryBoard.update({
-      where: { id },
-      data,
-      include: {
-        missionary: true,
-      },
-    });
+    return this.boardRepository.updateWithRelations(id, data);
   }
 
   async remove(id: string) {
     await this.findOne(id);
 
-    return this.prisma.missionaryBoard.delete({
-      where: { id },
-      include: {
-        missionary: true,
-      },
-    });
+    return this.boardRepository.deleteWithRelations(id);
   }
 }
