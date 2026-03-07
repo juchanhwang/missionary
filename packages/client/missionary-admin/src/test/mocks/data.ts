@@ -1,12 +1,13 @@
 import { type AuthUser } from 'apis/auth';
 import { type Missionary } from 'apis/missionary';
 import { type MissionGroup, type MissionGroupDetail } from 'apis/missionGroup';
+import { type User } from 'apis/user';
 
 export function createMockAuthUser(
   overrides: Partial<AuthUser> = {},
 ): AuthUser {
   return {
-    id: 1,
+    id: 'user-1',
     email: 'admin@example.com',
     role: 'ADMIN',
     provider: 'LOCAL',
@@ -57,4 +58,36 @@ export function createMockMissionary(
     createdAt: '2024-01-01T00:00:00.000Z',
     ...overrides,
   };
+}
+
+export function createMockUser(overrides: Partial<User> = {}): User {
+  return {
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    email: 'user@example.com',
+    name: '홍길동',
+    phoneNumber: '010-1234-5678',
+    identityNumber: '990101-1******',
+    loginId: 'hong123',
+    provider: 'LOCAL',
+    role: 'USER',
+    gender: 'MALE',
+    birthDate: '1999-01-01T00:00:00.000Z',
+    isBaptized: true,
+    baptizedAt: '2020-06-15T00:00:00.000Z',
+    deletedAt: null,
+    createdAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-01-01T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+export function createMockUserList(count: number): User[] {
+  return Array.from({ length: count }, (_, i) =>
+    createMockUser({
+      id: `550e8400-e29b-41d4-a716-44665544000${i}`,
+      email: `user${i + 1}@example.com`,
+      name: `사용자${i + 1}`,
+      loginId: `user${i + 1}`,
+    }),
+  );
 }
