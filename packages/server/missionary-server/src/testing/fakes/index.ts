@@ -1,0 +1,13 @@
+export { BaseFakeRepository } from './base-fake-repository';
+export { FakeBoardRepository } from './fake-board.repository';
+export { FakeChurchRepository } from './fake-church.repository';
+export { FakeMissionGroupRepository } from './fake-mission-group.repository';
+export { FakeMissionaryRepository } from './fake-missionary.repository';
+export { FakeMissionaryPosterRepository } from './fake-missionary-poster.repository';
+export { FakeMissionaryRegionRepository } from './fake-missionary-region.repository';
+export { FakeParticipationRepository } from './fake-participation.repository';
+export { FakeStaffRepository } from './fake-staff.repository';
+export { FakeTeamRepository } from './fake-team.repository';
+export { FakeTermsAgreementRepository } from './fake-terms-agreement.repository';
+export { FakeTermsRepository } from './fake-terms.repository';
+export { FakeUserRepository } from './fake-user.repository';

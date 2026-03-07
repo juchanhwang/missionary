@@ -1,45 +1,41 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
-import { PrismaService } from '@/database/prisma.service';
+import {
+  MISSIONARY_REPOSITORY,
+  type MissionaryRepository,
+} from '@/missionary/repositories/missionary-repository.interface';
 
 import { CreateMissionGroupDto } from './dto/create-mission-group.dto';
 import { UpdateMissionGroupDto } from './dto/update-mission-group.dto';
+import {
+  MISSION_GROUP_REPOSITORY,
+  type MissionGroupRepository,
+} from './repositories/mission-group-repository.interface';
 
 @Injectable()
 export class MissionGroupService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(MISSION_GROUP_REPOSITORY)
+    private readonly missionGroupRepository: MissionGroupRepository,
+    @Inject(MISSIONARY_REPOSITORY)
+    private readonly missionaryRepository: MissionaryRepository,
+  ) {}
 
   async create(createMissionGroupDto: CreateMissionGroupDto) {
-    return this.prisma.missionGroup.create({
-      data: createMissionGroupDto,
-    });
+    return this.missionGroupRepository.create(createMissionGroupDto);
   }
 
   async findAll() {
-    return this.prisma.missionGroup.findMany({
-      include: {
-        _count: {
-          select: { missionaries: true },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    return this.missionGroupRepository.findAllWithCount();
   }
 
   async findOne(id: string) {
-    const group = await this.prisma.missionGroup.findUnique({
-      where: { id },
-      include: {
-        missionaries: {
-          where: { deletedAt: null },
-          orderBy: { order: 'asc' },
-        },
-      },
-    });
+    const group = await this.missionGroupRepository.findWithMissionaries(id);
 
     if (!group) {
       throw new NotFoundException(`MissionGroup #${id}을 찾을 수 없습니다`);
@@ -51,20 +47,15 @@ export class MissionGroupService {
   async update(id: string, updateMissionGroupDto: UpdateMissionGroupDto) {
     await this.findOne(id); // Verify exists
 
-    return this.prisma.missionGroup.update({
-      where: { id },
-      data: updateMissionGroupDto,
-    });
+    return this.missionGroupRepository.update(id, updateMissionGroupDto);
   }
 
   async remove(id: string) {
     await this.findOne(id); // Verify exists
 
     // Check for existing missionaries
-    const missionaryCount = await this.prisma.missionary.count({
-      where: {
-        missionGroupId: id,
-      },
+    const missionaryCount = await this.missionaryRepository.count({
+      missionGroupId: id,
     });
 
     if (missionaryCount > 0) {
@@ -73,8 +64,6 @@ export class MissionGroupService {
       );
     }
 
-    return this.prisma.missionGroup.delete({
-      where: { id },
-    });
+    return this.missionGroupRepository.delete(id);
   }
 }

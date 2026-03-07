@@ -1,30 +1,29 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-
-import { PrismaService } from '@/database/prisma.service';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { CreateChurchDto } from './dto/create-church.dto';
 import { UpdateChurchDto } from './dto/update-church.dto';
+import {
+  CHURCH_REPOSITORY,
+  type ChurchRepository,
+} from './repositories/church-repository.interface';
 
 @Injectable()
 export class ChurchService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(CHURCH_REPOSITORY)
+    private readonly churchRepository: ChurchRepository,
+  ) {}
 
   async create(createChurchDto: CreateChurchDto) {
-    return this.prisma.church.create({
-      data: createChurchDto,
-    });
+    return this.churchRepository.create(createChurchDto);
   }
 
   async findAll() {
-    return this.prisma.church.findMany({
-      orderBy: { createdAt: 'desc' },
-    });
+    return this.churchRepository.findAll();
   }
 
   async findOne(id: string) {
-    const church = await this.prisma.church.findUnique({
-      where: { id },
-    });
+    const church = await this.churchRepository.findById(id);
 
     if (!church) {
       throw new NotFoundException(`Church #${id}을 찾을 수 없습니다`);
@@ -36,17 +35,12 @@ export class ChurchService {
   async update(id: string, updateChurchDto: UpdateChurchDto) {
     await this.findOne(id); // Verify exists
 
-    return this.prisma.church.update({
-      where: { id },
-      data: updateChurchDto,
-    });
+    return this.churchRepository.update({ id }, updateChurchDto);
   }
 
   async remove(id: string) {
     await this.findOne(id); // Verify exists
 
-    return this.prisma.church.delete({
-      where: { id },
-    });
+    return this.churchRepository.delete({ id });
   }
 }

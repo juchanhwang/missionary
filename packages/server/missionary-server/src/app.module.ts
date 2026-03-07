@@ -48,13 +48,15 @@ import { UserModule } from './user/user.module';
   controllers: [AppController],
   providers: [
     AppService,
+    JwtAuthGuard,
+    RolesGuard,
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard,
+      useExisting: JwtAuthGuard,
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard,
+      useExisting: RolesGuard,
     },
   ],
 })

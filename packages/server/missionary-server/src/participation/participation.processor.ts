@@ -1,9 +1,23 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Job } from 'bullmq';
 
 import { EncryptionService } from '@/common/encryption/encryption.service';
-import { PrismaService } from '@/database/prisma.service';
+import {
+  MISSIONARY_REPOSITORY,
+  type MissionaryRepository,
+} from '@/missionary/repositories/missionary-repository.interface';
+
+import {
+  PARTICIPATION_REPOSITORY,
+  type ParticipationRepository,
+} from './repositories/participation-repository.interface';
 
 import type { CreateParticipationDto } from './dto/create-participation.dto';
 
@@ -13,7 +27,10 @@ export class ParticipationProcessor extends WorkerHost {
   private readonly logger = new Logger(ParticipationProcessor.name);
 
   constructor(
-    private readonly prisma: PrismaService,
+    @Inject(PARTICIPATION_REPOSITORY)
+    private readonly participationRepository: ParticipationRepository,
+    @Inject(MISSIONARY_REPOSITORY)
+    private readonly missionaryRepository: MissionaryRepository,
     private readonly encryptionService: EncryptionService,
   ) {
     super();
@@ -26,12 +43,12 @@ export class ParticipationProcessor extends WorkerHost {
       `Processing participation creation for user ${userId}, missionary ${dto.missionaryId}`,
     );
 
-    const missionary = await this.prisma.missionary.findUnique({
-      where: { id: dto.missionaryId },
-    });
+    const missionary = await this.missionaryRepository.findWithDetails(
+      dto.missionaryId,
+    );
 
     if (!missionary) {
-      throw new ConflictException('Missionary not found');
+      throw new NotFoundException('Missionary not found');
     }
 
     if (
@@ -45,33 +62,19 @@ export class ParticipationProcessor extends WorkerHost {
       dto.identificationNumber,
     );
 
-    const result = await this.prisma.$transaction(async (tx) => {
-      const participation = await tx.participation.create({
-        data: {
-          name: dto.name,
-          birthDate: dto.birthDate,
-          applyFee: dto.applyFee,
-          identificationNumber: encryptedIdentificationNumber,
-          isOwnCar: dto.isOwnCar,
-          missionaryId: dto.missionaryId,
-          userId,
-          createdBy: userId,
-        },
-        include: {
-          missionary: true,
-          user: true,
-        },
-      });
-
-      await tx.missionary.update({
-        where: { id: dto.missionaryId },
-        data: {
-          currentParticipantCount: { increment: 1 },
-        },
-      });
-
-      return participation;
-    });
+    const result = await this.participationRepository.createAndIncrementCount(
+      {
+        name: dto.name,
+        birthDate: dto.birthDate,
+        applyFee: dto.applyFee,
+        identificationNumber: encryptedIdentificationNumber,
+        isOwnCar: dto.isOwnCar,
+        missionaryId: dto.missionaryId,
+        userId,
+        createdBy: userId,
+      },
+      dto.missionaryId,
+    );
 
     this.logger.log(
       `Successfully created participation ${result.id} for missionary ${dto.missionaryId}`,

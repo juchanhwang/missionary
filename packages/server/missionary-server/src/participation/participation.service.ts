@@ -1,5 +1,6 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import {
+  Inject,
   Injectable,
   NotFoundException,
   ForbiddenException,
@@ -7,24 +8,25 @@ import {
 import { Queue } from 'bullmq';
 
 import { EncryptionService } from '@/common/encryption/encryption.service';
-import { PrismaService } from '@/database/prisma.service';
 
 import { CreateParticipationDto } from './dto/create-participation.dto';
 import { UpdateParticipationDto } from './dto/update-participation.dto';
-import { Prisma } from '../../prisma/generated/prisma';
+import {
+  PARTICIPATION_REPOSITORY,
+  type FindAllFilters,
+  type ParticipationRepository,
+  type ParticipationUpdateInput,
+} from './repositories/participation-repository.interface';
 
 import type { Participation } from '../../prisma/generated/prisma';
 
-export interface FindAllFilters {
-  missionaryId?: string;
-  userId?: string;
-  isPaid?: boolean;
-}
+export type { FindAllFilters } from './repositories/participation-repository.interface';
 
 @Injectable()
 export class ParticipationService {
   constructor(
-    private readonly prisma: PrismaService,
+    @Inject(PARTICIPATION_REPOSITORY)
+    private readonly participationRepository: ParticipationRepository,
     private readonly encryptionService: EncryptionService,
     @InjectQueue('participation-queue') private readonly queue: Queue,
   ) {}
@@ -69,44 +71,15 @@ export class ParticipationService {
   }
 
   async findAll(filters: FindAllFilters = {}) {
-    const where: Prisma.ParticipationWhereInput = {};
-
-    if (filters.missionaryId) {
-      where.missionaryId = filters.missionaryId;
-    }
-
-    if (filters.userId) {
-      where.userId = filters.userId;
-    }
-
-    if (filters.isPaid !== undefined) {
-      where.isPaid = filters.isPaid;
-    }
-
-    const participations = await this.prisma.participation.findMany({
-      where,
-      include: {
-        missionary: true,
-        user: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const participations =
+      await this.participationRepository.findAllFiltered(filters);
 
     return participations.map((p) => this.decryptParticipation(p));
   }
 
   async findOne(id: string) {
-    const participation = await this.prisma.participation.findFirst({
-      where: {
-        id,
-      },
-      include: {
-        missionary: true,
-        user: true,
-      },
-    });
+    const participation =
+      await this.participationRepository.findOneWithRelations(id);
 
     if (!participation) {
       throw new NotFoundException(`Participation with ID ${id} not found`);
@@ -116,11 +89,7 @@ export class ParticipationService {
   }
 
   async update(id: string, dto: UpdateParticipationDto, userId: string) {
-    const participation = await this.prisma.participation.findFirst({
-      where: {
-        id,
-      },
-    });
+    const participation = await this.participationRepository.findFirst({ id });
 
     if (!participation) {
       throw new NotFoundException(`Participation with ID ${id} not found`);
@@ -132,7 +101,7 @@ export class ParticipationService {
       );
     }
 
-    const updateData: Prisma.ParticipationUncheckedUpdateInput = {
+    const updateData: ParticipationUpdateInput = {
       ...dto,
       updatedBy: userId,
       version: { increment: 1 },
@@ -144,28 +113,17 @@ export class ParticipationService {
       );
     }
 
-    const updated = await this.prisma.participation.update({
-      where: { id },
-      data: updateData,
-      include: {
-        missionary: true,
-        user: true,
-      },
-    });
+    const updated = await this.participationRepository.updateWithRelations(
+      id,
+      updateData,
+    );
 
     return this.decryptParticipation(updated);
   }
 
   async remove(id: string, userId: string) {
-    const participation = await this.prisma.participation.findFirst({
-      where: {
-        id,
-      },
-      include: {
-        missionary: true,
-        user: true,
-      },
-    });
+    const participation =
+      await this.participationRepository.findOneWithRelations(id);
 
     if (!participation) {
       throw new NotFoundException(`Participation with ID ${id} not found`);
@@ -177,34 +135,17 @@ export class ParticipationService {
       );
     }
 
-    await this.prisma.$transaction([
-      this.prisma.participation.update({
-        where: { id },
-        data: {
-          deletedAt: new Date(),
-          updatedBy: userId,
-        },
-      }),
-      this.prisma.missionary.update({
-        where: { id: participation.missionaryId },
-        data: {
-          currentParticipantCount: { decrement: 1 },
-        },
-      }),
-    ]);
+    await this.participationRepository.softDeleteWithCountDecrement(
+      id,
+      userId,
+      participation.missionaryId,
+    );
 
     return { message: 'Participation deleted successfully' };
   }
 
   async approvePayments(participationIds: string[]) {
-    await this.prisma.participation.updateMany({
-      where: {
-        id: { in: participationIds },
-      },
-      data: {
-        isPaid: true,
-      },
-    });
+    await this.participationRepository.approvePayments(participationIds);
 
     return {
       message: `${participationIds.length} participation(s) approved`,

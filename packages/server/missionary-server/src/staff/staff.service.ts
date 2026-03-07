@@ -1,68 +1,47 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
-import { PrismaService } from '@/database/prisma.service';
-
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
-import { Prisma } from '../../prisma/generated/prisma';
+import { STAFF_REPOSITORY } from './repositories';
+
+import type { StaffRepository, StaffUpdateInput } from './repositories';
 
 @Injectable()
 export class StaffService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(STAFF_REPOSITORY)
+    private readonly staffRepository: StaffRepository,
+  ) {}
 
   async create(dto: CreateStaffDto) {
     // Check unique constraint: missionaryId + userId
-    const existing = await this.prisma.missionaryStaff.findFirst({
-      where: {
-        missionaryId: dto.missionaryId,
-        userId: dto.userId,
-      },
-    });
+    const existing = await this.staffRepository.findByMissionaryAndUser(
+      dto.missionaryId,
+      dto.userId,
+    );
 
     if (existing) {
       throw new ConflictException('User already assigned to this missionary');
     }
 
-    return this.prisma.missionaryStaff.create({
-      data: {
-        missionaryId: dto.missionaryId,
-        userId: dto.userId,
-        role: dto.role,
-      },
-      include: {
-        missionary: true,
-        user: true,
-      },
+    return this.staffRepository.createWithRelations({
+      missionaryId: dto.missionaryId,
+      userId: dto.userId,
+      role: dto.role,
     });
   }
 
   async findByMissionary(missionaryId: string) {
-    return this.prisma.missionaryStaff.findMany({
-      where: {
-        missionaryId,
-      },
-      include: {
-        missionary: true,
-        user: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    return this.staffRepository.findByMissionary(missionaryId);
   }
 
   async findOne(id: string) {
-    const staff = await this.prisma.missionaryStaff.findUnique({
-      where: { id },
-      include: {
-        missionary: true,
-        user: true,
-      },
-    });
+    const staff = await this.staffRepository.findByIdWithRelations(id);
 
     if (!staff) {
       throw new NotFoundException(`Staff assignment with ID ${id} not found`);
@@ -74,29 +53,16 @@ export class StaffService {
   async update(id: string, dto: UpdateStaffDto) {
     await this.findOne(id);
 
-    const data: Prisma.MissionaryStaffUncheckedUpdateInput = {};
+    const data: StaffUpdateInput = {};
 
     if (dto.role !== undefined) data.role = dto.role;
 
-    return this.prisma.missionaryStaff.update({
-      where: { id },
-      data,
-      include: {
-        missionary: true,
-        user: true,
-      },
-    });
+    return this.staffRepository.updateWithRelations(id, data);
   }
 
   async remove(id: string) {
     await this.findOne(id);
 
-    return this.prisma.missionaryStaff.delete({
-      where: { id },
-      include: {
-        missionary: true,
-        user: true,
-      },
-    });
+    return this.staffRepository.deleteWithRelations(id);
   }
 }

@@ -1,47 +1,23 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as bcrypt from 'bcrypt';
 
+import {
+  PASSWORD_HASHER,
+  PasswordHasher,
+} from '@/common/interfaces/password-hasher.interface';
+import { makeUser } from '@/testing/factories/user.factory';
 import { UserService } from '@/user/user.service';
 
 import { AuthService } from './auth.service';
-
-jest.mock('bcrypt', () => ({
-  ...jest.requireActual('bcrypt'),
-  compare: jest.fn(),
-  hash: jest.fn().mockImplementation((data: string) => `hashed-${data}`),
-}));
 
 describe('AuthService', () => {
   let service: AuthService;
   let userService: jest.Mocked<UserService>;
   let jwtService: jest.Mocked<JwtService>;
-  let configService: jest.Mocked<ConfigService>;
 
-  const mockAdminUser = {
-    id: 'admin-uuid-1',
-    email: 'admin@example.com',
-    role: 'ADMIN' as const,
-    password: '$2b$10$X8Z4Y5W6...',
-    loginId: 'admin',
-    provider: 'LOCAL' as const,
-    providerId: null,
-    name: 'Admin User',
-    phoneNumber: null,
-    birthDate: null,
-    gender: null,
-    isBaptized: false,
-    baptizedAt: null,
-    identityNumber: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    deletedAt: null,
-    createdBy: 'system',
-    updatedBy: 'system',
-    version: 1,
-  };
+  let mockPasswordHasher: jest.Mocked<PasswordHasher>;
 
   beforeEach(async () => {
     const mockUserService = {
@@ -51,6 +27,7 @@ describe('AuthService', () => {
       findOne: jest.fn(),
       findAll: jest.fn(),
       findByLoginIdAndRole: jest.fn(),
+      updatePassword: jest.fn(),
     };
 
     const mockJwtService = {
@@ -66,33 +43,37 @@ describe('AuthService', () => {
       }),
     };
 
+    const mockPasswordHasherValue = {
+      hash: jest.fn().mockImplementation((data: string) => `hashed-${data}`),
+      compare: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: UserService, useValue: mockUserService },
         { provide: JwtService, useValue: mockJwtService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: PASSWORD_HASHER, useValue: mockPasswordHasherValue },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
     userService = module.get(UserService) as jest.Mocked<UserService>;
     jwtService = module.get(JwtService) as jest.Mocked<JwtService>;
-    configService = module.get(ConfigService) as jest.Mocked<ConfigService>;
+
+    mockPasswordHasher = module.get(
+      PASSWORD_HASHER,
+    ) as jest.Mocked<PasswordHasher>;
   });
 
-  it('should be defined', () => {
+  it('서비스가 정의되어 있다', () => {
     expect(service).toBeDefined();
   });
 
   describe('generateTokens', () => {
-    it('should include role in JWT payload', () => {
-      const user = {
-        id: 'user-uuid-1',
-        email: 'admin@example.com',
-        role: 'ADMIN',
-        provider: 'LOCAL',
-      };
+    it('JWT 페이로드에 역할이 포함된다', () => {
+      const user = makeUser({ role: 'ADMIN', provider: 'LOCAL' });
 
       jwtService.sign.mockReturnValueOnce('mock-access-token');
       jwtService.sign.mockReturnValueOnce('mock-refresh-token');
@@ -115,13 +96,8 @@ describe('AuthService', () => {
       );
     });
 
-    it('should generate access token with correct expiration', () => {
-      const user = {
-        id: 'user-uuid-1',
-        email: 'test@example.com',
-        role: 'USER',
-        provider: 'GOOGLE',
-      };
+    it('액세스 토큰이 올바른 만료 시간으로 생성된다', () => {
+      const user = makeUser({ provider: 'GOOGLE' });
 
       jwtService.sign.mockReturnValue('mock-token');
 
@@ -137,13 +113,8 @@ describe('AuthService', () => {
       );
     });
 
-    it('should generate refresh token with correct expiration', () => {
-      const user = {
-        id: 'user-uuid-1',
-        email: 'test@example.com',
-        role: 'USER',
-        provider: 'KAKAO',
-      };
+    it('리프레시 토큰이 올바른 만료 시간으로 생성된다', () => {
+      const user = makeUser({ provider: 'KAKAO' });
 
       jwtService.sign.mockReturnValue('mock-token');
 
@@ -166,15 +137,15 @@ describe('AuthService', () => {
       password: 'password123',
     };
 
-    it('should successfully login admin with valid credentials', async () => {
-      const hashedPassword = 'hashed-password123';
-      const adminUser = {
-        ...mockAdminUser,
-        password: hashedPassword,
-      };
+    it('유효한 자격 증명으로 관리자 로그인에 성공한다', async () => {
+      const adminUser = makeUser({
+        role: 'ADMIN',
+        loginId: 'admin',
+        password: 'hashed-password123',
+      });
 
       userService.findByLoginIdAndRole.mockResolvedValueOnce(adminUser);
-      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(true);
+      mockPasswordHasher.compare.mockResolvedValueOnce(true);
       jwtService.sign.mockReturnValueOnce('mock-access-token');
       jwtService.sign.mockReturnValueOnce('mock-refresh-token');
 
@@ -188,35 +159,35 @@ describe('AuthService', () => {
         'admin',
         'ADMIN',
       );
-      expect(bcrypt.compare).toHaveBeenCalledWith(
+      expect(mockPasswordHasher.compare).toHaveBeenCalledWith(
         'password123',
-        hashedPassword,
+        adminUser.password,
       );
     });
 
-    it('should throw UnauthorizedException with invalid password', async () => {
-      const hashedPassword = 'hashed-correct-password';
-      const adminUser = {
-        ...mockAdminUser,
-        password: hashedPassword,
-      };
+    it('잘못된 비밀번호로 로그인하면 UnauthorizedException을 던진다', async () => {
+      const adminUser = makeUser({
+        role: 'ADMIN',
+        loginId: 'admin',
+        password: 'hashed-correct-password',
+      });
 
       userService.findByLoginIdAndRole.mockResolvedValueOnce(adminUser);
-      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
+      mockPasswordHasher.compare.mockResolvedValueOnce(false);
 
       await expect(service.loginAdmin(adminLoginDto)).rejects.toThrow(
         UnauthorizedException,
       );
 
       userService.findByLoginIdAndRole.mockResolvedValueOnce(adminUser);
-      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
+      mockPasswordHasher.compare.mockResolvedValueOnce(false);
 
       await expect(service.loginAdmin(adminLoginDto)).rejects.toThrow(
         '관리자 인증에 실패했습니다',
       );
     });
 
-    it('should throw UnauthorizedException with non-existent loginId', async () => {
+    it('존재하지 않는 로그인 ID로 로그인하면 UnauthorizedException을 던진다', async () => {
       userService.findByLoginIdAndRole.mockResolvedValueOnce(null);
 
       await expect(service.loginAdmin(adminLoginDto)).rejects.toThrow(
@@ -230,11 +201,12 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw UnauthorizedException when user has no password', async () => {
-      const adminUserNoPassword = {
-        ...mockAdminUser,
+    it('비밀번호가 없는 사용자로 로그인하면 UnauthorizedException을 던진다', async () => {
+      const adminUserNoPassword = makeUser({
+        role: 'ADMIN',
+        loginId: 'admin',
         password: null,
-      };
+      });
 
       userService.findByLoginIdAndRole.mockResolvedValueOnce(
         adminUserNoPassword,
@@ -253,7 +225,7 @@ describe('AuthService', () => {
       );
     });
 
-    it('should only query users with ADMIN role', async () => {
+    it('ADMIN 역할의 사용자만 조회한다', async () => {
       userService.findByLoginIdAndRole.mockResolvedValueOnce(null);
 
       await expect(service.loginAdmin(adminLoginDto)).rejects.toThrow();
@@ -266,34 +238,32 @@ describe('AuthService', () => {
   });
 
   describe('validateLocalUser', () => {
-    it('should validate user with correct email and password', async () => {
-      const hashedPassword = 'hashed-password123';
-      const user = { ...mockAdminUser, password: hashedPassword };
+    it('올바른 이메일과 비밀번호로 사용자를 인증한다', async () => {
+      const user = makeUser({ password: 'hashed-password123' });
 
       userService.findByEmail.mockResolvedValueOnce(user);
-      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(true);
+      mockPasswordHasher.compare.mockResolvedValueOnce(true);
 
       const result = await service.validateLocalUser(
-        'admin@example.com',
+        user.email!,
         'password123',
       );
 
       expect(result).toEqual(user);
     });
 
-    it('should throw UnauthorizedException with invalid password', async () => {
-      const hashedPassword = 'hashed-correct-password';
-      const user = { ...mockAdminUser, password: hashedPassword };
+    it('잘못된 비밀번호로 로그인하면 UnauthorizedException을 던진다', async () => {
+      const user = makeUser({ password: 'hashed-correct-password' });
 
       userService.findByEmail.mockResolvedValueOnce(user);
-      (bcrypt.compare as jest.Mock).mockResolvedValueOnce(false);
+      mockPasswordHasher.compare.mockResolvedValueOnce(false);
 
       await expect(
-        service.validateLocalUser('admin@example.com', 'wrong-password'),
+        service.validateLocalUser(user.email!, 'wrong-password'),
       ).rejects.toThrow(UnauthorizedException);
     });
 
-    it('should throw UnauthorizedException with non-existent email', async () => {
+    it('존재하지 않는 이메일로 로그인하면 UnauthorizedException을 던진다', async () => {
       userService.findByEmail.mockResolvedValueOnce(null);
 
       await expect(
@@ -302,17 +272,87 @@ describe('AuthService', () => {
     });
   });
 
+  describe('validateOAuthUser', () => {
+    it('기존 OAuth 사용자가 있으면 해당 사용자를 반환한다', async () => {
+      const existingUser = makeUser({
+        provider: 'GOOGLE',
+        providerId: 'google-id-123',
+      });
+
+      userService.findByProvider.mockResolvedValueOnce(existingUser);
+
+      const result = await service.validateOAuthUser(
+        'GOOGLE',
+        'google-id-123',
+        existingUser.email!,
+        existingUser.name!,
+      );
+
+      expect(result).toEqual(existingUser);
+      expect(userService.findByProvider).toHaveBeenCalledWith(
+        'GOOGLE',
+        'google-id-123',
+      );
+      expect(userService.findByEmail).not.toHaveBeenCalled();
+    });
+
+    it('provider로 찾을 수 없지만 이메일로 기존 사용자가 있으면 해당 사용자를 반환한다', async () => {
+      const existingUser = makeUser({ provider: 'LOCAL' });
+
+      userService.findByProvider.mockResolvedValueOnce(null);
+      userService.findByEmail.mockResolvedValueOnce(existingUser);
+
+      const result = await service.validateOAuthUser(
+        'GOOGLE',
+        'google-id-456',
+        existingUser.email!,
+        existingUser.name!,
+      );
+
+      expect(result).toEqual(existingUser);
+      expect(userService.findByEmail).toHaveBeenCalledWith(existingUser.email);
+      expect(userService.createOAuthUser).not.toHaveBeenCalled();
+    });
+
+    it('기존 사용자가 없으면 새 OAuth 사용자를 생성한다', async () => {
+      const newUser = makeUser({
+        provider: 'KAKAO',
+        providerId: 'kakao-id-789',
+      });
+
+      userService.findByProvider.mockResolvedValueOnce(null);
+      userService.findByEmail.mockResolvedValueOnce(null);
+      userService.createOAuthUser.mockResolvedValueOnce(newUser);
+
+      const result = await service.validateOAuthUser(
+        'KAKAO',
+        'kakao-id-789',
+        newUser.email!,
+        newUser.name!,
+      );
+
+      expect(result).toEqual(newUser);
+      expect(userService.createOAuthUser).toHaveBeenCalledWith({
+        email: newUser.email,
+        name: newUser.name,
+        provider: 'KAKAO',
+        providerId: 'kakao-id-789',
+      });
+    });
+  });
+
   describe('refreshAccessToken', () => {
-    it('should generate new tokens with valid refresh token', async () => {
+    it('유효한 리프레시 토큰으로 새 토큰을 생성한다', async () => {
+      const user = makeUser();
       const payload = {
-        sub: 'user-uuid-1',
-        email: 'test@example.com',
+        sub: user.id,
+        email: user.email,
         role: 'USER' as const,
         provider: 'LOCAL' as const,
       };
 
       jwtService.verify.mockReturnValueOnce(payload);
-      userService.findOne.mockResolvedValueOnce(mockAdminUser);
+      userService.findOne.mockResolvedValueOnce(user);
       jwtService.sign.mockReturnValueOnce('new-access-token');
       jwtService.sign.mockReturnValueOnce('new-refresh-token');
 
@@ -327,7 +367,7 @@ describe('AuthService', () => {
       });
     });
 
-    it('should throw UnauthorizedException with invalid refresh token', async () => {
+    it('유효하지 않은 리프레시 토큰이면 UnauthorizedException을 던진다', async () => {
       jwtService.verify.mockImplementationOnce(() => {
         throw new Error('Invalid token');
       });
@@ -335,6 +375,79 @@ describe('AuthService', () => {
       await expect(service.refreshAccessToken('invalid-token')).rejects.toThrow(
         UnauthorizedException,
       );
+    });
+  });
+
+  describe('changePassword', () => {
+    it('비밀번호를 정상적으로 변경한다', async () => {
+      const user = makeUser({ password: 'hashed-current-password' });
+      const changePasswordDto = {
+        currentPassword: 'current-password',
+        newPassword: 'new-password-123',
+      };
+
+      userService.findOne.mockResolvedValueOnce(user);
+      mockPasswordHasher.compare.mockResolvedValueOnce(true);
+      mockPasswordHasher.hash.mockResolvedValueOnce('hashed-new-password-123');
+      userService.updatePassword.mockResolvedValueOnce(undefined);
+
+      const result = await service.changePassword(user.id, changePasswordDto);
+
+      expect(result).toEqual({ message: '비밀번호가 변경되었습니다' });
+      expect(mockPasswordHasher.compare).toHaveBeenCalledWith(
+        'current-password',
+        user.password,
+      );
+      expect(mockPasswordHasher.hash).toHaveBeenCalledWith('new-password-123');
+      expect(userService.updatePassword).toHaveBeenCalledWith(
+        user.id,
+        'hashed-new-password-123',
+      );
+    });
+
+    it('OAuth 계정의 비밀번호를 변경하려고 하면 BadRequestException을 던진다', async () => {
+      const oauthUser = makeUser({
+        provider: 'GOOGLE',
+        password: null,
+      });
+      const changePasswordDto = {
+        currentPassword: 'current-password',
+        newPassword: 'new-password-123',
+      };
+
+      userService.findOne.mockResolvedValueOnce(oauthUser);
+
+      await expect(
+        service.changePassword(oauthUser.id, changePasswordDto),
+      ).rejects.toThrow(BadRequestException);
+
+      userService.findOne.mockResolvedValueOnce(oauthUser);
+
+      await expect(
+        service.changePassword(oauthUser.id, changePasswordDto),
+      ).rejects.toThrow('OAuth 계정은 비밀번호를 변경할 수 없습니다');
+    });
+
+    it('현재 비밀번호가 일치하지 않으면 UnauthorizedException을 던진다', async () => {
+      const user = makeUser({ password: 'hashed-current-password' });
+      const changePasswordDto = {
+        currentPassword: 'wrong-password',
+        newPassword: 'new-password-123',
+      };
+
+      userService.findOne.mockResolvedValueOnce(user);
+      mockPasswordHasher.compare.mockResolvedValueOnce(false);
+
+      await expect(
+        service.changePassword(user.id, changePasswordDto),
+      ).rejects.toThrow(UnauthorizedException);
+
+      userService.findOne.mockResolvedValueOnce(user);
+      mockPasswordHasher.compare.mockResolvedValueOnce(false);
+
+      await expect(
+        service.changePassword(user.id, changePasswordDto),
+      ).rejects.toThrow('현재 비밀번호가 올바르지 않습니다');
     });
   });
 });
