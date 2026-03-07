@@ -124,9 +124,7 @@ export class FakeParticipationRepository
   async findAllFiltered(
     filters: FindAllFilters,
   ): Promise<ParticipationWithRelations[]> {
-    let results = [...this.store.values()].filter(
-      (p) => p.deletedAt === null,
-    );
+    let results = [...this.store.values()].filter((p) => p.deletedAt === null);
 
     if (filters.missionaryId) {
       results = results.filter((p) => p.missionaryId === filters.missionaryId);
