@@ -7,6 +7,8 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { UserRole } from '../enums/user-role.enum';
+
 @Injectable()
 export class MaskingInterceptor implements NestInterceptor {
   private readonly PII_FIELDS = [
@@ -16,10 +18,31 @@ export class MaskingInterceptor implements NestInterceptor {
   ];
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    return next.handle().pipe(map((data) => this.maskData(data)));
+    const request = context.switchToHttp().getRequest();
+    const userRole: UserRole | undefined = request?.user?.role;
+
+    return next.handle().pipe(
+      map((data) => {
+        const skipFields = this.getSkipFields(userRole, data);
+        return this.maskData(data, skipFields);
+      }),
+    );
   }
 
-  private maskData(data: any): any {
+  private getSkipFields(
+    userRole: UserRole | undefined,
+    data: any,
+  ): Set<string> {
+    const skipFields = new Set<string>();
+
+    if (userRole === UserRole.ADMIN && !Array.isArray(data)) {
+      skipFields.add('identityNumber');
+    }
+
+    return skipFields;
+  }
+
+  private maskData(data: any, skipFields: Set<string>): any {
     if (!data) {
       return data;
     }
@@ -29,7 +52,7 @@ export class MaskingInterceptor implements NestInterceptor {
     }
 
     if (Array.isArray(data)) {
-      return data.map((item) => this.maskData(item));
+      return data.map((item) => this.maskData(item, skipFields));
     }
 
     if (typeof data === 'object') {
@@ -37,9 +60,12 @@ export class MaskingInterceptor implements NestInterceptor {
 
       for (const key in masked) {
         if (this.PII_FIELDS.includes(key)) {
+          if (skipFields.has(key)) {
+            continue;
+          }
           masked[key] = this.maskLast6Chars(masked[key]);
         } else if (typeof masked[key] === 'object') {
-          masked[key] = this.maskData(masked[key]);
+          masked[key] = this.maskData(masked[key], skipFields);
         }
       }
 

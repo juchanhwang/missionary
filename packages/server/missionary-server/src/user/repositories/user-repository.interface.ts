@@ -27,6 +27,7 @@ export interface UserUpdateInput {
   email?: string | null;
   name?: string | null;
   password?: string | null;
+  role?: UserRole;
   loginId?: string | null;
   identityNumber?: string | null;
   phoneNumber?: string | null;
@@ -34,6 +35,18 @@ export interface UserUpdateInput {
   gender?: string | null;
   isBaptized?: boolean;
   baptizedAt?: Date | string | null;
+}
+
+export interface UserPaginationArgs {
+  skip?: number;
+  take?: number;
+  where?: Record<string, unknown>;
+  orderBy?: Record<string, 'asc' | 'desc'>;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
 }
 
 export interface UserRepository extends BaseRepository<
@@ -48,6 +61,11 @@ export interface UserRepository extends BaseRepository<
   ): Promise<User | null>;
   findByLoginIdAndRole(loginId: string, role: UserRole): Promise<User | null>;
   updatePassword(id: string, hashedPassword: string): Promise<void>;
+  findManyWithPagination(
+    args: UserPaginationArgs,
+  ): Promise<PaginatedResult<User>>;
+  softDelete(id: string): Promise<User>;
+  countActiveAdmins(): Promise<number>;
 }
 
 export const USER_REPOSITORY = Symbol('USER_REPOSITORY');

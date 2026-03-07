@@ -1,7 +1,7 @@
 import api from './instance';
 
 export interface AuthUser {
-  id: number;
+  id: string;
   email: string;
   role: string;
   provider: string;

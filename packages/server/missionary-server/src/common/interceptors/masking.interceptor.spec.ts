@@ -2,6 +2,7 @@ import { ExecutionContext, CallHandler } from '@nestjs/common';
 import { of } from 'rxjs';
 
 import { MaskingInterceptor } from './masking.interceptor';
+import { UserRole } from '../enums/user-role.enum';
 
 describe('MaskingInterceptor', () => {
   let interceptor: MaskingInterceptor;
@@ -14,8 +15,12 @@ describe('MaskingInterceptor', () => {
     } as any;
   });
 
-  const createMockContext = (): ExecutionContext => {
-    return {} as ExecutionContext;
+  const createMockContext = (user?: { role: UserRole }): ExecutionContext => {
+    return {
+      switchToHttp: jest.fn().mockReturnValue({
+        getRequest: jest.fn().mockReturnValue({ user }),
+      }),
+    } as any as ExecutionContext;
   };
 
   describe('intercept', () => {
@@ -278,6 +283,175 @@ describe('MaskingInterceptor', () => {
           expect(data[1].phoneNumber).toBe('010-333******');
           done();
         },
+      });
+    });
+
+    describe('ADMIN 역할 조건부 마스킹 해제', () => {
+      it('ADMIN + 단건 조회 → identityNumber 마스킹 해제', (done) => {
+        const responseData = {
+          name: 'John Doe',
+          identityNumber: '123456-1234567',
+          phoneNumber: '010-1234-5678',
+        };
+
+        mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
+
+        interceptor
+          .intercept(
+            createMockContext({ role: UserRole.ADMIN }),
+            mockCallHandler,
+          )
+          .subscribe({
+            next: (data) => {
+              expect(data.identityNumber).toBe('123456-1234567');
+              expect(data.phoneNumber).toBe('010-123******');
+              done();
+            },
+          });
+      });
+
+      it('ADMIN + 목록 조회 → identityNumber 마스킹 유지', (done) => {
+        const responseData = [
+          {
+            name: 'John Doe',
+            identityNumber: '123456-1234567',
+            phoneNumber: '010-1234-5678',
+          },
+          {
+            name: 'Jane Doe',
+            identityNumber: '654321-7654321',
+            phoneNumber: '010-9876-5432',
+          },
+        ];
+
+        mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
+
+        interceptor
+          .intercept(
+            createMockContext({ role: UserRole.ADMIN }),
+            mockCallHandler,
+          )
+          .subscribe({
+            next: (data) => {
+              expect(data[0].identityNumber).toBe('123456-1******');
+              expect(data[0].phoneNumber).toBe('010-123******');
+              expect(data[1].identityNumber).toBe('654321-7******');
+              expect(data[1].phoneNumber).toBe('010-987******');
+              done();
+            },
+          });
+      });
+
+      it('STAFF + 단건 조회 → identityNumber 마스킹 유지', (done) => {
+        const responseData = {
+          name: 'John Doe',
+          identityNumber: '123456-1234567',
+          phoneNumber: '010-1234-5678',
+        };
+
+        mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
+
+        interceptor
+          .intercept(
+            createMockContext({ role: UserRole.STAFF }),
+            mockCallHandler,
+          )
+          .subscribe({
+            next: (data) => {
+              expect(data.identityNumber).toBe('123456-1******');
+              expect(data.phoneNumber).toBe('010-123******');
+              done();
+            },
+          });
+      });
+
+      it('모든 역할 + 모든 엔드포인트 → phoneNumber 항상 마스킹', (done) => {
+        const singleResponse = {
+          phoneNumber: '010-1234-5678',
+          identityNumber: '123456-1234567',
+        };
+
+        mockCallHandler.handle = jest.fn().mockReturnValue(of(singleResponse));
+
+        interceptor
+          .intercept(
+            createMockContext({ role: UserRole.ADMIN }),
+            mockCallHandler,
+          )
+          .subscribe({
+            next: (data) => {
+              expect(data.phoneNumber).toBe('010-123******');
+              done();
+            },
+          });
+      });
+
+      it('ADMIN + 단건 조회 + 중첩 객체 → identityNumber 마스킹 해제', (done) => {
+        const responseData = {
+          user: {
+            identityNumber: '123456-1234567',
+            phoneNumber: '010-1234-5678',
+          },
+        };
+
+        mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
+
+        interceptor
+          .intercept(
+            createMockContext({ role: UserRole.ADMIN }),
+            mockCallHandler,
+          )
+          .subscribe({
+            next: (data) => {
+              expect(data.user.identityNumber).toBe('123456-1234567');
+              expect(data.user.phoneNumber).toBe('010-123******');
+              done();
+            },
+          });
+      });
+
+      it('USER + 단건 조회 → identityNumber 마스킹 유지', (done) => {
+        const responseData = {
+          identityNumber: '123456-1234567',
+          phoneNumber: '010-1234-5678',
+        };
+
+        mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
+
+        interceptor
+          .intercept(
+            createMockContext({ role: UserRole.USER }),
+            mockCallHandler,
+          )
+          .subscribe({
+            next: (data) => {
+              expect(data.identityNumber).toBe('123456-1******');
+              expect(data.phoneNumber).toBe('010-123******');
+              done();
+            },
+          });
+      });
+
+      it('ADMIN + 단건 조회 → bankAccount 마스킹 유지', (done) => {
+        const responseData = {
+          identityNumber: '123456-1234567',
+          bankAccount: '123-456-789012',
+        };
+
+        mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
+
+        interceptor
+          .intercept(
+            createMockContext({ role: UserRole.ADMIN }),
+            mockCallHandler,
+          )
+          .subscribe({
+            next: (data) => {
+              expect(data.identityNumber).toBe('123456-1234567');
+              expect(data.bankAccount).toBe('123-456-******');
+              done();
+            },
+          });
       });
     });
   });

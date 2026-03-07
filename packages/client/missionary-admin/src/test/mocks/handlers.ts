@@ -5,6 +5,8 @@ import {
   createMockMissionary,
   createMockMissionGroup,
   createMockMissionGroupDetail,
+  createMockUser,
+  createMockUserList,
 } from './data';
 
 const API_URL = 'http://localhost';
@@ -71,5 +73,32 @@ export const handlers = [
 
   http.delete(`${API_URL}/mission-groups/:id`, () =>
     HttpResponse.json({ deleted: true }),
+  ),
+
+  // Users
+  http.get(`${API_URL}/users`, ({ request }) => {
+    const url = new URL(request.url);
+    const page = Number(url.searchParams.get('page') ?? '1');
+    const pageSize = Number(url.searchParams.get('pageSize') ?? '10');
+    const users = createMockUserList(pageSize);
+    return HttpResponse.json({
+      data: users,
+      total: 30,
+      page,
+      pageSize,
+    });
+  }),
+
+  http.get(`${API_URL}/users/:id`, ({ params }) =>
+    HttpResponse.json(createMockUser({ id: params.id as string })),
+  ),
+
+  http.patch(`${API_URL}/users/:id`, ({ params }) =>
+    HttpResponse.json(createMockUser({ id: params.id as string })),
+  ),
+
+  http.delete(
+    `${API_URL}/users/:id`,
+    () => new HttpResponse(null, { status: 204 }),
   ),
 ];
