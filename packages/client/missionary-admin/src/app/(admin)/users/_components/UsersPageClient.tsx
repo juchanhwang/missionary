@@ -7,8 +7,11 @@ import {
   type PaginatedUsersResponse,
   type UserRole,
 } from 'apis/user';
+import { useAuth } from 'lib/auth/AuthContext';
 import { useState } from 'react';
 
+import { DeleteUserModal } from './DeleteUserModal';
+import { UserDetailPanel } from './UserDetailPanel';
 import { UserSearchFilter } from './UserSearchFilter';
 import { UserTable } from './UserTable';
 import { useGetUsers } from '../_hooks/useGetUsers';
@@ -20,7 +23,12 @@ interface UsersPageClientProps {
 }
 
 export function UsersPageClient({ initialData }: UsersPageClientProps) {
+  const { user: currentUser } = useAuth();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    userId: string;
+    userName: string;
+  } | null>(null);
   const [searchParams, setSearchParams] = useState<GetUsersParams>({
     page: 1,
     pageSize: PAGE_SIZE,
@@ -112,31 +120,26 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
         </div>
       </div>
 
-      {selectedUserId && (
-        <div className="absolute top-0 right-0 h-full w-[560px] bg-white shadow-[-4px_0_24px_rgba(0,0,0,0.08),-1px_0_4px_rgba(0,0,0,0.04)] z-30 flex flex-col">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-30">
-            <h3 className="text-base font-bold text-gray-90">유저 상세</h3>
-            <button
-              type="button"
-              onClick={() => setSelectedUserId(null)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-40 hover:text-gray-80 hover:bg-gray-10 transition-colors"
-            >
-              <svg
-                width="18"
-                height="18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="flex-1 flex items-center justify-center text-sm text-gray-50">
-            유저 상세 패널 (Task 11에서 구현)
-          </div>
-        </div>
+      <UserDetailPanel
+        userId={selectedUserId}
+        onClose={() => setSelectedUserId(null)}
+        currentUserRole={currentUser.role as 'ADMIN' | 'STAFF'}
+        onDeleteRequest={(userId, userName) =>
+          setDeleteTarget({ userId, userName })
+        }
+      />
+
+      {deleteTarget && (
+        <DeleteUserModal
+          isOpen={!!deleteTarget}
+          userId={deleteTarget.userId}
+          userName={deleteTarget.userName}
+          onClose={() => setDeleteTarget(null)}
+          onSuccess={() => {
+            setDeleteTarget(null);
+            setSelectedUserId(null);
+          }}
+        />
       )}
     </div>
   );
