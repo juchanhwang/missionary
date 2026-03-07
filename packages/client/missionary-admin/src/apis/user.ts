@@ -1,5 +1,4 @@
 import api from './instance';
-import { createServerApi } from './serverInstance';
 
 export type AuthProvider = 'LOCAL' | 'GOOGLE' | 'KAKAO';
 
@@ -66,17 +65,3 @@ export const userApi = {
     return api.delete(`/users/${id}`);
   },
 };
-
-export async function getServerUsers(params?: GetUsersParams) {
-  const serverApi = await createServerApi();
-  const { data } = await serverApi.get<PaginatedUsersResponse>('/users', {
-    params,
-  });
-  return data;
-}
-
-export async function getServerUser(id: string) {
-  const serverApi = await createServerApi();
-  const { data } = await serverApi.get<User>(`/users/${id}`);
-  return data;
-}

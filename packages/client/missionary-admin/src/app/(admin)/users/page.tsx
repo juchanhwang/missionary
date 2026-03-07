@@ -1,4 +1,4 @@
-import { getServerUsers } from 'apis/user';
+import { getServerUsers } from 'apis/user.server';
 
 import { UsersPageClient } from './_components/UsersPageClient';
 
