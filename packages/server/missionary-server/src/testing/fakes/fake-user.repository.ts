@@ -197,7 +197,11 @@ export class FakeUserRepository
         `Entity not found for soft delete: ${JSON.stringify({ id })}`,
       );
     }
-    const updated = { ...existing, deletedAt: new Date(), updatedAt: new Date() };
+    const updated = {
+      ...existing,
+      deletedAt: new Date(),
+      updatedAt: new Date(),
+    };
     this.store.set(id, updated);
     return updated;
   }

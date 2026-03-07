@@ -195,12 +195,9 @@ export class UserService {
     const target = await this.findOne(id);
 
     if (target.role === 'ADMIN') {
-      const activeAdminCount =
-        await this.userRepository.countActiveAdmins();
+      const activeAdminCount = await this.userRepository.countActiveAdmins();
       if (activeAdminCount <= 1) {
-        throw new BadRequestException(
-          '마지막 관리자는 삭제할 수 없습니다',
-        );
+        throw new BadRequestException('마지막 관리자는 삭제할 수 없습니다');
       }
     }
 

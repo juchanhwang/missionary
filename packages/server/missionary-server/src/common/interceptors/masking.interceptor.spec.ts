@@ -4,7 +4,6 @@ import { of } from 'rxjs';
 import { MaskingInterceptor } from './masking.interceptor';
 import { UserRole } from '../enums/user-role.enum';
 
-
 describe('MaskingInterceptor', () => {
   let interceptor: MaskingInterceptor;
   let mockCallHandler: CallHandler;
@@ -372,9 +371,7 @@ describe('MaskingInterceptor', () => {
           identityNumber: '123456-1234567',
         };
 
-        mockCallHandler.handle = jest
-          .fn()
-          .mockReturnValue(of(singleResponse));
+        mockCallHandler.handle = jest.fn().mockReturnValue(of(singleResponse));
 
         interceptor
           .intercept(

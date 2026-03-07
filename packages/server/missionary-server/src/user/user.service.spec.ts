@@ -384,9 +384,7 @@ describe('UserService', () => {
       const result = await userService.remove(user.id, adminUser);
 
       expect(result.email).toBe('remove@test.com');
-      const stored = fakeUserRepository
-        .getAll()
-        .find((u) => u.id === user.id);
+      const stored = fakeUserRepository.getAll().find((u) => u.id === user.id);
       expect(stored).toBeDefined();
       expect(stored?.deletedAt).toBeInstanceOf(Date);
     });

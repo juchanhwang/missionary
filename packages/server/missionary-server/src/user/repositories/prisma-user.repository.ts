@@ -89,13 +89,21 @@ export class PrismaUserRepository implements UserRepository {
   ): Promise<PaginatedResult<User>> {
     const [data, total] = await Promise.all([
       this.prisma.user.findMany({
-        where: args.where as Parameters<typeof this.prisma.user.findMany>[0] extends { where?: infer W } ? W : never,
+        where: args.where as Parameters<
+          typeof this.prisma.user.findMany
+        >[0] extends { where?: infer W }
+          ? W
+          : never,
         orderBy: args.orderBy,
         skip: args.skip,
         take: args.take,
       }),
       this.prisma.user.count({
-        where: args.where as Parameters<typeof this.prisma.user.count>[0] extends { where?: infer W } ? W : never,
+        where: args.where as Parameters<
+          typeof this.prisma.user.count
+        >[0] extends { where?: infer W }
+          ? W
+          : never,
       }),
     ]);
 

@@ -13,7 +13,6 @@ import { FakeUserRepository } from '@/testing/fakes/fake-user.repository';
 import { USER_REPOSITORY } from './repositories/user-repository.interface';
 import { UserService } from './user.service';
 
-
 describe('UserService 삭제 가드', () => {
   let userService: UserService;
   let fakeUserRepository: FakeUserRepository;
@@ -120,9 +119,7 @@ describe('UserService 삭제 가드', () => {
       const result = await userService.remove(staff.id, currentUser);
 
       expect(result).toBeDefined();
-      const stored = fakeUserRepository
-        .getAll()
-        .find((u) => u.id === staff.id);
+      const stored = fakeUserRepository.getAll().find((u) => u.id === staff.id);
       expect(stored?.deletedAt).toBeInstanceOf(Date);
     });
   });
