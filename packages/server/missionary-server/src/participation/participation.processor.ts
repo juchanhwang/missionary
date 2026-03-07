@@ -1,5 +1,11 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Job } from 'bullmq';
 
 import { EncryptionService } from '@/common/encryption/encryption.service';
@@ -42,7 +48,7 @@ export class ParticipationProcessor extends WorkerHost {
     );
 
     if (!missionary) {
-      throw new ConflictException('Missionary not found');
+      throw new NotFoundException('Missionary not found');
     }
 
     if (

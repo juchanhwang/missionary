@@ -86,7 +86,7 @@ export class FakeParticipationRepository
     }
     const updated = {
       ...existing,
-      ...(data as object),
+      ...this.resolveAtomicOperations(existing, data),
       updatedAt: new Date(),
     } as Participation;
     this.store.set(updated.id, updated);
@@ -124,7 +124,9 @@ export class FakeParticipationRepository
   async findAllFiltered(
     filters: FindAllFilters,
   ): Promise<ParticipationWithRelations[]> {
-    let results = [...this.store.values()];
+    let results = [...this.store.values()].filter(
+      (p) => p.deletedAt === null,
+    );
 
     if (filters.missionaryId) {
       results = results.filter((p) => p.missionaryId === filters.missionaryId);
@@ -147,7 +149,7 @@ export class FakeParticipationRepository
     id: string,
   ): Promise<ParticipationWithRelations | null> {
     const entity = this.store.get(id);
-    if (!entity) return null;
+    if (!entity || entity.deletedAt !== null) return null;
     return this.withRelations(entity);
   }
 
@@ -161,7 +163,7 @@ export class FakeParticipationRepository
     }
     const updated = {
       ...existing,
-      ...(data as object),
+      ...this.resolveAtomicOperations(existing, data),
       updatedAt: new Date(),
     } as Participation;
     this.store.set(id, updated);
@@ -291,6 +293,42 @@ export class FakeParticipationRepository
     }
 
     return { ...entity, missionary, user };
+  }
+
+  /**
+   * Prisma 원자 연산자({ increment, decrement, set })를
+   * 실제 값으로 변환한다.
+   */
+  private resolveAtomicOperations(
+    existing: Participation,
+    data: ParticipationUpdateInput,
+  ): Record<string, unknown> {
+    const resolved: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(data as object)) {
+      if (
+        value !== null &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        !(value instanceof Date)
+      ) {
+        const op = value as Record<string, unknown>;
+        const currentVal = (existing as Record<string, unknown>)[key];
+        const numCurrent = typeof currentVal === 'number' ? currentVal : 0;
+
+        if ('increment' in op && typeof op.increment === 'number') {
+          resolved[key] = numCurrent + op.increment;
+        } else if ('decrement' in op && typeof op.decrement === 'number') {
+          resolved[key] = numCurrent - op.decrement;
+        } else if ('set' in op) {
+          resolved[key] = op.set;
+        } else {
+          resolved[key] = value;
+        }
+      } else {
+        resolved[key] = value;
+      }
+    }
+    return resolved;
   }
 
   private matchesWhere(

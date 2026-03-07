@@ -100,7 +100,7 @@ export class PrismaParticipationRepository implements ParticipationRepository {
     id: string,
   ): Promise<ParticipationWithRelations | null> {
     return this.prisma.participation.findFirst({
-      where: { id },
+      where: { id, deletedAt: null },
       include: { missionary: true, user: true },
     });
   }

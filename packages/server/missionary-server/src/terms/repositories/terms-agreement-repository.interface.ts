@@ -5,7 +5,7 @@ import type {
 
 export interface AgreementWithRelations extends UserTermsAgreement {
   terms: Terms;
-  user?: { id: string; email: string | null; name: string | null };
+  user: { id: string; email: string | null; name: string | null };
 }
 
 export interface AgreementCreateInput {

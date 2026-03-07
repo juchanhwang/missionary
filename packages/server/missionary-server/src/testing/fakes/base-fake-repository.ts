@@ -79,7 +79,7 @@ export abstract class BaseFakeRepository<
     }
     const updated = {
       ...existing,
-      ...(data as object),
+      ...this.resolveAtomicOperations(existing, data),
       updatedAt: new Date(),
     } as T;
     this.store.set(updated.id, updated);
@@ -119,6 +119,46 @@ export abstract class BaseFakeRepository<
     return Object.entries(where).every(
       ([key, value]) => (item as Record<string, unknown>)[key] === value,
     );
+  }
+
+  /**
+   * Prisma 원자 연산자({ increment, decrement, set, multiply, divide })를
+   * 실제 값으로 변환한다. 일반 값은 그대로 반환한다.
+   */
+  protected resolveAtomicOperations(
+    existing: T,
+    data: UpdateInput,
+  ): Record<string, unknown> {
+    const resolved: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(data as object)) {
+      if (
+        value !== null &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        !(value instanceof Date)
+      ) {
+        const op = value as Record<string, unknown>;
+        const currentVal = (existing as Record<string, unknown>)[key];
+        const numCurrent = typeof currentVal === 'number' ? currentVal : 0;
+
+        if ('increment' in op && typeof op.increment === 'number') {
+          resolved[key] = numCurrent + op.increment;
+        } else if ('decrement' in op && typeof op.decrement === 'number') {
+          resolved[key] = numCurrent - op.decrement;
+        } else if ('set' in op) {
+          resolved[key] = op.set;
+        } else if ('multiply' in op && typeof op.multiply === 'number') {
+          resolved[key] = numCurrent * op.multiply;
+        } else if ('divide' in op && typeof op.divide === 'number') {
+          resolved[key] = numCurrent / op.divide;
+        } else {
+          resolved[key] = value;
+        }
+      } else {
+        resolved[key] = value;
+      }
+    }
+    return resolved;
   }
 
   // 유틸리티
