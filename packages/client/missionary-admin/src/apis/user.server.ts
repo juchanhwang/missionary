@@ -1,5 +1,6 @@
-import type { GetUsersParams, PaginatedUsersResponse, User } from './user';
 import { createServerApi } from './serverInstance';
+
+import type { GetUsersParams, PaginatedUsersResponse, User } from './user';
 
 export async function getServerUsers(params?: GetUsersParams) {
   const serverApi = await createServerApi();
