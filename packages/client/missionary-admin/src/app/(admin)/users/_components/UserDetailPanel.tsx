@@ -95,6 +95,7 @@ export function UserDetailPanel({
         gender: data.gender || undefined,
         isBaptized: data.isBaptized,
         baptizedAt: data.baptizedAt || undefined,
+        ...(isAdmin && data.role ? { role: data.role } : {}),
       },
       {
         onSuccess: () => {

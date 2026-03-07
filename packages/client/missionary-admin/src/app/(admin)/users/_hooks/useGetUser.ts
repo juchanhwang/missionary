@@ -9,5 +9,6 @@ export function useGetUser(id: string) {
       const response = await userApi.getUser(id);
       return response.data;
     },
+    enabled: id !== '',
   });
 }

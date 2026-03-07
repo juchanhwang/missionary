@@ -189,7 +189,10 @@ export class UserService {
 
   async remove(id: string, currentUser: AuthenticatedUser) {
     if (currentUser.id === id) {
-      throw new BadRequestException('자기 자신은 삭제할 수 없습니다');
+      throw new BadRequestException({
+        code: 'CANNOT_DELETE_SELF',
+        message: '자기 자신은 삭제할 수 없습니다',
+      });
     }
 
     const target = await this.findOne(id);
@@ -197,7 +200,10 @@ export class UserService {
     if (target.role === 'ADMIN') {
       const activeAdminCount = await this.userRepository.countActiveAdmins();
       if (activeAdminCount <= 1) {
-        throw new BadRequestException('마지막 관리자는 삭제할 수 없습니다');
+        throw new BadRequestException({
+          code: 'LAST_ADMIN',
+          message: '마지막 관리자는 삭제할 수 없습니다',
+        });
       }
     }
 
