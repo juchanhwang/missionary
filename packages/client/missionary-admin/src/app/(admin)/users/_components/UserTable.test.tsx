@@ -2,7 +2,7 @@ import { createMockUser, createMockUserList } from 'test/mocks/data';
 import { render, screen } from 'test/test-utils';
 import { vi } from 'vitest';
 
-import { UserTable } from '../UserTable';
+import { UserTable } from './UserTable';
 
 describe('UserTable', () => {
   const mockOnSelectUser = vi.fn();

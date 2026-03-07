@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from 'test/test-utils';
 import { vi } from 'vitest';
 
-import { UserSearchFilter } from '../UserSearchFilter';
+import { UserSearchFilter } from './UserSearchFilter';
 
 // design-system 컴포넌트 mock
 vi.mock('@samilhero/design-system', () => ({

@@ -2,15 +2,15 @@ import { createMockUser } from 'test/mocks/data';
 import { render, screen, waitFor } from 'test/test-utils';
 import { vi } from 'vitest';
 
-import { useGetUser } from '../../_hooks/useGetUser';
-import { useUpdateUser } from '../../_hooks/useUpdateUser';
-import { UserDetailPanel } from '../UserDetailPanel';
+import { useGetUser } from '../_hooks/useGetUser';
+import { useUpdateUser } from '../_hooks/useUpdateUser';
+import { UserDetailPanel } from './UserDetailPanel';
 
-vi.mock('../../_hooks/useGetUser', () => ({
+vi.mock('../_hooks/useGetUser', () => ({
   useGetUser: vi.fn(),
 }));
 
-vi.mock('../../_hooks/useUpdateUser', () => ({
+vi.mock('../_hooks/useUpdateUser', () => ({
   useUpdateUser: vi.fn(),
 }));
 

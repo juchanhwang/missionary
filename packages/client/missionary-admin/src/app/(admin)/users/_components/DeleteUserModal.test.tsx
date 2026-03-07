@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from 'test/test-utils';
 import { vi } from 'vitest';
 
-import { useDeleteUser } from '../../_hooks/useDeleteUser';
-import { DeleteUserModal } from '../DeleteUserModal';
+import { useDeleteUser } from '../_hooks/useDeleteUser';
+import { DeleteUserModal } from './DeleteUserModal';
 
-vi.mock('../../_hooks/useDeleteUser', () => ({
+vi.mock('../_hooks/useDeleteUser', () => ({
   useDeleteUser: vi.fn(),
 }));
 

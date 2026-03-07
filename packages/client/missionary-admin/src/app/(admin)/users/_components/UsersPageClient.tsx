@@ -7,7 +7,7 @@ import {
   type PaginatedUsersResponse,
   type UserRole,
 } from 'apis/user';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 import { UserSearchFilter } from './UserSearchFilter';
 import { UserTable } from './UserTable';
@@ -40,29 +40,29 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
   const currentPage = data?.page ?? searchParams.page ?? 1;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const handleSearchChange = useCallback((search: string) => {
+  const handleSearchChange = (search: string) => {
     setSearchParams((prev) => ({ ...prev, search, page: 1 }));
-  }, []);
+  };
 
-  const handleRoleChange = useCallback((role: UserRole | '') => {
+  const handleRoleChange = (role: UserRole | '') => {
     setSearchParams((prev) => ({ ...prev, role, page: 1 }));
-  }, []);
+  };
 
-  const handleProviderChange = useCallback((provider: AuthProvider | '') => {
+  const handleProviderChange = (provider: AuthProvider | '') => {
     setSearchParams((prev) => ({ ...prev, provider, page: 1 }));
-  }, []);
+  };
 
-  const handleBaptizedChange = useCallback((isBaptized: string) => {
+  const handleBaptizedChange = (isBaptized: string) => {
     setSearchParams((prev) => ({ ...prev, isBaptized, page: 1 }));
-  }, []);
+  };
 
-  const handleSelectUser = useCallback((id: string) => {
+  const handleSelectUser = (id: string) => {
     setSelectedUserId((prev) => (prev === id ? null : id));
-  }, []);
+  };
 
-  const handlePageChange = useCallback((page: number) => {
+  const handlePageChange = (page: number) => {
     setSearchParams((prev) => ({ ...prev, page }));
-  }, []);
+  };
 
   return (
     <div className="flex flex-col flex-1 min-w-0">
