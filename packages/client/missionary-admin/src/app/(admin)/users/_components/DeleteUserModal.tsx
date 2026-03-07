@@ -1,0 +1,112 @@
+'use client';
+
+import { Button } from '@samilhero/design-system';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import Modal from 'react-modal';
+
+import { useDeleteUser } from '../_hooks/useDeleteUser';
+
+export interface DeleteUserModalProps {
+  isOpen: boolean;
+  userId: string;
+  userName: string;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+const ERROR_MESSAGES: Record<string, string> = {
+  CANNOT_DELETE_SELF: '자기 자신은 삭제할 수 없습니다.',
+  LAST_ADMIN: '마지막 관리자는 삭제할 수 없습니다.',
+};
+
+function getErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    const code = error.response?.data?.code as string | undefined;
+    if (code && ERROR_MESSAGES[code]) {
+      return ERROR_MESSAGES[code];
+    }
+    const message = error.response?.data?.message as string | undefined;
+    if (message) {
+      return message;
+    }
+  }
+  return '유저 삭제 중 오류가 발생했습니다.';
+}
+
+export function DeleteUserModal({
+  isOpen,
+  userId,
+  userName,
+  onClose,
+  onSuccess,
+}: DeleteUserModalProps) {
+  const { mutate, isPending } = useDeleteUser();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      Modal.setAppElement('body');
+    }
+  }, []);
+
+  const handleAfterOpen = () => {
+    setErrorMessage(null);
+  };
+
+  const handleConfirm = () => {
+    setErrorMessage(null);
+    mutate(userId, {
+      onSuccess: () => {
+        onSuccess();
+      },
+      onError: (error) => {
+        setErrorMessage(getErrorMessage(error));
+      },
+    });
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onAfterOpen={handleAfterOpen}
+      onRequestClose={onClose}
+      contentLabel="유저 삭제 확인"
+      className="fixed inset-0 flex items-center justify-center p-4"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      shouldCloseOnEsc={!isPending}
+      shouldCloseOnOverlayClick={!isPending}
+    >
+      <div className="bg-white rounded-xl border border-gray-10 p-6 max-w-sm w-full">
+        <h2 className="text-lg font-bold text-gray-90 mb-3">유저 삭제</h2>
+        <p className="text-sm text-gray-50 mb-2">
+          정말 &apos;{userName}&apos; 유저를 삭제하시겠습니까?
+        </p>
+        <p className="text-xs text-gray-40 mb-6">30일 후 영구 삭제됩니다.</p>
+        {errorMessage && (
+          <p className="text-sm text-error-60 mb-4">{errorMessage}</p>
+        )}
+        <div className="flex gap-3 justify-end">
+          <Button
+            variant="outline"
+            color="neutral"
+            size="md"
+            onClick={onClose}
+            disabled={isPending}
+          >
+            취소
+          </Button>
+          <Button
+            variant="filled"
+            color="primary"
+            size="md"
+            onClick={handleConfirm}
+            disabled={isPending}
+          >
+            삭제
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
