@@ -35,22 +35,22 @@ export function LoginForm() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-10">
+    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-50">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col items-center w-[400px] rounded-2xl bg-white border border-gray-40 p-10"
+        className="flex flex-col items-center w-[400px] rounded-2xl bg-white border border-gray-300 p-10"
       >
         <img
           src="/logo-horizontal.svg"
           alt="삼일교회 로고"
           className="w-[200px] h-auto mb-10"
         />
-        <h1 className="mb-3 text-2xl font-bold leading-tight text-center text-gray-90">
+        <h1 className="mb-3 text-2xl font-bold leading-tight text-center text-gray-900">
           선교 시스템
           <br />
           로그인
         </h1>
-        <p className="mb-10 text-sm font-normal leading-relaxed text-center text-gray-50">
+        <p className="mb-10 text-sm font-normal leading-relaxed text-center text-gray-400">
           계정으로 로그인 하세요.
         </p>
         <div className="flex flex-col w-full gap-3">
@@ -88,15 +88,15 @@ export function LoginForm() {
           </Button>
         </div>
 
-        <div className="relative flex items-center justify-center w-full my-6 before:content-[''] before:flex-1 before:h-px before:bg-gray-10 after:content-[''] after:flex-1 after:h-px after:bg-gray-10">
-          <span className="px-3 text-xs text-gray-30">또는</span>
+        <div className="relative flex items-center justify-center w-full my-6 before:content-[''] before:flex-1 before:h-px before:bg-gray-50 after:content-[''] after:flex-1 after:h-px after:bg-gray-50">
+          <span className="px-3 text-xs text-gray-200">또는</span>
         </div>
 
         <div className="flex flex-col gap-3 w-full">
           <button
             type="button"
             onClick={loginGoogle}
-            className="flex items-center justify-center h-11 w-full rounded-lg bg-gray-10 border border-gray-30 text-sm font-medium text-gray-70 hover:bg-gray-20 transition-colors"
+            className="flex items-center justify-center h-11 w-full rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
           >
             Google로 로그인
           </button>
@@ -109,7 +109,7 @@ export function LoginForm() {
           </button>
         </div>
 
-        <p className="mt-6 text-sm text-gray-50">
+        <p className="mt-6 text-sm text-gray-400">
           계정이 없으신가요?{' '}
           <Link
             href="/signup"

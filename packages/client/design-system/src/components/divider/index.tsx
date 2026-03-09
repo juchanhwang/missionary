@@ -23,7 +23,7 @@ export function Divider({
   if (orientation === 'vertical') {
     return (
       <div
-        className={cn('w-px self-stretch bg-gray-20', className)}
+        className={cn('w-px self-stretch bg-gray-100', className)}
         role="separator"
         aria-orientation="vertical"
       />
@@ -32,7 +32,7 @@ export function Divider({
 
   return (
     <div
-      className={cn('w-full bg-gray-20', heightClasses[height], className)}
+      className={cn('w-full bg-gray-100', heightClasses[height], className)}
       role="separator"
       aria-orientation="horizontal"
     />

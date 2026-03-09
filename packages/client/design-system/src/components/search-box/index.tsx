@@ -30,10 +30,10 @@ export function SearchBox({
   return (
     <div
       className={cn(
-        'flex w-full items-center rounded-lg border border-gray-30 bg-gray-10 transition-colors',
+        'flex w-full items-center rounded-lg border border-gray-200 bg-gray-50 transition-colors',
         sizeClass.container,
-        'focus-within:ring-1 focus-within:ring-gray-50 focus-within:border-gray-50',
-        'hover:border-gray-40',
+        'focus-within:ring-1 focus-within:ring-gray-400 focus-within:border-gray-400',
+        'hover:border-gray-300',
         className,
       )}
     >
@@ -44,11 +44,11 @@ export function SearchBox({
         onChange={(e) => onChange?.(e.target.value)}
         ref={ref}
         className={cn(
-          'flex-1 border-0 bg-transparent text-black leading-[1.429] focus:outline-none placeholder:text-gray-50',
+          'flex-1 border-0 bg-transparent text-black leading-[1.429] focus:outline-none placeholder:text-gray-400',
           sizeClass.text,
         )}
       />
-      <Search size={sizeClass.icon} className="shrink-0 ml-2 text-gray-50" />
+      <Search size={sizeClass.icon} className="shrink-0 ml-2 text-gray-400" />
     </div>
   );
 }

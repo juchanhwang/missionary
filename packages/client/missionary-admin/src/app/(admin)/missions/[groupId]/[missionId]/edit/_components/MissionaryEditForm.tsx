@@ -72,8 +72,8 @@ export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
     >
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1.5">
-          <h2 className="text-lg font-semibold text-gray-90">선교 수정</h2>
-          <p className="text-sm text-gray-50">{missionary.name}</p>
+          <h2 className="text-lg font-semibold text-gray-900">선교 수정</h2>
+          <p className="text-sm text-gray-400">{missionary.name}</p>
         </div>
         <DeleteMissionSection
           missionaryId={missionary.id}
@@ -82,7 +82,7 @@ export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
         />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-30 shadow-sm p-6">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <MissionForm form={form} isPending={isPending} />
       </div>
 

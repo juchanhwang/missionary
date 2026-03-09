@@ -69,8 +69,8 @@ function SidebarNavItem({
         text-sm font-medium transition-colors duration-150
         ${
           isActive
-            ? 'bg-gray-20 text-gray-90'
-            : 'text-gray-60 hover:bg-gray-10 hover:text-gray-80'
+            ? 'bg-gray-100 text-gray-900'
+            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'
         }
       `}
     >
@@ -101,7 +101,7 @@ export function Sidebar() {
         aria-hidden="true"
       />
       <aside
-        className={`fixed top-0 left-0 z-30 flex flex-col w-[260px] h-screen bg-white border-r border-gray-30 transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-30 flex flex-col w-[260px] h-screen bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 lg:z-10`}
       >
@@ -116,13 +116,13 @@ export function Sidebar() {
                 fillOpacity={0.9}
               />
             </div>
-            <span className="text-base font-bold text-gray-90 tracking-tight">
+            <span className="text-base font-bold text-gray-900 tracking-tight">
               선교 관리 시스템
             </span>
           </div>
         </div>
 
-        <div className="mx-4 h-px bg-gray-30" />
+        <div className="mx-4 h-px bg-gray-200" />
 
         {/* Navigation */}
         <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto py-4">
@@ -139,21 +139,21 @@ export function Sidebar() {
         </nav>
 
         {/* User Section */}
-        <div className="border-t border-gray-30 px-4 py-4">
+        <div className="border-t border-gray-200 px-4 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-80 text-white text-sm font-semibold shrink-0">
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-800 text-white text-sm font-semibold shrink-0">
               {initial}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-90 truncate">
+              <p className="text-sm font-medium text-gray-900 truncate">
                 {user.email}
               </p>
-              <p className="text-xs text-gray-50 capitalize">{user.role}</p>
+              <p className="text-xs text-gray-400 capitalize">{user.role}</p>
             </div>
             <button
               type="button"
               onClick={logout}
-              className="shrink-0 p-1.5 rounded-md text-gray-50 hover:text-gray-80 hover:bg-gray-20 transition-colors"
+              className="shrink-0 p-1.5 rounded-md text-gray-400 hover:text-gray-800 hover:bg-gray-100 transition-colors"
               aria-label="로그아웃"
             >
               <LogOut size={18} />

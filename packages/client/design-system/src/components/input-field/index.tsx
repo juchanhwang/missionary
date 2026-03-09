@@ -46,7 +46,7 @@ export function InputField({
         <label
           htmlFor={inputId}
           className={cn(
-            'mb-1 text-xs font-normal leading-[1.833] text-gray-70',
+            'mb-1 text-xs font-normal leading-[1.833] text-gray-700',
             hideLabel && 'sr-only',
           )}
         >
@@ -55,11 +55,12 @@ export function InputField({
       )}
       <div
         className={cn(
-          'flex w-full items-center rounded-lg border border-gray-30 bg-gray-10 transition-colors',
+          'flex w-full items-center rounded-lg border border-gray-200 bg-gray-50 transition-colors',
           sizeClass.container,
-          'focus-within:ring-1 focus-within:ring-gray-50 focus-within:border-gray-50',
-          disabled && 'cursor-not-allowed opacity-50 bg-gray-20 border-gray-20',
-          !disabled && 'hover:border-gray-40',
+          'focus-within:ring-1 focus-within:ring-gray-400 focus-within:border-gray-400',
+          disabled &&
+            'cursor-not-allowed opacity-50 bg-gray-100 border-gray-100',
+          !disabled && 'hover:border-gray-300',
           error &&
             'border-error-60 focus-within:border-error-60 focus-within:ring-error-60',
         )}
@@ -72,7 +73,7 @@ export function InputField({
           aria-describedby={error ? errorId : undefined}
           ref={ref}
           className={cn(
-            'flex-1 border-0 bg-transparent text-black leading-[1.428] focus:outline-none placeholder:text-gray-50 disabled:cursor-not-allowed',
+            'flex-1 border-0 bg-transparent text-black leading-[1.428] focus:outline-none placeholder:text-gray-400 disabled:cursor-not-allowed',
             sizeClass.text,
           )}
           {...rest}

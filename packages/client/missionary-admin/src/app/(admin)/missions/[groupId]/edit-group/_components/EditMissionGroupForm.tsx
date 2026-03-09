@@ -62,7 +62,7 @@ export function EditMissionGroupForm() {
   if (!group) {
     return (
       <div className="flex items-center justify-center flex-1">
-        <p className="text-sm text-gray-50">그룹을 찾을 수 없습니다</p>
+        <p className="text-sm text-gray-400">그룹을 찾을 수 없습니다</p>
       </div>
     );
   }
@@ -74,12 +74,14 @@ export function EditMissionGroupForm() {
     >
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1.5">
-          <h2 className="text-lg font-semibold text-gray-90">선교 그룹 수정</h2>
-          <p className="text-sm text-gray-50">{group.name}</p>
+          <h2 className="text-lg font-semibold text-gray-900">
+            선교 그룹 수정
+          </h2>
+          <p className="text-sm text-gray-400">{group.name}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-30 shadow-sm p-6">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <MissionGroupForm form={form} isPending={isPending} />
       </div>
 

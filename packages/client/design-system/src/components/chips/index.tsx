@@ -11,9 +11,9 @@ const chipsVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-gray-10 text-gray-80',
-        accent: 'bg-gray-80 text-white',
-        outline: 'border border-gray-30 bg-transparent text-gray-80',
+        default: 'bg-gray-50 text-gray-800',
+        accent: 'bg-gray-800 text-white',
+        outline: 'border border-gray-200 bg-transparent text-gray-800',
       },
       size: {
         sm: 'px-2 py-1 text-xs',
@@ -47,7 +47,7 @@ export function Chips({
         <button
           type="button"
           onClick={onDismiss}
-          className="ml-1 rounded-full hover:bg-gray-10 p-0.5"
+          className="ml-1 rounded-full hover:bg-gray-50 p-0.5"
           aria-label="Remove"
         >
           <X size={12} strokeWidth={1.5} className="h-3 w-3" />

@@ -25,7 +25,9 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2.5">
-            <h2 className="text-lg font-semibold text-gray-90">{group.name}</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              {group.name}
+            </h2>
             <span
               className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
                 group.category === 'ABROAD'
@@ -38,14 +40,14 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
             <button
               type="button"
               onClick={() => router.push(`/missions/${groupId}/edit-group`)}
-              className="p-1 text-gray-50 hover:text-gray-90 transition-colors"
+              className="p-1 text-gray-400 hover:text-gray-900 transition-colors"
               aria-label="그룹 수정"
             >
               <Pencil size={14} />
             </button>
           </div>
           {group.description && (
-            <p className="text-sm text-gray-50">{group.description}</p>
+            <p className="text-sm text-gray-400">{group.description}</p>
           )}
         </div>
         <Button
@@ -56,11 +58,11 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-30 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-30">
-          <p className="text-sm font-semibold text-gray-90">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200">
+          <p className="text-sm font-semibold text-gray-900">
             선교 목록
-            <span className="ml-1.5 text-xs font-normal text-gray-50">
+            <span className="ml-1.5 text-xs font-normal text-gray-400">
               {missionCount}건
             </span>
           </p>
@@ -68,23 +70,23 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
 
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-gray-30 bg-gray-10">
-              <th className="px-5 py-3 text-xs font-medium text-gray-50">
+            <tr className="border-b border-gray-200 bg-gray-50">
+              <th className="px-5 py-3 text-xs font-medium text-gray-400">
                 선교명
               </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-50">
+              <th className="px-5 py-3 text-xs font-medium text-gray-400">
                 차수
               </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-50">
+              <th className="px-5 py-3 text-xs font-medium text-gray-400">
                 선교 기간
               </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-50">
+              <th className="px-5 py-3 text-xs font-medium text-gray-400">
                 담당 교역자
               </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-50">
+              <th className="px-5 py-3 text-xs font-medium text-gray-400">
                 최대 인원
               </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-50">
+              <th className="px-5 py-3 text-xs font-medium text-gray-400">
                 상태
               </th>
             </tr>
@@ -94,11 +96,11 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
               <tr>
                 <td colSpan={6} className="px-5 py-16 text-center">
                   <div className="flex flex-col items-center gap-2">
-                    <CalendarX size={32} className="text-gray-40" />
-                    <p className="text-sm text-gray-60">
+                    <CalendarX size={32} className="text-gray-300" />
+                    <p className="text-sm text-gray-500">
                       등록된 선교가 없습니다
                     </p>
-                    <p className="text-xs text-gray-50">
+                    <p className="text-xs text-gray-400">
                       &apos;선교 추가&apos; 버튼으로 새 선교를 등록하세요
                     </p>
                   </div>
@@ -108,27 +110,27 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
               group.missionaries?.map((mission) => (
                 <tr
                   key={mission.id}
-                  className="border-b border-gray-30 last:border-b-0 hover:bg-gray-10 transition-colors"
+                  className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
                 >
-                  <td className="px-5 py-3.5 text-sm font-medium text-gray-90">
+                  <td className="px-5 py-3.5 text-sm font-medium text-gray-900">
                     <Link
                       href={`/missions/${groupId}/${mission.id}/edit`}
-                      className="text-sm font-medium text-gray-90 hover:text-primary-60 hover:underline"
+                      className="text-sm font-medium text-gray-900 hover:text-primary-60 hover:underline"
                     >
                       {mission.name}
                     </Link>
                   </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-60">
+                  <td className="px-5 py-3.5 text-sm text-gray-500">
                     {mission.order}차
                   </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-60">
+                  <td className="px-5 py-3.5 text-sm text-gray-500">
                     {formatDate(mission.startDate)} ~{' '}
                     {formatDate(mission.endDate)}
                   </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-60">
+                  <td className="px-5 py-3.5 text-sm text-gray-500">
                     {mission.pastorName || '—'}
                   </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-60">
+                  <td className="px-5 py-3.5 text-sm text-gray-500">
                     {mission.maximumParticipantCount != null
                       ? `${mission.maximumParticipantCount}명`
                       : '—'}

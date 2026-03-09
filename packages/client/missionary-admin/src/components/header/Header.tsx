@@ -30,23 +30,23 @@ export function Header() {
   const { toggle } = useSidebar();
 
   return (
-    <header className="flex items-center justify-between w-full h-16 px-4 lg:px-8 bg-white border-b border-gray-30">
+    <header className="flex items-center justify-between w-full h-16 px-4 lg:px-8 bg-white border-b border-gray-200">
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={toggle}
-          className="p-1.5 rounded-md text-gray-60 hover:text-gray-90 hover:bg-gray-20 transition-colors lg:hidden"
+          className="p-1.5 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors lg:hidden"
           aria-label="메뉴 열기"
         >
           <Menu size={20} />
         </button>
-        <h1 className="text-xl font-semibold text-gray-90">{title}</h1>
+        <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
       </div>
 
       <div className="relative w-64">
         <Search
           size={18}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-50"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
         />
         <input
           type="text"
@@ -54,7 +54,7 @@ export function Header() {
           onChange={(e) => setSearchValue(e.target.value)}
           placeholder="검색..."
           aria-label="검색"
-          className="w-full h-10 pl-10 pr-4 rounded-lg bg-gray-10 text-sm text-gray-90 placeholder:text-gray-50 border border-transparent focus:border-gray-40 focus:outline-none transition-colors"
+          className="w-full h-10 pl-10 pr-4 rounded-lg bg-gray-50 text-sm text-gray-900 placeholder:text-gray-400 border border-transparent focus:border-gray-300 focus:outline-none transition-colors"
         />
       </div>
     </header>
