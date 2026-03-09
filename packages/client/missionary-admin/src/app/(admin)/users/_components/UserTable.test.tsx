@@ -5,7 +5,7 @@ import { vi } from 'vitest';
 import { UserTable } from './UserTable';
 
 describe('UserTable', () => {
-  const mockOnSelectUser = vi.fn();
+  const mockOnRowClick = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -16,8 +16,7 @@ describe('UserTable', () => {
       <UserTable
         users={[]}
         isLoading={false}
-        selectedUserId={null}
-        onSelectUser={mockOnSelectUser}
+        onRowClick={mockOnRowClick}
       />,
     );
 
@@ -32,8 +31,7 @@ describe('UserTable', () => {
       <UserTable
         users={users}
         isLoading={false}
-        selectedUserId={null}
-        onSelectUser={mockOnSelectUser}
+        onRowClick={mockOnRowClick}
       />,
     );
 
@@ -79,8 +77,7 @@ describe('UserTable', () => {
       <UserTable
         users={users}
         isLoading={false}
-        selectedUserId={null}
-        onSelectUser={mockOnSelectUser}
+        onRowClick={mockOnRowClick}
       />,
     );
 
@@ -98,42 +95,20 @@ describe('UserTable', () => {
     ).toBeInTheDocument();
   });
 
-  it('행 클릭 시 onSelectUser 콜백을 호출한다', async () => {
+  it('행 클릭 시 onRowClick 콜백을 호출한다', async () => {
     const users = [createMockUser({ id: 'user-abc', name: '테스트유저' })];
 
     const { user } = render(
       <UserTable
         users={users}
         isLoading={false}
-        selectedUserId={null}
-        onSelectUser={mockOnSelectUser}
+        onRowClick={mockOnRowClick}
       />,
     );
 
     await user.click(screen.getByRole('cell', { name: '테스트유저' }));
 
-    expect(mockOnSelectUser).toHaveBeenCalledWith('user-abc');
-  });
-
-  it('선택된 행에 aria-selected가 적용된다', () => {
-    const users = [
-      createMockUser({ id: 'user-1', name: '유저A' }),
-      createMockUser({ id: 'user-2', name: '유저B' }),
-    ];
-
-    render(
-      <UserTable
-        users={users}
-        isLoading={false}
-        selectedUserId="user-1"
-        onSelectUser={mockOnSelectUser}
-      />,
-    );
-
-    const rows = screen.getAllByRole('row');
-    // rows[0]은 헤더 행, rows[1]은 유저A 행, rows[2]는 유저B 행
-    expect(rows[1]).toHaveAttribute('aria-selected', 'true');
-    expect(rows[2]).toHaveAttribute('aria-selected', 'false');
+    expect(mockOnRowClick).toHaveBeenCalledWith('user-abc');
   });
 
   it('빈 상태를 표시한다', () => {
@@ -141,8 +116,7 @@ describe('UserTable', () => {
       <UserTable
         users={[]}
         isLoading={false}
-        selectedUserId={null}
-        onSelectUser={mockOnSelectUser}
+        onRowClick={mockOnRowClick}
       />,
     );
 
@@ -154,8 +128,7 @@ describe('UserTable', () => {
       <UserTable
         users={[]}
         isLoading={true}
-        selectedUserId={null}
-        onSelectUser={mockOnSelectUser}
+        onRowClick={mockOnRowClick}
       />,
     );
 
@@ -169,8 +142,7 @@ describe('UserTable', () => {
       <UserTable
         users={users}
         isLoading={false}
-        selectedUserId={null}
-        onSelectUser={mockOnSelectUser}
+        onRowClick={mockOnRowClick}
       />,
     );
 
@@ -184,8 +156,7 @@ describe('UserTable', () => {
       <UserTable
         users={users}
         isLoading={false}
-        selectedUserId={null}
-        onSelectUser={mockOnSelectUser}
+        onRowClick={mockOnRowClick}
       />,
     );
 
@@ -201,8 +172,7 @@ describe('UserTable', () => {
       <UserTable
         users={users}
         isLoading={false}
-        selectedUserId={null}
-        onSelectUser={mockOnSelectUser}
+        onRowClick={mockOnRowClick}
       />,
     );
 

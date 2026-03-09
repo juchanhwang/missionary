@@ -7,11 +7,9 @@ import {
   type PaginatedUsersResponse,
   type UserRole,
 } from 'apis/user';
-import { useAuth } from 'lib/auth/AuthContext';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { DeleteUserModal } from './DeleteUserModal';
-import { UserDetailPanel } from './UserDetailPanel';
 import { UserSearchFilter } from './UserSearchFilter';
 import { UserTable } from './UserTable';
 import { useGetUsers } from '../_hooks/useGetUsers';
@@ -23,12 +21,10 @@ interface UsersPageClientProps {
 }
 
 export function UsersPageClient({ initialData }: UsersPageClientProps) {
-  const { user: currentUser } = useAuth();
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<{
-    userId: string;
-    userName: string;
-  } | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const selectedUserId =
+    pathname.match(/^\/users\/([^/]+)\/edit$/)?.[1] ?? null;
   const [searchParams, setSearchParams] = useState<GetUsersParams>({
     page: 1,
     pageSize: PAGE_SIZE,
@@ -64,8 +60,8 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
     setSearchParams((prev) => ({ ...prev, isBaptized, page: 1 }));
   };
 
-  const handleSelectUser = (id: string) => {
-    setSelectedUserId((prev) => (prev === id ? null : id));
+  const handleRowClick = (id: string) => {
+    router.push(`/users/${id}/edit`);
   };
 
   const handlePageChange = (page: number) => {
@@ -73,7 +69,7 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
   };
 
   return (
-    <div className="flex flex-col flex-1 min-w-0">
+    <div className="flex flex-col flex-1 min-h-0 min-w-0">
       <div className="flex flex-col flex-1 p-8 min-h-0">
         <div className="shrink-0">
           <UserSearchFilter
@@ -102,7 +98,7 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
             users={users}
             isLoading={isLoading}
             selectedUserId={selectedUserId}
-            onSelectUser={handleSelectUser}
+            onRowClick={handleRowClick}
           />
 
           <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-t border-gray-30">
@@ -121,28 +117,6 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
           </div>
         </div>
       </div>
-
-      <UserDetailPanel
-        userId={selectedUserId}
-        onClose={() => setSelectedUserId(null)}
-        currentUserRole={currentUser.role as 'ADMIN' | 'STAFF'}
-        onDeleteRequest={(userId, userName) =>
-          setDeleteTarget({ userId, userName })
-        }
-      />
-
-      {deleteTarget && (
-        <DeleteUserModal
-          isOpen={!!deleteTarget}
-          userId={deleteTarget.userId}
-          userName={deleteTarget.userName}
-          onClose={() => setDeleteTarget(null)}
-          onSuccess={() => {
-            setDeleteTarget(null);
-            setSelectedUserId(null);
-          }}
-        />
-      )}
     </div>
   );
 }

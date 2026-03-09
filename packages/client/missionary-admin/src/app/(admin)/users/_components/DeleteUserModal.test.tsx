@@ -1,6 +1,6 @@
+import { http, HttpResponse } from 'msw';
 import { server } from 'test/mocks/server';
 import { render, screen, waitFor } from 'test/test-utils';
-import { http, HttpResponse } from 'msw';
 import { vi } from 'vitest';
 
 import { DeleteUserModal } from './DeleteUserModal';
