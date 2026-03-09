@@ -116,7 +116,7 @@ export function UserTable({
                 onClick={() => onRowClick(user.id)}
                 aria-selected={isSelected}
                 className={`border-b border-gray-30 last:border-b-0 transition-colors cursor-pointer group ${
-                  isSelected ? 'bg-blue-50/5' : 'hover:bg-primary-10/40'
+                  isSelected ? 'bg-blue-50/5' : 'hover:bg-gray-10'
                 }`}
               >
                 <td className="px-5 py-3.5 whitespace-nowrap sticky left-0 z-10 bg-white relative">
@@ -124,61 +124,55 @@ export function UserTable({
                     className={`absolute inset-0 pointer-events-none transition-colors ${
                       isSelected
                         ? 'bg-blue-50/5'
-                        : 'group-hover:bg-primary-10/40'
+                        : 'group-hover:bg-gray-10'
                     }`}
                   />
-                  <span
-                    className={`relative text-sm font-semibold ${
-                      isSelected
-                        ? 'text-primary-50'
-                        : 'text-gray-90 group-hover:text-primary-50'
-                    }`}
-                  >
+                  <span className="relative text-sm font-semibold text-gray-90">
                     {user.name || '-'}
                   </span>
                 </td>
-              <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
-                {user.email || '-'}
-              </td>
-              <td className="px-5 py-3.5 whitespace-nowrap">
-                <Badge variant={getRoleBadgeVariant(user.role)}>
-                  {user.role}
-                </Badge>
-              </td>
-              <td className="px-5 py-3.5 whitespace-nowrap">
-                <Badge variant={getProviderBadgeVariant(user.provider)}>
-                  {user.provider || '-'}
-                </Badge>
-              </td>
-              <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
-                {user.loginId || '-'}
-              </td>
-              <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
-                {user.phoneNumber || '-'}
-              </td>
-              <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
-                {formatDate(user.birthDate)}
-              </td>
-              <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
-                {formatGender(user.gender)}
-              </td>
-              <td className="px-5 py-3.5 whitespace-nowrap">
-                {user.isBaptized ? (
-                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-10 text-green-60">
-                    <Check size={12} strokeWidth={2.5} />
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-20 text-gray-40">
-                    <X size={12} strokeWidth={2.5} />
-                  </span>
-                )}
-              </td>
-              <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
-                {maskIdentityNumber(user.identityNumber)}
-              </td>
-              <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
-                {formatDate(user.createdAt)}
-              </td>
+                <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
+                  {user.email || '-'}
+                </td>
+                <td className="px-5 py-3.5 whitespace-nowrap">
+                  <Badge variant={getRoleBadgeVariant(user.role)}>
+                    {user.role}
+                  </Badge>
+                </td>
+                <td className="px-5 py-3.5 whitespace-nowrap">
+                  <Badge variant={getProviderBadgeVariant(user.provider)}>
+                    {user.provider || '-'}
+                  </Badge>
+                </td>
+                <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
+                  {user.loginId || '-'}
+                </td>
+                <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
+                  {user.phoneNumber || '-'}
+                </td>
+                <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
+                  {formatDate(user.birthDate)}
+                </td>
+                <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
+                  {formatGender(user.gender)}
+                </td>
+                <td className="px-5 py-3.5 whitespace-nowrap">
+                  {user.isBaptized ? (
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-10 text-green-60">
+                      <Check size={12} strokeWidth={2.5} />
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-20 text-gray-40">
+                      <X size={12} strokeWidth={2.5} />
+                    </span>
+                  )}
+                </td>
+                <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
+                  {maskIdentityNumber(user.identityNumber)}
+                </td>
+                <td className="px-5 py-3.5 text-sm text-gray-60 whitespace-nowrap">
+                  {formatDate(user.createdAt)}
+                </td>
               </tr>
             );
           })}

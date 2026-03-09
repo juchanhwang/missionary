@@ -13,11 +13,7 @@ describe('UserTable', () => {
 
   it('테이블 컬럼 헤더를 렌더링한다', () => {
     render(
-      <UserTable
-        users={[]}
-        isLoading={false}
-        onRowClick={mockOnRowClick}
-      />,
+      <UserTable users={[]} isLoading={false} onRowClick={mockOnRowClick} />,
     );
 
     // 빈 상태이므로 테이블 헤더는 표시되지 않음
@@ -28,11 +24,7 @@ describe('UserTable', () => {
     const users = createMockUserList(2);
 
     render(
-      <UserTable
-        users={users}
-        isLoading={false}
-        onRowClick={mockOnRowClick}
-      />,
+      <UserTable users={users} isLoading={false} onRowClick={mockOnRowClick} />,
     );
 
     expect(
@@ -74,11 +66,7 @@ describe('UserTable', () => {
     const users = createMockUserList(3);
 
     render(
-      <UserTable
-        users={users}
-        isLoading={false}
-        onRowClick={mockOnRowClick}
-      />,
+      <UserTable users={users} isLoading={false} onRowClick={mockOnRowClick} />,
     );
 
     expect(screen.getByRole('cell', { name: '사용자1' })).toBeInTheDocument();
@@ -99,11 +87,7 @@ describe('UserTable', () => {
     const users = [createMockUser({ id: 'user-abc', name: '테스트유저' })];
 
     const { user } = render(
-      <UserTable
-        users={users}
-        isLoading={false}
-        onRowClick={mockOnRowClick}
-      />,
+      <UserTable users={users} isLoading={false} onRowClick={mockOnRowClick} />,
     );
 
     await user.click(screen.getByRole('cell', { name: '테스트유저' }));
@@ -113,11 +97,7 @@ describe('UserTable', () => {
 
   it('빈 상태를 표시한다', () => {
     render(
-      <UserTable
-        users={[]}
-        isLoading={false}
-        onRowClick={mockOnRowClick}
-      />,
+      <UserTable users={[]} isLoading={false} onRowClick={mockOnRowClick} />,
     );
 
     expect(screen.getByText('조건에 맞는 유저가 없습니다')).toBeInTheDocument();
@@ -125,11 +105,7 @@ describe('UserTable', () => {
 
   it('로딩 중일 때 로딩 메시지를 표시한다', () => {
     render(
-      <UserTable
-        users={[]}
-        isLoading={true}
-        onRowClick={mockOnRowClick}
-      />,
+      <UserTable users={[]} isLoading={true} onRowClick={mockOnRowClick} />,
     );
 
     expect(screen.getByText('불러오는 중...')).toBeInTheDocument();
@@ -139,11 +115,7 @@ describe('UserTable', () => {
     const users = [createMockUser({ role: 'ADMIN', name: '관리자' })];
 
     render(
-      <UserTable
-        users={users}
-        isLoading={false}
-        onRowClick={mockOnRowClick}
-      />,
+      <UserTable users={users} isLoading={false} onRowClick={mockOnRowClick} />,
     );
 
     expect(screen.getByText('ADMIN')).toBeInTheDocument();
@@ -153,11 +125,7 @@ describe('UserTable', () => {
     const users = [createMockUser({ provider: 'GOOGLE', name: '구글유저' })];
 
     render(
-      <UserTable
-        users={users}
-        isLoading={false}
-        onRowClick={mockOnRowClick}
-      />,
+      <UserTable users={users} isLoading={false} onRowClick={mockOnRowClick} />,
     );
 
     expect(screen.getByText('GOOGLE')).toBeInTheDocument();
@@ -169,11 +137,7 @@ describe('UserTable', () => {
     ];
 
     render(
-      <UserTable
-        users={users}
-        isLoading={false}
-        onRowClick={mockOnRowClick}
-      />,
+      <UserTable users={users} isLoading={false} onRowClick={mockOnRowClick} />,
     );
 
     expect(screen.getByText('testlogin')).toBeInTheDocument();

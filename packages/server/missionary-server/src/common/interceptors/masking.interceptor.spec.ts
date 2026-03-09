@@ -304,7 +304,7 @@ describe('MaskingInterceptor', () => {
           .subscribe({
             next: (data) => {
               expect(data.identityNumber).toBe('123456-1234567');
-              expect(data.phoneNumber).toBe('010-123******');
+              expect(data.phoneNumber).toBe('010-1234-5678');
               done();
             },
           });
@@ -365,7 +365,7 @@ describe('MaskingInterceptor', () => {
           });
       });
 
-      it('모든 역할 + 모든 엔드포인트 → phoneNumber 항상 마스킹', (done) => {
+      it('ADMIN + 단건 조회 → phoneNumber 마스킹 해제', (done) => {
         const singleResponse = {
           phoneNumber: '010-1234-5678',
           identityNumber: '123456-1234567',
@@ -376,6 +376,26 @@ describe('MaskingInterceptor', () => {
         interceptor
           .intercept(
             createMockContext({ role: UserRole.ADMIN }),
+            mockCallHandler,
+          )
+          .subscribe({
+            next: (data) => {
+              expect(data.phoneNumber).toBe('010-1234-5678');
+              done();
+            },
+          });
+      });
+
+      it('STAFF + 단건 조회 → phoneNumber 마스킹 유지', (done) => {
+        const singleResponse = {
+          phoneNumber: '010-1234-5678',
+        };
+
+        mockCallHandler.handle = jest.fn().mockReturnValue(of(singleResponse));
+
+        interceptor
+          .intercept(
+            createMockContext({ role: UserRole.STAFF }),
             mockCallHandler,
           )
           .subscribe({
@@ -404,7 +424,7 @@ describe('MaskingInterceptor', () => {
           .subscribe({
             next: (data) => {
               expect(data.user.identityNumber).toBe('123456-1234567');
-              expect(data.user.phoneNumber).toBe('010-123******');
+              expect(data.user.phoneNumber).toBe('010-1234-5678');
               done();
             },
           });

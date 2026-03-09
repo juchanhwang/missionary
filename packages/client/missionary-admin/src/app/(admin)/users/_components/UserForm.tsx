@@ -12,10 +12,10 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 
-import type { UserUpdateFormValues } from '../_schemas/userSchema';
 import { formatDate } from '../_utils/formatDate';
 import { maskIdentityNumber } from '../_utils/maskIdentityNumber';
 
+import type { UserUpdateFormValues } from '../_schemas/userSchema';
 import type { User } from 'apis/user';
 
 const ROLE_LABELS: Record<string, string> = {
@@ -73,9 +73,7 @@ export function UserForm({ form, user, isEditable, isAdmin }: UserFormProps) {
                 placeholder="YYYY-MM-DD"
                 value={field.value ? new Date(field.value) : null}
                 onChange={(date) =>
-                  field.onChange(
-                    date ? date.toISOString().slice(0, 10) : '',
-                  )
+                  field.onChange(date ? date.toISOString().slice(0, 10) : '')
                 }
                 disabled={!isEditable}
               />
@@ -122,9 +120,7 @@ export function UserForm({ form, user, isEditable, isAdmin }: UserFormProps) {
                 label="역할"
               >
                 <Select.Trigger disabled={!isAdmin}>
-                  {field.value
-                    ? ROLE_LABELS[field.value]
-                    : '역할을 선택하세요'}
+                  {field.value ? ROLE_LABELS[field.value] : '역할을 선택하세요'}
                 </Select.Trigger>
                 <Select.Options>
                   <Select.Option item="USER">USER</Select.Option>
@@ -134,19 +130,11 @@ export function UserForm({ form, user, isEditable, isAdmin }: UserFormProps) {
               </Select>
             )}
           />
-          <InputField
-            label="인증방식"
-            value={user.provider ?? '-'}
-            disabled
-          />
+          <InputField label="인증방식" value={user.provider ?? '-'} disabled />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <InputField
-            label="로그인 ID"
-            value={user.loginId ?? '-'}
-            disabled
-          />
+          <InputField label="로그인 ID" value={user.loginId ?? '-'} disabled />
           <div>
             <p className="mb-1 text-xs font-normal leading-[1.833] text-gray-70">
               주민등록번호
@@ -220,9 +208,7 @@ export function UserForm({ form, user, isEditable, isAdmin }: UserFormProps) {
                 placeholder="YYYY-MM-DD"
                 value={field.value ? new Date(field.value) : null}
                 onChange={(date) =>
-                  field.onChange(
-                    date ? date.toISOString().slice(0, 10) : '',
-                  )
+                  field.onChange(date ? date.toISOString().slice(0, 10) : '')
                 }
                 disabled={!isEditable}
               />

@@ -37,6 +37,7 @@ export class MaskingInterceptor implements NestInterceptor {
 
     if (userRole === UserRole.ADMIN && !Array.isArray(data)) {
       skipFields.add('identityNumber');
+      skipFields.add('phoneNumber');
     }
 
     return skipFields;

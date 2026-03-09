@@ -2,8 +2,9 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@samilhero/design-system';
+import { useAuth } from 'lib/auth/AuthContext';
 import { Trash2, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -14,8 +15,6 @@ import {
   userUpdateSchema,
   type UserUpdateFormValues,
 } from '../../../../_schemas/userSchema';
-
-import { useAuth } from 'lib/auth/AuthContext';
 
 import type { User } from 'apis/user';
 
@@ -45,12 +44,17 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
   const isEditable = isAdmin;
 
   const updateUser = useUpdateUserAction(user.id);
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    requestAnimationFrame(() => setIsVisible(true));
-  }, []);
+    const isEditPath = /^\/users\/[^/]+\/edit$/.test(pathname);
+
+    if (isEditPath) {
+      requestAnimationFrame(() => setIsVisible(true));
+    }
+  }, [pathname]);
 
   const handleClose = () => {
     setIsVisible(false);
