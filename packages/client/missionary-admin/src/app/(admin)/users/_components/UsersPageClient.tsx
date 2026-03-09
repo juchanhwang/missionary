@@ -74,20 +74,22 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
 
   return (
     <div className="flex flex-col flex-1 min-w-0">
-      <div className="flex-1 p-8 overflow-y-auto">
-        <UserSearchFilter
-          search={searchParams.search ?? ''}
-          role={searchParams.role ?? ''}
-          provider={searchParams.provider ?? ''}
-          isBaptized={searchParams.isBaptized ?? ''}
-          onSearchChange={handleSearchChange}
-          onRoleChange={handleRoleChange}
-          onProviderChange={handleProviderChange}
-          onBaptizedChange={handleBaptizedChange}
-        />
+      <div className="flex flex-col flex-1 p-8 min-h-0">
+        <div className="shrink-0">
+          <UserSearchFilter
+            search={searchParams.search ?? ''}
+            role={searchParams.role ?? ''}
+            provider={searchParams.provider ?? ''}
+            isBaptized={searchParams.isBaptized ?? ''}
+            onSearchChange={handleSearchChange}
+            onRoleChange={handleRoleChange}
+            onProviderChange={handleProviderChange}
+            onBaptizedChange={handleBaptizedChange}
+          />
+        </div>
 
-        <div className="bg-white rounded-xl border border-gray-30 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-30">
+        <div className="flex flex-col flex-1 min-h-0 bg-white rounded-xl border border-gray-30 shadow-sm overflow-hidden">
+          <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-b border-gray-30">
             <p className="text-sm font-semibold text-gray-90">
               유저 목록
               <span className="ml-1.5 text-xs font-normal text-gray-50">
@@ -103,7 +105,7 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
             onSelectUser={handleSelectUser}
           />
 
-          <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-30">
+          <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-t border-gray-30">
             <p className="text-xs text-gray-50">
               {total > 0
                 ? `${(currentPage - 1) * PAGE_SIZE + 1} - ${Math.min(currentPage * PAGE_SIZE, total)} / ${total}건`

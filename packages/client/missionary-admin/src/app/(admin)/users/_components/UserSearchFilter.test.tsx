@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 
 import { UserSearchFilter } from './UserSearchFilter';
 
-// design-system 컴포넌트 mock
+// design-system 컴포넌트 mock (외부 의존성 경계 모킹 — 허용)
 vi.mock('@samilhero/design-system', () => ({
   SearchBox: ({
     value,
@@ -16,7 +16,7 @@ vi.mock('@samilhero/design-system', () => ({
     size?: string;
   }) => (
     <input
-      data-testid="search-box"
+      role="searchbox"
       value={value}
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
@@ -33,7 +33,9 @@ vi.mock('@samilhero/design-system', () => ({
     }) => <div data-testid="select">{children}</div>,
     {
       Trigger: ({ children }: { children: React.ReactNode }) => (
-        <div data-testid="select-trigger">{children}</div>
+        <button type="button" data-testid="select-trigger">
+          {children}
+        </button>
       ),
       Options: ({ children }: { children: React.ReactNode }) => (
         <div data-testid="select-options" hidden>
@@ -73,6 +75,7 @@ describe('UserSearchFilter', () => {
   });
 
   it('검색어 입력 후 디바운싱을 거쳐 콜백을 호출한다', async () => {
+    // 이 테스트는 real timers를 사용하여 실제 디바운스 동작을 검증한다
     vi.useRealTimers();
 
     const onSearchChange = vi.fn();
@@ -81,21 +84,18 @@ describe('UserSearchFilter', () => {
       <UserSearchFilter {...defaultProps} onSearchChange={onSearchChange} />,
     );
 
-    const searchInput = screen.getByTestId('search-box');
-    await user.type(searchInput, '홍길동');
+    const searchInput = screen.getByRole('searchbox');
+    await user.type(searchInput, 'test');
 
-    // 디바운스 대기
-    await waitFor(
-      () => {
-        expect(onSearchChange).toHaveBeenCalled();
-      },
-      { timeout: 500 },
-    );
+    // 디바운싱(300ms) 후 콜백 호출 확인
+    await waitFor(() => {
+      expect(onSearchChange).toHaveBeenCalled();
+    });
 
     // 디바운싱으로 인해 마지막 값으로 호출
     const lastCall =
       onSearchChange.mock.calls[onSearchChange.mock.calls.length - 1];
-    expect(lastCall[0]).toBe('홍길동');
+    expect(lastCall[0]).toBe('test');
   });
 
   it('검색 placeholder를 표시한다', () => {
@@ -109,42 +109,42 @@ describe('UserSearchFilter', () => {
   it('역할 필터 옵션을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} />);
 
-    const triggers = screen.getAllByTestId('select-trigger');
+    const triggers = screen.getAllByRole('button');
     expect(within(triggers[0]).getByText('전체 역할')).toBeInTheDocument();
   });
 
   it('인증방식 필터 옵션을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} />);
 
-    const triggers = screen.getAllByTestId('select-trigger');
+    const triggers = screen.getAllByRole('button');
     expect(within(triggers[1]).getByText('전체 인증방식')).toBeInTheDocument();
   });
 
   it('세례 여부 필터 옵션을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} />);
 
-    const triggers = screen.getAllByTestId('select-trigger');
+    const triggers = screen.getAllByRole('button');
     expect(within(triggers[2]).getByText('세례 여부')).toBeInTheDocument();
   });
 
   it('역할 필터가 선택되었을 때 선택된 값을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} role="ADMIN" />);
 
-    const triggers = screen.getAllByTestId('select-trigger');
+    const triggers = screen.getAllByRole('button');
     expect(within(triggers[0]).getByText('ADMIN')).toBeInTheDocument();
   });
 
   it('인증방식 필터가 선택되었을 때 선택된 값을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} provider="GOOGLE" />);
 
-    const triggers = screen.getAllByTestId('select-trigger');
+    const triggers = screen.getAllByRole('button');
     expect(within(triggers[1]).getByText('GOOGLE')).toBeInTheDocument();
   });
 
   it('세례 여부 필터가 선택되었을 때 선택된 값을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} isBaptized="true" />);
 
-    const triggers = screen.getAllByTestId('select-trigger');
+    const triggers = screen.getAllByRole('button');
     expect(within(triggers[2]).getByText('받음')).toBeInTheDocument();
   });
 

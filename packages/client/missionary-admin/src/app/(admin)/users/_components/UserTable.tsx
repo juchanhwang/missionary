@@ -5,22 +5,14 @@ import { Check, X } from 'lucide-react';
 
 import type { User } from 'apis/user';
 
+import { formatDate } from '../_utils/formatDate';
+import { maskIdentityNumber } from '../_utils/maskIdentityNumber';
+
 interface UserTableProps {
   users: User[];
   isLoading: boolean;
   selectedUserId: string | null;
   onSelectUser: (id: string) => void;
-}
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '-';
-  return dateStr.slice(0, 10);
-}
-
-function maskIdentityNumber(value: string | null): string {
-  if (!value) return '-';
-  if (value.length <= 6) return value;
-  return value.slice(0, 6) + '-' + '*'.repeat(value.length - 6);
 }
 
 function getRoleBadgeVariant(role: string) {
@@ -60,7 +52,7 @@ export function UserTable({
 }: UserTableProps) {
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-16 text-sm text-gray-50">
+      <div className="flex flex-1 items-center justify-center text-sm text-gray-50">
         불러오는 중...
       </div>
     );
@@ -68,18 +60,18 @@ export function UserTable({
 
   if (users.length === 0) {
     return (
-      <div className="flex items-center justify-center py-16 text-sm text-gray-50">
+      <div className="flex flex-1 items-center justify-center text-sm text-gray-50">
         조건에 맞는 유저가 없습니다
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="flex-1 min-h-0 overflow-auto">
       <table className="w-full text-left min-w-[1200px]">
-        <thead>
+        <thead className="sticky top-0 z-10">
           <tr className="border-b border-gray-30 bg-gray-10">
-            <th className="px-5 py-3 text-xs font-semibold text-gray-50 whitespace-nowrap sticky left-0 bg-gray-10 z-10">
+            <th className="px-5 py-3 text-xs font-semibold text-gray-50 whitespace-nowrap sticky left-0 bg-gray-10 z-20">
               이름
             </th>
             <th className="px-5 py-3 text-xs font-semibold text-gray-50 whitespace-nowrap">
@@ -122,6 +114,7 @@ export function UserTable({
               <tr
                 key={user.id}
                 onClick={() => onSelectUser(user.id)}
+                aria-selected={isSelected}
                 className={`border-b border-gray-30 last:border-b-0 transition-colors cursor-pointer group ${
                   isSelected ? 'bg-blue-50/5' : 'hover:bg-primary-10/40'
                 }`}

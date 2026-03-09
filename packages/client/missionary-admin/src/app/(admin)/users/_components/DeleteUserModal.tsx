@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
-import { useDeleteUser } from '../_hooks/useDeleteUser';
+import { useDeleteUserAction } from '../_hooks/useDeleteUserAction';
 
 export interface DeleteUserModalProps {
   isOpen: boolean;
@@ -41,7 +41,7 @@ export function DeleteUserModal({
   onClose,
   onSuccess,
 }: DeleteUserModalProps) {
-  const { mutate, isPending } = useDeleteUser();
+  const { mutate, isPending } = useDeleteUserAction();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {

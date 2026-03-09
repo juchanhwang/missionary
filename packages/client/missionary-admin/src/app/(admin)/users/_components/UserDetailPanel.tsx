@@ -6,12 +6,16 @@ import { Eye, EyeOff, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import type { User } from 'apis/user';
+
 import { useGetUser } from '../_hooks/useGetUser';
-import { useUpdateUser } from '../_hooks/useUpdateUser';
+import { useUpdateUserAction } from '../_hooks/useUpdateUserAction';
 import {
   userUpdateSchema,
   type UserUpdateFormValues,
 } from '../_schemas/userSchema';
+import { formatDate } from '../_utils/formatDate';
+import { maskIdentityNumber } from '../_utils/maskIdentityNumber';
 
 interface UserDetailPanelProps {
   userId: string | null;
@@ -20,21 +24,23 @@ interface UserDetailPanelProps {
   onDeleteRequest?: (userId: string, userName: string) => void;
 }
 
-function maskIdentityNumber(identityNumber: string | null): string {
-  if (!identityNumber) return '-';
-  if (identityNumber.length >= 7) {
-    return `${identityNumber.slice(0, 6)}-${identityNumber.charAt(6)}${'*'.repeat(6)}`;
-  }
-  return identityNumber;
-}
-
-function formatDate(dateString: string | null): string {
-  if (!dateString) return '-';
-  return dateString.slice(0, 10);
-}
-
 function getProviderLabel(provider: string | null): string {
   return provider ?? '-';
+}
+
+function toFormValues(user: User): UserUpdateFormValues {
+  return {
+    name: user.name ?? '',
+    phoneNumber: user.phoneNumber ?? '',
+    birthDate: user.birthDate ? user.birthDate.slice(0, 10) : '',
+    gender:
+      user.gender === 'MALE' || user.gender === 'FEMALE'
+        ? user.gender
+        : undefined,
+    isBaptized: user.isBaptized,
+    baptizedAt: user.baptizedAt ? user.baptizedAt.slice(0, 10) : '',
+    role: user.role,
+  };
 }
 
 export function UserDetailPanel({
@@ -45,7 +51,7 @@ export function UserDetailPanel({
 }: UserDetailPanelProps) {
   const isOpen = userId !== null;
   const { data: user, isLoading } = useGetUser(userId ?? '');
-  const updateUser = useUpdateUser(userId ?? '');
+  const updateUser = useUpdateUserAction(userId ?? '');
   const [showIdentity, setShowIdentity] = useState(false);
 
   const isAdmin = currentUserRole === 'ADMIN';
@@ -67,18 +73,7 @@ export function UserDetailPanel({
 
   useEffect(() => {
     if (user) {
-      form.reset({
-        name: user.name ?? '',
-        phoneNumber: user.phoneNumber ?? '',
-        birthDate: user.birthDate ? user.birthDate.slice(0, 10) : '',
-        gender:
-          user.gender === 'MALE' || user.gender === 'FEMALE'
-            ? user.gender
-            : undefined,
-        isBaptized: user.isBaptized,
-        baptizedAt: user.baptizedAt ? user.baptizedAt.slice(0, 10) : '',
-        role: user.role,
-      });
+      form.reset(toFormValues(user));
       setShowIdentity(false);
     }
   }, [user, form]);
@@ -107,18 +102,7 @@ export function UserDetailPanel({
 
   const handleReset = () => {
     if (user) {
-      form.reset({
-        name: user.name ?? '',
-        phoneNumber: user.phoneNumber ?? '',
-        birthDate: user.birthDate ? user.birthDate.slice(0, 10) : '',
-        gender:
-          user.gender === 'MALE' || user.gender === 'FEMALE'
-            ? user.gender
-            : undefined,
-        isBaptized: user.isBaptized,
-        baptizedAt: user.baptizedAt ? user.baptizedAt.slice(0, 10) : '',
-        role: user.role,
-      });
+      form.reset(toFormValues(user));
     }
   };
 

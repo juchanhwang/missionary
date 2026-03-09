@@ -1,18 +1,14 @@
 import { createMockUser } from 'test/mocks/data';
+import { server } from 'test/mocks/server';
 import { render, screen, waitFor } from 'test/test-utils';
+import { http, HttpResponse } from 'msw';
 import { vi } from 'vitest';
 
-import { useGetUser } from '../_hooks/useGetUser';
-import { useUpdateUser } from '../_hooks/useUpdateUser';
 import { UserDetailPanel } from './UserDetailPanel';
 
-vi.mock('../_hooks/useGetUser', () => ({
-  useGetUser: vi.fn(),
-}));
+// vi.mock 없음 - 실제 useGetUser, useUpdateUserAction 훅이 MSW를 통해 동작
 
-vi.mock('../_hooks/useUpdateUser', () => ({
-  useUpdateUser: vi.fn(),
-}));
+const API_URL = 'http://localhost';
 
 const mockUser = createMockUser({
   id: 'user-1',
@@ -32,25 +28,19 @@ const mockUser = createMockUser({
 describe('UserDetailPanel', () => {
   const mockOnClose = vi.fn();
   const mockOnDeleteRequest = vi.fn();
-  const mockMutate = vi.fn();
-  const mockUseGetUser = vi.mocked(useGetUser);
-  const mockUseUpdateUser = vi.mocked(useUpdateUser);
 
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockUseGetUser.mockReturnValue({
-      data: mockUser,
-      isLoading: false,
-    } as unknown as ReturnType<typeof useGetUser>);
-
-    mockUseUpdateUser.mockReturnValue({
-      mutate: mockMutate,
-      isPending: false,
-    } as unknown as ReturnType<typeof useUpdateUser>);
+    // 기본 MSW 핸들러를 오버라이드하여 특정 유저 데이터 반환
+    server.use(
+      http.get(`${API_URL}/users/:id`, () =>
+        HttpResponse.json(mockUser),
+      ),
+    );
   });
 
-  it('userId가 있을 때 패널을 렌더링한다', () => {
+  it('userId가 있을 때 패널을 렌더링한다', async () => {
     render(
       <UserDetailPanel
         userId="user-1"
@@ -60,11 +50,12 @@ describe('UserDetailPanel', () => {
       />,
     );
 
-    expect(screen.getByText('홍길동')).toBeInTheDocument();
+    // MSW에서 데이터를 가져올 때까지 대기 (findBy 사용)
+    expect(await screen.findByText('홍길동')).toBeInTheDocument();
     expect(screen.getByText('hong@example.com')).toBeInTheDocument();
   });
 
-  it('읽기 전용 필드(이메일, 인증방식, 로그인ID)를 확인한다', () => {
+  it('읽기 전용 필드(이메일, 인증방식, 로그인ID)를 확인한다', async () => {
     render(
       <UserDetailPanel
         userId="user-1"
@@ -73,6 +64,9 @@ describe('UserDetailPanel', () => {
         onDeleteRequest={mockOnDeleteRequest}
       />,
     );
+
+    // MSW 데이터 로드 대기
+    await screen.findByDisplayValue('hong@example.com');
 
     const emailInput = screen.getByDisplayValue('hong@example.com');
     expect(emailInput).toHaveAttribute('readOnly');
@@ -94,22 +88,22 @@ describe('UserDetailPanel', () => {
       />,
     );
 
+    // MSW 데이터 로드 대기
+    const nameInput = await screen.findByDisplayValue('홍길동');
+
     // 초기에는 되돌리기 버튼이 없음
     expect(screen.queryByText('되돌리기')).not.toBeInTheDocument();
 
     // 이름 필드 수정
-    const nameInput = screen.getByDisplayValue('홍길동');
     await user.clear(nameInput);
     await user.type(nameInput, '김철수');
 
     // 변경 후 되돌리기 버튼과 변경사항 메시지 표시
-    await waitFor(() => {
-      expect(screen.getByText('되돌리기')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('되돌리기')).toBeInTheDocument();
     expect(screen.getByText('변경사항이 있습니다')).toBeInTheDocument();
   });
 
-  it('STAFF 읽기 전용 모드에서 모든 입력 필드가 disabled 상태이다', () => {
+  it('STAFF 읽기 전용 모드에서 모든 입력 필드가 disabled 상태이다', async () => {
     render(
       <UserDetailPanel
         userId="user-1"
@@ -118,15 +112,17 @@ describe('UserDetailPanel', () => {
       />,
     );
 
+    // MSW 데이터 로드 대기
+    const nameInput = await screen.findByDisplayValue('홍길동');
+
     // 편집 가능한 필드들이 disabled
-    const nameInput = screen.getByDisplayValue('홍길동');
     expect(nameInput).toBeDisabled();
 
     const phoneInput = screen.getByDisplayValue('010-1234-5678');
     expect(phoneInput).toBeDisabled();
   });
 
-  it('STAFF 모드에서 삭제 버튼이 표시되지 않는다', () => {
+  it('STAFF 모드에서 삭제 버튼이 표시되지 않는다', async () => {
     render(
       <UserDetailPanel
         userId="user-1"
@@ -135,10 +131,13 @@ describe('UserDetailPanel', () => {
       />,
     );
 
+    // MSW 데이터 로드 대기
+    await screen.findByText('홍길동');
+
     expect(screen.queryByTitle('유저 삭제')).not.toBeInTheDocument();
   });
 
-  it('ADMIN 모드에서 삭제 버튼이 표시된다', () => {
+  it('ADMIN 모드에서 삭제 버튼이 표시된다', async () => {
     render(
       <UserDetailPanel
         userId="user-1"
@@ -148,10 +147,27 @@ describe('UserDetailPanel', () => {
       />,
     );
 
+    // MSW 데이터 로드 대기
+    await screen.findByText('홍길동');
+
     expect(screen.getByTitle('유저 삭제')).toBeInTheDocument();
   });
 
   it('폼 제출 시 updateUser mutation을 호출한다', async () => {
+    // Arrange: PATCH 핸들러를 오버라이드하여 호출 검증
+    let patchCalled = false;
+    let patchBody: Record<string, unknown> = {};
+
+    server.use(
+      http.patch(`${API_URL}/users/:id`, async ({ request, params }) => {
+        patchCalled = true;
+        patchBody = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json(
+          createMockUser({ id: params.id as string, name: '김철수' }),
+        );
+      }),
+    );
+
     const { user } = render(
       <UserDetailPanel
         userId="user-1"
@@ -161,32 +177,34 @@ describe('UserDetailPanel', () => {
       />,
     );
 
+    // MSW 데이터 로드 대기
+    const nameInput = await screen.findByDisplayValue('홍길동');
+
     // 이름 변경하여 dirty 상태로 만들기
-    const nameInput = screen.getByDisplayValue('홍길동');
     await user.clear(nameInput);
     await user.type(nameInput, '김철수');
 
-    // 저장 버튼 클릭
-    await waitFor(() => {
-      expect(screen.getByText('저장')).not.toBeDisabled();
-    });
-    await user.click(screen.getByText('저장'));
+    // 저장 버튼이 활성화될 때까지 대기
+    const saveButton = await screen.findByText('저장');
+    expect(saveButton).not.toBeDisabled();
 
+    // 저장 버튼 클릭
+    await user.click(saveButton);
+
+    // PATCH 요청이 전송되었는지 확인
     await waitFor(() => {
-      expect(mockMutate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: '김철수',
-        }),
-        expect.any(Object),
-      );
+      expect(patchCalled).toBe(true);
     });
+    expect(patchBody).toEqual(
+      expect.objectContaining({ name: '김철수' }),
+    );
   });
 
   it('로딩 중일 때 로딩 메시지를 표시한다', () => {
-    mockUseGetUser.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-    } as unknown as ReturnType<typeof useGetUser>);
+    // Arrange: MSW 핸들러를 지연 응답으로 오버라이드 (resolve되지 않는 Promise)
+    server.use(
+      http.get(`${API_URL}/users/:id`, () => new Promise(() => {})),
+    );
 
     render(
       <UserDetailPanel
@@ -199,11 +217,13 @@ describe('UserDetailPanel', () => {
     expect(screen.getByText('불러오는 중...')).toBeInTheDocument();
   });
 
-  it('유저를 찾을 수 없을 때 안내 메시지를 표시한다', () => {
-    mockUseGetUser.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-    } as unknown as ReturnType<typeof useGetUser>);
+  it('유저를 찾을 수 없을 때 안내 메시지를 표시한다', async () => {
+    // Arrange: MSW 핸들러를 404 응답으로 오버라이드
+    server.use(
+      http.get(`${API_URL}/users/:id`, () =>
+        HttpResponse.json(null, { status: 404 }),
+      ),
+    );
 
     render(
       <UserDetailPanel
@@ -214,7 +234,7 @@ describe('UserDetailPanel', () => {
     );
 
     expect(
-      screen.getByText('유저 정보를 찾을 수 없습니다'),
+      await screen.findByText('유저 정보를 찾을 수 없습니다'),
     ).toBeInTheDocument();
   });
 
@@ -227,6 +247,9 @@ describe('UserDetailPanel', () => {
         onDeleteRequest={mockOnDeleteRequest}
       />,
     );
+
+    // MSW 데이터 로드 대기
+    await screen.findByText('홍길동');
 
     await user.click(screen.getByTitle('유저 삭제'));
 

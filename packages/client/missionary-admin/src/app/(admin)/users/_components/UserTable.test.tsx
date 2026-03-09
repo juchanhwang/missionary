@@ -37,17 +37,39 @@ describe('UserTable', () => {
       />,
     );
 
-    expect(screen.getByText('이름')).toBeInTheDocument();
-    expect(screen.getByText('이메일')).toBeInTheDocument();
-    expect(screen.getByText('역할')).toBeInTheDocument();
-    expect(screen.getByText('인증방식')).toBeInTheDocument();
-    expect(screen.getByText('로그인ID')).toBeInTheDocument();
-    expect(screen.getByText('전화번호')).toBeInTheDocument();
-    expect(screen.getByText('생년월일')).toBeInTheDocument();
-    expect(screen.getByText('성별')).toBeInTheDocument();
-    expect(screen.getByText('세례')).toBeInTheDocument();
-    expect(screen.getByText('주민번호')).toBeInTheDocument();
-    expect(screen.getByText('가입일')).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '이름' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '이메일' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '역할' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '인증방식' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '로그인ID' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '전화번호' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '생년월일' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '성별' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '세례' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '주민번호' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: '가입일' }),
+    ).toBeInTheDocument();
   });
 
   it('유저 데이터 행을 표시한다', () => {
@@ -62,12 +84,18 @@ describe('UserTable', () => {
       />,
     );
 
-    expect(screen.getByText('사용자1')).toBeInTheDocument();
-    expect(screen.getByText('사용자2')).toBeInTheDocument();
-    expect(screen.getByText('사용자3')).toBeInTheDocument();
-    expect(screen.getByText('user1@example.com')).toBeInTheDocument();
-    expect(screen.getByText('user2@example.com')).toBeInTheDocument();
-    expect(screen.getByText('user3@example.com')).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: '사용자1' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: '사용자2' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: '사용자3' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('cell', { name: 'user1@example.com' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('cell', { name: 'user2@example.com' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('cell', { name: 'user3@example.com' }),
+    ).toBeInTheDocument();
   });
 
   it('행 클릭 시 onSelectUser 콜백을 호출한다', async () => {
@@ -82,12 +110,12 @@ describe('UserTable', () => {
       />,
     );
 
-    await user.click(screen.getByText('테스트유저'));
+    await user.click(screen.getByRole('cell', { name: '테스트유저' }));
 
     expect(mockOnSelectUser).toHaveBeenCalledWith('user-abc');
   });
 
-  it('선택된 행에 하이라이트 클래스를 적용한다', () => {
+  it('선택된 행에 aria-selected가 적용된다', () => {
     const users = [
       createMockUser({ id: 'user-1', name: '유저A' }),
       createMockUser({ id: 'user-2', name: '유저B' }),
@@ -102,11 +130,10 @@ describe('UserTable', () => {
       />,
     );
 
-    const selectedRow = screen.getByText('유저A').closest('tr');
-    const unselectedRow = screen.getByText('유저B').closest('tr');
-
-    expect(selectedRow).toHaveClass('bg-blue-50/5');
-    expect(unselectedRow).not.toHaveClass('bg-blue-50/5');
+    const rows = screen.getAllByRole('row');
+    // rows[0]은 헤더 행, rows[1]은 유저A 행, rows[2]는 유저B 행
+    expect(rows[1]).toHaveAttribute('aria-selected', 'true');
+    expect(rows[2]).toHaveAttribute('aria-selected', 'false');
   });
 
   it('빈 상태를 표시한다', () => {

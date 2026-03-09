@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { userApi } from 'apis/user';
+import { type UpdateUserPayload, userApi } from 'apis/user';
 import { queryKeys } from 'lib/queryKeys';
 
-export function useDeleteUser() {
+export function useUpdateUserAction(id: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => userApi.deleteUser(id),
+    mutationFn: (data: UpdateUserPayload) => userApi.updateUser(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.users.all,
