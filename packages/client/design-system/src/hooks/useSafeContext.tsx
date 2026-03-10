@@ -4,6 +4,12 @@ import { useContext } from 'react';
 
 import type { Context } from 'react';
 
+function captureSafeContextTrace(err: Error) {
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(err, captureSafeContextTrace);
+  }
+}
+
 export const useSafeContext = <T,>(
   context: Context<T>,
   hookName?: string,
@@ -17,9 +23,7 @@ export const useSafeContext = <T,>(
     const err = new Error(
       `${caller}는 ${providerName} 내부에서 사용해야 합니다.`,
     );
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(err);
-    }
+    captureSafeContextTrace(err);
     throw err;
   }
 
