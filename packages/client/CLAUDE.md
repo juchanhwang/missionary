@@ -49,6 +49,14 @@
 | Frontend test setup  | `missionary-app/src/test`, `missionary-admin/src/test`, `design-system/vitest.setup.ts` | jsdom 공통          |
 | Query/Auth providers | `*/src/lib`                                                                             | app별 provider 분리 |
 
+## React Compiler
+
+이 프로젝트는 React Compiler를 사용한다.
+
+- `useCallback`, `useMemo`, `React.memo`를 **절대 사용하지 않는다**.
+- 메모이제이션은 컴파일러가 자동으로 처리한다.
+- 기존 코드에 있더라도 새로 추가하지 않는다.
+
 ## Anti-Patterns
 
 - `dist/`, `storybook-static/`를 수정 대상으로 취급하지 않는다.

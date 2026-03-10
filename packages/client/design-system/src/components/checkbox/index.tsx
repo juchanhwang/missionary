@@ -93,7 +93,7 @@ export function Checkbox({
       <span
         className={cn(
           'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors',
-          checked ? 'border-gray-80 bg-gray-80' : 'border-gray-40 bg-white',
+          checked ? 'border-gray-800 bg-gray-800' : 'border-gray-300 bg-white',
         )}
       >
         {checked && <Check size={12} className="text-white" strokeWidth={3} />}

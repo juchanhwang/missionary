@@ -109,7 +109,7 @@ const STATS: StatCard[] = [
   {
     label: '완료',
     value: 2,
-    color: 'bg-gray-20 text-gray-60',
+    color: 'bg-gray-100 text-gray-500',
     icon: <SquareX size={22} />,
   },
   {
@@ -124,7 +124,7 @@ function StatusBadge({ status }: { status: MissionCard['status'] }) {
   const config = {
     active: { label: '진행중', className: 'bg-green-10 text-green-60' },
     upcoming: { label: '예정', className: 'bg-blue-10 text-blue-60' },
-    completed: { label: '완료', className: 'bg-gray-20 text-gray-60' },
+    completed: { label: '완료', className: 'bg-gray-100 text-gray-500' },
   } as const;
 
   const { label, className } = config[status];
@@ -144,26 +144,26 @@ function MissionCardItem({ mission }: { mission: MissionCard }) {
   );
 
   return (
-    <div className="flex flex-col gap-4 p-5 bg-white rounded-xl border border-gray-30 shadow-sm hover:shadow-md transition-shadow">
+    <div className="flex flex-col gap-4 p-5 bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-semibold text-gray-90 truncate">
+          <h3 className="text-base font-semibold text-gray-900 truncate">
             {mission.name}
           </h3>
-          <span className="text-xs text-gray-50 mt-0.5">{mission.type}</span>
+          <span className="text-xs text-gray-400 mt-0.5">{mission.type}</span>
         </div>
         <StatusBadge status={mission.status} />
       </div>
 
-      <div className="flex flex-col gap-2 text-sm text-gray-60">
+      <div className="flex flex-col gap-2 text-sm text-gray-500">
         <div className="flex items-center gap-2">
-          <Calendar size={14} className="shrink-0 text-gray-50" />
+          <Calendar size={14} className="shrink-0 text-gray-400" />
           <span>
             {mission.startDate} ~ {mission.endDate}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <User size={14} className="shrink-0 text-gray-50" />
+          <User size={14} className="shrink-0 text-gray-400" />
           <span>
             {mission.participants} / {mission.maxParticipants}명
           </span>
@@ -172,10 +172,10 @@ function MissionCardItem({ mission }: { mission: MissionCard }) {
 
       <div className="w-full">
         <div className="flex justify-between text-xs mb-1.5">
-          <span className="text-gray-50">참여율</span>
-          <span className="font-medium text-gray-70">{progress}%</span>
+          <span className="text-gray-400">참여율</span>
+          <span className="font-medium text-gray-700">{progress}%</span>
         </div>
-        <div className="w-full h-1.5 rounded-full bg-gray-20">
+        <div className="w-full h-1.5 rounded-full bg-gray-100">
           <div
             role="progressbar"
             aria-label={`${mission.name} 참여율`}
@@ -183,7 +183,7 @@ function MissionCardItem({ mission }: { mission: MissionCard }) {
             aria-valuemin={0}
             aria-valuemax={100}
             className={`h-full rounded-full transition-all ${
-              mission.status === 'active' ? 'bg-green-50' : 'bg-gray-40'
+              mission.status === 'active' ? 'bg-green-50' : 'bg-gray-300'
             }`}
             style={{ width: `${progress}%` }}
           />
@@ -200,7 +200,7 @@ export default function DashboardPage() {
         {STATS.map((stat) => (
           <div
             key={stat.label}
-            className="flex items-center gap-4 p-5 bg-white rounded-xl border border-gray-30"
+            className="flex items-center gap-4 p-5 bg-white rounded-xl border border-gray-200"
           >
             <div
               className={`flex items-center justify-center w-11 h-11 rounded-xl ${stat.color}`}
@@ -208,8 +208,8 @@ export default function DashboardPage() {
               {stat.icon}
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-90">{stat.value}</p>
-              <p className="text-sm text-gray-50">{stat.label}</p>
+              <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+              <p className="text-sm text-gray-400">{stat.label}</p>
             </div>
           </div>
         ))}
@@ -217,7 +217,7 @@ export default function DashboardPage() {
 
       <section>
         <div className="flex items-center gap-2.5 mb-4">
-          <h2 className="text-lg font-semibold text-gray-90">진행중인 선교</h2>
+          <h2 className="text-lg font-semibold text-gray-900">진행중인 선교</h2>
           <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-green-10 text-xs font-semibold text-green-60">
             {MOCK_ACTIVE_MISSIONS.length}
           </span>
@@ -231,8 +231,8 @@ export default function DashboardPage() {
 
       <section>
         <div className="flex items-center gap-2.5 mb-4">
-          <h2 className="text-lg font-semibold text-gray-90">비진행 선교</h2>
-          <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-gray-30 text-xs font-semibold text-gray-60">
+          <h2 className="text-lg font-semibold text-gray-900">비진행 선교</h2>
+          <span className="flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-gray-200 text-xs font-semibold text-gray-500">
             {MOCK_INACTIVE_MISSIONS.length}
           </span>
         </div>

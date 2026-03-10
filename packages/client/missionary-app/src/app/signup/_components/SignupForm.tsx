@@ -36,22 +36,22 @@ export function SignupForm() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-10">
+    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-50">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col items-center w-[400px] rounded-2xl bg-white border border-gray-40 p-10"
+        className="flex flex-col items-center w-[400px] rounded-2xl bg-white border border-gray-300 p-10"
       >
         <img
           src="/logo-horizontal.svg"
           alt="삼일교회 로고"
           className="w-[200px] h-auto mb-10"
         />
-        <h1 className="mb-3 text-2xl font-bold leading-tight text-center text-gray-90">
+        <h1 className="mb-3 text-2xl font-bold leading-tight text-center text-gray-900">
           선교 시스템
           <br />
           회원가입
         </h1>
-        <p className="mb-10 text-sm font-normal leading-relaxed text-center text-gray-50">
+        <p className="mb-10 text-sm font-normal leading-relaxed text-center text-gray-400">
           새 계정을 만들어 주세요.
         </p>
         <div className="flex flex-col w-full gap-3">
@@ -106,7 +106,7 @@ export function SignupForm() {
           </Button>
         </div>
 
-        <p className="mt-6 text-sm text-gray-50">
+        <p className="mt-6 text-sm text-gray-400">
           이미 계정이 있으신가요?{' '}
           <Link
             href="/login"

@@ -22,7 +22,7 @@ function DefaultErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
       role="alert"
       className="flex flex-col items-center gap-[12px] p-[24px]"
     >
-      <h2 className="text-[18px] font-bold text-gray-70 m-0">
+      <h2 className="text-[18px] font-bold text-gray-700 m-0">
         오류가 발생했습니다
       </h2>
       <pre className="text-[14px] text-error-50 m-0">{errorMessage}</pre>

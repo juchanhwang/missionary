@@ -81,7 +81,7 @@ export function DeleteMissionSection({
         ref={triggerRef}
         type="button"
         onClick={() => setIsMenuOpen((prev) => !prev)}
-        className="flex items-center justify-center w-9 h-9 rounded-lg border border-gray-30 bg-white text-gray-60 hover:bg-gray-10 hover:border-gray-40 transition-colors"
+        className="flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-colors"
         aria-label="더보기"
         aria-expanded={isMenuOpen}
         aria-haspopup="true"
@@ -90,7 +90,7 @@ export function DeleteMissionSection({
       </button>
 
       {isMenuOpen && (
-        <div className="absolute right-0 top-11 z-10 min-w-[140px] rounded-lg border border-gray-30 bg-white p-1 shadow-lg">
+        <div className="absolute right-0 top-11 z-10 min-w-[140px] rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
           <button
             type="button"
             onClick={handleDelete}

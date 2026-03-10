@@ -39,10 +39,12 @@ export function Input({
     <div className={cn('flex flex-col w-full', className)}>
       <div
         className={cn(
-          'flex w-full items-center rounded-lg border border-gray-30 bg-gray-10 transition-colors',
+          'flex w-full items-center rounded-lg border border-gray-200 bg-gray-50 transition-colors',
           sizeClass.container,
-          'focus-within:ring-1 focus-within:ring-gray-50 focus-within:border-gray-50',
-          disabled && 'cursor-not-allowed opacity-50 bg-gray-20 border-gray-20',
+          'focus-within:ring-1 focus-within:ring-gray-400 focus-within:border-gray-400',
+          disabled &&
+            'cursor-not-allowed opacity-50 bg-gray-100 border-gray-100',
+          !disabled && 'hover:border-gray-300',
           error &&
             'border-error-60 focus-within:border-error-60 focus-within:ring-error-60',
         )}
@@ -54,7 +56,7 @@ export function Input({
           value={value}
           ref={ref}
           className={cn(
-            'flex-1 border-0 bg-transparent placeholder:text-gray-50 focus:outline-none disabled:cursor-not-allowed',
+            'flex-1 border-0 bg-transparent placeholder:text-gray-400 focus:outline-none disabled:cursor-not-allowed',
             sizeClass.text,
           )}
           {...rest}

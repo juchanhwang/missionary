@@ -99,7 +99,7 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
         <div className="flex flex-col gap-8">
           {/* 기본 정보 */}
           <fieldset className="flex flex-col gap-4">
-            <legend className="text-sm font-semibold text-gray-80 mb-2">
+            <legend className="text-sm font-semibold text-gray-800 mb-2">
               기본 정보
             </legend>
 
@@ -145,7 +145,7 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
             </div>
 
             <div>
-              <p className="mb-1 text-xs font-normal leading-[1.833] text-gray-70">
+              <p className="mb-1 text-xs font-normal leading-[1.833] text-gray-700">
                 성별
               </p>
               <Controller
@@ -168,7 +168,7 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
 
           {/* 인증 정보 */}
           <fieldset className="flex flex-col gap-4">
-            <legend className="text-sm font-semibold text-gray-80 mb-2">
+            <legend className="text-sm font-semibold text-gray-800 mb-2">
               인증 정보
             </legend>
 
@@ -209,7 +209,7 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
                 disabled
               />
               <div>
-                <p className="mb-1 text-xs font-normal leading-[1.833] text-gray-70">
+                <p className="mb-1 text-xs font-normal leading-[1.833] text-gray-700">
                   주민등록번호
                 </p>
                 <div className="flex items-center gap-2">
@@ -228,7 +228,7 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
                     <button
                       type="button"
                       onClick={() => setShowIdentity((prev) => !prev)}
-                      className="flex h-9 shrink-0 items-center gap-1 rounded-lg border border-gray-30 px-3 text-xs font-medium text-primary-50 transition-colors hover:bg-primary-10"
+                      className="flex h-9 shrink-0 items-center gap-1 rounded-lg border border-gray-200 px-3 text-xs font-medium text-primary-50 transition-colors hover:bg-primary-10"
                     >
                       {showIdentity ? (
                         <>
@@ -250,13 +250,13 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
 
           {/* 교회 정보 */}
           <fieldset className="flex flex-col gap-4">
-            <legend className="text-sm font-semibold text-gray-80 mb-2">
+            <legend className="text-sm font-semibold text-gray-800 mb-2">
               교회 정보
             </legend>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="mb-1 text-xs font-normal leading-[1.833] text-gray-70">
+                <p className="mb-1 text-xs font-normal leading-[1.833] text-gray-700">
                   세례 여부
                 </p>
                 <Controller
@@ -294,7 +294,7 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
 
           {/* 시스템 정보 */}
           <fieldset className="flex flex-col gap-4">
-            <legend className="text-sm font-semibold text-gray-80 mb-2">
+            <legend className="text-sm font-semibold text-gray-800 mb-2">
               시스템 정보
             </legend>
 
@@ -315,10 +315,10 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
       </div>
 
       {/* Bottom Actions */}
-      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between border-t border-gray-30 bg-white px-6 py-4">
+      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between border-t border-gray-200 bg-white px-6 py-4">
         <div>
           {isDirty && (
-            <div className="flex items-center gap-1.5 text-xs text-gray-40">
+            <div className="flex items-center gap-1.5 text-xs text-gray-300">
               <span className="h-1.5 w-1.5 rounded-full bg-warning-50" />
               변경사항이 있습니다
             </div>

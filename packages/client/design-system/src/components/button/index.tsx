@@ -17,16 +17,16 @@ const sizeClasses: Record<ButtonSize, string> = {
 
 const filledColorClasses: Record<ButtonColor, string> = {
   primary:
-    'bg-primary-50 text-white hover:bg-primary-60 active:bg-primary-70 disabled:bg-gray-30 disabled:text-gray-50 disabled:cursor-not-allowed',
+    'bg-primary-50 text-white hover:bg-primary-60 active:bg-primary-70 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed',
   neutral:
-    'bg-gray-80 text-white hover:bg-gray-70 active:bg-gray-90 disabled:bg-gray-30 disabled:text-gray-50 disabled:cursor-not-allowed',
+    'bg-gray-800 text-white hover:bg-gray-700 active:bg-gray-900 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed',
 };
 
 const outlineColorClasses: Record<ButtonColor, string> = {
   primary:
-    'border border-primary-50 bg-white text-primary-50 hover:bg-primary-10 active:bg-primary-20 disabled:border-gray-30 disabled:text-gray-40 disabled:cursor-not-allowed',
+    'border border-primary-50 bg-white text-primary-50 hover:bg-primary-10 active:bg-primary-20 disabled:border-gray-200 disabled:text-gray-300 disabled:cursor-not-allowed',
   neutral:
-    'border border-gray-40 bg-white text-gray-80 hover:bg-gray-10 active:bg-gray-20 disabled:border-gray-30 disabled:text-gray-40 disabled:cursor-not-allowed',
+    'border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 active:bg-gray-100 disabled:border-gray-200 disabled:text-gray-300 disabled:cursor-not-allowed',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

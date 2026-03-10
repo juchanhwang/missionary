@@ -84,11 +84,11 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
           />
         </div>
 
-        <div className="flex flex-col flex-1 min-h-0 bg-white rounded-xl border border-gray-30 shadow-sm overflow-hidden">
-          <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-b border-gray-30">
-            <p className="text-sm font-semibold text-gray-90">
+        <div className="flex flex-col flex-1 min-h-0 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-b border-gray-200">
+            <p className="text-sm font-semibold text-gray-900">
               유저 목록
-              <span className="ml-1.5 text-xs font-normal text-gray-50">
+              <span className="ml-1.5 text-xs font-normal text-gray-400">
                 {total}건
               </span>
             </p>
@@ -101,8 +101,8 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
             onRowClick={handleRowClick}
           />
 
-          <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-t border-gray-30">
-            <p className="text-xs text-gray-50">
+          <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-t border-gray-200">
+            <p className="text-xs text-gray-400">
               {total > 0
                 ? `${(currentPage - 1) * PAGE_SIZE + 1} - ${Math.min(currentPage * PAGE_SIZE, total)} / ${total}건`
                 : '0건'}

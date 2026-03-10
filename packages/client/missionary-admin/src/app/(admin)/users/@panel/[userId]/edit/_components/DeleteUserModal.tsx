@@ -75,12 +75,12 @@ export function DeleteUserModal({
       shouldCloseOnEsc={!isPending}
       shouldCloseOnOverlayClick={!isPending}
     >
-      <div className="bg-white rounded-xl border border-gray-10 p-6 max-w-sm w-full">
-        <h2 className="text-lg font-bold text-gray-90 mb-3">유저 삭제</h2>
-        <p className="text-sm text-gray-50 mb-2">
+      <div className="bg-white rounded-xl border border-gray-50 p-6 max-w-sm w-full">
+        <h2 className="text-lg font-bold text-gray-900 mb-3">유저 삭제</h2>
+        <p className="text-sm text-gray-400 mb-2">
           정말 &apos;{userName}&apos; 유저를 삭제하시겠습니까?
         </p>
-        <p className="text-xs text-gray-40 mb-6">30일 후 영구 삭제됩니다.</p>
+        <p className="text-xs text-gray-300 mb-6">30일 후 영구 삭제됩니다.</p>
         {errorMessage && (
           <p className="text-sm text-error-60 mb-4">{errorMessage}</p>
         )}

@@ -29,11 +29,11 @@ export function UnsavedChangesModal({
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
-      <div className="bg-white rounded-xl border border-gray-10 p-6 max-w-sm w-full">
-        <h2 className="text-lg font-bold text-gray-90 mb-3">
+      <div className="bg-white rounded-xl border border-gray-50 p-6 max-w-sm w-full">
+        <h2 className="text-lg font-bold text-gray-900 mb-3">
           변경사항이 있습니다
         </h2>
-        <p className="text-sm text-gray-50 mb-6">
+        <p className="text-sm text-gray-400 mb-6">
           저장하지 않은 변경사항이 있습니다. 그래도 닫으시겠습니까?
         </p>
         <div className="flex gap-3 justify-end">

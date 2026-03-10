@@ -127,17 +127,17 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
       >
         <div className="flex h-full flex-col bg-white shadow-[-4px_0_24px_rgba(0,0,0,0.08),-1px_0_4px_rgba(0,0,0,0.04)]">
           {/* Panel Header */}
-          <div className="flex shrink-0 items-center justify-between border-b border-gray-30 px-4 py-3">
+          <div className="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={requestClose}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-60 transition-colors hover:bg-gray-10 hover:text-gray-80"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-800"
                 title="패널 닫기"
               >
                 <ArrowRightFromLine size={18} />
               </button>
-              <h3 className="text-sm font-semibold text-gray-90">
+              <h3 className="text-sm font-semibold text-gray-900">
                 {user.name ?? '-'}
               </h3>
             </div>
@@ -148,7 +148,7 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
                   prevUser && router.push(`/users/${prevUser.id}/edit`)
                 }
                 disabled={!prevUser}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-60 transition-colors hover:bg-gray-10 hover:text-gray-70 disabled:opacity-30 disabled:pointer-events-none"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700 disabled:opacity-30 disabled:pointer-events-none"
                 title="이전 유저"
               >
                 <ChevronUp size={18} />
@@ -159,7 +159,7 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
                   nextUser && router.push(`/users/${nextUser.id}/edit`)
                 }
                 disabled={!nextUser}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-60 transition-colors hover:bg-gray-10 hover:text-gray-70 disabled:opacity-30 disabled:pointer-events-none"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700 disabled:opacity-30 disabled:pointer-events-none"
                 title="다음 유저"
               >
                 <ChevronDown size={18} />
@@ -170,14 +170,14 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
                   onClick={() => setIsMenuOpen((prev) => !prev)}
                   aria-expanded={isMenuOpen}
                   aria-haspopup="menu"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-60 transition-colors hover:bg-gray-10 hover:text-gray-80"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-800"
                 >
                   <Ellipsis size={18} />
                 </button>
                 {isMenuOpen && (
                   <div
                     role="menu"
-                    className="absolute right-0 top-full mt-1 w-36 rounded-lg border border-gray-30 bg-white py-1 shadow-lg"
+                    className="absolute right-0 top-full mt-1 w-36 rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
                   >
                     <button
                       type="button"

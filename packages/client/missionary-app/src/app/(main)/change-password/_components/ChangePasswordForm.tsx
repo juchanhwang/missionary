@@ -45,15 +45,15 @@ export function ChangePasswordForm() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-10">
+    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-50">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col items-center w-[400px] rounded-2xl bg-white border border-gray-40 p-10"
+        className="flex flex-col items-center w-[400px] rounded-2xl bg-white border border-gray-300 p-10"
       >
-        <h1 className="mb-3 text-2xl font-bold leading-tight text-center text-gray-90">
+        <h1 className="mb-3 text-2xl font-bold leading-tight text-center text-gray-900">
           비밀번호 변경
         </h1>
-        <p className="mb-10 text-sm font-normal leading-relaxed text-center text-gray-50">
+        <p className="mb-10 text-sm font-normal leading-relaxed text-center text-gray-400">
           현재 비밀번호를 확인한 후
           <br />새 비밀번호를 설정하세요.
         </p>
