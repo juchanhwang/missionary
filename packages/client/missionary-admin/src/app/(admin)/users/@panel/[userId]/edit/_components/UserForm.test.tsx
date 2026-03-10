@@ -1,5 +1,5 @@
-import { http, HttpResponse } from 'msw';
 import { useAuth } from 'lib/auth/AuthContext';
+import { http, HttpResponse } from 'msw';
 import { createMockUser } from 'test/mocks/data';
 import { server } from 'test/mocks/server';
 import { render, screen, waitFor } from 'test/test-utils';
@@ -81,9 +81,7 @@ describe('UserForm', () => {
     await user.clear(screen.getByLabelText('이름'));
     await user.click(screen.getByRole('button', { name: '저장' }));
 
-    expect(
-      await screen.findByText('이름을 입력해주세요'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('이름을 입력해주세요')).toBeInTheDocument();
   });
 
   it('저장 성공 시 변경사항 표시가 사라진다', async () => {
@@ -94,16 +92,12 @@ describe('UserForm', () => {
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     await waitFor(() => {
-      expect(
-        screen.queryByText('변경사항이 있습니다'),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText('변경사항이 있습니다')).not.toBeInTheDocument();
     });
   });
 
   it('저장 중 버튼 텍스트가 변경되고 비활성화된다', async () => {
-    server.use(
-      http.patch(`${API_URL}/users/:id`, () => new Promise(() => {})),
-    );
+    server.use(http.patch(`${API_URL}/users/:id`, () => new Promise(() => {})));
 
     const { user } = renderForm();
 
@@ -112,9 +106,7 @@ describe('UserForm', () => {
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: '저장 중...' }),
-      ).toBeDisabled();
+      expect(screen.getByRole('button', { name: '저장 중...' })).toBeDisabled();
     });
   });
 

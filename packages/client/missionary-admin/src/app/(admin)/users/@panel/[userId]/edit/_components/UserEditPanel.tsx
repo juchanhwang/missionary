@@ -13,8 +13,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { UserForm } from './UserForm';
-import { DeleteUserModal } from '../../../../_components/DeleteUserModal';
-import { UnsavedChangesModal } from '../../../../_components/UnsavedChangesModal';
+import { DeleteUserModal } from 'app/(admin)/users/@panel/[userId]/edit/_components/DeleteUserModal';
+import { UnsavedChangesModal } from 'app/(admin)/users/@panel/[userId]/edit/_components/UnsavedChangesModal';
 
 import type { PaginatedUsersResponse, User } from 'apis/user';
 

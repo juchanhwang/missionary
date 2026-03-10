@@ -15,11 +15,11 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { useUpdateUserAction } from '../../../../_hooks/useUpdateUserAction';
+import { useUpdateUserAction } from 'app/(admin)/users/@panel/[userId]/edit/_hooks/useUpdateUserAction';
 import {
   userUpdateSchema,
   type UserUpdateFormValues,
-} from '../../../../_schemas/userSchema';
+} from '../_schemas/userSchema';
 import { formatDate } from '../../../../_utils/formatDate';
 import { maskIdentityNumber } from '../../../../_utils/maskIdentityNumber';
 

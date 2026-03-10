@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
-import { useDeleteUserAction } from '../_hooks/useDeleteUserAction';
+import { useDeleteUserAction } from 'app/(admin)/users/@panel/[userId]/edit/_hooks/useDeleteUserAction';
 
 export interface DeleteUserModalProps {
   isOpen: boolean;
