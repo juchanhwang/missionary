@@ -104,7 +104,12 @@ export function Radio({
           checked ? 'border-gray-80' : 'border-gray-40',
         )}
       >
-        {checked && <span className="h-2 w-2 rounded-full bg-gray-80" />}
+        <span
+          className={cn(
+            'h-2 w-2 rounded-full bg-gray-80 transition-transform',
+            checked ? 'scale-100' : 'scale-0',
+          )}
+        />
       </span>
       {label && <span className="text-sm">{label}</span>}
     </label>

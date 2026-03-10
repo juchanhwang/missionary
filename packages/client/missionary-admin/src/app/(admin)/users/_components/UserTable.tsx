@@ -39,8 +39,8 @@ function getProviderBadgeVariant(provider: string | null) {
 
 function formatGender(gender: string | null): string {
   if (!gender) return '-';
-  if (gender === 'M') return '남';
-  if (gender === 'F') return '여';
+  if (gender === 'M' || gender === 'MALE') return '남';
+  if (gender === 'F' || gender === 'FEMALE') return '여';
   return gender;
 }
 
