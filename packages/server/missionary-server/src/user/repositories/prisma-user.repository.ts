@@ -89,21 +89,13 @@ export class PrismaUserRepository implements UserRepository {
   ): Promise<PaginatedResult<User>> {
     const [data, total] = await Promise.all([
       this.prisma.user.findMany({
-        where: args.where as Parameters<
-          typeof this.prisma.user.findMany
-        >[0] extends { where?: infer W }
-          ? W
-          : never,
+        where: args.where,
         orderBy: args.orderBy,
         skip: args.skip,
         take: args.take,
       }),
       this.prisma.user.count({
-        where: args.where as Parameters<
-          typeof this.prisma.user.count
-        >[0] extends { where?: infer W }
-          ? W
-          : never,
+        where: args.where,
       }),
     ]);
 
@@ -127,6 +119,23 @@ export class PrismaUserRepository implements UserRepository {
   async countActiveAdmins(): Promise<number> {
     return this.prisma.user.count({
       where: { role: 'ADMIN', deletedAt: null },
+    });
+  }
+
+  async softDeleteIfNotLastAdmin(id: string): Promise<User | null> {
+    return this.prisma.$transaction(async (tx) => {
+      const adminCount = await tx.user.count({
+        where: { role: 'ADMIN', deletedAt: null },
+      });
+
+      if (adminCount <= 1) {
+        return null;
+      }
+
+      return tx.user.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
     });
   }
 }

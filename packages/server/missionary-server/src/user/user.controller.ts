@@ -14,6 +14,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { Public } from '@/common/decorators/public.decorator';
 import { Roles } from '@/common/decorators/roles.decorator';
+import { SkipMasking } from '@/common/decorators/skip-masking.decorator';
 import { UserRole } from '@/common/enums/user-role.enum';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 
@@ -43,6 +44,7 @@ export class UserController {
 
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.STAFF)
+  @SkipMasking()
   @ApiOperation({ summary: '사용자 단건 조회 (관리자/스태프)' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.findOne(id);
@@ -50,6 +52,7 @@ export class UserController {
 
   @Patch(':id')
   @Roles(UserRole.ADMIN)
+  @SkipMasking()
   @ApiOperation({ summary: '사용자 정보 수정 (관리자 전용)' })
   update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -61,6 +64,7 @@ export class UserController {
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
+  @SkipMasking()
   @ApiOperation({ summary: '사용자 삭제 (관리자 전용)' })
   remove(
     @Param('id', ParseUUIDPipe) id: string,

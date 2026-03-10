@@ -1,4 +1,5 @@
 import { ExecutionContext, CallHandler } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { of } from 'rxjs';
 
 import { MaskingInterceptor } from './masking.interceptor';
@@ -7,9 +8,13 @@ import { UserRole } from '../enums/user-role.enum';
 describe('MaskingInterceptor', () => {
   let interceptor: MaskingInterceptor;
   let mockCallHandler: CallHandler;
+  let mockReflector: { getAllAndOverride: jest.Mock };
 
   beforeEach(() => {
-    interceptor = new MaskingInterceptor();
+    mockReflector = {
+      getAllAndOverride: jest.fn().mockReturnValue(undefined),
+    };
+    interceptor = new MaskingInterceptor(mockReflector as unknown as Reflector);
     mockCallHandler = {
       handle: jest.fn(),
     } as any;
@@ -20,6 +25,8 @@ describe('MaskingInterceptor', () => {
       switchToHttp: jest.fn().mockReturnValue({
         getRequest: jest.fn().mockReturnValue({ user }),
       }),
+      getHandler: jest.fn().mockReturnValue(() => {}),
+      getClass: jest.fn().mockReturnValue(class {}),
     } as any as ExecutionContext;
   };
 
@@ -286,8 +293,13 @@ describe('MaskingInterceptor', () => {
       });
     });
 
-    describe('ADMIN 역할 조건부 마스킹 해제', () => {
-      it('ADMIN + 단건 조회 → identityNumber 마스킹 해제', (done) => {
+    describe('ADMIN 역할 + @SkipMasking 데코레이터 조건부 마스킹 해제', () => {
+      it('ADMIN + @SkipMasking → identityNumber, phoneNumber 마스킹 해제', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue([
+          'identityNumber',
+          'phoneNumber',
+        ]);
+
         const responseData = {
           name: 'John Doe',
           identityNumber: '123456-1234567',
@@ -310,7 +322,9 @@ describe('MaskingInterceptor', () => {
           });
       });
 
-      it('ADMIN + 목록 조회 → identityNumber 마스킹 유지', (done) => {
+      it('ADMIN + @SkipMasking 미적용 → 마스킹 유지', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue(undefined);
+
         const responseData = [
           {
             name: 'John Doe',
@@ -342,7 +356,12 @@ describe('MaskingInterceptor', () => {
           });
       });
 
-      it('STAFF + 단건 조회 → identityNumber 마스킹 유지', (done) => {
+      it('STAFF + @SkipMasking → 마스킹 유지', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue([
+          'identityNumber',
+          'phoneNumber',
+        ]);
+
         const responseData = {
           name: 'John Doe',
           identityNumber: '123456-1234567',
@@ -365,7 +384,12 @@ describe('MaskingInterceptor', () => {
           });
       });
 
-      it('ADMIN + 단건 조회 → phoneNumber 마스킹 해제', (done) => {
+      it('ADMIN + @SkipMasking → phoneNumber 마스킹 해제', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue([
+          'identityNumber',
+          'phoneNumber',
+        ]);
+
         const singleResponse = {
           phoneNumber: '010-1234-5678',
           identityNumber: '123456-1234567',
@@ -386,7 +410,12 @@ describe('MaskingInterceptor', () => {
           });
       });
 
-      it('STAFF + 단건 조회 → phoneNumber 마스킹 유지', (done) => {
+      it('STAFF + @SkipMasking → phoneNumber 마스킹 유지', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue([
+          'identityNumber',
+          'phoneNumber',
+        ]);
+
         const singleResponse = {
           phoneNumber: '010-1234-5678',
         };
@@ -406,7 +435,12 @@ describe('MaskingInterceptor', () => {
           });
       });
 
-      it('ADMIN + 단건 조회 + 중첩 객체 → identityNumber 마스킹 해제', (done) => {
+      it('ADMIN + @SkipMasking + 중첩 객체 → identityNumber 마스킹 해제', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue([
+          'identityNumber',
+          'phoneNumber',
+        ]);
+
         const responseData = {
           user: {
             identityNumber: '123456-1234567',
@@ -430,7 +464,12 @@ describe('MaskingInterceptor', () => {
           });
       });
 
-      it('USER + 단건 조회 → identityNumber 마스킹 유지', (done) => {
+      it('USER + @SkipMasking → 마스킹 유지', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue([
+          'identityNumber',
+          'phoneNumber',
+        ]);
+
         const responseData = {
           identityNumber: '123456-1234567',
           phoneNumber: '010-1234-5678',
@@ -452,7 +491,12 @@ describe('MaskingInterceptor', () => {
           });
       });
 
-      it('ADMIN + 단건 조회 → bankAccount 마스킹 유지', (done) => {
+      it('ADMIN + @SkipMasking(기본값) → bankAccount 마스킹 유지', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue([
+          'identityNumber',
+          'phoneNumber',
+        ]);
+
         const responseData = {
           identityNumber: '123456-1234567',
           bankAccount: '123-456-789012',
@@ -469,6 +513,32 @@ describe('MaskingInterceptor', () => {
             next: (data) => {
               expect(data.identityNumber).toBe('123456-1234567');
               expect(data.bankAccount).toBe('123-456-******');
+              done();
+            },
+          });
+      });
+
+      it('ADMIN + @SkipMasking(bankAccount) → bankAccount만 마스킹 해제', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue(['bankAccount']);
+
+        const responseData = {
+          identityNumber: '123456-1234567',
+          phoneNumber: '010-1234-5678',
+          bankAccount: '123-456-789012',
+        };
+
+        mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
+
+        interceptor
+          .intercept(
+            createMockContext({ role: UserRole.ADMIN }),
+            mockCallHandler,
+          )
+          .subscribe({
+            next: (data) => {
+              expect(data.identityNumber).toBe('123456-1******');
+              expect(data.phoneNumber).toBe('010-123******');
+              expect(data.bankAccount).toBe('123-456-789012');
               done();
             },
           });

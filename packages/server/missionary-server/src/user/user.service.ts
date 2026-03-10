@@ -25,6 +25,7 @@ import {
 
 import type {
   AuthProvider,
+  Prisma,
   User,
   UserRole as PrismaUserRole,
 } from '../../prisma/generated/prisma';
@@ -85,7 +86,7 @@ export class UserService {
     const pageSize = query?.pageSize ?? 10;
     const skip = (page - 1) * pageSize;
 
-    const where: Record<string, unknown> = { deletedAt: null };
+    const where: Prisma.UserWhereInput = { deletedAt: null };
 
     if (query?.search) {
       where['OR'] = [
@@ -198,13 +199,14 @@ export class UserService {
     const target = await this.findOne(id);
 
     if (target.role === 'ADMIN') {
-      const activeAdminCount = await this.userRepository.countActiveAdmins();
-      if (activeAdminCount <= 1) {
+      const user = await this.userRepository.softDeleteIfNotLastAdmin(id);
+      if (!user) {
         throw new BadRequestException({
           code: 'LAST_ADMIN',
           message: '마지막 관리자는 삭제할 수 없습니다',
         });
       }
+      return this.decryptIdentityNumber(user);
     }
 
     const user = await this.userRepository.softDelete(id);

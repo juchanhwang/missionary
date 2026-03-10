@@ -4,9 +4,11 @@ import {
   ExecutionContext,
   CallHandler,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { SKIP_MASKING_KEY } from '../decorators/skip-masking.decorator';
 import { UserRole } from '../enums/user-role.enum';
 
 @Injectable()
@@ -17,13 +19,19 @@ export class MaskingInterceptor implements NestInterceptor {
     'bankAccount',
   ];
 
+  constructor(private readonly reflector: Reflector) {}
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const userRole: UserRole | undefined = request?.user?.role;
 
+    const skipMaskingFields = this.reflector.getAllAndOverride<
+      string[] | undefined
+    >(SKIP_MASKING_KEY, [context.getHandler(), context.getClass()]);
+
     return next.handle().pipe(
       map((data) => {
-        const skipFields = this.getSkipFields(userRole, data);
+        const skipFields = this.getSkipFields(userRole, skipMaskingFields);
         return this.maskData(data, skipFields);
       }),
     );
@@ -31,13 +39,14 @@ export class MaskingInterceptor implements NestInterceptor {
 
   private getSkipFields(
     userRole: UserRole | undefined,
-    data: any,
+    skipMaskingFields: string[] | undefined,
   ): Set<string> {
     const skipFields = new Set<string>();
 
-    if (userRole === UserRole.ADMIN && !Array.isArray(data)) {
-      skipFields.add('identityNumber');
-      skipFields.add('phoneNumber');
+    if (userRole === UserRole.ADMIN && skipMaskingFields) {
+      for (const field of skipMaskingFields) {
+        skipFields.add(field);
+      }
     }
 
     return skipFields;

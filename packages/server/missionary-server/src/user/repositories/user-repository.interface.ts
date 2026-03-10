@@ -2,6 +2,7 @@ import type { BaseRepository } from '@/common/repositories';
 
 import type {
   AuthProvider,
+  Prisma,
   User,
   UserRole,
 } from '../../../prisma/generated/prisma';
@@ -40,7 +41,7 @@ export interface UserUpdateInput {
 export interface UserPaginationArgs {
   skip?: number;
   take?: number;
-  where?: Record<string, unknown>;
+  where?: Prisma.UserWhereInput;
   orderBy?: Record<string, 'asc' | 'desc'>;
 }
 
@@ -66,6 +67,11 @@ export interface UserRepository extends BaseRepository<
   ): Promise<PaginatedResult<User>>;
   softDelete(id: string): Promise<User>;
   countActiveAdmins(): Promise<number>;
+  /**
+   * 트랜잭션 내에서 ADMIN 수를 확인하고 soft delete를 수행한다.
+   * 마지막 ADMIN이면 삭제하지 않고 null을 반환한다.
+   */
+  softDeleteIfNotLastAdmin(id: string): Promise<User | null>;
 }
 
 export const USER_REPOSITORY = Symbol('USER_REPOSITORY');

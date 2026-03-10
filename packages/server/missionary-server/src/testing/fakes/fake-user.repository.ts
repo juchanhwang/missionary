@@ -212,6 +212,18 @@ export class FakeUserRepository
     ).length;
   }
 
+  async softDeleteIfNotLastAdmin(id: string): Promise<User | null> {
+    const adminCount = [...this.store.values()].filter(
+      (user) => user.role === 'ADMIN' && user.deletedAt === null,
+    ).length;
+
+    if (adminCount <= 1) {
+      return null;
+    }
+
+    return this.softDelete(id);
+  }
+
   async updatePassword(id: string, hashedPassword: string): Promise<void> {
     const existing = this.store.get(id);
     if (!existing) {
