@@ -1,4 +1,5 @@
 import api from './instance';
+import { stripEmpty } from './utils';
 
 export type AuthProvider = 'LOCAL' | 'GOOGLE' | 'KAKAO';
 
@@ -50,13 +51,8 @@ export interface UpdateUserPayload {
 
 export const userApi = {
   getUsers(params?: GetUsersParams) {
-    const filteredParams = params
-      ? Object.fromEntries(
-          Object.entries(params).filter(([, v]) => v !== '' && v != null),
-        )
-      : undefined;
     return api.get<PaginatedUsersResponse>('/users', {
-      params: filteredParams,
+      params: params ? stripEmpty(params) : undefined,
     });
   },
 

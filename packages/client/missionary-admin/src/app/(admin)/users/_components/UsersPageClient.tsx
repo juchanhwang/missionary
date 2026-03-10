@@ -34,7 +34,7 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
     isBaptized: '',
   });
 
-  const { data, isLoading, isError } = useGetUsers({
+  const { data, isLoading, isError, refetch } = useGetUsers({
     params: searchParams,
     initialData,
   });
@@ -95,8 +95,17 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
           </div>
 
           {isError ? (
-            <div className="flex flex-1 items-center justify-center text-sm text-error-60">
-              유저 목록을 불러오는 중 오류가 발생했습니다
+            <div className="flex flex-1 flex-col items-center justify-center gap-3">
+              <p className="text-sm text-error-60">
+                유저 목록을 불러오는 중 오류가 발생했습니다
+              </p>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className="rounded-lg border border-gray-200 px-4 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                다시 시도
+              </button>
             </div>
           ) : (
             <UserTable

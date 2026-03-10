@@ -5,6 +5,7 @@ import 'styles/_global.scss';
 import { QueryProvider } from 'lib/QueryProvider';
 
 import type { Metadata } from 'next';
+import { Toaster } from 'sonner';
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -12,6 +13,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <QueryProvider>
         <body>{children}</body>
       </QueryProvider>
+      <Toaster position="bottom-right" richColors />
     </html>
   );
 };

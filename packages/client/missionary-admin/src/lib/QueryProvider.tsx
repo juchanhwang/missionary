@@ -8,7 +8,7 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import axios from 'axios';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 
 function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
@@ -54,7 +54,6 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <OverlayProvider>{children}</OverlayProvider>
-      <Toaster position="bottom-right" richColors />
     </QueryClientProvider>
   );
 }
