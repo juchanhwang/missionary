@@ -18,7 +18,7 @@ export const useContextData = <T,>(
       `<${component} /> is missing a parent component that provides a ${dataContext.displayName || 'specified'} context.`,
     );
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(err, useContextData);
+      Error.captureStackTrace(err);
     }
     throw err;
   }

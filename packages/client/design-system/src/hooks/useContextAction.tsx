@@ -18,7 +18,7 @@ export const useContextAction = <T,>(
       `<${component} /> is missing a parent component that provides a ${actionContext.displayName || 'specified'} context.`,
     );
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(err, useContextAction);
+      Error.captureStackTrace(err);
     }
     throw err;
   }

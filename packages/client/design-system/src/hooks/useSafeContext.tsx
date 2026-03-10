@@ -18,7 +18,7 @@ export const useSafeContext = <T,>(
       `${caller}는 ${providerName} 내부에서 사용해야 합니다.`,
     );
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(err, useSafeContext);
+      Error.captureStackTrace(err);
     }
     throw err;
   }
