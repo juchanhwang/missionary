@@ -10,13 +10,15 @@ import {
   Ellipsis,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { UserForm } from './UserForm';
 import { DeleteUserModal } from '../../../../_components/DeleteUserModal';
 import { UnsavedChangesModal } from '../../../../_components/UnsavedChangesModal';
 
 import type { PaginatedUsersResponse, User } from 'apis/user';
+
+const PANEL_TRANSITION_MS = 300;
 
 interface UserEditPanelProps {
   user: User;
@@ -55,13 +57,6 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
       ? cachedUsers[currentIndex + 1]
       : null;
 
-  const navigateToUser = useCallback(
-    (targetUser: User) => {
-      router.push(`/users/${targetUser.id}/edit`);
-    },
-    [router],
-  );
-
   useEffect(() => {
     const isEditPath = /^\/users\/[^/]+\/edit$/.test(pathname);
 
@@ -86,7 +81,7 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
 
   const handleClose = () => {
     setIsVisible(false);
-    setTimeout(() => router.push('/users'), 300);
+    setTimeout(() => router.push('/users'), PANEL_TRANSITION_MS);
   };
 
   const requestClose = async () => {
@@ -97,7 +92,7 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
             isOpen={isOpen}
             close={(result) => {
               close(result);
-              setTimeout(unmount, 300);
+              setTimeout(unmount, PANEL_TRANSITION_MS);
             }}
           />
         ),
@@ -110,9 +105,9 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
     }
   };
 
-  const handleDirtyChange = useCallback((dirty: boolean) => {
+  const handleDirtyChange = (dirty: boolean) => {
     isDirtyRef.current = dirty;
-  }, []);
+  };
 
   return (
     <>
@@ -149,7 +144,9 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={() => prevUser && navigateToUser(prevUser)}
+                onClick={() =>
+                  prevUser && router.push(`/users/${prevUser.id}/edit`)
+                }
                 disabled={!prevUser}
                 className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-60 transition-colors hover:bg-gray-10 hover:text-gray-70 disabled:opacity-30 disabled:pointer-events-none"
                 title="이전 유저"
@@ -158,7 +155,9 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
               </button>
               <button
                 type="button"
-                onClick={() => nextUser && navigateToUser(nextUser)}
+                onClick={() =>
+                  nextUser && router.push(`/users/${nextUser.id}/edit`)
+                }
                 disabled={!nextUser}
                 className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-60 transition-colors hover:bg-gray-10 hover:text-gray-70 disabled:opacity-30 disabled:pointer-events-none"
                 title="다음 유저"
@@ -169,14 +168,20 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
                 <button
                   type="button"
                   onClick={() => setIsMenuOpen((prev) => !prev)}
+                  aria-expanded={isMenuOpen}
+                  aria-haspopup="menu"
                   className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-60 transition-colors hover:bg-gray-10 hover:text-gray-80"
                 >
                   <Ellipsis size={18} />
                 </button>
                 {isMenuOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-36 rounded-lg border border-gray-30 bg-white py-1 shadow-lg">
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-full mt-1 w-36 rounded-lg border border-gray-30 bg-white py-1 shadow-lg"
+                  >
                     <button
                       type="button"
+                      role="menuitem"
                       onClick={async () => {
                         setIsMenuOpen(false);
                         const deleted = await overlay.openAsync<boolean>(
@@ -185,7 +190,7 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
                               isOpen={isOpen}
                               close={(result) => {
                                 close(result);
-                                setTimeout(unmount, 300);
+                                setTimeout(unmount, PANEL_TRANSITION_MS);
                               }}
                               userId={user.id}
                               userName={user.name ?? '-'}
@@ -194,7 +199,10 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
                         );
                         if (deleted) {
                           setIsVisible(false);
-                          setTimeout(() => router.push('/users'), 300);
+                          setTimeout(
+                            () => router.push('/users'),
+                            PANEL_TRANSITION_MS,
+                          );
                         }
                       }}
                       className="flex w-full items-center gap-2 px-3 py-2 text-sm text-error-60 transition-colors hover:bg-error-10"
