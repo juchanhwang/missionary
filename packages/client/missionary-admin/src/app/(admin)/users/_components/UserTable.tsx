@@ -122,9 +122,7 @@ export function UserTable({
                 <td className="px-5 py-3.5 whitespace-nowrap sticky left-0 z-10 bg-white relative">
                   <div
                     className={`absolute inset-0 pointer-events-none transition-colors ${
-                      isSelected
-                        ? 'bg-blue-50/5'
-                        : 'group-hover:bg-gray-10'
+                      isSelected ? 'bg-blue-50/5' : 'group-hover:bg-gray-10'
                     }`}
                   />
                   <span className="relative text-sm font-semibold text-gray-90">

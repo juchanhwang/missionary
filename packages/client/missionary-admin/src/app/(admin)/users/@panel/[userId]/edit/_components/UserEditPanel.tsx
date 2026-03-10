@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@samilhero/design-system';
+import { Button, overlay } from '@samilhero/design-system';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from 'lib/auth/AuthContext';
 import { queryKeys } from 'lib/queryKeys';
@@ -14,18 +14,17 @@ import {
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Modal from 'react-modal';
 
 import { DeleteUserModal } from '../../../../_components/DeleteUserModal';
-import { UserForm } from '../../../../_components/UserForm';
+import { UnsavedChangesModal } from '../../../../_components/UnsavedChangesModal';
+import { UserForm } from './UserForm';
 import { useUpdateUserAction } from '../../../../_hooks/useUpdateUserAction';
 import {
   userUpdateSchema,
   type UserUpdateFormValues,
 } from '../../../../_schemas/userSchema';
 
-import type { PaginatedUsersResponse } from 'apis/user';
-import type { User } from 'apis/user';
+import type { PaginatedUsersResponse, User } from 'apis/user';
 
 interface UserEditPanelProps {
   user: User;
@@ -73,8 +72,6 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
   const updateUser = useUpdateUserAction(user.id);
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -122,17 +119,25 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
     setTimeout(() => router.push('/users'), 300);
   };
 
-  const requestClose = () => {
+  const requestClose = async () => {
     if (form.formState.isDirty) {
-      setIsConfirmOpen(true);
+      const confirmed = await overlay.openAsync<boolean>(
+        ({ isOpen, close, unmount }) => (
+          <UnsavedChangesModal
+            isOpen={isOpen}
+            close={(result) => {
+              close(result);
+              setTimeout(unmount, 300);
+            }}
+          />
+        ),
+      );
+      if (confirmed) {
+        handleClose();
+      }
     } else {
       handleClose();
     }
-  };
-
-  const confirmClose = () => {
-    setIsConfirmOpen(false);
-    handleClose();
   };
 
   const form = useForm<UserUpdateFormValues>({
@@ -226,9 +231,25 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
                     {isAdmin && (
                       <button
                         type="button"
-                        onClick={() => {
+                        onClick={async () => {
                           setIsMenuOpen(false);
-                          setIsModalOpen(true);
+                          const deleted = await overlay.openAsync<boolean>(
+                            ({ isOpen, close, unmount }) => (
+                              <DeleteUserModal
+                                isOpen={isOpen}
+                                close={(result) => {
+                                  close(result);
+                                  setTimeout(unmount, 300);
+                                }}
+                                userId={user.id}
+                                userName={user.name ?? '-'}
+                              />
+                            ),
+                          );
+                          if (deleted) {
+                            setIsVisible(false);
+                            setTimeout(() => router.push('/users'), 300);
+                          }
                         }}
                         className="flex w-full items-center gap-2 px-3 py-2 text-sm text-error-60 transition-colors hover:bg-error-10"
                       >
@@ -278,62 +299,6 @@ export function UserEditPanel({ user }: UserEditPanelProps) {
           </form>
         </div>
       </div>
-
-      {isModalOpen && (
-        <DeleteUserModal
-          isOpen={isModalOpen}
-          userId={user.id}
-          userName={user.name ?? '-'}
-          onClose={() => setIsModalOpen(false)}
-          onSuccess={() => {
-            setIsModalOpen(false);
-            setIsVisible(false);
-            setTimeout(() => router.push('/users'), 300);
-          }}
-        />
-      )}
-
-      <Modal
-        isOpen={isConfirmOpen}
-        onRequestClose={() => setIsConfirmOpen(false)}
-        contentLabel="변경사항 확인"
-        className="fixed inset-0 flex items-center justify-center p-4"
-        overlayClassName="fixed inset-0 bg-black/30 flex items-center justify-center z-50"
-        shouldCloseOnEsc
-        shouldCloseOnOverlayClick
-        appElement={
-          typeof window !== 'undefined'
-            ? document.body
-            : undefined
-        }
-      >
-        <div className="bg-white rounded-xl border border-gray-10 p-6 max-w-sm w-full">
-          <h2 className="text-lg font-bold text-gray-90 mb-3">
-            변경사항이 있습니다
-          </h2>
-          <p className="text-sm text-gray-50 mb-6">
-            저장하지 않은 변경사항이 있습니다. 그래도 닫으시겠습니까?
-          </p>
-          <div className="flex gap-3 justify-end">
-            <Button
-              variant="outline"
-              color="neutral"
-              size="md"
-              onClick={() => setIsConfirmOpen(false)}
-            >
-              취소
-            </Button>
-            <Button
-              variant="filled"
-              color="primary"
-              size="md"
-              onClick={confirmClose}
-            >
-              닫기
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </>
   );
 }

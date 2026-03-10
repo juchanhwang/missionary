@@ -9,10 +9,9 @@ import { useDeleteUserAction } from '../_hooks/useDeleteUserAction';
 
 export interface DeleteUserModalProps {
   isOpen: boolean;
+  close: (result: boolean) => void;
   userId: string;
   userName: string;
-  onClose: () => void;
-  onSuccess: () => void;
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -36,10 +35,9 @@ function getErrorMessage(error: unknown): string {
 
 export function DeleteUserModal({
   isOpen,
+  close,
   userId,
   userName,
-  onClose,
-  onSuccess,
 }: DeleteUserModalProps) {
   const { mutate, isPending } = useDeleteUserAction();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -58,7 +56,7 @@ export function DeleteUserModal({
     setErrorMessage(null);
     mutate(userId, {
       onSuccess: () => {
-        onSuccess();
+        close(true);
       },
       onError: (error) => {
         setErrorMessage(getErrorMessage(error));
@@ -70,10 +68,10 @@ export function DeleteUserModal({
     <Modal
       isOpen={isOpen}
       onAfterOpen={handleAfterOpen}
-      onRequestClose={onClose}
+      onRequestClose={() => close(false)}
       contentLabel="유저 삭제 확인"
       className="fixed inset-0 flex items-center justify-center p-4"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      overlayClassName="fixed inset-0 bg-black/30 flex items-center justify-center"
       shouldCloseOnEsc={!isPending}
       shouldCloseOnOverlayClick={!isPending}
     >
@@ -91,7 +89,7 @@ export function DeleteUserModal({
             variant="outline"
             color="neutral"
             size="md"
-            onClick={onClose}
+            onClick={() => close(false)}
             disabled={isPending}
           >
             취소

@@ -10,8 +10,7 @@ import { DeleteUserModal } from './DeleteUserModal';
 const API_URL = 'http://localhost';
 
 describe('DeleteUserModal', () => {
-  const mockOnClose = vi.fn();
-  const mockOnSuccess = vi.fn();
+  const mockClose = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -23,8 +22,7 @@ describe('DeleteUserModal', () => {
         isOpen={true}
         userId="user-1"
         userName="홍길동"
-        onClose={mockOnClose}
-        onSuccess={mockOnSuccess}
+        close={mockClose}
       />,
     );
 
@@ -38,8 +36,7 @@ describe('DeleteUserModal', () => {
         isOpen={false}
         userId="user-1"
         userName="홍길동"
-        onClose={mockOnClose}
-        onSuccess={mockOnSuccess}
+        close={mockClose}
       />,
     );
 
@@ -52,23 +49,21 @@ describe('DeleteUserModal', () => {
         isOpen={true}
         userId="user-1"
         userName="홍길동"
-        onClose={mockOnClose}
-        onSuccess={mockOnSuccess}
+        close={mockClose}
       />,
     );
 
     expect(screen.getByText('30일 후 영구 삭제됩니다.')).toBeInTheDocument();
   });
 
-  it('삭제 확인 시 onSuccess 콜백을 호출한다', async () => {
+  it('삭제 확인 시 close(true)를 호출한다', async () => {
     // Arrange: MSW 기본 핸들러가 DELETE /users/:id에 204 반환
     const { user } = render(
       <DeleteUserModal
         isOpen={true}
         userId="user-1"
         userName="홍길동"
-        onClose={mockOnClose}
-        onSuccess={mockOnSuccess}
+        close={mockClose}
       />,
     );
 
@@ -78,9 +73,9 @@ describe('DeleteUserModal', () => {
       screen.getByRole('button', { name: '삭제', hidden: true }),
     );
 
-    // Assert: MSW가 204 반환 → onSuccess 호출
+    // Assert: MSW가 204 반환 → close(true) 호출
     await waitFor(() => {
-      expect(mockOnSuccess).toHaveBeenCalled();
+      expect(mockClose).toHaveBeenCalledWith(true);
     });
   });
 
@@ -97,8 +92,7 @@ describe('DeleteUserModal', () => {
         isOpen={true}
         userId="user-1"
         userName="홍길동"
-        onClose={mockOnClose}
-        onSuccess={mockOnSuccess}
+        close={mockClose}
       />,
     );
 
@@ -113,14 +107,13 @@ describe('DeleteUserModal', () => {
     ).toBeInTheDocument();
   });
 
-  it('취소 버튼 클릭 시 onClose를 호출한다', async () => {
+  it('취소 버튼 클릭 시 close(false)를 호출한다', async () => {
     const { user } = render(
       <DeleteUserModal
         isOpen={true}
         userId="user-1"
         userName="홍길동"
-        onClose={mockOnClose}
-        onSuccess={mockOnSuccess}
+        close={mockClose}
       />,
     );
 
@@ -129,7 +122,7 @@ describe('DeleteUserModal', () => {
       screen.getByRole('button', { name: '취소', hidden: true }),
     );
 
-    expect(mockOnClose).toHaveBeenCalled();
+    expect(mockClose).toHaveBeenCalledWith(false);
   });
 
   it('삭제 버튼 클릭 후 mutation 진행 중에 버튼이 비활성화된다', async () => {
@@ -143,8 +136,7 @@ describe('DeleteUserModal', () => {
         isOpen={true}
         userId="user-1"
         userName="홍길동"
-        onClose={mockOnClose}
-        onSuccess={mockOnSuccess}
+        close={mockClose}
       />,
     );
 
