@@ -34,7 +34,7 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
     isBaptized: '',
   });
 
-  const { data, isLoading } = useGetUsers({
+  const { data, isLoading, isError } = useGetUsers({
     params: searchParams,
     initialData,
   });
@@ -94,12 +94,18 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
             </p>
           </div>
 
-          <UserTable
-            users={users}
-            isLoading={isLoading}
-            selectedUserId={selectedUserId}
-            onRowClick={handleRowClick}
-          />
+          {isError ? (
+            <div className="flex flex-1 items-center justify-center text-sm text-error-60">
+              유저 목록을 불러오는 중 오류가 발생했습니다
+            </div>
+          ) : (
+            <UserTable
+              users={users}
+              isLoading={isLoading}
+              selectedUserId={selectedUserId}
+              onRowClick={handleRowClick}
+            />
+          )}
 
           <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-t border-gray-200">
             <p className="text-xs text-gray-400">

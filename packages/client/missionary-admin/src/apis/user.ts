@@ -50,7 +50,16 @@ export interface UpdateUserPayload {
 
 export const userApi = {
   getUsers(params?: GetUsersParams) {
-    return api.get<PaginatedUsersResponse>('/users', { params });
+    const filteredParams = params
+      ? Object.fromEntries(
+          Object.entries(params).filter(
+            ([, v]) => v !== '' && v != null,
+          ),
+        )
+      : undefined;
+    return api.get<PaginatedUsersResponse>('/users', {
+      params: filteredParams,
+    });
   },
 
   getUser(id: string) {

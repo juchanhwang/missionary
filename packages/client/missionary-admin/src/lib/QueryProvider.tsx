@@ -6,6 +6,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
 
 function makeQueryClient() {
   return new QueryClient({
@@ -36,6 +37,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <OverlayProvider>{children}</OverlayProvider>
+      <Toaster position="bottom-right" richColors />
     </QueryClientProvider>
   );
 }
