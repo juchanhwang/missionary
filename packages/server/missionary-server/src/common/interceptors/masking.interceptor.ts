@@ -4,8 +4,12 @@ import {
   ExecutionContext,
   CallHandler,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+
+import { SKIP_MASKING_KEY } from '../decorators/skip-masking.decorator';
+import { UserRole } from '../enums/user-role.enum';
 
 @Injectable()
 export class MaskingInterceptor implements NestInterceptor {
@@ -15,11 +19,40 @@ export class MaskingInterceptor implements NestInterceptor {
     'bankAccount',
   ];
 
+  constructor(private readonly reflector: Reflector) {}
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    return next.handle().pipe(map((data) => this.maskData(data)));
+    const request = context.switchToHttp().getRequest();
+    const userRole: UserRole | undefined = request?.user?.role;
+
+    const skipMaskingFields = this.reflector.getAllAndOverride<
+      string[] | undefined
+    >(SKIP_MASKING_KEY, [context.getHandler(), context.getClass()]);
+
+    return next.handle().pipe(
+      map((data) => {
+        const skipFields = this.getSkipFields(userRole, skipMaskingFields);
+        return this.maskData(data, skipFields);
+      }),
+    );
   }
 
-  private maskData(data: any): any {
+  private getSkipFields(
+    userRole: UserRole | undefined,
+    skipMaskingFields: string[] | undefined,
+  ): Set<string> {
+    const skipFields = new Set<string>();
+
+    if (userRole === UserRole.ADMIN && skipMaskingFields) {
+      for (const field of skipMaskingFields) {
+        skipFields.add(field);
+      }
+    }
+
+    return skipFields;
+  }
+
+  private maskData(data: any, skipFields: Set<string>): any {
     if (!data) {
       return data;
     }
@@ -29,7 +62,7 @@ export class MaskingInterceptor implements NestInterceptor {
     }
 
     if (Array.isArray(data)) {
-      return data.map((item) => this.maskData(item));
+      return data.map((item) => this.maskData(item, skipFields));
     }
 
     if (typeof data === 'object') {
@@ -37,9 +70,12 @@ export class MaskingInterceptor implements NestInterceptor {
 
       for (const key in masked) {
         if (this.PII_FIELDS.includes(key)) {
+          if (skipFields.has(key)) {
+            continue;
+          }
           masked[key] = this.maskLast6Chars(masked[key]);
         } else if (typeof masked[key] === 'object') {
-          masked[key] = this.maskData(masked[key]);
+          masked[key] = this.maskData(masked[key], skipFields);
         }
       }
 

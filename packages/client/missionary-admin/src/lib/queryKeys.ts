@@ -15,4 +15,10 @@ export const queryKeys = {
     detail: (id: string) =>
       [...queryKeys.missionGroups.all, 'detail', id] as const,
   },
+  users: {
+    all: ['users'] as const,
+    list: (params?: object) =>
+      [...queryKeys.users.all, 'list', params] as const,
+    detail: (id: string) => [...queryKeys.users.all, 'detail', id] as const,
+  },
 } as const;

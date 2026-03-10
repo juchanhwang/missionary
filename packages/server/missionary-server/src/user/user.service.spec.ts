@@ -2,6 +2,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
 import { EncryptionService } from '@/common/encryption/encryption.service';
+import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 import {
   PASSWORD_HASHER,
   PasswordHasher,
@@ -26,6 +27,13 @@ describe('UserService', () => {
   const mockEncryptionService = {
     encrypt: jest.fn((value: string) => 'encrypted-' + value),
     decrypt: jest.fn((value: string) => value.replace('encrypted-', '')),
+  };
+
+  const adminUser: AuthenticatedUser = {
+    id: 'admin-caller-id',
+    email: 'admin-caller@test.com',
+    role: 'ADMIN',
+    provider: null,
   };
 
   beforeEach(async () => {
@@ -122,13 +130,13 @@ describe('UserService', () => {
 
       const result = await userService.findAll();
 
-      expect(result).toHaveLength(2);
+      expect(result.data).toHaveLength(2);
     });
 
     it('사용자가 없으면 빈 배열을 반환한다', async () => {
       const result = await userService.findAll();
 
-      expect(result).toEqual([]);
+      expect(result.data).toEqual([]);
     });
 
     it('주민등록번호가 있는 사용자는 복호화하여 반환한다', async () => {
@@ -137,7 +145,7 @@ describe('UserService', () => {
 
       const result = await userService.findAll();
 
-      expect(result[0].identityNumber).toBe('900101-1234567');
+      expect(result.data[0].identityNumber).toBe('900101-1234567');
     });
   });
 
@@ -363,20 +371,28 @@ describe('UserService', () => {
   });
 
   describe('remove', () => {
-    it('사용자를 정상적으로 삭제한다', async () => {
+    beforeEach(() => {
+      fakeUserRepository.seed(
+        makeUser({ id: adminUser.id, email: adminUser.email!, role: 'ADMIN' }),
+      );
+    });
+
+    it('사용자를 소프트 삭제한다', async () => {
       const user = makeUser({ email: 'remove@test.com' });
       await fakeUserRepository.create(user);
 
-      const result = await userService.remove(user.id);
+      const result = await userService.remove(user.id, adminUser);
 
       expect(result.email).toBe('remove@test.com');
-      expect(fakeUserRepository.getAll()).toHaveLength(0);
+      const stored = fakeUserRepository.getAll().find((u) => u.id === user.id);
+      expect(stored).toBeDefined();
+      expect(stored?.deletedAt).toBeInstanceOf(Date);
     });
 
     it('존재하지 않는 사용자를 삭제하면 NotFoundException을 던진다', async () => {
-      await expect(userService.remove('non-existent-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        userService.remove('non-existent-id', adminUser),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('삭제된 사용자의 주민등록번호를 복호화하여 반환한다', async () => {
@@ -386,7 +402,7 @@ describe('UserService', () => {
       });
       await fakeUserRepository.create(user);
 
-      const result = await userService.remove(user.id);
+      const result = await userService.remove(user.id, adminUser);
 
       expect(result.identityNumber).toBe('900101-1234567');
     });

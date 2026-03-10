@@ -4,7 +4,10 @@ import { useControllableState, useMergeRefs } from '@hooks';
 import { cn } from '@lib/utils';
 import React, { useContext, createContext, useMemo, useRef } from 'react';
 
-import { RadioGroupActionsContext } from '../radio-group/radioGroupContext';
+import {
+  RadioGroupActionsContext,
+  RadioGroupDataContext,
+} from '../radio-group/radioGroupContext';
 
 export const RadioActionsContext = createContext<{
   onChange: (checked: boolean) => void;
@@ -46,13 +49,19 @@ export function Radio({
   ...props
 }: RadioProps) {
   const groupActions = useContext(RadioGroupActionsContext);
+  const groupData = useContext(RadioGroupDataContext);
   const internalRef = useRef<HTMLInputElement>(null);
 
-  const [checked, onChange] = useControllableState<boolean>(
+  const isInGroup = groupData !== null;
+
+  const [internalChecked, onChange] = useControllableState<boolean>(
     controlledChecked,
     undefined,
     defaultChecked,
   );
+
+  // RadioGroup 안에서는 그룹 value로 checked를 결정
+  const checked = isInGroup ? groupData.value === value : internalChecked;
 
   const mergedRef = useMergeRefs(ref, internalRef);
 
@@ -95,7 +104,12 @@ export function Radio({
           checked ? 'border-gray-800' : 'border-gray-300',
         )}
       >
-        {checked && <span className="h-2 w-2 rounded-full bg-gray-800" />}
+        <span
+          className={cn(
+            'h-2 w-2 rounded-full bg-gray-800 transition-transform',
+            checked ? 'scale-100' : 'scale-0',
+          )}
+        />
       </span>
       {label && <span className="text-sm">{label}</span>}
     </label>

@@ -1,17 +1,22 @@
 import {
+  BadRequestException,
   ConflictException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
 import { EncryptionService } from '@/common/encryption/encryption.service';
+import { UserRole } from '@/common/enums/user-role.enum';
+import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 import {
   PASSWORD_HASHER,
   PasswordHasher,
 } from '@/common/interfaces/password-hasher.interface';
 
 import { CreateUserDto } from './dto/create-user.dto';
+import { FindAllUsersQueryDto } from './dto/find-all-users-query.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
   USER_REPOSITORY,
@@ -20,8 +25,9 @@ import {
 
 import type {
   AuthProvider,
+  Prisma,
   User,
-  UserRole,
+  UserRole as PrismaUserRole,
 } from '../../prisma/generated/prisma';
 
 @Injectable()
@@ -75,11 +81,45 @@ export class UserService {
     return this.decryptIdentityNumber(user);
   }
 
-  async findAll() {
-    const users = await this.userRepository.findMany({
+  async findAll(query?: FindAllUsersQueryDto) {
+    const page = query?.page ?? 1;
+    const pageSize = query?.pageSize ?? 10;
+    const skip = (page - 1) * pageSize;
+
+    const where: Prisma.UserWhereInput = { deletedAt: null };
+
+    if (query?.search) {
+      where['OR'] = [
+        { name: { contains: query.search } },
+        { email: { contains: query.search } },
+      ];
+    }
+
+    if (query?.role) {
+      where['role'] = query.role;
+    }
+
+    if (query?.provider) {
+      where['provider'] = query.provider;
+    }
+
+    if (query?.isBaptized !== undefined) {
+      where['isBaptized'] = query.isBaptized;
+    }
+
+    const { data, total } = await this.userRepository.findManyWithPagination({
+      where,
       orderBy: { createdAt: 'desc' },
+      skip,
+      take: pageSize,
     });
-    return users.map((user) => this.decryptIdentityNumber(user));
+
+    return {
+      data: data.map((user) => this.decryptIdentityNumber(user)),
+      total,
+      page,
+      pageSize,
+    };
   }
 
   async findOne(id: string) {
@@ -102,7 +142,7 @@ export class UserService {
     return this.decryptIdentityNumberNullable(user);
   }
 
-  async findByLoginIdAndRole(loginId: string, role: UserRole) {
+  async findByLoginIdAndRole(loginId: string, role: PrismaUserRole) {
     const user = await this.userRepository.findByLoginIdAndRole(loginId, role);
     return this.decryptIdentityNumberNullable(user);
   }
@@ -117,10 +157,18 @@ export class UserService {
     return this.decryptIdentityNumber(user);
   }
 
-  async update(id: string, dto: UpdateUserDto) {
+  async update(
+    id: string,
+    dto: UpdateUserDto,
+    currentUser?: AuthenticatedUser,
+  ) {
     await this.findOne(id);
 
-    const { password, ...rest } = dto;
+    if (dto.role && currentUser?.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('역할 변경은 ADMIN만 가능합니다');
+    }
+
+    const { password: _password, ...rest } = dto;
 
     const data = {
       ...rest,
@@ -140,10 +188,28 @@ export class UserService {
     await this.userRepository.updatePassword(id, hashedPassword);
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async remove(id: string, currentUser: AuthenticatedUser) {
+    if (currentUser.id === id) {
+      throw new BadRequestException({
+        code: 'CANNOT_DELETE_SELF',
+        message: '자기 자신은 삭제할 수 없습니다',
+      });
+    }
 
-    const user = await this.userRepository.delete({ id });
+    const target = await this.findOne(id);
+
+    if (target.role === 'ADMIN') {
+      const user = await this.userRepository.softDeleteIfNotLastAdmin(id);
+      if (!user) {
+        throw new BadRequestException({
+          code: 'LAST_ADMIN',
+          message: '마지막 관리자는 삭제할 수 없습니다',
+        });
+      }
+      return this.decryptIdentityNumber(user);
+    }
+
+    const user = await this.userRepository.softDelete(id);
     return this.decryptIdentityNumber(user);
   }
 }
