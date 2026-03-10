@@ -183,9 +183,11 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
                         : '역할을 선택하세요'}
                     </Select.Trigger>
                     <Select.Options>
-                      <Select.Option item="USER">사용자</Select.Option>
-                      <Select.Option item="STAFF">스태프</Select.Option>
-                      <Select.Option item="ADMIN">관리자</Select.Option>
+                      {Object.entries(ROLE_LABELS).map(([value, label]) => (
+                        <Select.Option key={value} item={value}>
+                          {label}
+                        </Select.Option>
+                      ))}
                     </Select.Options>
                   </Select>
                 )}

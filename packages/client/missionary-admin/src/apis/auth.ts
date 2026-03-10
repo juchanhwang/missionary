@@ -1,9 +1,11 @@
 import api from './instance';
 
+import type { UserRole } from './user';
+
 export interface AuthUser {
   id: string;
   email: string;
-  role: string;
+  role: UserRole;
   provider: string;
 }
 
