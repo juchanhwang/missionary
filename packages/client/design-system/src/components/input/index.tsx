@@ -44,6 +44,7 @@ export function Input({
           'focus-within:ring-1 focus-within:ring-gray-400 focus-within:border-gray-400',
           disabled &&
             'cursor-not-allowed opacity-50 bg-gray-100 border-gray-100',
+          !disabled && 'hover:border-gray-300',
           error &&
             'border-error-60 focus-within:border-error-60 focus-within:ring-error-60',
         )}
