@@ -88,9 +88,6 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
           form.reset(data);
           toast.success('유저 정보가 저장되었습니다');
         },
-        onError: () => {
-          toast.error('저장에 실패했습니다');
-        },
       },
     );
   };

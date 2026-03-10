@@ -52,9 +52,7 @@ export const userApi = {
   getUsers(params?: GetUsersParams) {
     const filteredParams = params
       ? Object.fromEntries(
-          Object.entries(params).filter(
-            ([, v]) => v !== '' && v != null,
-          ),
+          Object.entries(params).filter(([, v]) => v !== '' && v != null),
         )
       : undefined;
     return api.get<PaginatedUsersResponse>('/users', {
