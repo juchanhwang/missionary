@@ -95,8 +95,8 @@ export function LoginForm() {
           </Button>
         </div>
 
-        <div className="relative flex items-center justify-center w-full my-6 before:content-[''] before:flex-1 before:h-px before:bg-gray-50 after:content-[''] after:flex-1 after:h-px after:bg-gray-50">
-          <span className="px-3 text-xs text-gray-200">또는</span>
+        <div className="relative flex items-center justify-center w-full my-6 before:content-[''] before:flex-1 before:h-px before:bg-gray-200 after:content-[''] after:flex-1 after:h-px after:bg-gray-200">
+          <span className="px-3 text-xs text-gray-400">또는</span>
         </div>
 
         <div className="flex flex-col gap-3 w-full">

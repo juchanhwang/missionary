@@ -12,6 +12,7 @@ import {
 } from '@samilhero/design-system';
 import { useUpdateUserAction } from 'app/(admin)/users/@panel/[userId]/edit/_hooks/useUpdateUserAction';
 import { useAuth } from 'lib/auth/AuthContext';
+import { ROLE_LABELS } from 'lib/constants/role';
 import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -24,12 +25,6 @@ import {
 } from '../_schemas/userSchema';
 
 import type { User } from 'apis/user';
-
-const ROLE_LABELS: Record<string, string> = {
-  USER: 'USER',
-  STAFF: 'STAFF',
-  ADMIN: 'ADMIN',
-};
 
 interface UserFormProps {
   user: User;
@@ -188,9 +183,9 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
                         : '역할을 선택하세요'}
                     </Select.Trigger>
                     <Select.Options>
-                      <Select.Option item="USER">USER</Select.Option>
-                      <Select.Option item="STAFF">STAFF</Select.Option>
-                      <Select.Option item="ADMIN">ADMIN</Select.Option>
+                      <Select.Option item="USER">사용자</Select.Option>
+                      <Select.Option item="STAFF">스태프</Select.Option>
+                      <Select.Option item="ADMIN">관리자</Select.Option>
                     </Select.Options>
                   </Select>
                 )}

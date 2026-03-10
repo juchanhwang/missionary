@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from 'lib/auth/AuthContext';
+import { ROLE_LABELS } from 'lib/constants/role';
 import { useSidebar } from 'lib/sidebar/SidebarContext';
 import {
   FileText,
@@ -148,7 +149,9 @@ export function Sidebar() {
               <p className="text-sm font-medium text-gray-900 truncate">
                 {user.email}
               </p>
-              <p className="text-xs text-gray-400 capitalize">{user.role}</p>
+              <p className="text-xs text-gray-400">
+                {ROLE_LABELS[user.role] ?? user.role}
+              </p>
             </div>
             <button
               type="button"
