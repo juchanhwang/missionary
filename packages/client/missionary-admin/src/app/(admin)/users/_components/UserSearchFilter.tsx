@@ -1,10 +1,10 @@
 'use client';
 
 import { SearchBox, Select } from '@samilhero/design-system';
+import { ROLE_LABELS } from 'lib/constants/role';
 import { useEffect, useRef, useState } from 'react';
 
 import type { AuthProvider, UserRole } from 'apis/user';
-import { ROLE_LABELS } from 'lib/constants/role';
 
 const PROVIDER_LABELS: Record<string, string> = {
   LOCAL: 'LOCAL',
