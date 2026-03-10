@@ -13,10 +13,11 @@ const badgeVariants = cva(
         success: 'border-transparent bg-green-10 text-green-60',
         warning: 'border-transparent bg-warning-10 text-warning-70',
         info: 'border-transparent bg-blue-10 text-blue-60',
-        default: 'border-transparent bg-gray-80 text-white hover:bg-gray-70',
+        default: 'border-transparent bg-gray-800 text-white hover:bg-gray-700',
         destructive:
           'border-transparent bg-primary-50 text-white hover:bg-primary-60',
-        outline: 'border-gray-30 bg-transparent text-gray-80 hover:bg-gray-10',
+        outline:
+          'border-gray-200 bg-transparent text-gray-800 hover:bg-gray-50',
       },
     },
     defaultVariants: {

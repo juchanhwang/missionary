@@ -23,7 +23,7 @@ export function MissionForm({ form, isPending }: MissionFormProps) {
     <div className="flex flex-col gap-8">
       {/* 기본 정보 */}
       <fieldset className="flex flex-col gap-4">
-        <legend className="text-sm font-semibold text-gray-80 mb-2">
+        <legend className="text-sm font-semibold text-gray-800 mb-2">
           기본 정보
         </legend>
 
@@ -83,7 +83,7 @@ export function MissionForm({ form, isPending }: MissionFormProps) {
 
       {/* 일정 */}
       <fieldset className="flex flex-col gap-4">
-        <legend className="text-sm font-semibold text-gray-80 mb-2">
+        <legend className="text-sm font-semibold text-gray-800 mb-2">
           일정
         </legend>
 
@@ -150,7 +150,7 @@ export function MissionForm({ form, isPending }: MissionFormProps) {
 
       {/* 담당자 정보 */}
       <fieldset className="flex flex-col gap-4">
-        <legend className="text-sm font-semibold text-gray-80 mb-2">
+        <legend className="text-sm font-semibold text-gray-800 mb-2">
           담당자 정보
         </legend>
 
@@ -173,7 +173,7 @@ export function MissionForm({ form, isPending }: MissionFormProps) {
 
       {/* 참가 정보 */}
       <fieldset className="flex flex-col gap-4">
-        <legend className="text-sm font-semibold text-gray-80 mb-2">
+        <legend className="text-sm font-semibold text-gray-800 mb-2">
           참가 정보
         </legend>
 
@@ -199,7 +199,7 @@ export function MissionForm({ form, isPending }: MissionFormProps) {
 
       {/* 입금 정보 */}
       <fieldset className="flex flex-col gap-4">
-        <legend className="text-sm font-semibold text-gray-80 mb-2">
+        <legend className="text-sm font-semibold text-gray-800 mb-2">
           입금 정보
         </legend>
 

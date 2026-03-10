@@ -20,12 +20,12 @@ const positionClasses: Record<TooltipPosition, string> = {
 };
 
 const arrowClasses: Record<TooltipPosition, string> = {
-  top: 'top-full left-1/2 -translate-x-1/2 border-t-gray-90 border-x-transparent border-b-transparent border-4',
+  top: 'top-full left-1/2 -translate-x-1/2 border-t-gray-900 border-x-transparent border-b-transparent border-4',
   bottom:
-    'bottom-full left-1/2 -translate-x-1/2 border-b-gray-90 border-x-transparent border-t-transparent border-4',
-  left: 'left-full top-1/2 -translate-y-1/2 border-l-gray-90 border-y-transparent border-r-transparent border-4',
+    'bottom-full left-1/2 -translate-x-1/2 border-b-gray-900 border-x-transparent border-t-transparent border-4',
+  left: 'left-full top-1/2 -translate-y-1/2 border-l-gray-900 border-y-transparent border-r-transparent border-4',
   right:
-    'right-full top-1/2 -translate-y-1/2 border-r-gray-90 border-y-transparent border-l-transparent border-4',
+    'right-full top-1/2 -translate-y-1/2 border-r-gray-900 border-y-transparent border-l-transparent border-4',
 };
 
 export const Tooltip = ({
@@ -42,7 +42,7 @@ export const Tooltip = ({
       <span
         role="tooltip"
         className={cn(
-          'absolute z-10 w-max px-3 py-1.5 rounded text-xs text-white text-center opacity-0 invisible transition-opacity duration-300 group-hover:opacity-100 group-hover:visible bg-gray-90',
+          'absolute z-10 w-max px-3 py-1.5 rounded text-xs text-white text-center opacity-0 invisible transition-opacity duration-300 group-hover:opacity-100 group-hover:visible bg-gray-900',
           positionClasses[position],
         )}
       >

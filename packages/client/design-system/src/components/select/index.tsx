@@ -164,7 +164,7 @@ const SelectRoot = ({
             <label
               htmlFor={selectId}
               className={cn(
-                'mb-1 text-xs font-normal leading-[1.833] text-gray-70',
+                'mb-1 text-xs font-normal leading-[1.833] text-gray-700',
                 hideLabel && 'sr-only',
               )}
             >
