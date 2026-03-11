@@ -11,9 +11,11 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko">
       <QueryProvider>
-        <body>{children}</body>
+        <body>
+          {children}
+          <Toaster position="bottom-right" richColors />
+        </body>
       </QueryProvider>
-      <Toaster position="bottom-right" richColors />
     </html>
   );
 };
