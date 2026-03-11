@@ -131,7 +131,7 @@ describe('UserSearchFilter', () => {
     render(<UserSearchFilter {...defaultProps} role="ADMIN" />);
 
     const triggers = screen.getAllByRole('button');
-    expect(within(triggers[0]).getByText('ADMIN')).toBeInTheDocument();
+    expect(within(triggers[0]).getByText('관리자')).toBeInTheDocument();
   });
 
   it('인증방식 필터가 선택되었을 때 선택된 값을 표시한다', () => {
