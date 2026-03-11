@@ -2,4 +2,12 @@
 . "$(dirname "$0")/_/husky.sh"
 
 pnpm lint:fix:all
+
+# lint:fix로 수정된 파일을 다시 staging
+git diff --name-only | while read -r file; do
+  if git diff --cached --name-only | grep -qF "$file"; then
+    git add "$file"
+  fi
+done
+
 pnpm type-check

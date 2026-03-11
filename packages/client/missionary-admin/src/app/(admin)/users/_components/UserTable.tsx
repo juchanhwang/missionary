@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@samilhero/design-system';
+import { ROLE_LABELS } from 'lib/constants/role';
 import { Check, X } from 'lucide-react';
 
 import { formatDate } from '../_utils/formatDate';
@@ -134,7 +135,7 @@ export function UserTable({
                 </td>
                 <td className="px-5 py-3.5 whitespace-nowrap">
                   <Badge variant={getRoleBadgeVariant(user.role)}>
-                    {user.role}
+                    {ROLE_LABELS[user.role] ?? user.role}
                   </Badge>
                 </td>
                 <td className="px-5 py-3.5 whitespace-nowrap">

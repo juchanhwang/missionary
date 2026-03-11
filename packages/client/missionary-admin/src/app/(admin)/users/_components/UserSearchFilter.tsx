@@ -1,15 +1,10 @@
 'use client';
 
 import { SearchBox, Select } from '@samilhero/design-system';
+import { ROLE_LABELS } from 'lib/constants/role';
 import { useEffect, useRef, useState } from 'react';
 
 import type { AuthProvider, UserRole } from 'apis/user';
-
-const ROLE_LABELS: Record<string, string> = {
-  USER: 'USER',
-  STAFF: 'STAFF',
-  ADMIN: 'ADMIN',
-};
 
 const PROVIDER_LABELS: Record<string, string> = {
   LOCAL: 'LOCAL',
@@ -93,9 +88,11 @@ export function UserSearchFilter({
         </Select.Trigger>
         <Select.Options>
           <Select.Option item="">전체 역할</Select.Option>
-          <Select.Option item="USER">USER</Select.Option>
-          <Select.Option item="STAFF">STAFF</Select.Option>
-          <Select.Option item="ADMIN">ADMIN</Select.Option>
+          {Object.entries(ROLE_LABELS).map(([value, label]) => (
+            <Select.Option key={value} item={value}>
+              {label}
+            </Select.Option>
+          ))}
         </Select.Options>
       </Select>
 
