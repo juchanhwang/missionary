@@ -16,6 +16,7 @@ import { ROLE_LABELS } from 'lib/constants/role';
 import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { formatDate } from '../../../../_utils/formatDate';
 import { maskIdentityNumber } from '../../../../_utils/maskIdentityNumber';
@@ -80,6 +81,7 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
       {
         onSuccess: () => {
           form.reset(data);
+          toast.success('유저 정보가 저장되었습니다');
         },
       },
     );

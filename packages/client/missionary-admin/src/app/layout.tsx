@@ -3,6 +3,7 @@ import '../../../design-system/src/components/date-picker/DatePickerStyles.css';
 import 'styles/tailwind.css';
 import 'styles/_global.scss';
 import { QueryProvider } from 'lib/QueryProvider';
+import { Toaster } from 'sonner';
 
 import type { Metadata } from 'next';
 
@@ -12,6 +13,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <QueryProvider>
         <body>{children}</body>
       </QueryProvider>
+      <Toaster position="bottom-right" richColors />
     </html>
   );
 };

@@ -2,10 +2,23 @@
 
 import { OverlayProvider } from '@samilhero/design-system';
 import {
+  MutationCache,
   isServer,
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import axios from 'axios';
+import { toast } from 'sonner';
+
+function getErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data;
+    if (data?.message) {
+      return Array.isArray(data.message) ? data.message[0] : data.message;
+    }
+  }
+  return '오류가 발생했습니다';
+}
 
 function makeQueryClient() {
   return new QueryClient({
@@ -16,6 +29,11 @@ function makeQueryClient() {
         refetchOnWindowFocus: false,
       },
     },
+    mutationCache: new MutationCache({
+      onError: (error) => {
+        toast.error(getErrorMessage(error));
+      },
+    }),
   });
 }
 
