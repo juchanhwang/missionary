@@ -7,12 +7,13 @@ import {
   type PaginatedUsersResponse,
   type UserRole,
 } from 'apis/user';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
+import { useGetUsers } from '../_hooks/useGetUsers';
+import { UserEditPanel } from './panel/UserEditPanel';
 import { UserSearchFilter } from './UserSearchFilter';
 import { UserTable } from './UserTable';
-import { useGetUsers } from '../_hooks/useGetUsers';
 
 const PAGE_SIZE = 20;
 
@@ -22,10 +23,20 @@ interface UsersPageClientProps {
 
 export function UsersPageClient({ initialData }: UsersPageClientProps) {
   const router = useRouter();
-  const pathname = usePathname();
-  const selectedUserId =
-    pathname.match(/^\/users\/([^/]+)\/edit$/)?.[1] ?? null;
-  const [searchParams, setSearchParams] = useState<GetUsersParams>({
+  const searchParams = useSearchParams();
+  const selectedUserId = searchParams.get('userId');
+  const [mountedUserId, setMountedUserId] = useState<string | null>(null);
+
+  // 새 유저 선택 시 패널 마운트 (렌더 중 파생 상태)
+  if (selectedUserId && selectedUserId !== mountedUserId) {
+    setMountedUserId(selectedUserId);
+  }
+
+  const handlePanelExited = () => {
+    setMountedUserId(null);
+  };
+
+  const [filterParams, setFilterParams] = useState<GetUsersParams>({
     page: 1,
     pageSize: PAGE_SIZE,
     search: '',
@@ -35,37 +46,46 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
   });
 
   const { data, isLoading, isError, refetch } = useGetUsers({
-    params: searchParams,
+    params: filterParams,
     initialData,
   });
 
   const users = data?.data ?? [];
   const total = data?.total ?? 0;
-  const currentPage = data?.page ?? searchParams.page ?? 1;
+  const currentPage = data?.page ?? filterParams.page ?? 1;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const handleSearchChange = (search: string) => {
-    setSearchParams((prev) => ({ ...prev, search, page: 1 }));
+    setFilterParams((prev) => ({ ...prev, search, page: 1 }));
   };
 
   const handleRoleChange = (role: UserRole | '') => {
-    setSearchParams((prev) => ({ ...prev, role, page: 1 }));
+    setFilterParams((prev) => ({ ...prev, role, page: 1 }));
   };
 
   const handleProviderChange = (provider: AuthProvider | '') => {
-    setSearchParams((prev) => ({ ...prev, provider, page: 1 }));
+    setFilterParams((prev) => ({ ...prev, provider, page: 1 }));
   };
 
   const handleBaptizedChange = (isBaptized: string) => {
-    setSearchParams((prev) => ({ ...prev, isBaptized, page: 1 }));
+    setFilterParams((prev) => ({ ...prev, isBaptized, page: 1 }));
   };
 
   const handleRowClick = (id: string) => {
-    router.push(`/users/${id}/edit`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('userId', id);
+    router.push(`/users?${params.toString()}`);
+  };
+
+  const handlePanelClose = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('userId');
+    const queryString = params.toString();
+    router.push(queryString ? `/users?${queryString}` : '/users');
   };
 
   const handlePageChange = (page: number) => {
-    setSearchParams((prev) => ({ ...prev, page }));
+    setFilterParams((prev) => ({ ...prev, page }));
   };
 
   return (
@@ -73,10 +93,10 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
       <div className="flex flex-col flex-1 p-8 min-h-0">
         <div className="shrink-0">
           <UserSearchFilter
-            search={searchParams.search ?? ''}
-            role={searchParams.role ?? ''}
-            provider={searchParams.provider ?? ''}
-            isBaptized={searchParams.isBaptized ?? ''}
+            search={filterParams.search ?? ''}
+            role={filterParams.role ?? ''}
+            provider={filterParams.provider ?? ''}
+            isBaptized={filterParams.isBaptized ?? ''}
             onSearchChange={handleSearchChange}
             onRoleChange={handleRoleChange}
             onProviderChange={handleProviderChange}
@@ -132,6 +152,18 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
           </div>
         </div>
       </div>
+
+      {mountedUserId && (
+        <UserEditPanel
+          key={mountedUserId}
+          userId={mountedUserId}
+          users={users}
+          initialData={users.find((u) => u.id === mountedUserId)}
+          isOpen={!!selectedUserId}
+          onClose={handlePanelClose}
+          onExited={handlePanelExited}
+        />
+      )}
     </div>
   );
 }

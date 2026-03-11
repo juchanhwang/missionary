@@ -1,8 +1,9 @@
-import { DeleteUserModal } from 'app/(admin)/users/@panel/[userId]/edit/_components/DeleteUserModal';
 import { http, HttpResponse } from 'msw';
 import { server } from 'test/mocks/server';
 import { render, screen, waitFor } from 'test/test-utils';
 import { vi } from 'vitest';
+
+import { DeleteUserModal } from './DeleteUserModal';
 
 // vi.mock 없음 - 실제 useDeleteUserAction 훅이 MSW를 통해 동작
 
