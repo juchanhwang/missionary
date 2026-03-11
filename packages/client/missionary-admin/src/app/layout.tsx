@@ -7,7 +7,6 @@ import { Toaster } from 'sonner';
 
 import type { Metadata } from 'next';
 
-
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko">
