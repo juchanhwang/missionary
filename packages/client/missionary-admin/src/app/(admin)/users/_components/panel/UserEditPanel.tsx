@@ -43,6 +43,7 @@ export function UserEditPanel({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const isDirtyRef = useRef(false);
+  const hasExitedRef = useRef(false);
 
   const { data: user, isLoading, isError } = useGetUser(userId, initialData);
 
@@ -83,28 +84,44 @@ export function UserEditPanel({
   };
 
   const handleTransitionEnd = (e: React.TransitionEvent) => {
-    if (e.propertyName === 'translate' && !isVisible) {
-      onExited(); // 애니메이션 완료 후 언마운트
+    if (e.propertyName === 'translate' && !isVisible && !hasExitedRef.current) {
+      hasExitedRef.current = true;
+      onExited();
     }
   };
 
+  // transitionend 미발생 폴백 (prefers-reduced-motion 등)
+  useEffect(() => {
+    if (!isVisible && !isOpen) {
+      const timer = setTimeout(() => {
+        if (!hasExitedRef.current) {
+          hasExitedRef.current = true;
+          onExited();
+        }
+      }, PANEL_TRANSITION_MS + 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, isOpen, onExited]);
+
+  const confirmIfDirty = async (): Promise<boolean> => {
+    if (!isDirtyRef.current) return true;
+
+    const confirmed = await overlay.openAsync<boolean>(
+      ({ isOpen: isModalOpen, close, unmount }) => (
+        <UnsavedChangesModal
+          isOpen={isModalOpen}
+          close={(result) => {
+            close(result);
+            setTimeout(unmount, PANEL_TRANSITION_MS);
+          }}
+        />
+      ),
+    );
+    return !!confirmed;
+  };
+
   const requestClose = async () => {
-    if (isDirtyRef.current) {
-      const confirmed = await overlay.openAsync<boolean>(
-        ({ isOpen: isModalOpen, close, unmount }) => (
-          <UnsavedChangesModal
-            isOpen={isModalOpen}
-            close={(result) => {
-              close(result);
-              setTimeout(unmount, PANEL_TRANSITION_MS);
-            }}
-          />
-        ),
-      );
-      if (confirmed) {
-        handleClose();
-      }
-    } else {
+    if (await confirmIfDirty()) {
       handleClose();
     }
   };
@@ -113,7 +130,9 @@ export function UserEditPanel({
     isDirtyRef.current = dirty;
   };
 
-  const navigateToUser = (targetUserId: string) => {
+  const navigateToUser = async (targetUserId: string) => {
+    if (!(await confirmIfDirty())) return;
+
     const params = new URLSearchParams(searchParams.toString());
     params.set('userId', targetUserId);
     router.push(`/users?${params.toString()}`);
@@ -121,14 +140,12 @@ export function UserEditPanel({
 
   return (
     <>
-      {/* Backdrop */}
-      {isVisible && (
-        <div
-          className="fixed inset-0 z-20"
-          onClick={requestClose}
-          aria-hidden="true"
-        />
-      )}
+      {/* Backdrop: 슬라이드 아웃 중에도 유지하여 클릭 방지 */}
+      <div
+        className="fixed inset-0 z-20"
+        onClick={isOpen ? requestClose : undefined}
+        aria-hidden="true"
+      />
 
       <aside
         className={`fixed right-0 top-0 h-full w-[560px] z-30 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
