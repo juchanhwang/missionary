@@ -28,7 +28,7 @@ export type UserSearchType = 'name' | 'loginId' | 'phone';
 export interface GetUsersParams {
   page?: number;
   pageSize?: number;
-  searchType?: UserSearchType | '';
+  searchType?: UserSearchType;
   keyword?: string;
   role?: UserRole | '';
   provider?: AuthProvider | '';
