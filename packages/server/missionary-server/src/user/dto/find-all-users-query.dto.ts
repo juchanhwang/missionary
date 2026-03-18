@@ -37,12 +37,21 @@ export class FindAllUsersQueryDto {
   declare pageSize?: number;
 
   @ApiPropertyOptional({
-    description: '검색어 (이름 또는 이메일)',
+    description: '검색 대상 필드',
+    enum: ['name', 'loginId', 'phone'],
+    example: 'name',
+  })
+  @IsOptional()
+  @IsEnum(['name', 'loginId', 'phone'] as const)
+  declare searchType?: 'name' | 'loginId' | 'phone';
+
+  @ApiPropertyOptional({
+    description: '검색어',
     example: '홍길동',
   })
   @IsOptional()
   @IsString()
-  declare search?: string;
+  declare keyword?: string;
 
   @ApiPropertyOptional({
     description: '역할 필터',

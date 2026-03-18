@@ -80,7 +80,7 @@ describe('UserService 페이지네이션', () => {
   });
 
   describe('findAll 검색', () => {
-    it('search로 이름에 포함된 유저를 검색한다', async () => {
+    it('searchType=name으로 이름에 포함된 유저를 검색한다', async () => {
       await fakeUserRepository.create(
         makeUser({ name: '홍길동', email: 'hong@test.com' }),
       );
@@ -88,24 +88,57 @@ describe('UserService 페이지네이션', () => {
         makeUser({ name: '김철수', email: 'kim@test.com' }),
       );
 
-      const result = await userService.findAll({ search: '홍길동' });
+      const result = await userService.findAll({
+        searchType: 'name',
+        keyword: '홍길동',
+      });
 
       expect(result.data).toHaveLength(1);
       expect(result.data[0].name).toBe('홍길동');
     });
 
-    it('search로 이메일에 포함된 유저를 검색한다', async () => {
+    it('searchType=loginId로 로그인 아이디에 포함된 유저를 검색한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({ loginId: 'hong123', email: 'hong@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ loginId: 'kim456', email: 'kim@test.com' }),
+      );
+
+      const result = await userService.findAll({
+        searchType: 'loginId',
+        keyword: 'hong',
+      });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].loginId).toBe('hong123');
+    });
+
+    it('searchType=phone으로 핸드폰번호에 포함된 유저를 검색한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({ phoneNumber: '010-1234-5678', email: 'hong@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ phoneNumber: '010-9999-8888', email: 'kim@test.com' }),
+      );
+
+      const result = await userService.findAll({
+        searchType: 'phone',
+        keyword: '1234',
+      });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].phoneNumber).toBe('010-1234-5678');
+    });
+
+    it('keyword만 있고 searchType이 없으면 검색하지 않는다', async () => {
       await fakeUserRepository.create(
         makeUser({ name: '홍길동', email: 'hong@test.com' }),
       );
-      await fakeUserRepository.create(
-        makeUser({ name: '김철수', email: 'kim@test.com' }),
-      );
 
-      const result = await userService.findAll({ search: 'hong' });
+      const result = await userService.findAll({ keyword: '홍길동' } as any);
 
       expect(result.data).toHaveLength(1);
-      expect(result.data[0].email).toBe('hong@test.com');
     });
   });
 
