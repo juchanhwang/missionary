@@ -8,6 +8,7 @@ import {
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
 import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
+import { UpdateMissionaryRegionDto } from './dto/update-missionary-region.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
 import {
   calculateNextOrder,
@@ -161,6 +162,27 @@ export class MissionaryService {
     await this.findOne(missionaryId);
 
     return this.missionaryRegionRepository.findByMissionary(missionaryId);
+  }
+
+  async updateRegion(
+    missionaryId: string,
+    regionId: string,
+    dto: UpdateMissionaryRegionDto,
+  ) {
+    await this.findOne(missionaryId);
+
+    const region = await this.missionaryRegionRepository.findByIdAndMissionary(
+      regionId,
+      missionaryId,
+    );
+
+    if (!region) {
+      throw new NotFoundException(
+        `MissionaryRegion with ID ${regionId} not found for missionary ${missionaryId}`,
+      );
+    }
+
+    return this.missionaryRegionRepository.update(regionId, dto);
   }
 
   async removeRegion(missionaryId: string, regionId: string) {

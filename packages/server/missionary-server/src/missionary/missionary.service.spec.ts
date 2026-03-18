@@ -14,6 +14,7 @@ import { FakeMissionaryRepository } from '@/testing/fakes/fake-missionary.reposi
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
 import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
+import { UpdateMissionaryRegionDto } from './dto/update-missionary-region.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
 import { MissionaryService } from './missionary.service';
 import {
@@ -371,6 +372,71 @@ describe('MissionaryService', () => {
       await expect(service.getRegions('non-existent-id')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // updateRegion
+  // ──────────────────────────────────────────────
+  describe('updateRegion', () => {
+    it('선교의 연계지 정보를 수정한다', async () => {
+      const missionary = await fakeMissionaryRepo.create({
+        name: '선교',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-12-31'),
+        createdById: 'user-1',
+      });
+
+      const region = await fakeRegionRepo.create({
+        missionaryId: missionary.id,
+        name: '원래 지역',
+        pastorName: '김목사',
+      });
+
+      const dto = new UpdateMissionaryRegionDto();
+      dto.name = '수정된 지역';
+
+      const result = await service.updateRegion(missionary.id, region.id, dto);
+
+      expect(result.name).toBe('수정된 지역');
+      expect(result.pastorName).toBe('김목사');
+    });
+
+    it('존재하지 않는 선교의 연계지를 수정하면 NotFoundException을 던진다', async () => {
+      const dto = new UpdateMissionaryRegionDto();
+      dto.name = '수정';
+
+      await expect(
+        service.updateRegion('non-existent-id', 'region-id', dto),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('해당 선교에 속하지 않는 연계지를 수정하면 NotFoundException을 던진다', async () => {
+      const missionary = await fakeMissionaryRepo.create({
+        name: '선교',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-12-31'),
+        createdById: 'user-1',
+      });
+
+      const otherMissionary = await fakeMissionaryRepo.create({
+        name: '다른 선교',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-12-31'),
+        createdById: 'user-2',
+      });
+
+      const region = await fakeRegionRepo.create({
+        missionaryId: otherMissionary.id,
+        name: '다른 선교의 지역',
+      });
+
+      const dto = new UpdateMissionaryRegionDto();
+      dto.name = '수정';
+
+      await expect(
+        service.updateRegion(missionary.id, region.id, dto),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

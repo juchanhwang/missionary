@@ -5,6 +5,7 @@ import { PrismaService } from '@/database/prisma.service';
 import type {
   MissionaryRegionCreateInput,
   MissionaryRegionRepository,
+  MissionaryRegionUpdateInput,
 } from './missionary-region-repository.interface';
 import type { MissionaryRegion } from '../../../prisma/generated/prisma';
 
@@ -29,6 +30,16 @@ export class PrismaMissionaryRegionRepository implements MissionaryRegionReposit
   ): Promise<MissionaryRegion | null> {
     return this.prisma.missionaryRegion.findFirst({
       where: { id, missionaryId },
+    });
+  }
+
+  async update(
+    id: string,
+    data: MissionaryRegionUpdateInput,
+  ): Promise<MissionaryRegion> {
+    return this.prisma.missionaryRegion.update({
+      where: { id },
+      data,
     });
   }
 

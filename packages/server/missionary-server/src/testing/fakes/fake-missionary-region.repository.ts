@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import type {
   MissionaryRegionCreateInput,
   MissionaryRegionRepository,
+  MissionaryRegionUpdateInput,
 } from '@/missionary/repositories/missionary-region-repository.interface';
 
 import type { MissionaryRegion } from '../../../prisma/generated/prisma';
@@ -46,6 +47,23 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
     const entity = this.store.get(id);
     if (!entity || entity.missionaryId !== missionaryId) return null;
     return entity;
+  }
+
+  async update(
+    id: string,
+    data: MissionaryRegionUpdateInput,
+  ): Promise<MissionaryRegion> {
+    const existing = this.store.get(id);
+    if (!existing) {
+      throw new Error(`MissionaryRegion not found: ${id}`);
+    }
+    const updated: MissionaryRegion = {
+      ...existing,
+      ...data,
+      updatedAt: new Date(),
+    };
+    this.store.set(id, updated);
+    return updated;
   }
 
   async delete(id: string): Promise<MissionaryRegion> {

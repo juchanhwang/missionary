@@ -11,6 +11,15 @@ export interface MissionaryRegionCreateInput {
   addressDetail?: string | null;
 }
 
+export interface MissionaryRegionUpdateInput {
+  name?: string;
+  visitPurpose?: string | null;
+  pastorName?: string | null;
+  pastorPhone?: string | null;
+  addressBasic?: string | null;
+  addressDetail?: string | null;
+}
+
 export interface MissionaryRegionRepository {
   create(data: MissionaryRegionCreateInput): Promise<MissionaryRegion>;
   findByMissionary(missionaryId: string): Promise<MissionaryRegion[]>;
@@ -18,6 +27,10 @@ export interface MissionaryRegionRepository {
     id: string,
     missionaryId: string,
   ): Promise<MissionaryRegion | null>;
+  update(
+    id: string,
+    data: MissionaryRegionUpdateInput,
+  ): Promise<MissionaryRegion>;
   delete(id: string): Promise<MissionaryRegion>;
 }
 
