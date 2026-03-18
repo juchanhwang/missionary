@@ -91,17 +91,14 @@ export function MissionaryRegionTable({
                 {isAdmin && (
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-2">
-                      <Tooltip text="현재 사용 불가 (준비 중)">
-                        <button
-                          type="button"
-                          disabled
-                          className="cursor-not-allowed rounded-md p-1.5 text-gray-400"
-                          aria-label={`${region.name} 수정`}
-                          onClick={() => onEdit(region)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                      </Tooltip>
+                      <button
+                        type="button"
+                        className="rounded-md p-1.5 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                        aria-label={`${region.name} 수정`}
+                        onClick={() => onEdit(region)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
                       <button
                         type="button"
                         className="rounded-md p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
