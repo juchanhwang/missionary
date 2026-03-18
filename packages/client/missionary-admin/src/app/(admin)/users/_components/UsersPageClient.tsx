@@ -6,6 +6,7 @@ import {
   type GetUsersParams,
   type PaginatedUsersResponse,
   type UserRole,
+  type UserSearchType,
 } from 'apis/user';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -39,7 +40,8 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
   const [filterParams, setFilterParams] = useState<GetUsersParams>({
     page: 1,
     pageSize: PAGE_SIZE,
-    search: '',
+    searchType: 'name',
+    keyword: '',
     role: '',
     provider: '',
     isBaptized: '',
@@ -55,8 +57,12 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
   const currentPage = data?.page ?? filterParams.page ?? 1;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const handleSearchChange = (search: string) => {
-    setFilterParams((prev) => ({ ...prev, search, page: 1 }));
+  const handleSearchTypeChange = (searchType: UserSearchType) => {
+    setFilterParams((prev) => ({ ...prev, searchType, keyword: '', page: 1 }));
+  };
+
+  const handleKeywordChange = (keyword: string) => {
+    setFilterParams((prev) => ({ ...prev, keyword, page: 1 }));
   };
 
   const handleRoleChange = (role: UserRole | '') => {
@@ -93,11 +99,13 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
       <div className="flex flex-col flex-1 p-8 min-h-0">
         <div className="shrink-0">
           <UserSearchFilter
-            search={filterParams.search ?? ''}
+            searchType={filterParams.searchType || 'name'}
+            keyword={filterParams.keyword ?? ''}
             role={filterParams.role ?? ''}
             provider={filterParams.provider ?? ''}
             isBaptized={filterParams.isBaptized ?? ''}
-            onSearchChange={handleSearchChange}
+            onSearchTypeChange={handleSearchTypeChange}
+            onKeywordChange={handleKeywordChange}
             onRoleChange={handleRoleChange}
             onProviderChange={handleProviderChange}
             onBaptizedChange={handleBaptizedChange}
