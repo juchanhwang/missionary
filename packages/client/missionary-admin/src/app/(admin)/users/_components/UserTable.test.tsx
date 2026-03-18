@@ -112,13 +112,13 @@ describe('UserTable', () => {
   });
 
   it('유저의 역할 배지를 표시한다', () => {
-    const users = [createMockUser({ role: 'ADMIN', name: '관리자' })];
+    const users = [createMockUser({ role: 'ADMIN', name: '테스트관리자' })];
 
     render(
       <UserTable users={users} isLoading={false} onRowClick={mockOnRowClick} />,
     );
 
-    expect(screen.getByText('ADMIN')).toBeInTheDocument();
+    expect(screen.getByText('관리자')).toBeInTheDocument();
   });
 
   it('유저의 인증방식 배지를 표시한다', () => {
