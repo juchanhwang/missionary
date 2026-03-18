@@ -4,10 +4,12 @@ import {
   IsBoolean,
   IsEnum,
   IsInt,
+  IsNotEmpty,
   IsOptional,
   IsString,
   Max,
   Min,
+  ValidateIf,
 } from 'class-validator';
 
 import type { AuthProvider, UserRole } from '../../../prisma/generated/prisma';
@@ -37,12 +39,23 @@ export class FindAllUsersQueryDto {
   declare pageSize?: number;
 
   @ApiPropertyOptional({
-    description: '검색어 (이름 또는 이메일)',
+    description: '검색 대상 필드 (keyword와 함께 전달 필수)',
+    enum: ['name', 'loginId', 'phone'],
+    example: 'name',
+  })
+  @ValidateIf((o) => o.keyword !== undefined)
+  @IsEnum(['name', 'loginId', 'phone'] as const)
+  declare searchType?: 'name' | 'loginId' | 'phone';
+
+  @ApiPropertyOptional({
+    description: '검색어 (searchType과 함께 전달 필수)',
     example: '홍길동',
   })
-  @IsOptional()
+  @ValidateIf((o) => o.searchType !== undefined)
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
-  declare search?: string;
+  @IsNotEmpty()
+  declare keyword?: string;
 
   @ApiPropertyOptional({
     description: '역할 필터',

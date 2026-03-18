@@ -88,11 +88,14 @@ export class UserService {
 
     const where: Prisma.UserWhereInput = { deletedAt: null };
 
-    if (query?.search) {
-      where['OR'] = [
-        { name: { contains: query.search } },
-        { email: { contains: query.search } },
-      ];
+    if (query?.keyword && query?.searchType) {
+      const fieldMap = {
+        name: 'name',
+        loginId: 'loginId',
+        phone: 'phoneNumber',
+      } as const;
+      const field = fieldMap[query.searchType];
+      where[field] = { contains: query.keyword };
     }
 
     if (query?.role) {
