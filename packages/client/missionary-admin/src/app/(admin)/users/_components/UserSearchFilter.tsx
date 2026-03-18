@@ -4,7 +4,13 @@ import { SearchBox, Select } from '@samilhero/design-system';
 import { ROLE_LABELS } from 'lib/constants/role';
 import { useEffect, useRef, useState } from 'react';
 
-import type { AuthProvider, UserRole } from 'apis/user';
+import type { AuthProvider, UserRole, UserSearchType } from 'apis/user';
+
+const SEARCH_TYPE_LABELS: Record<UserSearchType, string> = {
+  name: '이름',
+  loginId: '아이디',
+  phone: '핸드폰번호',
+};
 
 const PROVIDER_LABELS: Record<string, string> = {
   LOCAL: 'LOCAL',
@@ -18,42 +24,46 @@ const BAPTIZED_LABELS: Record<string, string> = {
 };
 
 interface UserSearchFilterProps {
-  search: string;
+  searchType: UserSearchType;
+  keyword: string;
   role: UserRole | '';
   provider: AuthProvider | '';
   isBaptized: string;
-  onSearchChange: (value: string) => void;
+  onSearchTypeChange: (value: UserSearchType) => void;
+  onKeywordChange: (value: string) => void;
   onRoleChange: (value: UserRole | '') => void;
   onProviderChange: (value: AuthProvider | '') => void;
   onBaptizedChange: (value: string) => void;
 }
 
 export function UserSearchFilter({
-  search,
+  searchType,
+  keyword,
   role,
   provider,
   isBaptized,
-  onSearchChange,
+  onSearchTypeChange,
+  onKeywordChange,
   onRoleChange,
   onProviderChange,
   onBaptizedChange,
 }: UserSearchFilterProps) {
-  const [localSearch, setLocalSearch] = useState(search);
+  const [localKeyword, setLocalKeyword] = useState(keyword);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    setLocalSearch(search);
-  }, [search]);
+    setLocalKeyword(keyword);
+  }, [keyword]);
 
-  const handleSearchInput = (value: string) => {
-    setLocalSearch(value);
+  const handleKeywordInput = (value: string) => {
+    setLocalKeyword(value);
 
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
 
     debounceRef.current = setTimeout(() => {
-      onSearchChange(value);
+      onKeywordChange(value);
     }, 300);
   };
 
@@ -67,11 +77,28 @@ export function UserSearchFilter({
 
   return (
     <div className="flex items-center gap-3 mb-5">
+      <Select
+        value={searchType}
+        onChange={(value?: string | string[] | null) =>
+          onSearchTypeChange(((value as string) || 'name') as UserSearchType)
+        }
+        size="md"
+      >
+        <Select.Trigger>{SEARCH_TYPE_LABELS[searchType]}</Select.Trigger>
+        <Select.Options>
+          {Object.entries(SEARCH_TYPE_LABELS).map(([value, label]) => (
+            <Select.Option key={value} item={value}>
+              {label}
+            </Select.Option>
+          ))}
+        </Select.Options>
+      </Select>
+
       <div className="flex-1 max-w-md">
         <SearchBox
-          value={localSearch}
-          placeholder="이름 또는 이메일로 검색..."
-          onChange={handleSearchInput}
+          value={localKeyword}
+          placeholder={`${SEARCH_TYPE_LABELS[searchType]}(으)로 검색...`}
+          onChange={handleKeywordInput}
           size="md"
         />
       </div>

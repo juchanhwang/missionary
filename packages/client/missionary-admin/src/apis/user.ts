@@ -23,10 +23,13 @@ export interface User {
   updatedAt: string;
 }
 
+export type UserSearchType = 'name' | 'loginId' | 'phone';
+
 export interface GetUsersParams {
   page?: number;
   pageSize?: number;
-  search?: string;
+  searchType?: UserSearchType | '';
+  keyword?: string;
   role?: UserRole | '';
   provider?: AuthProvider | '';
   isBaptized?: string;

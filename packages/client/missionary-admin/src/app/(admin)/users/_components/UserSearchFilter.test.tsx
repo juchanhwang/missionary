@@ -55,11 +55,13 @@ vi.mock('@samilhero/design-system', () => ({
 
 describe('UserSearchFilter', () => {
   const defaultProps = {
-    search: '',
+    searchType: 'name' as const,
+    keyword: '',
     role: '' as const,
     provider: '' as const,
     isBaptized: '',
-    onSearchChange: vi.fn(),
+    onSearchTypeChange: vi.fn(),
+    onKeywordChange: vi.fn(),
     onRoleChange: vi.fn(),
     onProviderChange: vi.fn(),
     onBaptizedChange: vi.fn(),
@@ -75,81 +77,93 @@ describe('UserSearchFilter', () => {
   });
 
   it('검색어 입력 후 디바운싱을 거쳐 콜백을 호출한다', async () => {
-    // 이 테스트는 real timers를 사용하여 실제 디바운스 동작을 검증한다
     vi.useRealTimers();
 
-    const onSearchChange = vi.fn();
+    const onKeywordChange = vi.fn();
 
     const { user } = render(
-      <UserSearchFilter {...defaultProps} onSearchChange={onSearchChange} />,
+      <UserSearchFilter {...defaultProps} onKeywordChange={onKeywordChange} />,
     );
 
     const searchInput = screen.getByRole('searchbox');
     await user.type(searchInput, 'test');
 
-    // 디바운싱(300ms) 후 콜백 호출 확인
     await waitFor(() => {
-      expect(onSearchChange).toHaveBeenCalled();
+      expect(onKeywordChange).toHaveBeenCalled();
     });
 
-    // 디바운싱으로 인해 마지막 값으로 호출
     const lastCall =
-      onSearchChange.mock.calls[onSearchChange.mock.calls.length - 1];
+      onKeywordChange.mock.calls[onKeywordChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('test');
   });
 
-  it('검색 placeholder를 표시한다', () => {
-    render(<UserSearchFilter {...defaultProps} />);
+  it('검색 타입에 따라 placeholder를 표시한다', () => {
+    render(<UserSearchFilter {...defaultProps} searchType="name" />);
 
     expect(
-      screen.getByPlaceholderText('이름 또는 이메일로 검색...'),
+      screen.getByPlaceholderText('이름(으)로 검색...'),
     ).toBeInTheDocument();
+  });
+
+  it('검색 타입을 아이디로 변경하면 placeholder가 변경된다', () => {
+    render(<UserSearchFilter {...defaultProps} searchType="loginId" />);
+
+    expect(
+      screen.getByPlaceholderText('아이디(으)로 검색...'),
+    ).toBeInTheDocument();
+  });
+
+  it('검색 타입 선택 드롭다운의 기본값이 표시된다', () => {
+    render(<UserSearchFilter {...defaultProps} />);
+
+    const triggers = screen.getAllByRole('button');
+    expect(within(triggers[0]).getByText('이름')).toBeInTheDocument();
   });
 
   it('역할 필터 옵션을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} />);
 
     const triggers = screen.getAllByRole('button');
-    expect(within(triggers[0]).getByText('전체 역할')).toBeInTheDocument();
+    expect(within(triggers[1]).getByText('전체 역할')).toBeInTheDocument();
   });
 
   it('인증방식 필터 옵션을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} />);
 
     const triggers = screen.getAllByRole('button');
-    expect(within(triggers[1]).getByText('전체 인증방식')).toBeInTheDocument();
+    expect(within(triggers[2]).getByText('전체 인증방식')).toBeInTheDocument();
   });
 
   it('세례 여부 필터 옵션을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} />);
 
     const triggers = screen.getAllByRole('button');
-    expect(within(triggers[2]).getByText('세례 여부')).toBeInTheDocument();
+    expect(within(triggers[3]).getByText('세례 여부')).toBeInTheDocument();
   });
 
   it('역할 필터가 선택되었을 때 선택된 값을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} role="ADMIN" />);
 
     const triggers = screen.getAllByRole('button');
-    expect(within(triggers[0]).getByText('관리자')).toBeInTheDocument();
+    expect(within(triggers[1]).getByText('관리자')).toBeInTheDocument();
   });
 
   it('인증방식 필터가 선택되었을 때 선택된 값을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} provider="GOOGLE" />);
 
     const triggers = screen.getAllByRole('button');
-    expect(within(triggers[1]).getByText('GOOGLE')).toBeInTheDocument();
+    expect(within(triggers[2]).getByText('GOOGLE')).toBeInTheDocument();
   });
 
   it('세례 여부 필터가 선택되었을 때 선택된 값을 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} isBaptized="true" />);
 
     const triggers = screen.getAllByRole('button');
-    expect(within(triggers[2]).getByText('받음')).toBeInTheDocument();
+    expect(within(triggers[3]).getByText('받음')).toBeInTheDocument();
   });
 
   it('초기 검색어가 입력 필드에 표시된다', () => {
-    render(<UserSearchFilter {...defaultProps} search="테스트" />);
+    render(<UserSearchFilter {...defaultProps} keyword="테스트" />);
 
     expect(screen.getByDisplayValue('테스트')).toBeInTheDocument();
   });
