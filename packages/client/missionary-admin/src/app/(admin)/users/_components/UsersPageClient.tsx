@@ -58,7 +58,7 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const handleSearchTypeChange = (searchType: UserSearchType) => {
-    setFilterParams((prev) => ({ ...prev, searchType, page: 1 }));
+    setFilterParams((prev) => ({ ...prev, searchType, keyword: '', page: 1 }));
   };
 
   const handleKeywordChange = (keyword: string) => {

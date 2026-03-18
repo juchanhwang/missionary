@@ -100,17 +100,13 @@ describe('UserSearchFilter', () => {
   it('검색 타입에 따라 placeholder를 표시한다', () => {
     render(<UserSearchFilter {...defaultProps} searchType="name" />);
 
-    expect(
-      screen.getByPlaceholderText('이름(으)로 검색...'),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('이름으로 검색...')).toBeInTheDocument();
   });
 
   it('검색 타입을 아이디로 변경하면 placeholder가 변경된다', () => {
     render(<UserSearchFilter {...defaultProps} searchType="loginId" />);
 
-    expect(
-      screen.getByPlaceholderText('아이디(으)로 검색...'),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('아이디로 검색...')).toBeInTheDocument();
   });
 
   it('검색 타입 선택 드롭다운의 기본값이 표시된다', () => {

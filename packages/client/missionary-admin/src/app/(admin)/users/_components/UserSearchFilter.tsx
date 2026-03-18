@@ -12,6 +12,13 @@ const SEARCH_TYPE_LABELS: Record<UserSearchType, string> = {
   phone: '핸드폰번호',
 };
 
+function getParticleRo(word: string) {
+  const lastChar = word.charCodeAt(word.length - 1);
+  if (lastChar < 0xac00 || lastChar > 0xd7a3) return '로';
+  const jongseong = (lastChar - 0xac00) % 28;
+  return jongseong === 0 || jongseong === 8 ? '로' : '으로';
+}
+
 const PROVIDER_LABELS: Record<string, string> = {
   LOCAL: 'LOCAL',
   GOOGLE: 'GOOGLE',
@@ -79,9 +86,10 @@ export function UserSearchFilter({
     <div className="flex items-center gap-3 mb-5">
       <Select
         value={searchType}
-        onChange={(value?: string | string[] | null) =>
-          onSearchTypeChange(((value as string) || 'name') as UserSearchType)
-        }
+        onChange={(value?: string | string[] | null) => {
+          if (!value || typeof value !== 'string') return;
+          onSearchTypeChange(value as UserSearchType);
+        }}
         size="md"
       >
         <Select.Trigger>{SEARCH_TYPE_LABELS[searchType]}</Select.Trigger>
@@ -97,7 +105,7 @@ export function UserSearchFilter({
       <div className="flex-1 max-w-md">
         <SearchBox
           value={localKeyword}
-          placeholder={`${SEARCH_TYPE_LABELS[searchType]}(으)로 검색...`}
+          placeholder={`${SEARCH_TYPE_LABELS[searchType]}${getParticleRo(SEARCH_TYPE_LABELS[searchType])} 검색...`}
           onChange={handleKeywordInput}
           size="md"
         />
