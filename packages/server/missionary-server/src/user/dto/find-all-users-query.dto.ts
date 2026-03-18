@@ -50,6 +50,7 @@ export class FindAllUsersQueryDto {
     example: '홍길동',
   })
   @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   declare keyword?: string;
 

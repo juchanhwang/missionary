@@ -135,10 +135,14 @@ describe('UserService 페이지네이션', () => {
       await fakeUserRepository.create(
         makeUser({ name: '홍길동', email: 'hong@test.com' }),
       );
+      await fakeUserRepository.create(
+        makeUser({ name: '김철수', email: 'kim@test.com' }),
+      );
 
       const result = await userService.findAll({ keyword: '홍길동' } as any);
 
-      expect(result.data).toHaveLength(1);
+      // 검색 조건이 무시되어 전체 2명이 반환되어야 한다
+      expect(result.data).toHaveLength(2);
     });
   });
 
