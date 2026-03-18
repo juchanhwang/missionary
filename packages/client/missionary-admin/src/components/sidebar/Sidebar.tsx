@@ -35,7 +35,7 @@ const NAV_ITEMS: NavItemConfig[] = [
   },
   {
     label: '연계지 관리',
-    href: '/regions',
+    href: '/missionary-regions',
     icon: <MapPin size={20} />,
   },
   {

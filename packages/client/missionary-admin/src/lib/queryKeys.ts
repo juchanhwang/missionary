@@ -21,4 +21,9 @@ export const queryKeys = {
       [...queryKeys.users.all, 'list', params] as const,
     detail: (id: string) => [...queryKeys.users.all, 'detail', id] as const,
   },
+  missionaryRegions: {
+    all: ['missionaryRegions'] as const,
+    list: (missionaryId: number) =>
+      [...queryKeys.missionaryRegions.all, 'list', missionaryId] as const,
+  },
 } as const;
