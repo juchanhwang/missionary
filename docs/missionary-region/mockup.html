@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>연계지 관리 — UI 목업 v1.9</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      color: #111827;
+      background: #F9FAFB;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: 260px;
+      height: 100vh;
+      background: white;
+      border-right: 1px solid #E5E7EB;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .sidebar-logo {
+      height: 64px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar-logo-icon {
+      width: 32px; height: 32px;
+      background: #E60012;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sidebar-logo-text { font-size: 15px; font-weight: 700; color: #111827; letter-spacing: -0.02em; }
+    .sidebar-divider { height: 1px; background: #E5E7EB; margin: 0 16px; }
+    .sidebar-nav {
+      flex: 1; overflow-y: auto; padding: 16px 0;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .nav-item {
+      position: relative;
+      display: flex; align-items: center; gap: 12px;
+      height: 44px; margin: 0 12px; padding: 0 12px;
+      border-radius: 8px; font-size: 14px; font-weight: 500;
+      color: #6B7280; cursor: pointer; transition: all 0.15s; text-decoration: none;
+    }
+    .nav-item:hover { background: #F9FAFB; color: #1F2937; }
+    .nav-item.active { background: #F3F4F6; color: #111827; font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 8px; bottom: 8px;
+      width: 3px; border-radius: 0 2px 2px 0; background: #E60012;
+    }
+    .sidebar-user {
+      border-top: 1px solid #E5E7EB; padding: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #1F2937; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; flex-shrink: 0;
+    }
+
+    /* ─── LAYOUT ─── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .header {
+      height: 64px; background: white; border-bottom: 1px solid #E5E7EB;
+      padding: 0 32px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .header h1 { font-size: 20px; font-weight: 600; color: #111827; }
+    .header-search { position: relative; width: 256px; }
+    .header-search input {
+      width: 100%; height: 40px; padding: 0 16px 0 40px;
+      border-radius: 8px; background: #F9FAFB; border: 1px solid transparent;
+      font-size: 14px; color: #111827; outline: none; transition: border-color 0.15s; font-family: inherit;
+    }
+    .header-search input:focus { border-color: #D1D5DB; }
+    .header-search input::placeholder { color: #9CA3AF; }
+    .header-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9CA3AF; }
+
+    .content {
+      flex: 1; overflow-y: auto; padding: 28px 32px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+
+    /* ─── PAGE HEADER ─── */
+    .page-header { display: flex; align-items: center; justify-content: space-between; }
+    .page-header h2 { font-size: 22px; font-weight: 700; color: #111827; }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px; font-weight: 600; border-radius: 8px;
+      cursor: pointer; transition: all 0.15s; border: none; font-family: inherit;
+    }
+    .btn-xs  { height: 28px; padding: 0 10px; font-size: 12px; border-radius: 6px; }
+    .btn-sm  { height: 32px; padding: 0 12px; font-size: 13px; }
+    .btn-md  { height: 40px; padding: 0 16px; font-size: 14px; }
+    .btn-lg  { height: 48px; padding: 0 20px; font-size: 15px; }
+
+    .btn-primary { background: #E60012; color: white; }
+    .btn-primary:hover:not(:disabled) { background: #CC0010; }
+    .btn-primary:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; }
+
+    .btn-neutral { background: #1F2937; color: white; }
+    .btn-neutral:hover:not(:disabled) { background: #374151; }
+
+    .btn-outline { background: white; color: #1F2937; border: 1px solid #D1D5DB; }
+    .btn-outline:hover:not(:disabled) { background: #F9FAFB; }
+    .btn-outline:disabled { border-color: #E5E7EB; color: #D1D5DB; cursor: not-allowed; }
+
+    .btn-outline-danger { background: white; color: #E60012; border: 1px solid #FECACA; }
+    .btn-outline-danger:hover { background: #FFF5F5; }
+
+    .btn-destructive { background: #E60012; color: white; }
+    .btn-destructive:hover { background: #CC0010; }
+
+    .btn-ghost { background: transparent; color: #6B7280; border: none; }
+    .btn-ghost:hover { background: #F3F4F6; color: #1F2937; }
+
+    /* ─── FILTER ROW v1.5: SearchBox 왼쪽 — 유저 관리 패턴 일치 ─── */
+    .filter-row {
+      display: flex; gap: 12px; align-items: flex-end;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; }
+    .filter-label { font-size: 12px; font-weight: 500; color: #374151; }
+    .filter-search-group { display: flex; flex-direction: column; gap: 5px; flex: 1; max-width: 360px; }
+
+    .select-trigger {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 40px; padding: 0 12px; border: 1px solid #E5E7EB; border-radius: 8px;
+      background: white; font-size: 14px; color: #111827;
+      cursor: pointer; gap: 8px; min-width: 180px; transition: all 0.15s;
+    }
+    .select-trigger:hover { border-color: #D1D5DB; }
+    .select-trigger.has-value { color: #111827; }
+    .select-trigger.disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+    /* ─── SEARCH BOX IN FILTER ROW ─── */
+    .filter-search { position: relative; flex: 1; min-width: 240px; }
+    .filter-search input {
+      width: 100%; height: 40px; padding: 0 12px 0 38px;
+      border: 1px solid #E5E7EB; border-radius: 8px; background: white;
+      font-size: 14px; color: #111827; outline: none; transition: all 0.15s; font-family: inherit;
+    }
+    .filter-search input:focus { border-color: #9CA3AF; box-shadow: 0 0 0 1px #9CA3AF; }
+    .filter-search input::placeholder { color: #9CA3AF; }
+    .filter-search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #9CA3AF; pointer-events: none; }
+    .filter-search-clear {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      width: 18px; height: 18px; border-radius: 50%; background: #9CA3AF;
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─── CARD ─── */
+    .card { background: white; border-radius: 12px; border: 1px solid #E5E7EB; overflow: hidden; }
+    .card-header {
+      padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #F3F4F6;
+    }
+    .card-title { font-size: 15px; font-weight: 600; color: #111827; display: flex; align-items: center; gap: 8px; }
+    .count-badge {
+      background: #F3F4F6; color: #6B7280;
+      font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+    }
+
+    /* ─── TABLE v1.7: 선교 그룹 | 차수 | 연계지 | ... ─── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    thead tr { border-bottom: 1px solid #F3F4F6; background: #F9FAFB; }
+    th { padding: 11px 16px; font-size: 12px; font-weight: 600; color: #9CA3AF; text-align: left; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid #F3F4F6; cursor: default; transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #FAFAFA; }
+    td { padding: 13px 16px; font-size: 14px; color: #6B7280; vertical-align: middle; }
+    td.region-name { font-weight: 500; color: #111827; }
+    td.group-name { color: #6B7280; font-size: 13px; }
+    td.order-name { color: #374151; font-size: 13px; font-weight: 500; }
+    .action-cell { display: flex; align-items: center; gap: 6px; justify-content: center; }
+    .truncate-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 72px 24px; gap: 10px; text-align: center;
+    }
+    .empty-icon { width: 48px; height: 48px; color: #D1D5DB; margin-bottom: 2px; }
+    .empty-icon.error { color: #F87171; }
+    .empty-title { font-size: 15px; font-weight: 600; color: #374151; }
+    .empty-desc { font-size: 13px; color: #9CA3AF; line-height: 1.7; }
+
+    /* ─── SKELETON ─── */
+    .skeleton {
+      background: linear-gradient(90deg, #F3F4F6 25%, #E9EAEC 50%, #F3F4F6 75%);
+      background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 4px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ─── TOOLTIP ─── */
+    .tip { position: relative; display: inline-flex; }
+    .tipbox {
+      position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+      background: #1F2937; color: white; font-size: 11px; padding: 5px 10px; border-radius: 6px;
+      white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 50;
+    }
+    .tip:hover .tipbox { opacity: 1; }
+
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center; z-index: 100;
+    }
+    .modal {
+      background: white; border-radius: 16px; width: 480px; max-height: 88vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      animation: modalIn 0.2s ease;
+    }
+    .modal-sm { width: 380px; }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal-header {
+      padding: 20px 24px 16px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #E5E7EB; flex-shrink: 0;
+    }
+    .modal-title { font-size: 17px; font-weight: 700; color: #111827; }
+    .modal-body { padding: 24px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
+    .modal-footer {
+      padding: 16px 24px; border-top: 1px solid #E5E7EB;
+      display: flex; justify-content: flex-end; gap: 10px; flex-shrink: 0;
+    }
+
+    /* ─── FORM ─── */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label {
+      font-size: 12px; font-weight: 500; color: #374151;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .form-label .req { color: #E60012; }
+    .form-label .lock { color: #9CA3AF; }
+    .input-field {
+      width: 100%; height: 40px; padding: 0 12px;
+      border: 1px solid #E5E7EB; border-radius: 8px; background: #F9FAFB;
+      font-size: 14px; color: #111827; font-family: inherit; outline: none; transition: all 0.15s;
+    }
+    .input-field:focus { border-color: #9CA3AF; box-shadow: 0 0 0 1px #9CA3AF; }
+    .input-field::placeholder { color: #9CA3AF; }
+    .input-field[readonly] { color: #6B7280; cursor: default; }
+    .input-field:disabled { opacity: 0.5; cursor: not-allowed; }
+    .form-hr { border: none; border-top: 1px solid #F3F4F6; margin: 2px 0; }
+    .addr-row { display: flex; gap: 8px; align-items: flex-end; }
+    .addr-row .form-group { flex: 1; }
+
+    .modal-select {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 40px; padding: 0 12px; border: 1px solid #E5E7EB; border-radius: 8px;
+      background: #F9FAFB; font-size: 14px; color: #111827; cursor: pointer; width: 100%;
+    }
+    .modal-select.disabled { opacity: 0.5; cursor: not-allowed; background: #F3F4F6; }
+    .modal-select.placeholder span { color: #9CA3AF; }
+
+    /* ─── STATE SWITCHER ─── */
+    .switcher {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 4px; background: rgba(17,24,39,0.92); backdrop-filter: blur(12px);
+      padding: 6px; border-radius: 14px; z-index: 200; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .sw-btn {
+      padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 600;
+      color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s;
+      border: none; background: transparent; font-family: inherit; white-space: nowrap; line-height: 1.5;
+      text-align: center;
+    }
+    .sw-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+    .sw-btn.on { background: white; color: #111827; }
+    .sw-sep { width: 1px; background: rgba(255,255,255,0.15); margin: 4px 2px; align-self: stretch; }
+
+    /* ─── PAGINATION v1.9 ─── */
+    .pagination-wrap {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-top: 1px solid #F3F4F6;
+    }
+    .pagination-range {
+      font-size: 13px; color: #6B7280; white-space: nowrap;
+    }
+    .pagination-btns {
+      display: flex; align-items: center; gap: 2px;
+    }
+    .pg-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 32px; height: 32px; padding: 0 6px; border-radius: 6px;
+      font-size: 13px; font-weight: 500; border: none; background: transparent;
+      color: #374151; cursor: pointer; transition: background 0.12s;
+    }
+    .pg-btn:hover:not(:disabled) { background: #F3F4F6; }
+    .pg-btn.active { background: #111827; color: white; font-weight: 700; }
+    .pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .pg-btn svg { display: block; }
+
+    /* ─── VERSION BADGE ─── */
+    .ver-badge {
+      position: fixed; top: 14px; right: 16px;
+      background: #E60012; color: white; font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 20px; z-index: 300; letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="ver-badge">UI Spec v1.9</div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/></svg>
+    </div>
+    <span class="sidebar-logo-text">선교 관리 시스템</span>
+  </div>
+  <div class="sidebar-divider"></div>
+  <nav class="sidebar-nav">
+    <a class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>선교 관리</a>
+    <a class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>유저 관리</a>
+    <a class="nav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>연계지 관리</a>
+    <a class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>게시 관리</a>
+    <a class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>약관 관리</a>
+    <a class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>공지 관리</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="avatar">A</div>
+    <div style="flex:1;min-width:0">
+      <p style="font-size:13px;font-weight:500;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">admin@samilhero.com</p>
+      <p style="font-size:11px;color:#9CA3AF;margin-top:2px">관리자</p>
+    </div>
+    <button class="btn btn-ghost" style="padding:6px;border-radius:6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main">
+  <header class="header">
+    <h1>연계지 관리</h1>
+    <div class="header-search">
+      <svg class="header-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="검색...">
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h2>연계지 관리</h2>
+      <!-- v1.4: 항상 활성 — disabled 없음 -->
+      <button class="btn btn-primary btn-md" onclick="goModal('CREATE')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        연계지 등록
+      </button>
+    </div>
+
+    <!-- Filters v1.7: SearchBox 왼쪽 → 선교 그룹 → 차수 (유저 관리 패턴 일치) -->
+    <div class="filter-row">
+      <!-- SearchBox 왼쪽 (유저 관리와 동일 패턴) -->
+      <div class="filter-search-group">
+        <span class="filter-label">&nbsp;</span>
+        <div class="filter-search">
+          <svg class="filter-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="이름, 목사명으로 검색..." oninput="handleSearch(this.value)" aria-label="연계지 검색" role="searchbox">
+          <button class="filter-search-clear" id="searchClear" style="display:none" onclick="clearSearch()" title="검색어 초기화">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <!-- cascade 필터: 선교 그룹 → 차수 (오른쪽 그룹) -->
+      <div class="filter-group">
+        <span class="filter-label">선교 그룹</span>
+        <div class="select-trigger has-value" id="groupSel" onclick="cycleGroup()">
+          <span id="groupSelText">전체</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">차수</span>
+        <div class="select-trigger has-value" id="missionSel" onclick="cycleMission()">
+          <span id="missionSelText">전체</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Content -->
+    <div id="area"></div>
+  </div>
+</main>
+
+<!-- ═══ MODAL LAYER ═══ -->
+<div class="modal-overlay" id="overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<!-- ═══ STATE SWITCHER — v1.7: 선교 그룹 | 차수 | 연계지 컬럼 구조 ═══ -->
+<div class="switcher">
+  <button class="sw-btn on" id="sw-TABLE" onclick="goState('TABLE')">테이블<br><small style="font-weight:400;opacity:.7">전체 기본 노출</small></button>
+  <button class="sw-btn" id="sw-B" onclick="goState('B')">빈 상태 B<br><small style="font-weight:400;opacity:.7">연계지 없음</small></button>
+  <button class="sw-btn" id="sw-C" onclick="goState('C')">빈 상태 C<br><small style="font-weight:400;opacity:.7">검색 결과 없음</small></button>
+  <button class="sw-btn" id="sw-LOAD" onclick="goState('LOAD')">로딩<br><small style="font-weight:400;opacity:.7">Skeleton</small></button>
+  <button class="sw-btn" id="sw-ERROR" onclick="goState('ERROR')">에러<br><small style="font-weight:400;opacity:.7">로드 실패</small></button>
+  <div class="sw-sep"></div>
+  <button class="sw-btn" id="sw-CREATE" onclick="goModal('CREATE')">등록 모달</button>
+  <button class="sw-btn" id="sw-EDIT" onclick="goModal('EDIT')">수정 모달</button>
+  <button class="sw-btn" id="sw-DELETE" onclick="goModal('DELETE')">삭제 모달</button>
+</div>
+
+<script>
+/* ─── ICON HELPERS ─── */
+const I = {
+  building2: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>`,
+  search: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+  alertCircle: `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  close: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  chevDown: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`,
+  lock: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+  plus: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+};
+
+/* ─── SAMPLE DATA v1.7: 5개 샘플 — 도메인 정확 반영 ───
+   Category(국내/해외) → MissionGroup(장흥선교, 필리핀선교 등) → Missionary(1차, 2차) → MissionaryRegion
+─── */
+const REGIONS = [
+  { group:'장흥선교', groupCategory:'국내', mission:'1차', name:'장흥제일교회',  purpose:'단기선교', pastor:'홍길동', phone:'010-1234-5678', addr:'전라남도 장흥군 장흥읍 중앙로 123', detail:'101호' },
+  { group:'장흥선교', groupCategory:'국내', mission:'1차', name:'장흥중앙교회',  purpose:'—',       pastor:'이중앙', phone:'010-2222-3333', addr:'전라남도 장흥군 장흥읍 장흥로 56', detail:'—' },
+  { group:'장흥선교', groupCategory:'국내', mission:'1차', name:'장흥동부교회',  purpose:'단기선교', pastor:'박동부', phone:'010-4444-5555', addr:'전라남도 장흥군 장흥읍 동부로 89', detail:'—' },
+  { group:'장흥선교', groupCategory:'국내', mission:'2차', name:'고흥은혜교회',  purpose:'—',       pastor:'김철수', phone:'010-9876-5432', addr:'전라남도 고흥군 고흥읍 교육로 45', detail:'—' },
+  { group:'장흥선교', groupCategory:'국내', mission:'2차', name:'고흥소망교회',  purpose:'장기선교', pastor:'최소망', phone:'010-6677-8899', addr:'전라남도 고흥군 고흥읍 소망로 12', detail:'—' },
+  { group:'장흥선교', groupCategory:'국내', mission:'2차', name:'보성중앙교회',  purpose:'장기선교', pastor:'—',     phone:'—',            addr:'전라남도 보성군 보성읍 보성로 78', detail:'—' },
+  { group:'장흥선교', groupCategory:'국내', mission:'2차', name:'보성제일교회',  purpose:'—',       pastor:'정제일', phone:'010-1111-9999', addr:'전라남도 보성군 보성읍 제일로 34', detail:'—' },
+  { group:'장흥선교', groupCategory:'국내', mission:'2차', name:'강진새빛교회',  purpose:'단기선교', pastor:'한새빛', phone:'010-7788-1122', addr:'전라남도 강진군 강진읍 새빛로 7', detail:'—' },
+  { group:'장흥선교', groupCategory:'국내', mission:'3차', name:'장흥열린교회',  purpose:'—',       pastor:'오열린', phone:'010-3344-5566', addr:'전라남도 장흥군 장흥읍 열린로 22', detail:'202호' },
+  { group:'장흥선교', groupCategory:'국내', mission:'3차', name:'화순성광교회',  purpose:'단기선교', pastor:'임성광', phone:'010-8899-0011', addr:'전라남도 화순군 화순읍 성광로 50', detail:'—' },
+  { group:'장흥선교', groupCategory:'국내', mission:'3차', name:'나주사랑교회',  purpose:'의료선교', pastor:'조사랑', phone:'010-5566-7788', addr:'전라남도 나주시 나주읍 사랑로 99', detail:'—' },
+  { group:'군선교',   groupCategory:'국내', mission:'1차', name:'광양새벽교회',  purpose:'—',       pastor:'이새벽', phone:'010-3333-7777', addr:'전라남도 광양시 광양읍 새벽로 12', detail:'—' },
+  { group:'군선교',   groupCategory:'국내', mission:'1차', name:'순천은혜교회',  purpose:'단기선교', pastor:'강은혜', phone:'010-9900-1122', addr:'전라남도 순천시 순천읍 은혜로 45', detail:'—' },
+  { group:'군선교',   groupCategory:'국내', mission:'1차', name:'여수빛교회',    purpose:'—',       pastor:'윤빛남', phone:'010-2233-4455', addr:'전라남도 여수시 여수읍 빛로 33', detail:'—' },
+  { group:'군선교',   groupCategory:'국내', mission:'2차', name:'광양중앙교회',  purpose:'—',       pastor:'서중앙', phone:'010-6655-4433', addr:'전라남도 광양시 광양읍 중앙로 88', detail:'—' },
+  { group:'군선교',   groupCategory:'국내', mission:'2차', name:'순천소망교회',  purpose:'단기선교', pastor:'문소망', phone:'010-1122-3344', addr:'전라남도 순천시 순천읍 소망로 67', detail:'—' },
+  { group:'필리핀선교', groupCategory:'해외', mission:'1차', name:'마닐라성도교회', purpose:'의료선교', pastor:'박미래', phone:'010-5555-1234', addr:'Metro Manila, Philippines', detail:'—' },
+  { group:'필리핀선교', groupCategory:'해외', mission:'1차', name:'세부소망교회',   purpose:'단기선교', pastor:'홍세부', phone:'010-7777-8888', addr:'Cebu City, Philippines', detail:'—' },
+  { group:'필리핀선교', groupCategory:'해외', mission:'1차', name:'다바오열린교회', purpose:'—',       pastor:'—',     phone:'—',            addr:'Davao City, Philippines', detail:'—' },
+  { group:'필리핀선교', groupCategory:'해외', mission:'2차', name:'마닐라제일교회', purpose:'교육선교', pastor:'이마닐', phone:'010-4444-6666', addr:'Quezon City, Philippines', detail:'—' },
+  { group:'필리핀선교', groupCategory:'해외', mission:'2차', name:'세부새빛교회',   purpose:'—',       pastor:'최세부', phone:'010-8888-2222', addr:'Cebu City, Philippines', detail:'—' },
+];
+
+/* ─── FILTER STATE ───
+   MissionGroup(선교 그룹) — 실제 선교 프로그램명 + category(국내/해외)
+   Missionary(선교) — 차수 (1차, 2차)
+─── */
+let filterGroup = '전체';
+let filterMission = '전체';
+let searchQuery = '';
+
+/* ─── PAGINATION STATE v1.9 ─── */
+const PAGE_SIZE = 20;
+let currentPage = 1;
+
+const GROUP_OPTIONS = [
+  { name:'전체', category: null },
+  { name:'군선교',    category:'국내' },
+  { name:'장흥선교',  category:'국내' },
+  { name:'필리핀선교', category:'해외' },
+];
+const MISSION_MAP = {
+  '전체':      ['전체'],
+  '장흥선교':  ['전체', '1차', '2차'],
+  '군선교':    ['전체', '1차'],
+  '필리핀선교': ['전체', '1차'],
+};
+
+let groupIdx = 0;
+let missionIdx = 0;
+
+function cycleGroup() {
+  groupIdx = (groupIdx + 1) % GROUP_OPTIONS.length;
+  filterGroup = GROUP_OPTIONS[groupIdx].name;
+  filterMission = '전체';
+  missionIdx = 0;
+  currentPage = 1; // 필터 변경 시 page 리셋
+  const g = GROUP_OPTIONS[groupIdx];
+  // Trigger 텍스트 — 카테고리 라벨 포함 (v1.5)
+  document.getElementById('groupSelText').innerHTML =
+    g.category
+      ? `${g.name} <span style="font-size:11px;color:#9CA3AF;font-weight:400">(${g.category})</span>`
+      : '전체';
+  document.getElementById('missionSelText').textContent = '전체';
+  refreshArea();
+}
+
+function cycleMission() {
+  const opts = MISSION_MAP[filterGroup] || ['전체'];
+  missionIdx = (missionIdx + 1) % opts.length;
+  filterMission = opts[missionIdx];
+  currentPage = 1; // 필터 변경 시 page 리셋
+  document.getElementById('missionSelText').textContent = filterMission;
+  refreshArea();
+}
+
+function handleSearch(val) {
+  searchQuery = val;
+  currentPage = 1; // 검색어 변경 시 page 리셋
+  document.getElementById('searchClear').style.display = val ? 'flex' : 'none';
+  refreshArea();
+}
+
+function clearSearch() {
+  searchQuery = '';
+  currentPage = 1;
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchClear').style.display = 'none';
+  refreshArea();
+}
+
+function getFilteredRegions() {
+  return REGIONS.filter(r => {
+    const groupOk = filterGroup === '전체' || r.group === filterGroup;
+    const missionOk = filterMission === '전체' || r.mission === filterMission;
+    const queryOk = !searchQuery ||
+      r.name.includes(searchQuery) ||
+      (r.pastor !== '—' && r.pastor.includes(searchQuery));
+    return groupOk && missionOk && queryOk;
+  });
+}
+
+/* ─── STATE RENDERERS ─── */
+
+// 빈 상태 B — 연계지 없음 (필터 적용 포함)
+function renderB() {
+  return `<div class="card">
+    <div class="empty-state">
+      <div class="empty-icon">${I.building2}</div>
+      <p class="empty-title">등록된 연계지가 없습니다</p>
+      <p class="empty-desc">연결된 연계지가 아직 없습니다.</p>
+      <button class="btn btn-primary btn-md" style="margin-top:12px" onclick="goModal('CREATE')">
+        ${I.plus} 연계지 등록
+      </button>
+    </div>
+  </div>`;
+}
+
+// 빈 상태 C — 검색 결과 없음
+function renderC(query) {
+  const q = query || searchQuery || '삼일교회';
+  return `<div class="card">
+    <div class="card-header">
+      <div class="card-title">연계지 목록 <span class="count-badge">0개</span></div>
+    </div>
+    <div class="empty-state">
+      <div class="empty-icon">${I.search}</div>
+      <p class="empty-title">검색 결과가 없습니다</p>
+      <p class="empty-desc">'${q}'에 해당하는 연계지를 찾을 수 없습니다.</p>
+      <button class="btn btn-outline btn-md" style="margin-top:12px" onclick="clearSearch()">검색어 초기화</button>
+    </div>
+  </div>`;
+}
+
+// 에러 상태
+function renderError() {
+  return `<div class="card">
+    <div class="empty-state">
+      <div class="empty-icon error">${I.alertCircle}</div>
+      <p class="empty-title">데이터를 불러오지 못했습니다</p>
+      <p class="empty-desc">네트워크 오류가 발생했습니다. 다시 시도해주세요.</p>
+      <button class="btn btn-outline btn-md" style="margin-top:12px" onclick="goState('TABLE')">다시 시도</button>
+    </div>
+  </div>`;
+}
+
+/* ─── PAGINATION RENDERER v1.9 ─── */
+function renderPagination(total) {
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  if (totalPages <= 1) return ''; // 단일 페이지이면 미표시
+
+  const start = (currentPage - 1) * PAGE_SIZE + 1;
+  const end = Math.min(currentPage * PAGE_SIZE, total);
+
+  // 페이지 그룹 (5개 단위)
+  const GROUP = 5;
+  const groupStart = Math.floor((currentPage - 1) / GROUP) * GROUP + 1;
+  const groupEnd = Math.min(groupStart + GROUP - 1, totalPages);
+  const pages = [];
+  for (let i = groupStart; i <= groupEnd; i++) pages.push(i);
+
+  const pgBtn = (label, page, disabled, active) =>
+    `<button class="pg-btn${active ? ' active' : ''}" ${disabled ? 'disabled' : ''}
+      onclick="goPage(${page})" aria-label="${label}" ${active ? 'aria-current="page"' : ''}>
+      ${label}
+    </button>`;
+
+  const prevSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>`;
+  const nextSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>`;
+
+  return `<div class="pagination-wrap">
+    <span class="pagination-range">${start} - ${end} / 전체 ${total}건</span>
+    <div class="pagination-btns">
+      <button class="pg-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goPage(${currentPage - 1})" aria-label="이전 페이지">${prevSvg}</button>
+      ${pages.map(p => pgBtn(p, p, false, p === currentPage)).join('')}
+      <button class="pg-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goPage(${currentPage + 1})" aria-label="다음 페이지">${nextSvg}</button>
+    </div>
+  </div>`;
+}
+
+function goPage(page) {
+  currentPage = page;
+  refreshArea();
+}
+
+// v1.7: 테이블 — 선교 그룹 | 차수 | 연계지 | ...
+// v1.6 3단계 정렬 유지: 선교 그룹명 ASC → 차수 DESC → 연계지 이름 ASC
+function renderTable(regions) {
+  const data = regions !== undefined ? regions : getFilteredRegions();
+  const sorted = [...data].sort((a, b) => {
+    const groupCmp = a.group.localeCompare(b.group, 'ko');
+    if (groupCmp !== 0) return groupCmp;
+    const aNum = parseInt(a.mission) || 0;
+    const bNum = parseInt(b.mission) || 0;
+    if (aNum !== bNum) return bNum - aNum;
+    return a.name.localeCompare(b.name, 'ko');
+  });
+
+  // v1.9: 페이지네이션 — 20건/페이지 슬라이싱
+  const total = sorted.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+  const pageStart = (currentPage - 1) * PAGE_SIZE;
+  const paged = sorted.slice(pageStart, pageStart + PAGE_SIZE);
+
+  const rows = paged.map(r => `
+    <tr>
+      <td class="group-name">${r.group}</td>
+      <td class="order-name">${r.mission}</td>
+      <td class="region-name">${r.name}</td>
+      <td>${r.purpose}</td>
+      <td>${r.pastor}</td>
+      <td>${r.phone}</td>
+      <td>
+        <div class="truncate-cell" title="${r.addr}${r.detail !== '—' ? ' ' + r.detail : ''}">${r.addr}${r.detail !== '—' ? ' ' + r.detail : ''}</div>
+      </td>
+      <td>
+        <div class="action-cell">
+          <div class="tip">
+            <button class="btn btn-outline btn-xs" disabled style="cursor:not-allowed;opacity:.4">수정</button>
+            <span class="tipbox">현재 사용 불가 (준비 중)</span>
+          </div>
+          <button class="btn btn-outline-danger btn-xs" onclick="goModal('DELETE')">삭제</button>
+        </div>
+      </td>
+    </tr>`).join('');
+
+  return `<div class="card">
+    <div class="card-header">
+      <div class="card-title">연계지 목록 <span class="count-badge">${total}개</span></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <caption style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">연계지 목록</caption>
+        <thead><tr>
+          <th scope="col" style="width:140px">선교 그룹</th>
+          <th scope="col" style="width:100px">차수</th>
+          <th scope="col" style="width:140px">연계지</th>
+          <th scope="col" style="width:120px">방문목적</th>
+          <th scope="col" style="width:100px">목사명</th>
+          <th scope="col" style="width:130px">목사연락처</th>
+          <th scope="col">주소</th>
+          <th scope="col" style="width:112px;text-align:center">액션</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    ${renderPagination(total)}
+  </div>`;
+}
+
+// v1.7: 스켈레톤 — 선교 그룹 | 차수 | 연계지 | ... (8컬럼)
+function renderLoad() {
+  const skRows = [1,2,3,4,5].map(() => `
+    <tr>
+      <td><div class="skeleton" style="width:72px;height:14px"></div></td>
+      <td><div class="skeleton" style="width:36px;height:14px"></div></td>
+      <td><div class="skeleton" style="width:88px;height:14px"></div></td>
+      <td><div class="skeleton" style="width:56px;height:14px"></div></td>
+      <td><div class="skeleton" style="width:48px;height:14px"></div></td>
+      <td><div class="skeleton" style="width:96px;height:14px"></div></td>
+      <td><div class="skeleton" style="width:160px;height:14px"></div></td>
+      <td><div style="display:flex;gap:6px;justify-content:center">
+        <div class="skeleton" style="width:38px;height:28px;border-radius:6px"></div>
+        <div class="skeleton" style="width:38px;height:28px;border-radius:6px"></div>
+      </div></td>
+    </tr>`).join('');
+  return `<div class="card">
+    <div class="card-header">
+      <div class="card-title">연계지 목록 <div class="skeleton" style="display:inline-block;width:36px;height:20px;border-radius:20px;vertical-align:middle"></div></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:140px">선교 그룹</th>
+          <th style="width:100px">차수</th>
+          <th style="width:140px">연계지</th>
+          <th style="width:120px">방문목적</th>
+          <th style="width:100px">목사명</th>
+          <th style="width:130px">목사연락처</th>
+          <th>주소</th>
+          <th style="width:112px;text-align:center">액션</th>
+        </tr></thead>
+        <tbody>${skRows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ─── MODAL RENDERERS ─── */
+// v1.4: 등록 모달 — 자동 채움 조건 (필터 전체면 빈값)
+function renderCreateModal() {
+  const hasGroup = filterGroup !== '전체';
+  const hasMission = filterMission !== '전체';
+  return `
+    <div class="modal-header">
+      <span class="modal-title">연계지 등록</span>
+      <button class="btn btn-ghost" style="padding:6px;border-radius:6px" onclick="closeModal()">${I.close}</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">선교 그룹 <span class="req">*</span></label>
+          <div class="modal-select ${hasGroup ? '' : 'placeholder'}">
+            <span>${hasGroup
+              ? filterGroup + (GROUP_OPTIONS.find(g=>g.name===filterGroup)?.category
+                  ? ` <span style="font-size:11px;color:#9CA3AF">(${GROUP_OPTIONS.find(g=>g.name===filterGroup).category})</span>` : '')
+              : '선교 그룹을 선택하세요'}</span>${I.chevDown}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">차수 <span class="req">*</span></label>
+          <div class="modal-select ${hasMission ? '' : 'placeholder'}">
+            <span>${hasMission ? filterMission : '차수를 선택하세요'}</span>${I.chevDown}
+          </div>
+        </div>
+      </div>
+      <hr class="form-hr">
+      <div class="form-group">
+        <label class="form-label">연계지 이름 <span class="req">*</span></label>
+        <input class="input-field" type="text" placeholder="연계지(교회) 이름을 입력하세요">
+      </div>
+      <div class="form-group">
+        <label class="form-label">방문목적</label>
+        <input class="input-field" type="text" placeholder="예: 단기선교, 의료선교">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">목사명</label>
+          <input class="input-field" type="text" placeholder="담당 목사 이름">
+        </div>
+        <div class="form-group">
+          <label class="form-label">목사연락처</label>
+          <input class="input-field" type="tel" placeholder="010-0000-0000">
+        </div>
+      </div>
+      <div class="addr-row">
+        <div class="form-group" style="flex:1">
+          <label class="form-label">기본주소</label>
+          <input class="input-field" type="text" placeholder="주소 검색 버튼을 클릭하세요" readonly style="background:#F9FAFB">
+        </div>
+        <div style="align-self:flex-end">
+          <button class="btn btn-outline btn-md" style="white-space:nowrap;height:40px">주소 검색</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">상세주소</label>
+        <input class="input-field" type="text" placeholder="건물명, 층, 호수 등">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-md" onclick="closeModal()">취소</button>
+      <button class="btn btn-primary btn-md">저장</button>
+    </div>`;
+}
+
+// 수정 모달 — 선교 그룹/차수 잠금 + tooltip
+function renderEditModal() {
+  return `
+    <div class="modal-header">
+      <span class="modal-title">연계지 수정</span>
+      <button class="btn btn-ghost" style="padding:6px;border-radius:6px" onclick="closeModal()">${I.close}</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">선교 그룹 <span class="lock">${I.lock}</span></label>
+          <div class="tip" style="display:flex">
+            <div class="modal-select disabled" style="flex:1" aria-label="선교 그룹 (변경 불가)">
+              <span>장흥선교 <span style="font-size:11px;color:#9CA3AF">(국내)</span></span>${I.chevDown}
+            </div>
+            <span class="tipbox">소속 선교 변경은 지원하지 않습니다</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">차수 <span class="lock">${I.lock}</span></label>
+          <div class="tip" style="display:flex">
+            <div class="modal-select disabled" style="flex:1" aria-label="차수 (변경 불가)"><span>1차</span>${I.chevDown}</div>
+            <span class="tipbox">소속 선교 변경은 지원하지 않습니다</span>
+          </div>
+        </div>
+      </div>
+      <hr class="form-hr">
+      <div class="form-group">
+        <label class="form-label">연계지 이름 <span class="req">*</span></label>
+        <input class="input-field" type="text" value="장흥제일교회">
+      </div>
+      <div class="form-group">
+        <label class="form-label">방문목적</label>
+        <input class="input-field" type="text" value="단기선교">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">목사명</label>
+          <input class="input-field" type="text" value="홍길동">
+        </div>
+        <div class="form-group">
+          <label class="form-label">목사연락처</label>
+          <input class="input-field" type="tel" value="010-1234-5678">
+        </div>
+      </div>
+      <div class="addr-row">
+        <div class="form-group" style="flex:1">
+          <label class="form-label">기본주소</label>
+          <input class="input-field" type="text" value="전라남도 장흥군 장흥읍 중앙로 123" readonly style="background:#F9FAFB">
+        </div>
+        <div style="align-self:flex-end">
+          <button class="btn btn-outline btn-md" style="white-space:nowrap;height:40px">주소 검색</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">상세주소</label>
+        <input class="input-field" type="text" value="101호">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-md" onclick="closeModal()">취소</button>
+      <button class="btn btn-primary btn-md">저장</button>
+    </div>`;
+}
+
+// 삭제 확인 모달
+function renderDeleteModal() {
+  return `
+    <div class="modal-header">
+      <span class="modal-title">연계지 삭제</span>
+      <button class="btn btn-ghost" style="padding:6px;border-radius:6px" onclick="closeModal()">${I.close}</button>
+    </div>
+    <div class="modal-body" style="gap:8px">
+      <p style="font-size:15px;color:#111827;font-weight:500;line-height:1.5">'장흥제일교회'을(를) 삭제하시겠습니까?</p>
+      <p style="font-size:13px;color:#9CA3AF;line-height:1.6">삭제한 데이터는 복구할 수 없습니다.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-md" onclick="closeModal()">취소</button>
+      <button class="btn btn-destructive btn-md">삭제</button>
+    </div>`;
+}
+
+/* ─── STATE MACHINE ─── */
+const ALL_STATES = ['TABLE','B','C','LOAD','ERROR','CREATE','EDIT','DELETE'];
+let curState = 'TABLE';
+let forceState = null;
+
+function refreshArea() {
+  const area = document.getElementById('area');
+  if (forceState === 'B')     { area.innerHTML = renderB();     return; }
+  if (forceState === 'LOAD')  { area.innerHTML = renderLoad();  return; }
+  if (forceState === 'ERROR') { area.innerHTML = renderError(); return; }
+
+  const filtered = getFilteredRegions();
+  if (searchQuery && filtered.length === 0) {
+    area.innerHTML = renderC(searchQuery);
+    setTabHighlight('C');
+  } else if (filtered.length === 0) {
+    area.innerHTML = renderB();
+    setTabHighlight('B');
+  } else {
+    area.innerHTML = renderTable(filtered);
+    setTabHighlight('TABLE');
+  }
+}
+
+function goState(s) {
+  curState = s;
+  const area = document.getElementById('area');
+
+  if (s === 'TABLE') {
+    forceState = null;
+    refreshArea();
+  } else if (s === 'B') {
+    forceState = 'B';
+    area.innerHTML = renderB();
+  } else if (s === 'C') {
+    forceState = null;
+    document.getElementById('searchInput').value = '삼일교회';
+    searchQuery = '삼일교회';
+    document.getElementById('searchClear').style.display = 'flex';
+    area.innerHTML = renderC('삼일교회');
+  } else if (s === 'LOAD') {
+    forceState = 'LOAD';
+    area.innerHTML = renderLoad();
+  } else if (s === 'ERROR') {
+    forceState = 'ERROR';
+    area.innerHTML = renderError();
+  }
+
+  setTabHighlight(s);
+  closeModal();
+}
+
+function setTabHighlight(s) {
+  ALL_STATES.forEach(k => {
+    const el = document.getElementById('sw-' + k);
+    if (el) el.classList.toggle('on', k === s);
+  });
+}
+
+function goModal(type) {
+  const box = document.getElementById('modalBox');
+  const overlay = document.getElementById('overlay');
+  const map = { CREATE: renderCreateModal, EDIT: renderEditModal, DELETE: renderDeleteModal };
+  box.innerHTML = (map[type] || renderCreateModal)();
+  box.className = 'modal' + (type === 'DELETE' ? ' modal-sm' : '');
+  overlay.style.display = 'flex';
+  setTabHighlight(type);
+}
+
+function closeModal() {
+  document.getElementById('overlay').style.display = 'none';
+  setTabHighlight(curState);
+}
+
+// Init: 전체 기본 노출
+goState('TABLE');
+</script>
+</body>
+</html>
