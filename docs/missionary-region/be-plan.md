@@ -79,8 +79,8 @@ GET /regions?missionGroupId=<uuid>&missionaryId=<uuid>&query=<string>&limit=<num
 | `missionGroupId` | UUID | N | — | 선교 그룹 필터 |
 | `missionaryId` | UUID | N | — | 차수(선교) 필터 |
 | `query` | string | N | — | name, pastorName 부분 일치 검색 |
-| `limit` | number | N | — | 페이지 크기 (MVP 미사용, 예비) |
-| `offset` | number | N | 0 | 오프셋 (MVP 미사용, 예비) |
+| `limit` | number | N | 20 | 페이지 크기 (양수) |
+| `offset` | number | N | 0 | 오프셋 (0 이상) |
 
 **Request DTO**: `GetRegionsQueryDto`
 
@@ -105,14 +105,14 @@ export class GetRegionsQueryDto {
   @IsString()
   declare query?: string;
 
-  @ApiPropertyOptional({ description: '페이지 크기 (예비)' })
+  @ApiPropertyOptional({ description: '페이지 크기', default: 20 })
   @IsOptional()
   @Transform(({ value }) => parseInt(value, 10))
   @IsInt()
   @Min(1)
   declare limit?: number;
 
-  @ApiPropertyOptional({ description: '오프셋 (예비)' })
+  @ApiPropertyOptional({ description: '오프셋', default: 0 })
   @IsOptional()
   @Transform(({ value }) => parseInt(value, 10))
   @IsInt()
@@ -250,8 +250,8 @@ async findAllWithFilters(params: {
         { missionary: { order: 'desc' } },
         { name: 'asc' },
       ],
-      ...(params.limit && { take: params.limit }),
-      ...(params.offset && { skip: params.offset }),
+      take: params.limit ?? 20,
+      skip: params.offset ?? 0,
     }),
     this.prisma.missionaryRegion.count({ where }),
   ]);
@@ -264,6 +264,7 @@ async findAllWithFilters(params: {
 - `missionaryId`가 있으면 직접 필터, 없고 `missionGroupId`만 있으면 `missionary.missionGroupId`로 필터
 - `query` 검색은 `OR` 조건으로 `name`, `pastorName` 부분 일치 (`contains` + `insensitive`)
 - 정렬은 `missionary.missionGroup.name ASC → missionary.order DESC → name ASC`
+- 페이지네이션: `limit` 기본값 20, `offset` 기본값 0 — 항상 적용
 - `Promise.all`로 데이터 + count 병렬 조회
 - Soft delete는 PrismaService 미들웨어가 자동 처리 (`deletedAt: null` 자동 주입)
 

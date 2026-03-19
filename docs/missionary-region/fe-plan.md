@@ -47,7 +47,7 @@ app/(admin)/users/
 | 인증/권한 | `useAuth()` → `user.role` 체크 | 동일 |
 | 모달 제어 | `react-modal` + `overlay.openAsync` (DS) | 동일 |
 
-> **핵심 차이**: Users 페이지는 필터를 `useState`로 관리하지만, 연계지 페이지는 **URL 쿼리 파라미터**(`?missionGroupId=&missionaryId=&query=`)로 관리하여 새로고침 유지 및 링크 공유를 지원한다.
+> **핵심 차이**: Users 페이지는 필터를 `useState`로 관리하지만, 연계지 페이지는 **URL 쿼리 파라미터**(`?missionGroupId=&missionaryId=&query=&page=`)로 관리하여 새로고침 유지 및 링크 공유를 지원한다. 페이지네이션도 URL `page` 파라미터로 관리한다.
 
 ### 1-3. API 연동 패턴
 
@@ -105,6 +105,7 @@ app/(admin)/regions/
 │   ├── MissionGroupSelect.tsx               # 선교 그룹 드롭다운 (카테고리 라벨)
 │   ├── MissionarySelect.tsx                 # 차수 드롭다운 (cascade 연동)
 │   ├── MissionaryRegionTable.tsx            # 연계지 목록 테이블
+│   ├── MissionaryRegionPagination.tsx      # 페이지네이션 컴포넌트
 │   ├── MissionaryRegionEmptyState.tsx       # 빈 상태 / 에러 상태 UI
 │   └── modal/
 │       ├── MissionaryRegionFormModal.tsx     # 등록/수정 모달 (mode prop)
@@ -164,6 +165,11 @@ page.tsx (서버 컴포넌트)
                 └── 액션 (ADMIN 전용)
                     ├── 수정 버튼 → MissionaryRegionFormModal (mode='edit')
                     └── 삭제 버튼 → DeleteMissionaryRegionModal
+        │
+        └── MissionaryRegionPagination (total > ITEMS_PER_PAGE 일 때 표시)
+            ├── 이전/다음 버튼
+            ├── 페이지 번호 버튼
+            └── 현재 페이지 / 전체 페이지 표시
 
 모달 계층 (overlay-kit 관리):
 ├── MissionaryRegionFormModal
@@ -251,6 +257,14 @@ interface DeleteMissionaryRegionModalProps {
   close: (result: boolean) => void;
   region: RegionListItem;             // 삭제 대상
 }
+
+// MissionaryRegionPagination
+interface MissionaryRegionPaginationProps {
+  currentPage: number;                // 현재 페이지 (1-based)
+  totalPages: number;                 // 전체 페이지 수 (Math.ceil(total / ITEMS_PER_PAGE))
+  total: number;                      // 전체 항목 수
+  onPageChange: (page: number) => void;
+}
 ```
 
 ---
@@ -264,23 +278,28 @@ interface DeleteMissionaryRegionModalProps {
 // 패턴: useSearchParams + router.replace
 // 참고: Users 페이지와 달리 URL 기반으로 동작
 
+const ITEMS_PER_PAGE = 20;
+
 interface RegionFilterParams {
   query: string;
   missionGroupId: string;
   missionaryId: string;
+  page: number;                                // 현재 페이지 (1-based, 기본값 1)
 }
 
 interface UseRegionFilterParamsReturn {
   params: RegionFilterParams;
-  setQuery: (value: string) => void;           // debounce 포함
-  setMissionGroupId: (value: string) => void;  // cascade: missionaryId 리셋
-  setMissionaryId: (value: string) => void;
-  clearQuery: () => void;
+  setQuery: (value: string) => void;           // debounce 포함, page 1로 리셋
+  setMissionGroupId: (value: string) => void;  // cascade: missionaryId + page 리셋
+  setMissionaryId: (value: string) => void;    // page 1로 리셋
+  setPage: (page: number) => void;             // 페이지 변경
+  clearQuery: () => void;                      // page 1로 리셋
 }
 
 // 구현 핵심:
-// - 검색어 변경: 300ms debounce 후 URL 업데이트
-// - 선교 그룹 변경: missionaryId도 함께 제거 (cascade)
+// - 검색어 변경: 300ms debounce 후 URL 업데이트 + page=1 리셋
+// - 선교 그룹 변경: missionaryId + page 함께 제거 (cascade)
+// - 필터/검색 변경 시 항상 page=1로 리셋
 // - router.replace 사용 (히스토리 스택 방지)
 ```
 
@@ -315,7 +334,7 @@ interface UseGetMissionariesOptions {
 ### 3-4. useGetMissionaryRegions — 연계지 목록 (신규 API)
 
 ```typescript
-// API: GET /regions?missionGroupId=&missionaryId=&query=
+// API: GET /regions?missionGroupId=&missionaryId=&query=&limit=&offset=
 // 반환: RegionListResponse { data: RegionListItem[], total: number }
 // queryKey: queryKeys.missionaryRegions.list(params)
 
@@ -323,12 +342,15 @@ interface UseGetMissionaryRegionsParams {
   missionGroupId?: string;
   missionaryId?: string;
   query?: string;
+  page?: number;                    // 1-based, 기본값 1
 }
 
 // 구현:
-// - queryKey에 params 포함 → 필터 변경 시 자동 리페치
+// - queryKey에 params 포함 → 필터/페이지 변경 시 자동 리페치
+// - API 호출 시 page → limit/offset 변환: { limit: ITEMS_PER_PAGE, offset: (page - 1) * ITEMS_PER_PAGE }
 // - enabled: 항상 true (전체 조회 기본)
 // - staleTime: 적절히 설정 (예: 30초)
+// - placeholderData: keepPreviousData (페이지 전환 시 이전 데이터 유지)
 ```
 
 ### 3-5. useCreateMissionaryRegion — 등록 mutation
@@ -408,6 +430,8 @@ export interface GetRegionsParams {
   missionGroupId?: string;
   missionaryId?: string;
   query?: string;
+  limit?: number;                   // 페이지 크기 (기본값: 20)
+  offset?: number;                  // 오프셋 ((page - 1) * limit)
 }
 
 export interface CreateRegionPayload {
@@ -592,8 +616,9 @@ declare global {
 | 3-3 | MissionaryRegionEmptyState | `_components/MissionaryRegionEmptyState.tsx` | 없음 |
 | 3-4 | MissionaryRegionTable | `_components/MissionaryRegionTable.tsx` | 없음 |
 | 3-5 | KakaoAddressButton | `_components/modal/KakaoAddressButton.tsx` | 1-4 |
+| 3-6 | MissionaryRegionPagination | `_components/MissionaryRegionPagination.tsx` | 없음 |
 
-> 3-1 ~ 3-5 모두 병렬 실행 가능.
+> 3-1 ~ 3-6 모두 병렬 실행 가능.
 
 ### Wave 4: 모달 + 필터 (Wave 3 완료 후, 병렬 실행 가능)
 
@@ -630,7 +655,8 @@ Wave 1 (병렬)          Wave 2 (병렬)        Wave 3 (병렬)        Wave 4   
 │ 1-3 Schema  │───────┼──────────┘  │      │ 3-3 Empty    │   │ 4-3 Del  │     └──────────┘   └──────┘
 │ 1-4 Kakao   │───────┼─────────────┼────▶ │ 3-4 Table    │   │ 4-4 Filtr│
 │ 1-5 Filter  │───────┼─────────────┘      │ 3-5 KakaoBtn │   └──────────┘
-└─────────────┘       └──────────────┘      └──────────────┘
+└─────────────┘       └──────────────┘      │ 3-6 Paginat  │
+                                            └──────────────┘
 ```
 
 ---
@@ -645,6 +671,8 @@ Wave 1 (병렬)          Wave 2 (병렬)        Wave 3 (병렬)        Wave 4   
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef, useState, useEffect } from 'react';
 
+const ITEMS_PER_PAGE = 20;
+
 export function useRegionFilterParams() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -654,6 +682,7 @@ export function useRegionFilterParams() {
     query: searchParams.get('query') ?? '',
     missionGroupId: searchParams.get('missionGroupId') ?? '',
     missionaryId: searchParams.get('missionaryId') ?? '',
+    page: Number(searchParams.get('page')) || 1,  // 1-based, 기본값 1
   };
 
   // 검색어 debounce용 로컬 상태
@@ -671,16 +700,20 @@ export function useRegionFilterParams() {
     router.replace(qs ? `?${qs}` : '?', { scroll: false });
   };
 
-  // 선교 그룹 변경 → 차수 리셋 (cascade)
+  // 선교 그룹 변경 → 차수 + 페이지 리셋 (cascade)
   const setMissionGroupId = (value: string) => {
     updateParams({
       missionGroupId: value || null,
       missionaryId: null, // cascade reset
+      page: null,         // page 1로 리셋 (기본값)
     });
   };
 
   const setMissionaryId = (value: string) => {
-    updateParams({ missionaryId: value || null });
+    updateParams({
+      missionaryId: value || null,
+      page: null,         // page 1로 리셋
+    });
   };
 
   // 검색어 debounce
@@ -688,13 +721,21 @@ export function useRegionFilterParams() {
     setLocalQuery(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      updateParams({ query: value || null });
+      updateParams({
+        query: value || null,
+        page: null,       // page 1로 리셋
+      });
     }, 300);
+  };
+
+  // 페이지 변경
+  const setPage = (page: number) => {
+    updateParams({ page: page > 1 ? String(page) : null }); // page=1이면 URL에서 제거
   };
 
   const clearQuery = () => {
     setLocalQuery('');
-    updateParams({ query: null });
+    updateParams({ query: null, page: null });
   };
 
   useEffect(() => {
@@ -703,7 +744,7 @@ export function useRegionFilterParams() {
     };
   }, []);
 
-  return { params, localQuery, setQuery, setMissionGroupId, setMissionaryId, clearQuery };
+  return { params, localQuery, setQuery, setMissionGroupId, setMissionaryId, setPage, clearQuery };
 }
 ```
 
@@ -718,23 +759,36 @@ import { missionGroupApi } from '@/apis/missionGroup';
 import { queryKeys } from '@/lib/queryKeys';
 import { MissionaryRegionsPageClient } from './_components/MissionaryRegionsPageClient';
 
+const ITEMS_PER_PAGE = 20;
+
 interface PageProps {
   searchParams: Promise<{
     query?: string;
     missionGroupId?: string;
     missionaryId?: string;
+    page?: string;
   }>;
 }
 
 export default async function RegionsPage({ searchParams }: PageProps) {
-  const params = await searchParams;
+  const rawParams = await searchParams;
+  const page = Number(rawParams.page) || 1;
   const queryClient = new QueryClient();
+
+  // page → limit/offset 변환
+  const apiParams = {
+    missionGroupId: rawParams.missionGroupId,
+    missionaryId: rawParams.missionaryId,
+    query: rawParams.query,
+    limit: ITEMS_PER_PAGE,
+    offset: (page - 1) * ITEMS_PER_PAGE,
+  };
 
   // 초기 데이터 병렬 프리페치
   await Promise.all([
     queryClient.prefetchQuery({
-      queryKey: queryKeys.missionaryRegions.list(params),
-      queryFn: () => missionaryRegionApi.getRegions(params),
+      queryKey: queryKeys.missionaryRegions.list(apiParams),
+      queryFn: () => missionaryRegionApi.getRegions(apiParams),
     }),
     queryClient.prefetchQuery({
       queryKey: queryKeys.missionGroups.all,
@@ -801,7 +855,59 @@ const handleCreateClick = () => {
 };
 ```
 
-### 8-6. 테이블 주소 truncate + tooltip
+### 8-6. 페이지네이션 구현 상세
+
+```typescript
+// _components/MissionaryRegionPagination.tsx
+const ITEMS_PER_PAGE = 20;
+
+// 전체 페이지 수 계산
+const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+
+// 표시할 페이지 번호 계산 (최대 5개)
+function getPageNumbers(current: number, total: number): number[] {
+  const maxVisible = 5;
+  if (total <= maxVisible) return Array.from({ length: total }, (_, i) => i + 1);
+
+  let start = Math.max(1, current - Math.floor(maxVisible / 2));
+  const end = Math.min(total, start + maxVisible - 1);
+  start = Math.max(1, end - maxVisible + 1);
+
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+}
+```
+
+```tsx
+// 렌더링:
+// total > ITEMS_PER_PAGE 일 때만 표시
+{totalPages > 1 && (
+  <MissionaryRegionPagination
+    currentPage={params.page}
+    totalPages={totalPages}
+    total={data.total}
+    onPageChange={setPage}
+  />
+)}
+```
+
+```typescript
+// useGetMissionaryRegions 훅 내부 — page → limit/offset 변환:
+const { page = 1, ...filterParams } = params;
+const apiParams = {
+  ...filterParams,
+  limit: ITEMS_PER_PAGE,
+  offset: (page - 1) * ITEMS_PER_PAGE,
+};
+
+// placeholderData로 페이지 전환 시 이전 데이터 유지
+useQuery({
+  queryKey: queryKeys.missionaryRegions.list(apiParams),
+  queryFn: () => missionaryRegionApi.getRegions(apiParams),
+  placeholderData: keepPreviousData,
+});
+```
+
+### 8-7. 테이블 주소 truncate + tooltip
 
 ```tsx
 // 주소 셀:
@@ -836,7 +942,7 @@ const handleCreateClick = () => {
 |--------|:------:|------|
 | 카카오 CDN 로드 실패 | 중 | 폴백 처리 구현 (readOnly 해제 + 안내) |
 | GET /regions 응답 형태 변경 | 고 | 타입 정의를 PRD 스키마 기준으로 선 구현, 실제 API와 diff 시 조정 |
-| 대량 데이터 (수백 건) 시 성능 | 저 | MVP에서 페이지네이션 미적용이나, API `{ data, total }` 래퍼로 추후 확장 대비 |
+| 대량 데이터 (수백 건) 시 성능 | 저 | 페이지네이션 적용 (limit=20, offset 기반), `keepPreviousData`로 UX 개선 |
 | overlay-kit 모달 중첩 (이탈 방지 모달) | 중 | UnsavedChangesModal 패턴 검증 필요 (UserEditPanel 패턴 참조) |
 
 ### 9-3. MSW 모킹 전략 (BE 미완료 시)
