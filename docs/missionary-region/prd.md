@@ -2,7 +2,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| 문서 버전 | v0.6 |
+| 문서 버전 | v0.7 |
 | 작성일 | 2026-03-19 |
 | 작성자 | PO |
 | 상태 | Review |
@@ -18,6 +18,7 @@
 | v0.4 | 초안 — FR-1~4, 클라이언트 사이드 검색, 선교 필수 선택 후 조회 |
 | v0.5 | 전체 기본 노출로 전환, 서버 사이드 검색/필터, 전체 조회 API 추가, 테이블 컬럼 확장(선교 그룹/선교명), 에러 상태 UI 보강, 데스크톱 전용 명시 |
 | v0.6 | 용어 정비 — "선교(Missionary)" → "차수", "이름" → "연계지 이름"; 도메인 다이어그램 예시 수정(국내선교 → 장흥선교, 장흥선교 → 2차); FR-1~3 및 UI 설계 섹션 전반 반영 |
+| v0.7 | pastorPhone 입력 형식 검증 규칙 명시, 백엔드 인가(Guard) 작업 항목 추가, API 응답 페이지네이션 래퍼 예비 설계 반영 |
 
 ---
 
@@ -60,7 +61,7 @@
 | name | 연계지(교회) 이름 | string | Y |
 | visitPurpose | 방문 목적 | string | N |
 | pastorName | 담당 목사 이름 | string | N |
-| pastorPhone | 담당 목사 연락처 | string | N |
+| pastorPhone | 담당 목사 연락처. 형식: 숫자·하이픈만 허용, 7~15자 (예: `010-0000-0000`). BE `@Matches(/^[\d-]{7,15}$/)` 적용 | string | N |
 | addressBasic | 기본 주소 | string | N |
 | addressDetail | 상세 주소 | string | N |
 | missionaryId | 소속 선교 ID (FK) | string (UUID) | Y |
@@ -130,11 +131,18 @@ MissionGroup (선교 그룹) ──1:N──▶ Missionary (선교) ──1:N─
 |:--------:|------|------|
 | P0 | 전체 조회 API 추가 | `GET /regions?missionGroupId=&missionaryId=&query=` 엔드포인트 구현. Missionary/MissionGroup join하여 차수명/그룹명 포함 응답. `query`는 name, pastorName 부분 일치 검색. |
 | P0 | PATCH API 추가 | `PATCH /missionaries/:id/regions/:regionId` 엔드포인트 구현. `UpdateMissionaryRegionDto`는 이미 존재. |
+| P0 | 인가(Guard) 적용 | POST/PATCH/DELETE 엔드포인트에 `JwtAuthGuard` + `@Roles(Role.ADMIN)` 적용. GET(조회)은 인증된 사용자 전체 허용. |
 
 ### 전체 조회 API 응답 스키마
 
 ```typescript
-// GET /regions 응답 아이템
+// GET /regions?missionGroupId=&missionaryId=&query=&limit=&offset=
+// limit, offset은 선택적(optional) — MVP에서는 미사용, 향후 페이지네이션 추가 시 활용
+interface RegionListResponse {
+  data: RegionListItem[];
+  total: number;  // 필터/검색 조건에 맞는 전체 건수
+}
+
 interface RegionListItem {
   id: string;
   name: string;
@@ -154,6 +162,8 @@ interface RegionListItem {
   };
 }
 ```
+
+> **설계 결정**: MVP에서 페이지네이션 UI는 미적용하지만, API 응답을 `{ data, total }` 래퍼 형태로 설계하고 `limit`/`offset` 파라미터를 선택적으로 예비 포함한다. 향후 페이지네이션 추가 시 Breaking Change 없이 확장 가능.
 
 ---
 
@@ -175,7 +185,7 @@ interface RegionListItem {
 | 필터 구조 | **MissionGroup(선교 그룹) → Missionary(차수) 계층형 필터** | 연계지의 상위 맥락(선교 그룹) 표시 필요 |
 | 필터/검색 상태 | **URL 쿼리 파라미터** (`?missionGroupId=&missionaryId=&query=`) | 새로고침 유지, 링크 공유 가능 |
 | 등록 버튼 | **항상 활성** — 차수 선택은 모달 내부에서 처리 | 전체 기본 노출에서 disabled 조건 불필요 |
-| 페이지네이션 | **미적용** (MVP) | 전체 연계지 수 수십~수백 개 수준 예상 |
+| 페이지네이션 | **UI 미적용** (MVP), API는 `{ data, total }` 래퍼 + 선택적 `limit`/`offset` 예비 설계 | 전체 연계지 수 수십~수백 개 수준 예상. 향후 확장 시 Breaking Change 방지 |
 | 등록/수정 폼 재사용 | `mode` prop으로 분기 | 동일 컴포넌트로 등록/수정 처리 |
 | 테이블 컬럼 | 선교 그룹/차수 **항상 표시** | 전체 조회 시 소속 맥락 필수, 필터 선택 시에도 유지 (조건부 렌더링 복잡도 회피) |
 | 대상 디바이스 | **데스크톱 전용** (1280px+) | Admin 페이지, 기존 사이드바 구조가 모바일 미대응 |
