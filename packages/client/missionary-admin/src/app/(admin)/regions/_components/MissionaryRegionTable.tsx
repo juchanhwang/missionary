@@ -133,8 +133,16 @@ export function MissionaryRegionTable({
               return (
                 <tr
                   key={region.id}
-                  className="border-b border-gray-200 last:border-b-0 cursor-pointer transition-colors duration-150 hover:bg-gray-50"
-                  onClick={() => onEdit(region)}
+                  className={`border-b border-gray-200 last:border-b-0 transition-colors duration-150 ${isAdmin ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+                  onClick={isAdmin ? () => onEdit(region) : undefined}
+                  onKeyDown={
+                    isAdmin
+                      ? (e: React.KeyboardEvent) => {
+                          if (e.key === 'Enter') onEdit(region);
+                        }
+                      : undefined
+                  }
+                  tabIndex={isAdmin ? 0 : undefined}
                 >
                   <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
                     {region.missionary.missionGroup?.name ?? '—'}
@@ -151,11 +159,13 @@ export function MissionaryRegionTable({
                   <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
                     {region.pastorPhone ?? '—'}
                   </td>
-                  <td
-                    className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap max-w-[200px] truncate"
-                    title={fullAddress || undefined}
-                  >
-                    {fullAddress || '—'}
+                  <td className="px-5 py-3.5 text-sm text-gray-500">
+                    <div
+                      className="truncate max-w-[200px]"
+                      title={fullAddress || undefined}
+                    >
+                      {fullAddress || '—'}
+                    </div>
                   </td>
                   {isAdmin && (
                     <td className="px-5 py-3.5 whitespace-nowrap text-center">

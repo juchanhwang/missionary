@@ -22,8 +22,10 @@ export class PrismaService
 
   constructor(private readonly configService: ConfigService) {
     const rawUrl = configService.get<string>('DATABASE_URL') ?? '';
+    // pg 모듈은 PostgreSQL의 sslmode(allow/prefer/require/verify-ca/verify-full)를
+    // 직접 지원하지 않으므로, disable이 아닌 모든 값에서 SSL을 활성화한다.
+    // pg의 ssl 옵션을 직접 전달하므로 connection string에서 sslmode를 제거한다.
     const needsSsl = /sslmode=(?!disable\b)[a-z-]+/.test(rawUrl);
-    // pg 모듈에 ssl 옵션을 직접 전달하므로 connection string에서 sslmode 제거
     const dbUrl = rawUrl.replace(/[?&]sslmode=[a-z-]+/g, (match) =>
       match.startsWith('?') ? '?' : '',
     );

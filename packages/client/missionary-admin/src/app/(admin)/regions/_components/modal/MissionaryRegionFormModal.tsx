@@ -143,9 +143,9 @@ export function MissionaryRegionFormModal({
     } else if (region) {
       updateMutation.mutate(
         {
-          missionaryId,
+          missionaryId: region.missionaryId,
           regionId: region.id,
-          data: payload,
+          data: { ...payload, missionaryId: missionaryId || undefined },
         },
         {
           onSuccess: () => {

@@ -44,6 +44,7 @@ export interface CreateRegionPayload {
 }
 
 export interface UpdateRegionPayload {
+  missionaryId?: string;
   name?: string;
   pastorName?: string;
   pastorPhone?: string;
