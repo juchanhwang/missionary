@@ -8,6 +8,7 @@ import {
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
 import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
+import { UpdateMissionaryRegionDto } from './dto/update-missionary-region.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
 import {
   calculateNextOrder,
@@ -21,6 +22,8 @@ import {
 import {
   MISSIONARY_REGION_REPOSITORY,
   type MissionaryRegionRepository,
+  type MissionaryRegionUpdateInput,
+  type FindAllRegionsParams,
 } from './repositories/missionary-region-repository.interface';
 import {
   MISSIONARY_REPOSITORY,
@@ -141,6 +144,39 @@ export class MissionaryService {
     await this.findOne(id);
 
     return this.missionaryRepository.delete(id);
+  }
+
+  async findAllRegions(params: FindAllRegionsParams) {
+    return this.missionaryRegionRepository.findAllWithFilters(params);
+  }
+
+  async updateRegion(
+    missionaryId: string,
+    regionId: string,
+    dto: UpdateMissionaryRegionDto,
+  ) {
+    await this.findOne(missionaryId);
+
+    const region = await this.missionaryRegionRepository.findByIdAndMissionary(
+      regionId,
+      missionaryId,
+    );
+
+    if (!region) {
+      throw new NotFoundException(
+        `MissionaryRegion with ID ${regionId} not found for missionary ${missionaryId}`,
+      );
+    }
+
+    const data: MissionaryRegionUpdateInput = {};
+    if (dto.name !== undefined) data.name = dto.name;
+    if (dto.visitPurpose !== undefined) data.visitPurpose = dto.visitPurpose;
+    if (dto.pastorName !== undefined) data.pastorName = dto.pastorName;
+    if (dto.pastorPhone !== undefined) data.pastorPhone = dto.pastorPhone;
+    if (dto.addressBasic !== undefined) data.addressBasic = dto.addressBasic;
+    if (dto.addressDetail !== undefined) data.addressDetail = dto.addressDetail;
+
+    return this.missionaryRegionRepository.update(regionId, data);
   }
 
   async addRegion(missionaryId: string, dto: CreateMissionaryRegionDto) {
