@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
 
 export class CreateMissionaryRegionDto {
   @ApiProperty({ example: '새일교회 제주지교회', description: '연계지 이름' })
@@ -32,6 +32,9 @@ export class CreateMissionaryRegionDto {
   })
   @IsOptional()
   @IsString()
+  @Matches(/^[\d-]{7,15}$/, {
+    message: 'pastorPhone은 숫자와 하이픈만 허용하며 7~15자여야 합니다',
+  })
   declare pastorPhone?: string;
 
   @ApiProperty({
