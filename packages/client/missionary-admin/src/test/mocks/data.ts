@@ -1,5 +1,6 @@
 import { type AuthUser } from 'apis/auth';
 import { type Missionary } from 'apis/missionary';
+import { type RegionListItem } from 'apis/missionaryRegion';
 import { type MissionGroup, type MissionGroupDetail } from 'apis/missionGroup';
 import { type User } from 'apis/user';
 
@@ -88,6 +89,37 @@ export function createMockUserList(count: number): User[] {
       email: `user${i + 1}@example.com`,
       name: `사용자${i + 1}`,
       loginId: `user${i + 1}`,
+    }),
+  );
+}
+
+export function createMockRegion(
+  overrides: Partial<RegionListItem> = {},
+): RegionListItem {
+  return {
+    id: 'region-1',
+    name: '서울교회',
+    visitPurpose: '전도',
+    pastorName: '김목사',
+    pastorPhone: '010-1234-5678',
+    addressBasic: '서울 강남구 테헤란로 123',
+    addressDetail: '4층',
+    missionaryId: 'missionary-1',
+    missionary: {
+      id: 'missionary-1',
+      name: '1차 선교',
+      missionGroup: { id: 'group-1', name: '필리핀 선교' },
+    },
+    ...overrides,
+  };
+}
+
+export function createMockRegionList(count: number): RegionListItem[] {
+  return Array.from({ length: count }, (_, i) =>
+    createMockRegion({
+      id: `region-${i + 1}`,
+      name: `교회${i + 1}`,
+      missionaryId: `missionary-${i + 1}`,
     }),
   );
 }
