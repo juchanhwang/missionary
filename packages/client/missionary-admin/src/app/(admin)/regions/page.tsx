@@ -7,7 +7,6 @@ import { missionaryRegionApi } from 'apis/missionaryRegion';
 import { missionGroupApi } from 'apis/missionGroup';
 import { stripEmpty } from 'apis/utils';
 import { queryKeys } from 'lib/queryKeys';
-import Script from 'next/script';
 
 import { MissionaryRegionsPageClient } from './_components/MissionaryRegionsPageClient';
 
@@ -48,14 +47,8 @@ export default async function RegionsPage({ searchParams }: PageProps) {
   ]);
 
   return (
-    <>
-      <Script
-        src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
-        strategy="lazyOnload"
-      />
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <MissionaryRegionsPageClient />
-      </HydrationBoundary>
-    </>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <MissionaryRegionsPageClient />
+    </HydrationBoundary>
   );
 }

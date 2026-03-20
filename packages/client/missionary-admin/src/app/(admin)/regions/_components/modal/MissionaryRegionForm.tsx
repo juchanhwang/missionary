@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, InputField } from '@samilhero/design-system';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { useKakaoAddress } from '../../_hooks/useKakaoAddress';
@@ -38,7 +38,6 @@ export function MissionaryRegionForm({
 }: MissionaryRegionFormProps) {
   const isEdit = mode === 'edit';
   const addressDetailRef = useRef<HTMLInputElement>(null);
-  const [isKakaoFallback, setIsKakaoFallback] = useState(false);
 
   const form = useForm<MissionaryRegionFormValues>({
     resolver: zodResolver(missionaryRegionSchema),
@@ -66,18 +65,12 @@ export function MissionaryRegionForm({
     onDirtyChange(isDirty);
   }, [isDirty, onDirtyChange]);
 
-  const { openSearch, isKakaoAvailable } = useKakaoAddress({
+  const { openSearch } = useKakaoAddress({
     onSelect: (address) => {
       form.setValue('addressBasic', address, { shouldDirty: true });
       addressDetailRef.current?.focus();
     },
   });
-
-  useEffect(() => {
-    if (!isKakaoAvailable) {
-      setIsKakaoFallback(true);
-    }
-  }, [isKakaoAvailable]);
 
   return (
     <form
@@ -164,40 +157,27 @@ export function MissionaryRegionForm({
           </div>
 
           {/* 주소 */}
-          <div>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <InputField
-                  label="기본주소"
-                  placeholder={
-                    isKakaoFallback
-                      ? '주소를 직접 입력하세요'
-                      : '주소 검색 버튼을 클릭하세요'
-                  }
-                  readOnly={!isKakaoFallback}
-                  className={!isKakaoFallback ? '[&_input]:bg-gray-50' : ''}
-                  {...form.register('addressBasic')}
-                />
-              </div>
-              {!isKakaoFallback && (
-                <div className="flex items-end">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    color="neutral"
-                    size="md"
-                    onClick={openSearch}
-                  >
-                    주소 검색
-                  </Button>
-                </div>
-              )}
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <InputField
+                label="기본주소"
+                placeholder="주소 검색 버튼을 클릭하세요"
+                readOnly
+                className="[&_input]:bg-gray-50"
+                {...form.register('addressBasic')}
+              />
             </div>
-            {isKakaoFallback && (
-              <p className="mt-1 text-xs text-gray-400">
-                주소 검색을 사용할 수 없어 직접 입력합니다
-              </p>
-            )}
+            <div className="flex items-end">
+              <Button
+                type="button"
+                variant="outline"
+                color="neutral"
+                size="md"
+                onClick={openSearch}
+              >
+                주소 검색
+              </Button>
+            </div>
           </div>
 
           <InputField
