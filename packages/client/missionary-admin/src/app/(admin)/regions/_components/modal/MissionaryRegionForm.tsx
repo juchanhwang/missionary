@@ -1,0 +1,230 @@
+'use client';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, InputField } from '@samilhero/design-system';
+import { useEffect, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+
+import { useKakaoAddress } from '../../_hooks/useKakaoAddress';
+import {
+  missionaryRegionSchema,
+  type MissionaryRegionFormValues,
+} from '../../_schemas/missionaryRegionSchema';
+import { MissionarySelect } from '../MissionarySelect';
+import { MissionGroupSelect } from '../MissionGroupSelect';
+
+import type { RegionListItem } from 'apis/missionaryRegion';
+
+interface MissionaryRegionFormProps {
+  mode: 'create' | 'edit';
+  region?: RegionListItem;
+  defaultMissionGroupId?: string;
+  defaultMissionaryId?: string;
+  onSubmit: (data: MissionaryRegionFormValues) => void;
+  onCancel: () => void;
+  onDirtyChange: (isDirty: boolean) => void;
+  isPending: boolean;
+}
+
+export function MissionaryRegionForm({
+  mode,
+  region,
+  defaultMissionGroupId,
+  defaultMissionaryId,
+  onSubmit,
+  onCancel,
+  onDirtyChange,
+  isPending,
+}: MissionaryRegionFormProps) {
+  const isEdit = mode === 'edit';
+  const addressDetailRef = useRef<HTMLInputElement>(null);
+  const [isKakaoFallback, setIsKakaoFallback] = useState(false);
+
+  const form = useForm<MissionaryRegionFormValues>({
+    resolver: zodResolver(missionaryRegionSchema),
+    mode: 'onSubmit',
+    defaultValues: {
+      missionGroupId: isEdit
+        ? (region?.missionary.missionGroup?.id ?? '')
+        : (defaultMissionGroupId ?? ''),
+      missionaryId: isEdit
+        ? (region?.missionaryId ?? '')
+        : (defaultMissionaryId ?? ''),
+      name: region?.name ?? '',
+      visitPurpose: region?.visitPurpose ?? '',
+      pastorName: region?.pastorName ?? '',
+      pastorPhone: region?.pastorPhone ?? '',
+      addressBasic: region?.addressBasic ?? '',
+      addressDetail: region?.addressDetail ?? '',
+    },
+  });
+
+  const { isDirty } = form.formState;
+  const watchMissionGroupId = form.watch('missionGroupId');
+
+  useEffect(() => {
+    onDirtyChange(isDirty);
+  }, [isDirty, onDirtyChange]);
+
+  const { openSearch, isKakaoAvailable } = useKakaoAddress({
+    onSelect: (address) => {
+      form.setValue('addressBasic', address, { shouldDirty: true });
+      addressDetailRef.current?.focus();
+    },
+  });
+
+  useEffect(() => {
+    if (!isKakaoAvailable) {
+      setIsKakaoFallback(true);
+    }
+  }, [isKakaoAvailable]);
+
+  return (
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="flex min-h-0 flex-1 flex-col"
+    >
+      <div className="flex-1 overflow-y-auto px-6 py-6">
+        <div className="flex flex-col gap-4">
+          {/* 선교 그룹 + 차수 */}
+          <div className="grid grid-cols-2 gap-4">
+            <Controller
+              name="missionGroupId"
+              control={form.control}
+              render={({ field }) => (
+                <MissionGroupSelect
+                  value={field.value}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    if (!isEdit) {
+                      form.setValue('missionaryId', '');
+                    }
+                  }}
+                  disabled={isEdit}
+                  showLockIcon={isEdit}
+                  label="선교 그룹 *"
+                />
+              )}
+            />
+            <Controller
+              name="missionaryId"
+              control={form.control}
+              render={({ field }) => (
+                <MissionarySelect
+                  value={field.value}
+                  missionGroupId={watchMissionGroupId}
+                  onChange={field.onChange}
+                  disabled={isEdit}
+                  showLockIcon={isEdit}
+                  label="차수 *"
+                />
+              )}
+            />
+          </div>
+
+          {form.formState.errors.missionGroupId && (
+            <p className="text-xs text-error-60">
+              {form.formState.errors.missionGroupId.message}
+            </p>
+          )}
+          {form.formState.errors.missionaryId && (
+            <p className="text-xs text-error-60">
+              {form.formState.errors.missionaryId.message}
+            </p>
+          )}
+
+          <hr className="border-gray-100" />
+
+          {/* 연계지 정보 */}
+          <InputField
+            label="이름 *"
+            placeholder="연계지(교회) 이름"
+            {...form.register('name')}
+            error={form.formState.errors.name?.message}
+          />
+
+          <InputField
+            label="방문목적"
+            placeholder="방문 목적"
+            {...form.register('visitPurpose')}
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <InputField
+              label="목사명"
+              placeholder="담당 목사 이름"
+              {...form.register('pastorName')}
+            />
+            <InputField
+              label="목사연락처"
+              placeholder="010-0000-0000"
+              {...form.register('pastorPhone')}
+              error={form.formState.errors.pastorPhone?.message}
+            />
+          </div>
+
+          {/* 주소 */}
+          <div>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <InputField
+                  label="기본주소"
+                  placeholder={
+                    isKakaoFallback
+                      ? '주소를 직접 입력하세요'
+                      : '주소 검색 버튼을 클릭하세요'
+                  }
+                  readOnly={!isKakaoFallback}
+                  className={!isKakaoFallback ? '[&_input]:bg-gray-50' : ''}
+                  {...form.register('addressBasic')}
+                />
+              </div>
+              {!isKakaoFallback && (
+                <div className="flex items-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    color="neutral"
+                    size="md"
+                    onClick={openSearch}
+                  >
+                    주소 검색
+                  </Button>
+                </div>
+              )}
+            </div>
+            {isKakaoFallback && (
+              <p className="mt-1 text-xs text-gray-400">
+                주소 검색을 사용할 수 없어 직접 입력합니다
+              </p>
+            )}
+          </div>
+
+          <InputField
+            label="상세주소"
+            placeholder="상세 주소를 입력하세요"
+            {...form.register('addressDetail')}
+            ref={addressDetailRef}
+          />
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="shrink-0 flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
+        <Button
+          type="button"
+          variant="outline"
+          color="neutral"
+          size="md"
+          onClick={onCancel}
+          disabled={isPending}
+        >
+          취소
+        </Button>
+        <Button type="submit" size="md" disabled={isPending}>
+          {isPending ? '저장 중...' : '저장'}
+        </Button>
+      </div>
+    </form>
+  );
+}
