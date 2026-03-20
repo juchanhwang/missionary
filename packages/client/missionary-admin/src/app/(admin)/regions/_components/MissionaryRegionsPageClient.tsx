@@ -19,7 +19,7 @@ import type { RegionListItem } from 'apis/missionaryRegion';
 
 export function MissionaryRegionsPageClient() {
   const { user } = useAuth();
-  const isAdmin = user.role === 'ADMIN';
+  const isAdmin = user?.role === 'ADMIN';
 
   const {
     params,
@@ -86,7 +86,10 @@ export function MissionaryRegionsPageClient() {
 
   const hasData = !isLoading && !isError && regions.length > 0;
   const isEmpty = !isLoading && !isError && regions.length === 0;
-  const emptyType = params.query ? 'no-results' : 'empty';
+  const emptyType =
+    params.query || params.missionGroupId || params.missionaryId
+      ? 'no-results'
+      : 'empty';
 
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0">

@@ -21,7 +21,7 @@ export function useRegionFilterParams() {
     query: searchParams.get('query') ?? '',
     missionGroupId: searchParams.get('missionGroupId') ?? '',
     missionaryId: searchParams.get('missionaryId') ?? '',
-    page: Number(searchParams.get('page')) || 1,
+    page: Math.max(1, Number(searchParams.get('page')) || 1),
   };
 
   const updateParams = (updates: Record<string, string | null>) => {

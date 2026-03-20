@@ -24,7 +24,7 @@ interface PageProps {
 
 export default async function RegionsPage({ searchParams }: PageProps) {
   const rawParams = await searchParams;
-  const page = Number(rawParams.page) || 1;
+  const page = Math.max(1, Number(rawParams.page) || 1);
   const queryClient = new QueryClient();
 
   const apiParams = stripEmpty({

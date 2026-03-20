@@ -13,12 +13,14 @@ interface MissionaryRegionTableProps {
   onDelete: (region: RegionListItem) => void;
 }
 
-function SkeletonRows() {
+function SkeletonRows({ isAdmin }: { isAdmin: boolean }) {
+  const colCount = isAdmin ? 8 : 7;
+
   return (
     <>
       {Array.from({ length: 5 }, (_, i) => (
         <tr key={i} className="border-b border-gray-200">
-          {Array.from({ length: 8 }, (_, j) => (
+          {Array.from({ length: colCount }, (_, j) => (
             <td key={j} className="px-5 py-3.5">
               <div className="h-4 bg-gray-100 rounded animate-pulse" />
             </td>
@@ -101,7 +103,7 @@ export function MissionaryRegionTable({
         </thead>
         <tbody>
           {isLoading ? (
-            <SkeletonRows />
+            <SkeletonRows isAdmin={isAdmin} />
           ) : (
             regions.map((region) => {
               const fullAddress = formatAddress(region);
