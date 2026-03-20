@@ -202,6 +202,9 @@ importers:
       lucide-react:
         specifier: ^0.563.0
         version: 0.563.0(react@19.2.4)
+      react-daum-postcode:
+        specifier: ^4.0.0
+        version: 4.0.0(react@19.2.4)
       react-error-boundary:
         specifier: ^6.1.0
         version: 6.1.0(react@19.2.4)
@@ -6475,6 +6478,11 @@ packages:
     peerDependenciesMeta:
       date-fns-tz:
         optional: true
+
+  react-daum-postcode@4.0.0:
+    resolution: {integrity: sha512-2CGR8Aa/5637IKaplJXv5m9S/qQWWYBr30FhQ9mK9nXiisVbTvrpU9D4U1mgr8YYCKw2RgcK8daN+F+PJhW+ig==}
+    peerDependencies:
+      react: '>=16.8.0'
 
   react-docgen-typescript@2.4.0:
     resolution: {integrity: sha512-ZtAp5XTO5HRzQctjPU0ybY0RRCQO19X/8fxn3w7y2VVTUbGHDKULPTL4ky3vB05euSgG5NpALhEhDPvQ56wvXg==}
@@ -14360,6 +14368,10 @@ snapshots:
       date-fns: 4.1.0
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
+
+  react-daum-postcode@4.0.0(react@19.2.4):
+    dependencies:
+      react: 19.2.4
 
   react-docgen-typescript@2.4.0(typescript@5.9.3):
     dependencies:
