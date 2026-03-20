@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>연계지 관리 — 삭제됨 탭 UI 시안</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      color: #111827;
+      background: #F9FAFB;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: 260px; height: 100vh; background: white;
+      border-right: 1px solid #E5E7EB; display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .sidebar-logo {
+      height: 64px; padding: 0 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-logo-icon {
+      width: 32px; height: 32px; background: #E60012; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sidebar-logo-text { font-size: 15px; font-weight: 700; color: #111827; letter-spacing: -0.02em; }
+    .sidebar-divider { height: 1px; background: #E5E7EB; margin: 0 16px; }
+    .sidebar-nav {
+      flex: 1; overflow-y: auto; padding: 16px 0;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .nav-item {
+      position: relative; display: flex; align-items: center; gap: 12px;
+      height: 44px; margin: 0 12px; padding: 0 12px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; color: #6B7280; cursor: pointer;
+      transition: all 0.15s; text-decoration: none;
+    }
+    .nav-item:hover { background: #F9FAFB; color: #1F2937; }
+    .nav-item.active { background: #F3F4F6; color: #111827; font-weight: 600; }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 8px; bottom: 8px;
+      width: 3px; border-radius: 0 2px 2px 0; background: #E60012;
+    }
+    .sidebar-user {
+      border-top: 1px solid #E5E7EB; padding: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%; background: #1F2937; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; flex-shrink: 0;
+    }
+
+    /* ─── LAYOUT ─── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .header {
+      height: 64px; background: white; border-bottom: 1px solid #E5E7EB;
+      padding: 0 32px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .header h1 { font-size: 20px; font-weight: 600; color: #111827; }
+    .header-search { position: relative; width: 256px; }
+    .header-search input {
+      width: 100%; height: 40px; padding: 0 16px 0 40px; border-radius: 8px;
+      background: #F9FAFB; border: 1px solid transparent;
+      font-size: 14px; color: #111827; outline: none; transition: border-color 0.15s; font-family: inherit;
+    }
+    .header-search input::placeholder { color: #9CA3AF; }
+    .header-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9CA3AF; }
+
+    .content {
+      flex: 1; overflow-y: auto; padding: 28px 32px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+
+    /* ─── PAGE HEADER ─── */
+    .page-header { display: flex; align-items: center; justify-content: space-between; }
+    .page-header h2 { font-size: 22px; font-weight: 700; color: #111827; }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px; font-weight: 600; border-radius: 8px;
+      cursor: pointer; transition: all 0.15s; border: none; font-family: inherit;
+    }
+    .btn-xs  { height: 28px; padding: 0 10px; font-size: 12px; border-radius: 6px; }
+    .btn-sm  { height: 32px; padding: 0 12px; font-size: 13px; }
+    .btn-md  { height: 40px; padding: 0 16px; font-size: 14px; }
+    .btn-primary { background: #E60012; color: white; }
+    .btn-primary:hover { background: #CC0010; }
+    .btn-outline { background: white; color: #1F2937; border: 1px solid #D1D5DB; }
+    .btn-outline:hover { background: #F9FAFB; }
+    .btn-restore { background: white; color: #0891B2; border: 1px solid #BAE6FD; }
+    .btn-restore:hover { background: #F0F9FF; }
+    .btn-ghost { background: transparent; color: #6B7280; border: none; }
+    .btn-ghost:hover { background: #F3F4F6; color: #1F2937; }
+
+    /* ─── FILTER ROW ─── */
+    .filter-row { display: flex; gap: 12px; align-items: flex-end; }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; }
+    .filter-label { font-size: 12px; font-weight: 500; color: #374151; }
+    .filter-search-group { display: flex; flex-direction: column; gap: 5px; flex: 1; max-width: 360px; }
+    .filter-search { position: relative; flex: 1; min-width: 240px; }
+    .filter-search input {
+      width: 100%; height: 40px; padding: 0 12px 0 38px;
+      border: 1px solid #E5E7EB; border-radius: 8px; background: white;
+      font-size: 14px; color: #111827; outline: none; transition: all 0.15s; font-family: inherit;
+    }
+    .filter-search input:focus { border-color: #9CA3AF; box-shadow: 0 0 0 1px #9CA3AF; }
+    .filter-search input::placeholder { color: #9CA3AF; }
+    .filter-search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #9CA3AF; pointer-events: none; }
+    .select-trigger {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 40px; padding: 0 12px; border: 1px solid #E5E7EB; border-radius: 8px;
+      background: white; font-size: 14px; color: #111827;
+      cursor: pointer; gap: 8px; min-width: 180px; transition: all 0.15s;
+    }
+    .select-trigger:hover { border-color: #D1D5DB; }
+
+    /* ─── CARD ─── */
+    .card {
+      background: white; border-radius: 12px; border: 1px solid #E5E7EB;
+      overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 0;
+    }
+
+    /* ─── TAB HEADER ─── */
+    /* 탭은 카드 헤더 내부에 배치 — 왼쪽은 탭, 오른쪽은 액션 버튼 */
+    .card-header-tabs {
+      display: flex; align-items: stretch; justify-content: space-between;
+      border-bottom: 1px solid #E5E7EB; padding: 0 20px; flex-shrink: 0; min-height: 50px;
+    }
+    .tab-list {
+      display: flex; align-items: stretch; gap: 0;
+    }
+    .tab-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 0 4px; margin-right: 20px;
+      font-size: 14px; font-weight: 500; color: #9CA3AF;
+      border: none; background: transparent; cursor: pointer;
+      border-bottom: 2px solid transparent; transition: all 0.15s;
+      font-family: inherit; white-space: nowrap;
+    }
+    .tab-btn:hover { color: #374151; }
+    .tab-btn.active {
+      color: #111827; font-weight: 600;
+      border-bottom-color: #111827;
+    }
+    .tab-count {
+      font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 20px;
+      background: #F3F4F6; color: #6B7280;
+    }
+    .tab-btn.active .tab-count {
+      background: #111827; color: white;
+    }
+    /* 삭제됨 탭의 카운트 — 활성 상태일 때 적색 계열 */
+    .tab-btn.active .tab-count-danger {
+      background: #FEE2E2; color: #DC2626;
+    }
+    .tab-btn.tab-danger.active {
+      color: #DC2626; border-bottom-color: #DC2626;
+    }
+    .tab-btn.tab-danger.active .tab-count {
+      background: #FEE2E2; color: #DC2626;
+    }
+
+    .card-header-right {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ─── TABLE ─── */
+    .table-wrap { overflow-x: auto; flex: 1; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    thead tr { border-bottom: 1px solid #F3F4F6; background: #F9FAFB; }
+    th { padding: 11px 16px; font-size: 12px; font-weight: 600; color: #9CA3AF; text-align: left; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid #F3F4F6; cursor: pointer; transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #F9FAFB; }
+    td { padding: 13px 16px; font-size: 14px; color: #6B7280; vertical-align: middle; }
+    td.region-name { font-weight: 500; color: #111827; }
+    td.group-name { color: #6B7280; font-size: 13px; }
+    td.order-name { color: #374151; font-size: 13px; font-weight: 500; }
+    .action-cell { display: flex; align-items: center; gap: 6px; justify-content: center; }
+    .truncate-cell { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* 삭제됨 탭 — 행 스타일 (비활성 느낌) */
+    .deleted-row td { color: #9CA3AF; }
+    .deleted-row td.region-name { color: #6B7280; }
+    .deleted-row:hover { background: #FAFAFA !important; cursor: default; }
+    .deleted-row { cursor: default !important; }
+
+    /* 삭제일 컬럼 */
+    td.deleted-at {
+      font-size: 12px; color: #9CA3AF; white-space: nowrap;
+    }
+    td.deleted-at .deleted-label {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #FEF2F2; color: #DC2626;
+      font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 72px 24px; gap: 10px; text-align: center; flex: 1;
+    }
+    .empty-icon { width: 48px; height: 48px; color: #D1D5DB; margin-bottom: 2px; }
+    .empty-title { font-size: 15px; font-weight: 600; color: #374151; }
+    .empty-desc { font-size: 13px; color: #9CA3AF; line-height: 1.7; }
+
+    /* ─── PAGINATION ─── */
+    .pagination-wrap {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-top: 1px solid #F3F4F6; flex-shrink: 0;
+    }
+    .pagination-range { font-size: 13px; color: #6B7280; white-space: nowrap; }
+    .pagination-btns { display: flex; align-items: center; gap: 2px; }
+    .pg-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 32px; height: 32px; padding: 0 6px; border-radius: 6px;
+      font-size: 13px; font-weight: 500; border: none; background: transparent;
+      color: #374151; cursor: pointer; transition: background 0.12s;
+    }
+    .pg-btn:hover:not(:disabled) { background: #F3F4F6; }
+    .pg-btn.active { background: #111827; color: white; font-weight: 700; }
+    .pg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ─── RESTORE CONFIRM MODAL ─── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center; z-index: 100;
+    }
+    .modal {
+      background: white; border-radius: 16px; width: 380px;
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+      animation: modalIn 0.18s ease;
+    }
+    @keyframes modalIn { from { opacity:0; transform: scale(0.96) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+    .modal-header {
+      padding: 20px 24px 16px; display: flex; align-items: flex-start; gap: 14px;
+      border-bottom: 1px solid #E5E7EB; flex-shrink: 0;
+    }
+    .modal-icon-wrap {
+      width: 40px; height: 40px; border-radius: 10px; background: #DCFCE7; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; color: #16A34A;
+    }
+    .modal-title { font-size: 17px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+    .modal-desc { font-size: 13px; color: #6B7280; line-height: 1.6; }
+    .modal-footer {
+      padding: 16px 24px; display: flex; justify-content: flex-end; gap: 10px; flex-shrink: 0;
+    }
+    .btn-confirm-restore { background: #16A34A; color: white; }
+    .btn-confirm-restore:hover { background: #15803D; }
+
+    /* ─── STATE SWITCHER ─── */
+    .switcher {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 4px; background: rgba(17,24,39,0.92); backdrop-filter: blur(12px);
+      padding: 6px; border-radius: 14px; z-index: 200; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .sw-btn {
+      padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 600;
+      color: rgba(255,255,255,0.55); cursor: pointer; transition: all 0.15s;
+      border: none; background: transparent; font-family: inherit; white-space: nowrap;
+    }
+    .sw-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+    .sw-btn.on { background: white; color: #111827; }
+    .sw-sep { width: 1px; background: rgba(255,255,255,0.15); margin: 4px 2px; align-self: stretch; }
+
+    /* ─── ANNOTATION (설계 설명) ─── */
+    .annotation-panel {
+      position: fixed; right: 20px; top: 80px; width: 260px;
+      background: #1F2937; border-radius: 12px; padding: 16px;
+      color: white; z-index: 150; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+    .ann-title { font-size: 12px; font-weight: 700; color: #F9FAFB; margin-bottom: 10px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .ann-item { font-size: 12px; color: #D1D5DB; line-height: 1.7; margin-bottom: 8px; }
+    .ann-item strong { color: white; }
+    .ann-toggle {
+      position: fixed; right: 20px; top: 80px;
+      background: #1F2937; color: white; border: none; border-radius: 8px;
+      padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; z-index: 151;
+      font-family: inherit;
+    }
+
+    /* ─── VERSION BADGE ─── */
+    .ver-badge {
+      position: fixed; top: 14px; right: 16px;
+      background: #E60012; color: white; font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 20px; z-index: 300; letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="ver-badge">시안 v1.0</div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/></svg>
+    </div>
+    <span class="sidebar-logo-text">선교 관리 시스템</span>
+  </div>
+  <div class="sidebar-divider"></div>
+  <nav class="sidebar-nav">
+    <a class="nav-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      선교 관리
+    </a>
+    <a class="nav-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      유저 관리
+    </a>
+    <a class="nav-item active">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      연계지 관리
+    </a>
+    <a class="nav-item">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      게시 관리
+    </a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="avatar">A</div>
+    <div style="flex:1;min-width:0">
+      <p style="font-size:13px;font-weight:500;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">admin@samilhero.com</p>
+      <p style="font-size:11px;color:#9CA3AF;margin-top:2px">관리자</p>
+    </div>
+    <button class="btn btn-ghost" style="padding:6px;border-radius:6px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main">
+  <header class="header">
+    <h1>연계지 관리</h1>
+    <div class="header-search">
+      <svg class="header-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="검색...">
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h2>연계지 관리</h2>
+      <button class="btn btn-primary btn-md" id="headerRegisterBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        연계지 등록
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <div class="filter-search-group">
+        <span class="filter-label">&nbsp;</span>
+        <div class="filter-search">
+          <svg class="filter-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="이름, 목사명으로 검색..." aria-label="연계지 검색">
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">선교 그룹</span>
+        <div class="select-trigger">
+          <span>전체</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">차수</span>
+        <div class="select-trigger">
+          <span>전체</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TABLE CARD ═══ -->
+    <div class="card">
+
+      <!-- ── 탭 헤더 (핵심 설계) ── -->
+      <div class="card-header-tabs">
+        <div class="tab-list" role="tablist">
+          <button
+            class="tab-btn active"
+            id="tab-active"
+            role="tab"
+            aria-selected="true"
+            aria-controls="panel-active"
+            onclick="switchTab('active')"
+          >
+            활성 연계지
+            <span class="tab-count">85</span>
+          </button>
+          <button
+            class="tab-btn tab-danger"
+            id="tab-deleted"
+            role="tab"
+            aria-selected="false"
+            aria-controls="panel-deleted"
+            onclick="switchTab('deleted')"
+          >
+            삭제된 연계지
+            <span class="tab-count">12</span>
+          </button>
+        </div>
+
+        <!-- 오른쪽: 탭 상태에 따라 버튼 토글 -->
+        <div class="card-header-right">
+          <!-- 활성 탭: 등록 버튼 -->
+          <button class="btn btn-primary btn-sm" id="registerBtn" onclick="alert('연계지 등록 모달 열림')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            연계지 등록
+          </button>
+        </div>
+      </div>
+
+      <!-- ── 활성 연계지 패널 ── -->
+      <div id="panel-active" role="tabpanel" aria-labelledby="tab-active">
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;">연계지 목록 (활성)</caption>
+            <thead>
+              <tr>
+                <th style="width:140px">선교 그룹</th>
+                <th style="width:80px">차수</th>
+                <th style="width:140px">연계지</th>
+                <th style="width:100px">목사명</th>
+                <th style="width:130px">목사연락처</th>
+                <th>주소</th>
+                <th style="width:112px;text-align:center">액션</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="group-name">장흥선교</td>
+                <td class="order-name">2차</td>
+                <td class="region-name">OO교회</td>
+                <td>박목사</td>
+                <td>010-1234-5678</td>
+                <td><div class="truncate-cell" title="서울특별시 강남구 테헤란로 123">서울특별시 강남구 테헤란로 123</div></td>
+                <td>
+                  <div class="action-cell">
+                    <button class="btn btn-outline btn-xs" onclick="event.stopPropagation()" aria-label="OO교회 수정">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn btn-outline btn-xs" onclick="event.stopPropagation()" aria-label="OO교회 삭제">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="group-name">장흥선교</td>
+                <td class="order-name">1차</td>
+                <td class="region-name">XX교회</td>
+                <td>—</td>
+                <td>—</td>
+                <td><div class="truncate-cell">전라남도 장흥군 장흥읍</div></td>
+                <td>
+                  <div class="action-cell">
+                    <button class="btn btn-outline btn-xs" onclick="event.stopPropagation()">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn btn-outline btn-xs" onclick="event.stopPropagation()">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="group-name">필리핀선교</td>
+                <td class="order-name">1차</td>
+                <td class="region-name">Manila Grace Church</td>
+                <td>이목사</td>
+                <td>010-5555-7777</td>
+                <td><div class="truncate-cell" title="Manila, Philippines">Manila, Philippines</div></td>
+                <td>
+                  <div class="action-cell">
+                    <button class="btn btn-outline btn-xs" onclick="event.stopPropagation()">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn btn-outline btn-xs" onclick="event.stopPropagation()">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="group-name">군선교</td>
+                <td class="order-name">1차</td>
+                <td class="region-name">AA교회</td>
+                <td>최목사</td>
+                <td>—</td>
+                <td><div class="truncate-cell">경기도 포천시 군내면</div></td>
+                <td>
+                  <div class="action-cell">
+                    <button class="btn btn-outline btn-xs" onclick="event.stopPropagation()">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button class="btn btn-outline btn-xs" onclick="event.stopPropagation()">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-wrap">
+          <p class="pagination-range">1 - 20 / 전체 85건</p>
+          <div class="pagination-btns">
+            <button class="pg-btn" disabled>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="pg-btn active">1</button>
+            <button class="pg-btn">2</button>
+            <button class="pg-btn">3</button>
+            <button class="pg-btn">4</button>
+            <button class="pg-btn">5</button>
+            <button class="pg-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 삭제된 연계지 패널 ── -->
+      <div id="panel-deleted" role="tabpanel" aria-labelledby="tab-deleted" style="display:none">
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;">삭제된 연계지 목록</caption>
+            <thead>
+              <tr>
+                <th style="width:140px">선교 그룹</th>
+                <th style="width:80px">차수</th>
+                <th style="width:140px">연계지</th>
+                <th style="width:100px">목사명</th>
+                <th style="width:130px">목사연락처</th>
+                <th>주소</th>
+                <th style="width:130px">삭제일</th>
+                <th style="width:80px;text-align:center">복구</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="deleted-row">
+                <td class="group-name">장흥선교</td>
+                <td class="order-name" style="color:#9CA3AF">2차</td>
+                <td class="region-name">YY교회</td>
+                <td>—</td>
+                <td>—</td>
+                <td><div class="truncate-cell">전라남도 장흥군</div></td>
+                <td class="deleted-at">2026-03-15</td>
+                <td>
+                  <div class="action-cell">
+                    <button class="btn btn-restore btn-xs" onclick="event.stopPropagation(); openRestoreModal('YY교회')" aria-label="YY교회 복구">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                      복구
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="deleted-row">
+                <td class="group-name">필리핀선교</td>
+                <td class="order-name" style="color:#9CA3AF">1차</td>
+                <td class="region-name">Cebu Life Church</td>
+                <td>김목사</td>
+                <td>010-2222-3333</td>
+                <td><div class="truncate-cell">Cebu City, Philippines</div></td>
+                <td class="deleted-at">2026-03-10</td>
+                <td>
+                  <div class="action-cell">
+                    <button class="btn btn-restore btn-xs" onclick="event.stopPropagation(); openRestoreModal('Cebu Life Church')" aria-label="Cebu Life Church 복구">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                      복구
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="deleted-row">
+                <td class="group-name">군선교</td>
+                <td class="order-name" style="color:#9CA3AF">1차</td>
+                <td class="region-name">BB교회</td>
+                <td>—</td>
+                <td>—</td>
+                <td><div class="truncate-cell">강원도 철원군</div></td>
+                <td class="deleted-at">2026-02-28</td>
+                <td>
+                  <div class="action-cell">
+                    <button class="btn btn-restore btn-xs" onclick="event.stopPropagation(); openRestoreModal('BB교회')" aria-label="BB교회 복구">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                      복구
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-wrap">
+          <p class="pagination-range">1 - 12 / 전체 12건</p>
+          <div class="pagination-btns">
+            <button class="pg-btn" disabled>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="pg-btn active">1</button>
+            <button class="pg-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /card -->
+  </div><!-- /content -->
+</main>
+
+<!-- ═══ 복구 확인 모달 ═══ -->
+<div class="modal-overlay" id="restoreModal" style="display:none" onclick="if(event.target===this)closeRestoreModal()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="restoreModalTitle">
+    <div class="modal-header">
+      <div class="modal-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      </div>
+      <div>
+        <p class="modal-title" id="restoreModalTitle">연계지 복구</p>
+        <p class="modal-desc" id="restoreModalDesc">'YY교회'을(를) 활성 연계지로 복구하시겠습니까?</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="closeRestoreModal()">취소</button>
+      <button class="btn btn-confirm-restore btn-sm" onclick="closeRestoreModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        복구
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 설계 주석 패널 ═══ -->
+<div class="annotation-panel" id="annPanel">
+  <p class="ann-title">설계 의도</p>
+  <div class="ann-item">
+    <strong>탭 위치</strong><br>
+    테이블 카드 헤더 내부 — 필터와 독립적으로 동작. 탭 전환 시 필터는 유지.
+  </div>
+  <div class="ann-item">
+    <strong>삭제됨 탭 차이점</strong><br>
+    ① 등록 버튼 숨김<br>
+    ② 삭제일 컬럼 추가<br>
+    ③ 복구 버튼 (하늘색, 분리된 의도)<br>
+    ④ 행 클릭 비활성 (수정 불가 맥락)
+  </div>
+  <div class="ann-item">
+    <strong>복구 확인 모달</strong><br>
+    초록 아이콘 — "위험한 동작"이 아닌 "긍정적 복원" 의미 전달. 삭제 확인과 색상 분리.
+  </div>
+  <div class="ann-item">
+    <strong>탭 카운트 배지</strong><br>
+    활성 탭: dark 배지<br>
+    삭제됨 탭(active): red 배지 — 주의 환기
+  </div>
+</div>
+
+<!-- ═══ STATE SWITCHER ═══ -->
+<div class="switcher">
+  <button class="sw-btn on" onclick="switchTab('active'); highlightSw(this)">활성 연계지 탭</button>
+  <div class="sw-sep"></div>
+  <button class="sw-btn" onclick="switchTab('deleted'); highlightSw(this)">삭제된 연계지 탭</button>
+  <div class="sw-sep"></div>
+  <button class="sw-btn" onclick="openRestoreModal('YY교회'); highlightSw(this)">복구 모달</button>
+  <div class="sw-sep"></div>
+  <button class="sw-btn" onclick="toggleAnn(); highlightSw(this)">설계 주석 토글</button>
+</div>
+
+<script>
+  function switchTab(tab) {
+    const isActive = tab === 'active';
+
+    // 탭 버튼 상태
+    document.getElementById('tab-active').classList.toggle('active', isActive);
+    document.getElementById('tab-active').setAttribute('aria-selected', isActive);
+    document.getElementById('tab-deleted').classList.toggle('active', !isActive);
+    document.getElementById('tab-deleted').setAttribute('aria-selected', !isActive);
+
+    // 패널 전환
+    document.getElementById('panel-active').style.display = isActive ? '' : 'none';
+    document.getElementById('panel-deleted').style.display = isActive ? 'none' : '';
+
+    // 등록 버튼 / 페이지 헤더 버튼 토글
+    document.getElementById('registerBtn').style.display = isActive ? '' : 'none';
+    document.getElementById('headerRegisterBtn').style.display = isActive ? '' : 'none';
+  }
+
+  function openRestoreModal(name) {
+    document.getElementById('restoreModalDesc').textContent =
+      `'${name}'을(를) 활성 연계지로 복구하시겠습니까?`;
+    document.getElementById('restoreModal').style.display = 'flex';
+  }
+
+  function closeRestoreModal() {
+    document.getElementById('restoreModal').style.display = 'none';
+  }
+
+  function toggleAnn() {
+    const p = document.getElementById('annPanel');
+    p.style.display = p.style.display === 'none' ? '' : 'none';
+  }
+
+  function highlightSw(btn) {
+    document.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+  }
+
+  // ESC 모달 닫기
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeRestoreModal();
+  });
+</script>
+</body>
+</html>

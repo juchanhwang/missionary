@@ -58,6 +58,12 @@ export class PrismaService
           : ['warn', 'error'],
     });
 
+    // where에 deletedAt이 명시적으로 설정된 경우 해당 조건을 존중하고,
+    // 설정되지 않은 경우에만 deletedAt: null 필터를 자동 적용한다.
+    const addSoftDeleteFilter = <T extends Record<string, unknown>>(
+      where: T = {} as T,
+    ): T => ('deletedAt' in where ? where : { ...where, deletedAt: null });
+
     return this.$extends({
       query: {
         $allModels: {
@@ -74,27 +80,27 @@ export class PrismaService
             });
           },
           async findFirst({ args, query }) {
-            args.where = { ...args.where, deletedAt: null };
+            args.where = addSoftDeleteFilter(args.where);
             return query(args);
           },
           async findFirstOrThrow({ args, query }) {
-            args.where = { ...args.where, deletedAt: null };
+            args.where = addSoftDeleteFilter(args.where);
             return query(args);
           },
           async findMany({ args, query }) {
-            args.where = { ...args.where, deletedAt: null };
+            args.where = addSoftDeleteFilter(args.where);
             return query(args);
           },
           async findUnique({ args, query }) {
-            args.where = { ...args.where, deletedAt: null };
+            args.where = addSoftDeleteFilter(args.where as any);
             return query(args);
           },
           async findUniqueOrThrow({ args, query }) {
-            args.where = { ...args.where, deletedAt: null };
+            args.where = addSoftDeleteFilter(args.where as any);
             return query(args);
           },
           async updateMany({ args, query }) {
-            args.where = { ...args.where, deletedAt: null };
+            args.where = addSoftDeleteFilter(args.where);
             return query(args);
           },
         },

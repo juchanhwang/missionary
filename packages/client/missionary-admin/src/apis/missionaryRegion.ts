@@ -17,8 +17,17 @@ export interface RegionListItem {
   } | null;
 }
 
+export interface DeletedRegionListItem extends RegionListItem {
+  deletedAt: string;
+}
+
 export interface RegionListResponse {
   data: RegionListItem[];
+  total: number;
+}
+
+export interface DeletedRegionListResponse {
+  data: DeletedRegionListItem[];
   total: number;
 }
 
@@ -71,5 +80,17 @@ export const missionaryRegionApi = {
 
   deleteRegion(missionGroupId: string, regionId: string) {
     return api.delete(`/mission-groups/${missionGroupId}/regions/${regionId}`);
+  },
+
+  getDeletedRegions(params?: GetRegionsParams) {
+    return api.get<DeletedRegionListResponse>('/regions/deleted', {
+      params: params ? stripEmpty(params) : undefined,
+    });
+  },
+
+  restoreRegion(missionGroupId: string, regionId: string) {
+    return api.patch(
+      `/mission-groups/${missionGroupId}/regions/${regionId}/restore`,
+    );
   },
 };

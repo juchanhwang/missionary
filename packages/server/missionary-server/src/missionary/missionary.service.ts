@@ -150,6 +150,10 @@ export class MissionaryService {
     return this.missionaryRegionRepository.findAllWithFilters(params);
   }
 
+  async findDeletedRegions(params: FindAllRegionsParams) {
+    return this.missionaryRegionRepository.findDeletedWithFilters(params);
+  }
+
   async updateRegion(
     missionGroupId: string,
     regionId: string,
@@ -170,10 +174,6 @@ export class MissionaryService {
     }
 
     const data: MissionaryRegionUpdateInput = {};
-    if (dto.missionaryId !== undefined) {
-      await this.findOne(dto.missionaryId);
-      data.missionaryId = dto.missionaryId;
-    }
     if (dto.name !== undefined) data.name = dto.name;
     if (dto.pastorName !== undefined) data.pastorName = dto.pastorName;
     if (dto.pastorPhone !== undefined) data.pastorPhone = dto.pastorPhone;
@@ -194,6 +194,24 @@ export class MissionaryService {
       addressBasic: dto.addressBasic,
       addressDetail: dto.addressDetail,
     });
+  }
+
+  async restoreRegion(missionGroupId: string, regionId: string) {
+    await this.findMissionGroup(missionGroupId);
+
+    const region =
+      await this.missionaryRegionRepository.findDeletedByIdAndMissionGroup(
+        regionId,
+        missionGroupId,
+      );
+
+    if (!region) {
+      throw new NotFoundException(
+        `Deleted MissionaryRegion with ID ${regionId} not found for mission group ${missionGroupId}`,
+      );
+    }
+
+    return this.missionaryRegionRepository.restore(regionId);
   }
 
   async removeRegion(missionGroupId: string, regionId: string) {

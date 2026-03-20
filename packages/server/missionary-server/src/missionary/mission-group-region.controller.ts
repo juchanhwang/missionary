@@ -51,4 +51,14 @@ export class MissionGroupRegionController {
   ) {
     return this.missionaryService.removeRegion(id, regionId);
   }
+
+  @Patch(':id/regions/:regionId/restore')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: '삭제된 연계지 복구 (관리자 전용)' })
+  restoreRegion(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('regionId', ParseUUIDPipe) regionId: string,
+  ) {
+    return this.missionaryService.restoreRegion(id, regionId);
+  }
 }

@@ -46,7 +46,9 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
     missionGroupId: string,
   ): Promise<MissionaryRegion[]> {
     return [...this.store.values()]
-      .filter((r) => r.missionGroupId === missionGroupId)
+      .filter(
+        (r) => r.missionGroupId === missionGroupId && r.deletedAt === null,
+      )
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
@@ -55,7 +57,12 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
     missionGroupId: string,
   ): Promise<MissionaryRegion | null> {
     const entity = this.store.get(id);
-    if (!entity || entity.missionGroupId !== missionGroupId) return null;
+    if (
+      !entity ||
+      entity.missionGroupId !== missionGroupId ||
+      entity.deletedAt !== null
+    )
+      return null;
     return entity;
   }
 
@@ -64,14 +71,15 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
     if (!existing) {
       throw new Error(`MissionaryRegion not found: ${id}`);
     }
-    this.store.delete(id);
-    return existing;
+    const deleted = { ...existing, deletedAt: new Date() };
+    this.store.set(id, deleted);
+    return deleted;
   }
 
   async findAllWithFilters(
     params: FindAllRegionsParams,
   ): Promise<FindAllRegionsResult> {
-    let regions = [...this.store.values()];
+    let regions = [...this.store.values()].filter((r) => r.deletedAt === null);
 
     // 필터 적용
     if (params.missionGroupId) {
@@ -120,6 +128,78 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
       })) as RegionWithMissionGroup[],
       total,
     };
+  }
+
+  async findDeletedWithFilters(
+    params: FindAllRegionsParams,
+  ): Promise<FindAllRegionsResult> {
+    let regions = [...this.store.values()].filter((r) => r.deletedAt !== null);
+
+    if (params.missionGroupId) {
+      regions = regions.filter(
+        (r) => r.missionGroupId === params.missionGroupId,
+      );
+    }
+
+    if (params.query) {
+      const q = params.query.toLowerCase();
+      regions = regions.filter(
+        (r) =>
+          r.name.toLowerCase().includes(q) ||
+          (r.pastorName && r.pastorName.toLowerCase().includes(q)),
+      );
+    }
+
+    const total = regions.length;
+
+    regions.sort((a, b) => {
+      const groupA = this.missionGroupMap.get(a.missionGroupId);
+      const groupB = this.missionGroupMap.get(b.missionGroupId);
+      const groupNameA = groupA?.name ?? '';
+      const groupNameB = groupB?.name ?? '';
+      if (groupNameA < groupNameB) return -1;
+      if (groupNameA > groupNameB) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    const offset = params.offset ?? 0;
+    const limit = params.limit ?? 20;
+    const data = regions.slice(offset, offset + limit);
+
+    return {
+      data: data.map((r) => ({
+        ...r,
+        missionGroup: this.missionGroupMap.get(r.missionGroupId) ?? {
+          id: r.missionGroupId,
+          name: '',
+        },
+      })) as RegionWithMissionGroup[],
+      total,
+    };
+  }
+
+  async findDeletedByIdAndMissionGroup(
+    id: string,
+    missionGroupId: string,
+  ): Promise<MissionaryRegion | null> {
+    const entity = this.store.get(id);
+    if (
+      !entity ||
+      entity.missionGroupId !== missionGroupId ||
+      entity.deletedAt === null
+    )
+      return null;
+    return entity;
+  }
+
+  async restore(id: string): Promise<MissionaryRegion> {
+    const existing = this.store.get(id);
+    if (!existing) {
+      throw new Error(`MissionaryRegion not found: ${id}`);
+    }
+    const restored = { ...existing, deletedAt: null, updatedAt: new Date() };
+    this.store.set(id, restored);
+    return restored;
   }
 
   async update(

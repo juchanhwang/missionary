@@ -1,6 +1,9 @@
 import { type AuthUser } from 'apis/auth';
 import { type Missionary } from 'apis/missionary';
-import { type RegionListItem } from 'apis/missionaryRegion';
+import {
+  type DeletedRegionListItem,
+  type RegionListItem,
+} from 'apis/missionaryRegion';
 import { type MissionGroup, type MissionGroupDetail } from 'apis/missionGroup';
 import { type User } from 'apis/user';
 
@@ -114,6 +117,28 @@ export function createMockRegionList(count: number): RegionListItem[] {
     createMockRegion({
       id: `region-${i + 1}`,
       name: `교회${i + 1}`,
+    }),
+  );
+}
+
+export function createMockDeletedRegion(
+  overrides: Partial<DeletedRegionListItem> = {},
+): DeletedRegionListItem {
+  return {
+    ...createMockRegion(),
+    deletedAt: '2026-03-15T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+export function createMockDeletedRegionList(
+  count: number,
+): DeletedRegionListItem[] {
+  return Array.from({ length: count }, (_, i) =>
+    createMockDeletedRegion({
+      id: `deleted-region-${i + 1}`,
+      name: `삭제교회${i + 1}`,
+      deletedAt: new Date(2026, 2, 15 - i).toISOString(),
     }),
   );
 }

@@ -11,7 +11,6 @@ export interface MissionaryRegionCreateInput {
 }
 
 export interface MissionaryRegionUpdateInput {
-  missionaryId?: string;
   name?: string;
   pastorName?: string | null;
   pastorPhone?: string | null;
@@ -49,6 +48,14 @@ export interface MissionaryRegionRepository {
   findAllWithFilters(
     params: FindAllRegionsParams,
   ): Promise<FindAllRegionsResult>;
+  findDeletedWithFilters(
+    params: FindAllRegionsParams,
+  ): Promise<FindAllRegionsResult>;
+  findDeletedByIdAndMissionGroup(
+    id: string,
+    missionGroupId: string,
+  ): Promise<MissionaryRegion | null>;
+  restore(id: string): Promise<MissionaryRegion>;
   update(
     id: string,
     data: MissionaryRegionUpdateInput,

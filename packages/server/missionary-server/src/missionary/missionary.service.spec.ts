@@ -360,7 +360,7 @@ describe('MissionaryService', () => {
       const result = await service.removeRegion(group.id, region.id);
 
       expect(result.id).toBe(region.id);
-      expect(fakeRegionRepo.getAll()).toHaveLength(0);
+      expect(result.deletedAt).not.toBeNull();
     });
 
     it('존재하지 않는 선교 그룹의 연계지를 삭제하면 NotFoundException을 던진다', async () => {
@@ -680,6 +680,86 @@ describe('MissionaryService', () => {
 
       expect(result.name).toBe('수정된 교회');
       expect(result.pastorName).toBe('김목사');
+    });
+  });
+
+  describe('findDeletedRegions', () => {
+    it('삭제된 연계지만 조회한다', async () => {
+      const group = makeMissionGroup();
+      await fakeMissionGroupRepo.create({
+        id: group.id,
+        name: group.name,
+        category: group.category,
+      });
+      fakeRegionRepo.setMissionGroup(group.id, {
+        id: group.id,
+        name: group.name,
+      });
+
+      await fakeRegionRepo.create({
+        missionGroupId: group.id,
+        name: '활성 지역',
+      });
+      const region2 = await fakeRegionRepo.create({
+        missionGroupId: group.id,
+        name: '삭제된 지역',
+      });
+
+      await service.removeRegion(group.id, region2.id);
+
+      const result = await service.findDeletedRegions({});
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].name).toBe('삭제된 지역');
+
+      const activeResult = await service.findAllRegions({});
+      expect(activeResult.data).toHaveLength(1);
+      expect(activeResult.data[0].name).toBe('활성 지역');
+    });
+  });
+
+  describe('restoreRegion', () => {
+    it('삭제된 연계지를 복구한다', async () => {
+      const group = makeMissionGroup();
+      await fakeMissionGroupRepo.create({
+        id: group.id,
+        name: group.name,
+        category: group.category,
+      });
+
+      const region = await fakeRegionRepo.create({
+        missionGroupId: group.id,
+        name: '복구할 지역',
+      });
+
+      await service.removeRegion(group.id, region.id);
+
+      const restored = await service.restoreRegion(group.id, region.id);
+      expect(restored.deletedAt).toBeNull();
+      expect(restored.name).toBe('복구할 지역');
+    });
+
+    it('존재하지 않는 선교 그룹이면 NotFoundException을 던진다', async () => {
+      await expect(
+        service.restoreRegion('non-existent-id', 'region-id'),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('삭제되지 않은 연계지를 복구하면 NotFoundException을 던진다', async () => {
+      const group = makeMissionGroup();
+      await fakeMissionGroupRepo.create({
+        id: group.id,
+        name: group.name,
+        category: group.category,
+      });
+
+      const region = await fakeRegionRepo.create({
+        missionGroupId: group.id,
+        name: '활성 지역',
+      });
+
+      await expect(service.restoreRegion(group.id, region.id)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
