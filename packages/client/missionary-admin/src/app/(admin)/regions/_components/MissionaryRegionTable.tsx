@@ -154,8 +154,6 @@ export function MissionaryRegionTable({
                           variant="outline"
                           color="neutral"
                           size="sm"
-                          disabled
-                          title="현재 사용 불가 (준비 중)"
                           onClick={() => onEdit(region)}
                           aria-label={`${region.name} 수정`}
                         >
