@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 
 export class GetRegionsQueryDto {
   @ApiPropertyOptional({ description: '선교 그룹 ID 필터' })
@@ -8,7 +8,10 @@ export class GetRegionsQueryDto {
   @IsUUID()
   declare missionGroupId?: string;
 
-  @ApiPropertyOptional({ description: '차수(선교) ID 필터' })
+  @ApiPropertyOptional({
+    description:
+      '차수(선교) ID 필터. missionGroupId와 동시 전달 시 이 값이 우선 적용됨.',
+  })
   @IsOptional()
   @IsUUID()
   declare missionaryId?: string;
@@ -23,6 +26,7 @@ export class GetRegionsQueryDto {
   @Transform(({ value }) => (value !== undefined ? parseInt(value, 10) : 20))
   @IsInt()
   @Min(1)
+  @Max(100)
   limit: number = 20;
 
   @ApiPropertyOptional({ description: '오프셋', default: 0 })

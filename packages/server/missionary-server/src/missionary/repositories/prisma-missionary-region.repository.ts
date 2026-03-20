@@ -100,7 +100,7 @@ export class PrismaMissionaryRegionRepository implements MissionaryRegionReposit
     data: MissionaryRegionUpdateInput,
   ): Promise<MissionaryRegion> {
     return this.prisma.missionaryRegion.update({
-      where: { id },
+      where: { id, deletedAt: null },
       data,
     });
   }
