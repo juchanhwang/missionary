@@ -240,8 +240,6 @@ model MissionaryRegion {
   id   String @id @default(uuid())
   name String
 
-  visitPurpose String? @map("visit_purpose")
-
   // Pastor embedded object (flattened)
   pastorName  String? @map("pastor_name")
   pastorPhone String? @map("pastor_phone")

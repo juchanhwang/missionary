@@ -37,7 +37,7 @@ export function MissionaryRegionFilters({
   };
 
   return (
-    <div className="flex items-center gap-3 mb-5">
+    <div className="flex items-end gap-3 mb-5">
       <div className="flex-1 max-w-[360px]">
         <SearchBox
           value={localKeyword}
@@ -48,16 +48,20 @@ export function MissionaryRegionFilters({
         />
       </div>
 
-      <MissionGroupSelect
-        value={missionGroupId}
-        onChange={onMissionGroupChange}
-      />
+      <div className="min-w-[180px]">
+        <MissionGroupSelect
+          value={missionGroupId}
+          onChange={onMissionGroupChange}
+        />
+      </div>
 
-      <MissionarySelect
-        value={missionaryId}
-        missionGroupId={missionGroupId}
-        onChange={onMissionaryChange}
-      />
+      <div className="min-w-[180px]">
+        <MissionarySelect
+          value={missionaryId}
+          missionGroupId={missionGroupId}
+          onChange={onMissionaryChange}
+        />
+      </div>
     </div>
   );
 }

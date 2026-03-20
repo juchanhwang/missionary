@@ -8,15 +8,6 @@ export class CreateMissionaryRegionDto {
   declare name: string;
 
   @ApiProperty({
-    example: '복음 전파',
-    description: '방문 목적',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  declare visitPurpose?: string;
-
-  @ApiProperty({
     example: '김목사',
     description: '담임 목사 이름',
     required: false,

@@ -14,17 +14,36 @@ interface MissionaryRegionTableProps {
 }
 
 function SkeletonRows({ isAdmin }: { isAdmin: boolean }) {
-  const colCount = isAdmin ? 8 : 7;
-
   return (
     <>
       {Array.from({ length: 5 }, (_, i) => (
         <tr key={i} className="border-b border-gray-200">
-          {Array.from({ length: colCount }, (_, j) => (
-            <td key={j} className="px-5 py-3.5">
-              <div className="h-4 bg-gray-100 rounded animate-pulse" />
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-14 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-20 bg-gray-100 rounded-md animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-12 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-28 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+          </td>
+          {isAdmin && (
+            <td className="px-5 py-3.5">
+              <div className="flex items-center justify-center gap-1">
+                <div className="h-7 w-7 bg-gray-100 rounded animate-pulse" />
+                <div className="h-7 w-7 bg-gray-100 rounded animate-pulse" />
+              </div>
             </td>
-          ))}
+          )}
         </tr>
       ))}
     </>
@@ -69,12 +88,6 @@ export function MissionaryRegionTable({
             </th>
             <th
               scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[120px]"
-            >
-              방문목적
-            </th>
-            <th
-              scope="col"
               className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
             >
               목사명
@@ -104,6 +117,15 @@ export function MissionaryRegionTable({
         <tbody>
           {isLoading ? (
             <SkeletonRows isAdmin={isAdmin} />
+          ) : regions.length === 0 ? (
+            <tr>
+              <td
+                colSpan={isAdmin ? 7 : 6}
+                className="px-5 py-16 text-center text-sm text-gray-400"
+              >
+                조건에 맞는 연계지가 없습니다
+              </td>
+            </tr>
           ) : (
             regions.map((region) => {
               const fullAddress = formatAddress(region);
@@ -111,19 +133,17 @@ export function MissionaryRegionTable({
               return (
                 <tr
                   key={region.id}
-                  className="border-b border-gray-200 last:border-b-0 transition-colors hover:bg-gray-50"
+                  className="border-b border-gray-200 last:border-b-0 cursor-pointer transition-colors duration-150 hover:bg-gray-50"
+                  onClick={() => onEdit(region)}
                 >
-                  <td className="px-5 py-3.5 text-sm text-gray-900 whitespace-nowrap">
+                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
                     {region.missionary.missionGroup?.name ?? '—'}
                   </td>
                   <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {region.missionary.name ?? '—'}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm font-semibold text-gray-900 whitespace-nowrap">
-                    {region.name}
+                    {region.missionary.order ?? '—'}
                   </td>
                   <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {region.visitPurpose ?? '—'}
+                    {region.name}
                   </td>
                   <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
                     {region.pastorName ?? '—'}
@@ -131,21 +151,11 @@ export function MissionaryRegionTable({
                   <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
                     {region.pastorPhone ?? '—'}
                   </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    <div
-                      className="truncate max-w-[200px]"
-                      title={fullAddress || undefined}
-                    >
-                      {region.addressBasic ?? '—'}
-                      {region.addressDetail && (
-                        <>
-                          <br />
-                          <span className="text-gray-400">
-                            {region.addressDetail}
-                          </span>
-                        </>
-                      )}
-                    </div>
+                  <td
+                    className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap max-w-[200px] truncate"
+                    title={fullAddress || undefined}
+                  >
+                    {fullAddress || '—'}
                   </td>
                   {isAdmin && (
                     <td className="px-5 py-3.5 whitespace-nowrap text-center">
@@ -154,7 +164,10 @@ export function MissionaryRegionTable({
                           variant="outline"
                           color="neutral"
                           size="sm"
-                          onClick={() => onEdit(region)}
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            onEdit(region);
+                          }}
                           aria-label={`${region.name} 수정`}
                         >
                           <Pencil size={14} />
@@ -163,7 +176,10 @@ export function MissionaryRegionTable({
                           variant="outline"
                           color="neutral"
                           size="sm"
-                          onClick={() => onDelete(region)}
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            onDelete(region);
+                          }}
                           aria-label={`${region.name} 삭제`}
                         >
                           <Trash2 size={14} />

@@ -22,9 +22,9 @@ export class PrismaService
 
   constructor(private readonly configService: ConfigService) {
     const rawUrl = configService.get<string>('DATABASE_URL') ?? '';
-    const needsSsl = /sslmode=require/.test(rawUrl);
+    const needsSsl = /sslmode=(?!disable\b)[a-z-]+/.test(rawUrl);
     // pg 모듈에 ssl 옵션을 직접 전달하므로 connection string에서 sslmode 제거
-    const dbUrl = rawUrl.replace(/[?&]sslmode=require/g, (match) =>
+    const dbUrl = rawUrl.replace(/[?&]sslmode=[a-z-]+/g, (match) =>
       match.startsWith('?') ? '?' : '',
     );
 

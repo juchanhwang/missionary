@@ -29,7 +29,6 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
       id: data.id ?? randomUUID(),
       missionaryId: data.missionaryId,
       name: data.name,
-      visitPurpose: data.visitPurpose ?? null,
       pastorName: data.pastorName ?? null,
       pastorPhone: data.pastorPhone ?? null,
       addressBasic: data.addressBasic ?? null,

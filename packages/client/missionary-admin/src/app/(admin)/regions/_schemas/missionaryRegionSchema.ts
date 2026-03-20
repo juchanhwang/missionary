@@ -4,7 +4,6 @@ export const missionaryRegionSchema = z.object({
   missionGroupId: z.string().min(1, '선교 그룹을 선택해주세요'),
   missionaryId: z.string().min(1, '차수를 선택해주세요'),
   name: z.string().min(1, '연계지 이름을 입력해주세요'),
-  visitPurpose: z.string().optional(),
   pastorName: z.string().optional(),
   pastorPhone: z
     .string()

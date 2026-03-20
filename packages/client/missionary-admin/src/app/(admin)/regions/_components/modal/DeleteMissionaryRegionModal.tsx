@@ -50,7 +50,7 @@ export function DeleteMissionaryRegionModal({
       onRequestClose={() => close(false)}
       contentLabel="연계지 삭제 확인"
       className="fixed inset-0 flex items-center justify-center p-4"
-      overlayClassName="fixed inset-0 bg-black/30 flex items-center justify-center"
+      overlayClassName="fixed inset-0 z-50 bg-black/30 flex items-center justify-center"
       shouldCloseOnEsc={!isPending}
       shouldCloseOnOverlayClick={!isPending}
     >

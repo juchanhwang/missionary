@@ -25,7 +25,7 @@ function UnsavedChangesModal({ isOpen, close }: UnsavedChangesModalProps) {
       onRequestClose={() => close(false)}
       contentLabel="변경사항 확인"
       className="fixed inset-0 flex items-center justify-center p-4"
-      overlayClassName="fixed inset-0 bg-black/30 flex items-center justify-center"
+      overlayClassName="fixed inset-0 z-[60] bg-black/30 flex items-center justify-center"
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
@@ -121,7 +121,6 @@ export function MissionaryRegionFormModal({
     const rest = data;
     const payload = {
       name: rest.name,
-      visitPurpose: rest.visitPurpose || undefined,
       pastorName: rest.pastorName || undefined,
       pastorPhone: rest.pastorPhone || undefined,
       addressBasic: rest.addressBasic || undefined,
@@ -144,7 +143,7 @@ export function MissionaryRegionFormModal({
     } else if (region) {
       updateMutation.mutate(
         {
-          missionaryId: region.missionaryId,
+          missionaryId,
           regionId: region.id,
           data: payload,
         },
@@ -167,7 +166,7 @@ export function MissionaryRegionFormModal({
       onRequestClose={requestClose}
       contentLabel={isCreate ? '연계지 등록' : '연계지 수정'}
       className="fixed inset-0 flex items-center justify-center p-4"
-      overlayClassName="fixed inset-0 bg-black/30 flex items-center justify-center"
+      overlayClassName="fixed inset-0 z-50 bg-black/30 flex items-center justify-center"
       shouldCloseOnEsc={!isPending}
       shouldCloseOnOverlayClick={!isPending}
     >

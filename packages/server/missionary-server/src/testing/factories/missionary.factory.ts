@@ -64,7 +64,6 @@ export function makeMissionaryRegion(
   return {
     id: randomUUID(),
     name: '테스트지역',
-    visitPurpose: null,
     pastorName: null,
     pastorPhone: null,
     addressBasic: null,
