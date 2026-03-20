@@ -21,18 +21,11 @@ export function MissionaryRegionsPageClient() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
 
-  const {
-    params,
-    setQuery,
-    setMissionGroupId,
-    setMissionaryId,
-    setPage,
-    clearQuery,
-  } = useRegionFilterParams();
+  const { params, setQuery, setMissionGroupId, setPage, clearQuery } =
+    useRegionFilterParams();
 
   const { data, isLoading, isError, refetch } = useGetMissionaryRegions({
     missionGroupId: params.missionGroupId || undefined,
-    missionaryId: params.missionaryId || undefined,
     query: params.query || undefined,
     page: params.page,
   });
@@ -52,7 +45,6 @@ export function MissionaryRegionsPageClient() {
           setTimeout(unmount, 300);
         }}
         defaultMissionGroupId={params.missionGroupId || undefined}
-        defaultMissionaryId={params.missionaryId || undefined}
       />
     ));
   };
@@ -87,9 +79,7 @@ export function MissionaryRegionsPageClient() {
   const hasData = !isLoading && !isError && regions.length > 0;
   const isEmpty = !isLoading && !isError && regions.length === 0;
   const emptyType =
-    params.query || params.missionGroupId || params.missionaryId
-      ? 'no-results'
-      : 'empty';
+    params.query || params.missionGroupId ? 'no-results' : 'empty';
 
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0">
@@ -115,10 +105,8 @@ export function MissionaryRegionsPageClient() {
           <MissionaryRegionFilters
             query={params.query}
             missionGroupId={params.missionGroupId}
-            missionaryId={params.missionaryId}
             onQueryChange={setQuery}
             onMissionGroupChange={setMissionGroupId}
-            onMissionaryChange={setMissionaryId}
           />
         </div>
 

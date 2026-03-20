@@ -7,7 +7,6 @@ import { ITEMS_PER_PAGE } from './useRegionFilterParams';
 
 interface UseGetMissionaryRegionsParams {
   missionGroupId?: string;
-  missionaryId?: string;
   query?: string;
   page?: number;
 }

@@ -69,7 +69,7 @@ export function makeMissionaryRegion(
     pastorPhone: null,
     addressBasic: null,
     addressDetail: null,
-    missionaryId: randomUUID(),
+    missionGroupId: randomUUID(),
     createdAt: new Date('2024-01-01T00:00:00Z'),
     updatedAt: new Date('2024-01-01T00:00:00Z'),
     createdBy: null,

@@ -4,6 +4,7 @@ import { PrismaModule } from '@/database/prisma.module';
 import { MISSION_GROUP_REPOSITORY } from '@/mission-group/repositories/mission-group-repository.interface';
 import { PrismaMissionGroupRepository } from '@/mission-group/repositories/prisma-mission-group.repository';
 
+import { MissionGroupRegionController } from './mission-group-region.controller';
 import { MissionaryController } from './missionary.controller';
 import { MissionaryService } from './missionary.service';
 import { RegionController } from './region.controller';
@@ -16,7 +17,11 @@ import { PrismaMissionaryRepository } from './repositories/prisma-missionary.rep
 
 @Module({
   imports: [PrismaModule],
-  controllers: [MissionaryController, RegionController],
+  controllers: [
+    MissionaryController,
+    RegionController,
+    MissionGroupRegionController,
+  ],
   providers: [
     MissionaryService,
     {

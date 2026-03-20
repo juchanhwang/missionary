@@ -3,7 +3,7 @@ import { missionaryRegionApi } from 'apis/missionaryRegion';
 import { queryKeys } from 'lib/queryKeys';
 
 interface DeleteRegionArgs {
-  missionaryId: string;
+  missionGroupId: string;
   regionId: string;
 }
 
@@ -11,8 +11,8 @@ export function useDeleteMissionaryRegion() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ missionaryId, regionId }: DeleteRegionArgs) =>
-      missionaryRegionApi.deleteRegion(missionaryId, regionId),
+    mutationFn: ({ missionGroupId, regionId }: DeleteRegionArgs) =>
+      missionaryRegionApi.deleteRegion(missionGroupId, regionId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.missionaryRegions.all,

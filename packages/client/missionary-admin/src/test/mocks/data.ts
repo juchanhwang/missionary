@@ -99,17 +99,12 @@ export function createMockRegion(
   return {
     id: 'region-1',
     name: '서울교회',
-    visitPurpose: '전도',
     pastorName: '김목사',
     pastorPhone: '010-1234-5678',
     addressBasic: '서울 강남구 테헤란로 123',
     addressDetail: '4층',
-    missionaryId: 'missionary-1',
-    missionary: {
-      id: 'missionary-1',
-      name: '1차 선교',
-      missionGroup: { id: 'group-1', name: '필리핀 선교' },
-    },
+    missionGroupId: 'group-1',
+    missionGroup: { id: 'group-1', name: '필리핀 선교' },
     ...overrides,
   };
 }
@@ -119,7 +114,6 @@ export function createMockRegionList(count: number): RegionListItem[] {
     createMockRegion({
       id: `region-${i + 1}`,
       name: `교회${i + 1}`,
-      missionaryId: `missionary-${i + 1}`,
     }),
   );
 }

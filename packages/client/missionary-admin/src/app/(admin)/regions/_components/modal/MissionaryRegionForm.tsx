@@ -10,7 +10,6 @@ import {
   missionaryRegionSchema,
   type MissionaryRegionFormValues,
 } from '../../_schemas/missionaryRegionSchema';
-import { MissionarySelect } from '../MissionarySelect';
 import { MissionGroupSelect } from '../MissionGroupSelect';
 
 import type { RegionListItem } from 'apis/missionaryRegion';
@@ -19,7 +18,6 @@ interface MissionaryRegionFormProps {
   mode: 'create' | 'edit';
   region?: RegionListItem;
   defaultMissionGroupId?: string;
-  defaultMissionaryId?: string;
   onSubmit: (data: MissionaryRegionFormValues) => void;
   onCancel: () => void;
   onDirtyChange: (isDirty: boolean) => void;
@@ -30,7 +28,6 @@ export function MissionaryRegionForm({
   mode,
   region,
   defaultMissionGroupId,
-  defaultMissionaryId,
   onSubmit,
   onCancel,
   onDirtyChange,
@@ -44,13 +41,9 @@ export function MissionaryRegionForm({
     mode: 'onSubmit',
     defaultValues: {
       missionGroupId: isEdit
-        ? (region?.missionary.missionGroup?.id ?? '')
+        ? (region?.missionGroup?.id ?? '')
         : (defaultMissionGroupId ?? ''),
-      missionaryId: isEdit
-        ? (region?.missionaryId ?? '')
-        : (defaultMissionaryId ?? ''),
       name: region?.name ?? '',
-      visitPurpose: region?.visitPurpose ?? '',
       pastorName: region?.pastorName ?? '',
       pastorPhone: region?.pastorPhone ?? '',
       addressBasic: region?.addressBasic ?? '',
@@ -59,7 +52,6 @@ export function MissionaryRegionForm({
   });
 
   const { isDirty } = form.formState;
-  const watchMissionGroupId = form.watch('missionGroupId');
 
   useEffect(() => {
     onDirtyChange(isDirty);
@@ -79,50 +71,22 @@ export function MissionaryRegionForm({
     >
       <div className="flex-1 overflow-y-auto px-6 py-6">
         <div className="flex flex-col gap-4">
-          {/* 선교 그룹 + 차수 */}
-          <div className="grid grid-cols-2 gap-4">
-            <Controller
-              name="missionGroupId"
-              control={form.control}
-              render={({ field }) => (
-                <MissionGroupSelect
-                  value={field.value}
-                  onChange={(value) => {
-                    field.onChange(value);
-                    if (!isEdit) {
-                      form.setValue('missionaryId', '');
-                    }
-                  }}
-                  disabled={isEdit}
-                  showLockIcon={isEdit}
-                  label="선교 그룹 *"
-                />
-              )}
-            />
-            <Controller
-              name="missionaryId"
-              control={form.control}
-              render={({ field }) => (
-                <MissionarySelect
-                  value={field.value}
-                  missionGroupId={watchMissionGroupId}
-                  onChange={field.onChange}
-                  disabled={isEdit}
-                  showLockIcon={isEdit}
-                  label="차수 *"
-                />
-              )}
-            />
-          </div>
+          {/* 선교 그룹 */}
+          <Controller
+            name="missionGroupId"
+            control={form.control}
+            render={({ field }) => (
+              <MissionGroupSelect
+                value={field.value}
+                onChange={field.onChange}
+                label="선교 그룹 *"
+              />
+            )}
+          />
 
           {form.formState.errors.missionGroupId && (
             <p className="text-xs text-error-60">
               {form.formState.errors.missionGroupId.message}
-            </p>
-          )}
-          {form.formState.errors.missionaryId && (
-            <p className="text-xs text-error-60">
-              {form.formState.errors.missionaryId.message}
             </p>
           )}
 
@@ -134,12 +98,6 @@ export function MissionaryRegionForm({
             placeholder="연계지(교회) 이름"
             {...form.register('name')}
             error={form.formState.errors.name?.message}
-          />
-
-          <InputField
-            label="방문목적"
-            placeholder="방문 목적"
-            {...form.register('visitPurpose')}
           />
 
           <div className="grid grid-cols-2 gap-4">

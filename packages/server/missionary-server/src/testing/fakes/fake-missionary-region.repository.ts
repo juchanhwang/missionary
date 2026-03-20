@@ -6,28 +6,25 @@ import type {
   MissionaryRegionCreateInput,
   MissionaryRegionRepository,
   MissionaryRegionUpdateInput,
-  RegionWithMissionary,
+  RegionWithMissionGroup,
 } from '@/missionary/repositories/missionary-region-repository.interface';
 
 import type { MissionaryRegion } from '../../../prisma/generated/prisma';
 
-interface MissionaryInfo {
+interface MissionGroupInfo {
   id: string;
   name: string;
-  order: number | null;
-  missionGroupId: string | null;
-  missionGroup: { id: string; name: string } | null;
 }
 
 export class FakeMissionaryRegionRepository implements MissionaryRegionRepository {
   private store = new Map<string, MissionaryRegion>();
-  private missionaryMap = new Map<string, MissionaryInfo>();
+  private missionGroupMap = new Map<string, MissionGroupInfo>();
 
   async create(data: MissionaryRegionCreateInput): Promise<MissionaryRegion> {
     const now = new Date();
     const entity: MissionaryRegion = {
       id: data.id ?? randomUUID(),
-      missionaryId: data.missionaryId,
+      missionGroupId: data.missionGroupId,
       name: data.name,
       visitPurpose: data.visitPurpose ?? null,
       pastorName: data.pastorName ?? null,
@@ -46,18 +43,20 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
     return entity;
   }
 
-  async findByMissionary(missionaryId: string): Promise<MissionaryRegion[]> {
+  async findByMissionGroup(
+    missionGroupId: string,
+  ): Promise<MissionaryRegion[]> {
     return [...this.store.values()]
-      .filter((r) => r.missionaryId === missionaryId)
+      .filter((r) => r.missionGroupId === missionGroupId)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  async findByIdAndMissionary(
+  async findByIdAndMissionGroup(
     id: string,
-    missionaryId: string,
+    missionGroupId: string,
   ): Promise<MissionaryRegion | null> {
     const entity = this.store.get(id);
-    if (!entity || entity.missionaryId !== missionaryId) return null;
+    if (!entity || entity.missionGroupId !== missionGroupId) return null;
     return entity;
   }
 
@@ -76,13 +75,10 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
     let regions = [...this.store.values()];
 
     // 필터 적용
-    if (params.missionaryId) {
-      regions = regions.filter((r) => r.missionaryId === params.missionaryId);
-    } else if (params.missionGroupId) {
-      regions = regions.filter((r) => {
-        const missionary = this.missionaryMap.get(r.missionaryId);
-        return missionary?.missionGroupId === params.missionGroupId;
-      });
+    if (params.missionGroupId) {
+      regions = regions.filter(
+        (r) => r.missionGroupId === params.missionGroupId,
+      );
     }
 
     // 검색 적용
@@ -97,19 +93,15 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
 
     const total = regions.length;
 
-    // 정렬: missionGroup.name ASC → missionary.order DESC → name ASC
+    // 정렬: missionGroup.name ASC → name ASC
     regions.sort((a, b) => {
-      const mA = this.missionaryMap.get(a.missionaryId);
-      const mB = this.missionaryMap.get(b.missionaryId);
+      const groupA = this.missionGroupMap.get(a.missionGroupId);
+      const groupB = this.missionGroupMap.get(b.missionGroupId);
 
-      const groupNameA = mA?.missionGroup?.name ?? '';
-      const groupNameB = mB?.missionGroup?.name ?? '';
+      const groupNameA = groupA?.name ?? '';
+      const groupNameB = groupB?.name ?? '';
       if (groupNameA < groupNameB) return -1;
       if (groupNameA > groupNameB) return 1;
-
-      const orderA = mA?.order ?? 0;
-      const orderB = mB?.order ?? 0;
-      if (orderB !== orderA) return orderB - orderA;
 
       return a.name.localeCompare(b.name);
     });
@@ -122,14 +114,11 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
     return {
       data: data.map((r) => ({
         ...r,
-        missionary: this.missionaryMap.get(r.missionaryId) ?? {
-          id: r.missionaryId,
+        missionGroup: this.missionGroupMap.get(r.missionGroupId) ?? {
+          id: r.missionGroupId,
           name: '',
-          order: null,
-          missionGroupId: null,
-          missionGroup: null,
         },
-      })) as RegionWithMissionary[],
+      })) as RegionWithMissionGroup[],
       total,
     };
   }
@@ -154,13 +143,13 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
 
   // --- 테스트 헬퍼 ---
 
-  setMissionary(missionaryId: string, info: MissionaryInfo): void {
-    this.missionaryMap.set(missionaryId, info);
+  setMissionGroup(missionGroupId: string, info: MissionGroupInfo): void {
+    this.missionGroupMap.set(missionGroupId, info);
   }
 
   clear(): void {
     this.store.clear();
-    this.missionaryMap.clear();
+    this.missionGroupMap.clear();
   }
 
   getAll(): MissionaryRegion[] {

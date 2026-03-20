@@ -25,7 +25,7 @@ function UnsavedChangesModal({ isOpen, close }: UnsavedChangesModalProps) {
       onRequestClose={() => close(false)}
       contentLabel="변경사항 확인"
       className="fixed inset-0 flex items-center justify-center p-4"
-      overlayClassName="fixed inset-0 bg-black/30 flex items-center justify-center"
+      overlayClassName="fixed inset-0 z-[60] bg-black/30 flex items-center justify-center"
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
@@ -63,7 +63,6 @@ interface MissionaryRegionFormModalProps {
   close: (result: boolean) => void;
   region?: RegionListItem;
   defaultMissionGroupId?: string;
-  defaultMissionaryId?: string;
 }
 
 export function MissionaryRegionFormModal({
@@ -72,7 +71,6 @@ export function MissionaryRegionFormModal({
   close,
   region,
   defaultMissionGroupId,
-  defaultMissionaryId,
 }: MissionaryRegionFormModalProps) {
   const createMutation = useCreateMissionaryRegion();
   const updateMutation = useUpdateMissionaryRegion();
@@ -117,20 +115,18 @@ export function MissionaryRegionFormModal({
   };
 
   const handleSubmit = (data: MissionaryRegionFormValues) => {
-    const { missionaryId } = data;
-    const rest = data;
+    const { missionGroupId } = data;
     const payload = {
-      name: rest.name,
-      visitPurpose: rest.visitPurpose || undefined,
-      pastorName: rest.pastorName || undefined,
-      pastorPhone: rest.pastorPhone || undefined,
-      addressBasic: rest.addressBasic || undefined,
-      addressDetail: rest.addressDetail || undefined,
+      name: data.name,
+      pastorName: data.pastorName || undefined,
+      pastorPhone: data.pastorPhone || undefined,
+      addressBasic: data.addressBasic || undefined,
+      addressDetail: data.addressDetail || undefined,
     };
 
     if (isCreate) {
       createMutation.mutate(
-        { missionaryId, data: payload },
+        { missionGroupId, data: payload },
         {
           onSuccess: () => {
             toast.success('연계지가 등록되었습니다');
@@ -144,7 +140,7 @@ export function MissionaryRegionFormModal({
     } else if (region) {
       updateMutation.mutate(
         {
-          missionaryId: region.missionaryId,
+          missionGroupId: region.missionGroupId,
           regionId: region.id,
           data: payload,
         },
@@ -167,7 +163,7 @@ export function MissionaryRegionFormModal({
       onRequestClose={requestClose}
       contentLabel={isCreate ? '연계지 등록' : '연계지 수정'}
       className="fixed inset-0 flex items-center justify-center p-4"
-      overlayClassName="fixed inset-0 bg-black/30 flex items-center justify-center"
+      overlayClassName="fixed inset-0 z-50 bg-black/30 flex items-center justify-center"
       shouldCloseOnEsc={!isPending}
       shouldCloseOnOverlayClick={!isPending}
     >
@@ -201,7 +197,6 @@ export function MissionaryRegionFormModal({
           mode={mode}
           region={region}
           defaultMissionGroupId={defaultMissionGroupId}
-          defaultMissionaryId={defaultMissionaryId}
           onSubmit={handleSubmit}
           onCancel={requestClose}
           onDirtyChange={handleDirtyChange}

@@ -2,7 +2,6 @@ import type {
   Missionary,
   MissionGroup,
   MissionaryPoster,
-  MissionaryRegion,
   MissionStatus,
 } from '../../../prisma/generated/prisma';
 
@@ -51,7 +50,6 @@ export type MissionaryWithGroup = Missionary & {
 export type MissionaryWithDetails = Missionary & {
   missionGroup: MissionGroup | null;
   posters: MissionaryPoster[];
-  regions: MissionaryRegion[];
 };
 
 export interface MissionaryRepository {

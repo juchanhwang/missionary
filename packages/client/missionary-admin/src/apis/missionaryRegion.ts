@@ -6,20 +6,15 @@ import { stripEmpty } from './utils';
 export interface RegionListItem {
   id: string;
   name: string;
-  visitPurpose: string | null;
   pastorName: string | null;
   pastorPhone: string | null;
   addressBasic: string | null;
   addressDetail: string | null;
-  missionaryId: string;
-  missionary: {
+  missionGroupId: string;
+  missionGroup: {
     id: string;
     name: string;
-    missionGroup: {
-      id: string;
-      name: string;
-    } | null;
-  };
+  } | null;
 }
 
 export interface RegionListResponse {
@@ -29,7 +24,6 @@ export interface RegionListResponse {
 
 export interface GetRegionsParams {
   missionGroupId?: string;
-  missionaryId?: string;
   query?: string;
   limit?: number;
   offset?: number;
@@ -37,7 +31,6 @@ export interface GetRegionsParams {
 
 export interface CreateRegionPayload {
   name: string;
-  visitPurpose?: string;
   pastorName?: string;
   pastorPhone?: string;
   addressBasic?: string;
@@ -46,7 +39,6 @@ export interface CreateRegionPayload {
 
 export interface UpdateRegionPayload {
   name?: string;
-  visitPurpose?: string;
   pastorName?: string;
   pastorPhone?: string;
   addressBasic?: string;
@@ -62,19 +54,22 @@ export const missionaryRegionApi = {
     });
   },
 
-  createRegion(missionaryId: string, data: CreateRegionPayload) {
-    return api.post(`/missionaries/${missionaryId}/regions`, data);
+  createRegion(missionGroupId: string, data: CreateRegionPayload) {
+    return api.post(`/mission-groups/${missionGroupId}/regions`, data);
   },
 
   updateRegion(
-    missionaryId: string,
+    missionGroupId: string,
     regionId: string,
     data: UpdateRegionPayload,
   ) {
-    return api.patch(`/missionaries/${missionaryId}/regions/${regionId}`, data);
+    return api.patch(
+      `/mission-groups/${missionGroupId}/regions/${regionId}`,
+      data,
+    );
   },
 
-  deleteRegion(missionaryId: string, regionId: string) {
-    return api.delete(`/missionaries/${missionaryId}/regions/${regionId}`);
+  deleteRegion(missionGroupId: string, regionId: string) {
+    return api.delete(`/mission-groups/${missionGroupId}/regions/${regionId}`);
   },
 };

@@ -151,20 +151,21 @@ export class MissionaryService {
   }
 
   async updateRegion(
-    missionaryId: string,
+    missionGroupId: string,
     regionId: string,
     dto: UpdateMissionaryRegionDto,
   ) {
-    await this.findOne(missionaryId);
+    await this.findMissionGroup(missionGroupId);
 
-    const region = await this.missionaryRegionRepository.findByIdAndMissionary(
-      regionId,
-      missionaryId,
-    );
+    const region =
+      await this.missionaryRegionRepository.findByIdAndMissionGroup(
+        regionId,
+        missionGroupId,
+      );
 
     if (!region) {
       throw new NotFoundException(
-        `MissionaryRegion with ID ${regionId} not found for missionary ${missionaryId}`,
+        `MissionaryRegion with ID ${regionId} not found for mission group ${missionGroupId}`,
       );
     }
 
@@ -179,11 +180,11 @@ export class MissionaryService {
     return this.missionaryRegionRepository.update(regionId, data);
   }
 
-  async addRegion(missionaryId: string, dto: CreateMissionaryRegionDto) {
-    await this.findOne(missionaryId);
+  async addRegion(missionGroupId: string, dto: CreateMissionaryRegionDto) {
+    await this.findMissionGroup(missionGroupId);
 
     return this.missionaryRegionRepository.create({
-      missionaryId,
+      missionGroupId,
       name: dto.name,
       visitPurpose: dto.visitPurpose,
       pastorName: dto.pastorName,
@@ -193,23 +194,18 @@ export class MissionaryService {
     });
   }
 
-  async getRegions(missionaryId: string) {
-    await this.findOne(missionaryId);
+  async removeRegion(missionGroupId: string, regionId: string) {
+    await this.findMissionGroup(missionGroupId);
 
-    return this.missionaryRegionRepository.findByMissionary(missionaryId);
-  }
-
-  async removeRegion(missionaryId: string, regionId: string) {
-    await this.findOne(missionaryId);
-
-    const region = await this.missionaryRegionRepository.findByIdAndMissionary(
-      regionId,
-      missionaryId,
-    );
+    const region =
+      await this.missionaryRegionRepository.findByIdAndMissionGroup(
+        regionId,
+        missionGroupId,
+      );
 
     if (!region) {
       throw new NotFoundException(
-        `MissionaryRegion with ID ${regionId} not found for missionary ${missionaryId}`,
+        `MissionaryRegion with ID ${regionId} not found for mission group ${missionGroupId}`,
       );
     }
 
@@ -247,5 +243,15 @@ export class MissionaryService {
     }
 
     return this.missionaryPosterRepository.delete(posterId);
+  }
+
+  private async findMissionGroup(id: string) {
+    const group = await this.missionGroupRepository.findById(id);
+
+    if (!group) {
+      throw new NotFoundException(`MissionGroup with ID ${id} not found`);
+    }
+
+    return group;
   }
 }

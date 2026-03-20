@@ -12,7 +12,6 @@ import type {
   Missionary,
   MissionGroup,
   MissionaryPoster,
-  MissionaryRegion,
   MissionStatus,
 } from '../../../prisma/generated/prisma';
 
@@ -29,7 +28,6 @@ export class FakeMissionaryRepository implements MissionaryRepository {
    * sub-resource 조회를 위한 저장소.
    * findWithDetails 에서 사용한다.
    */
-  private regionsByMissionary = new Map<string, MissionaryRegion[]>();
   private postersByMissionary = new Map<string, MissionaryPoster[]>();
 
   async create(data: MissionaryCreateInput): Promise<MissionaryWithGroup> {
@@ -92,7 +90,6 @@ export class FakeMissionaryRepository implements MissionaryRepository {
         ? (this.groups.get(entity.missionGroupId) ?? null)
         : null,
       posters: this.postersByMissionary.get(id) ?? [],
-      regions: this.regionsByMissionary.get(id) ?? [],
     };
   }
 
@@ -154,10 +151,6 @@ export class FakeMissionaryRepository implements MissionaryRepository {
     this.groups.set(id, group);
   }
 
-  setRegions(missionaryId: string, regions: MissionaryRegion[]): void {
-    this.regionsByMissionary.set(missionaryId, regions);
-  }
-
   setPosters(missionaryId: string, posters: MissionaryPoster[]): void {
     this.postersByMissionary.set(missionaryId, posters);
   }
@@ -165,7 +158,6 @@ export class FakeMissionaryRepository implements MissionaryRepository {
   clear(): void {
     this.store.clear();
     this.groups.clear();
-    this.regionsByMissionary.clear();
     this.postersByMissionary.clear();
   }
 

@@ -5,7 +5,7 @@ import { queryKeys } from 'lib/queryKeys';
 import type { CreateRegionPayload } from 'apis/missionaryRegion';
 
 interface CreateRegionArgs {
-  missionaryId: string;
+  missionGroupId: string;
   data: CreateRegionPayload;
 }
 
@@ -13,8 +13,8 @@ export function useCreateMissionaryRegion() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ missionaryId, data }: CreateRegionArgs) =>
-      missionaryRegionApi.createRegion(missionaryId, data),
+    mutationFn: ({ missionGroupId, data }: CreateRegionArgs) =>
+      missionaryRegionApi.createRegion(missionGroupId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.missionaryRegions.all,
