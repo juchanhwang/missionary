@@ -43,7 +43,9 @@ export function MissionarySelect({
       >
         <span className="flex items-center gap-1.5">
           {showLockIcon && <Lock size={12} className="text-gray-400" />}
-          {selectedMissionary ? selectedMissionary.name : '전체'}
+          {selectedMissionary
+            ? (selectedMissionary.order ?? selectedMissionary.name)
+            : '전체'}
         </span>
       </Select.Trigger>
       <Select.Options>
@@ -55,7 +57,7 @@ export function MissionarySelect({
         ) : (
           missionaries.map((m) => (
             <Select.Option key={m.id} item={m.id}>
-              {m.name}
+              {m.order ?? m.name}
             </Select.Option>
           ))
         )}

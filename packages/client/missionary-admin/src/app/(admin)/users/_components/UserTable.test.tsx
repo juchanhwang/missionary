@@ -103,12 +103,15 @@ describe('UserTable', () => {
     expect(screen.getByText('조건에 맞는 유저가 없습니다')).toBeInTheDocument();
   });
 
-  it('로딩 중일 때 로딩 메시지를 표시한다', () => {
+  it('로딩 중일 때 스켈레톤 UI를 표시한다', () => {
     render(
       <UserTable users={[]} isLoading={true} onRowClick={mockOnRowClick} />,
     );
 
-    expect(screen.getByText('불러오는 중...')).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(
+      screen.queryByText('조건에 맞는 유저가 없습니다'),
+    ).not.toBeInTheDocument();
   });
 
   it('유저의 역할 배지를 표시한다', () => {

@@ -50,7 +50,6 @@ export function MissionaryRegionForm({
         ? (region?.missionaryId ?? '')
         : (defaultMissionaryId ?? ''),
       name: region?.name ?? '',
-      visitPurpose: region?.visitPurpose ?? '',
       pastorName: region?.pastorName ?? '',
       pastorPhone: region?.pastorPhone ?? '',
       addressBasic: region?.addressBasic ?? '',
@@ -89,12 +88,8 @@ export function MissionaryRegionForm({
                   value={field.value}
                   onChange={(value) => {
                     field.onChange(value);
-                    if (!isEdit) {
-                      form.setValue('missionaryId', '');
-                    }
+                    form.setValue('missionaryId', '');
                   }}
-                  disabled={isEdit}
-                  showLockIcon={isEdit}
                   label="선교 그룹 *"
                 />
               )}
@@ -107,8 +102,6 @@ export function MissionaryRegionForm({
                   value={field.value}
                   missionGroupId={watchMissionGroupId}
                   onChange={field.onChange}
-                  disabled={isEdit}
-                  showLockIcon={isEdit}
                   label="차수 *"
                 />
               )}
@@ -134,12 +127,6 @@ export function MissionaryRegionForm({
             placeholder="연계지(교회) 이름"
             {...form.register('name')}
             error={form.formState.errors.name?.message}
-          />
-
-          <InputField
-            label="방문목적"
-            placeholder="방문 목적"
-            {...form.register('visitPurpose')}
           />
 
           <div className="grid grid-cols-2 gap-4">

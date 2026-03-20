@@ -169,8 +169,11 @@ export class MissionaryService {
     }
 
     const data: MissionaryRegionUpdateInput = {};
+    if (dto.missionaryId !== undefined) {
+      await this.findOne(dto.missionaryId);
+      data.missionaryId = dto.missionaryId;
+    }
     if (dto.name !== undefined) data.name = dto.name;
-    if (dto.visitPurpose !== undefined) data.visitPurpose = dto.visitPurpose;
     if (dto.pastorName !== undefined) data.pastorName = dto.pastorName;
     if (dto.pastorPhone !== undefined) data.pastorPhone = dto.pastorPhone;
     if (dto.addressBasic !== undefined) data.addressBasic = dto.addressBasic;
@@ -185,7 +188,6 @@ export class MissionaryService {
     return this.missionaryRegionRepository.create({
       missionaryId,
       name: dto.name,
-      visitPurpose: dto.visitPurpose,
       pastorName: dto.pastorName,
       pastorPhone: dto.pastorPhone,
       addressBasic: dto.addressBasic,

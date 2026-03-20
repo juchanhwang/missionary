@@ -6,7 +6,6 @@ import { stripEmpty } from './utils';
 export interface RegionListItem {
   id: string;
   name: string;
-  visitPurpose: string | null;
   pastorName: string | null;
   pastorPhone: string | null;
   addressBasic: string | null;
@@ -15,6 +14,7 @@ export interface RegionListItem {
   missionary: {
     id: string;
     name: string;
+    order?: number;
     missionGroup: {
       id: string;
       name: string;
@@ -37,7 +37,6 @@ export interface GetRegionsParams {
 
 export interface CreateRegionPayload {
   name: string;
-  visitPurpose?: string;
   pastorName?: string;
   pastorPhone?: string;
   addressBasic?: string;
@@ -45,8 +44,8 @@ export interface CreateRegionPayload {
 }
 
 export interface UpdateRegionPayload {
+  missionaryId?: string;
   name?: string;
-  visitPurpose?: string;
   pastorName?: string;
   pastorPhone?: string;
   addressBasic?: string;

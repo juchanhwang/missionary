@@ -94,22 +94,6 @@ export function MissionaryRegionsPageClient() {
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0">
       <div className="flex flex-col flex-1 p-8 min-h-0">
-        {/* 헤더 */}
-        <div className="shrink-0 flex items-center justify-between mb-5">
-          <h1 className="text-xl font-bold text-gray-900">연계지 관리</h1>
-          {isAdmin && (
-            <Button
-              variant="filled"
-              color="primary"
-              size="md"
-              onClick={handleCreateClick}
-            >
-              <Plus size={16} />
-              연계지 등록
-            </Button>
-          )}
-        </div>
-
         {/* 필터 */}
         <div className="shrink-0">
           <MissionaryRegionFilters
@@ -132,6 +116,17 @@ export function MissionaryRegionsPageClient() {
                 {total}건
               </span>
             </p>
+            {isAdmin && (
+              <Button
+                variant="filled"
+                color="primary"
+                size="sm"
+                onClick={handleCreateClick}
+              >
+                <Plus size={14} />
+                연계지 등록
+              </Button>
+            )}
           </div>
 
           {/* 콘텐츠 */}

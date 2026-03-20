@@ -99,7 +99,6 @@ export function createMockRegion(
   return {
     id: 'region-1',
     name: '서울교회',
-    visitPurpose: '전도',
     pastorName: '김목사',
     pastorPhone: '010-1234-5678',
     addressBasic: '서울 강남구 테헤란로 123',
@@ -108,6 +107,7 @@ export function createMockRegion(
     missionary: {
       id: 'missionary-1',
       name: '1차 선교',
+      order: 1,
       missionGroup: { id: 'group-1', name: '필리핀 선교' },
     },
     ...overrides,
