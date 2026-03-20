@@ -8,7 +8,7 @@
 -- WHERE m.mission_group_id IS NULL;
 
 -- 2. 새 컬럼 추가
-ALTER TABLE "missionary_region" ADD COLUMN "mission_group_id" UUID;
+ALTER TABLE "missionary_region" ADD COLUMN "mission_group_id" TEXT;
 
 -- 3. 기존 데이터 변환: missionary를 통해 mission_group_id 매핑
 UPDATE "missionary_region" mr

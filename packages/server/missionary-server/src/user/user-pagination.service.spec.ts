@@ -210,4 +210,326 @@ describe('UserService 페이지네이션', () => {
       expect(result.total).toBe(1);
     });
   });
+
+  // ──────────────────────────────────────────────
+  // 페이지네이션 엣지 케이스
+  // ──────────────────────────────────────────────
+  describe('findAll 페이지네이션 엣지 케이스', () => {
+    it('유저가 없으면 빈 배열과 total 0을 반환한다', async () => {
+      const result = await userService.findAll();
+
+      expect(result.data).toHaveLength(0);
+      expect(result.total).toBe(0);
+      expect(result.page).toBe(1);
+    });
+
+    it('마지막 페이지에서 남은 유저만 반환한다', async () => {
+      for (let i = 0; i < 12; i++) {
+        await fakeUserRepository.create(
+          makeUser({ email: `user${i}@test.com` }),
+        );
+      }
+
+      const result = await userService.findAll({ page: 2, pageSize: 10 });
+
+      expect(result.data).toHaveLength(2);
+      expect(result.total).toBe(12);
+    });
+
+    it('페이지 범위를 초과하면 빈 배열을 반환한다', async () => {
+      await fakeUserRepository.create(makeUser({ email: 'only@test.com' }));
+
+      const result = await userService.findAll({ page: 100, pageSize: 10 });
+
+      expect(result.data).toHaveLength(0);
+      expect(result.total).toBe(1);
+    });
+
+    it('pageSize=1이면 유저 1명만 반환한다', async () => {
+      await fakeUserRepository.create(makeUser({ email: 'a@test.com' }));
+      await fakeUserRepository.create(makeUser({ email: 'b@test.com' }));
+
+      const result = await userService.findAll({ page: 1, pageSize: 1 });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.total).toBe(2);
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // 검색 엣지 케이스
+  // ──────────────────────────────────────────────
+  describe('findAll 검색 엣지 케이스', () => {
+    it('검색 결과가 없으면 빈 배열을 반환한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({ name: '홍길동', email: 'hong@test.com' }),
+      );
+
+      const result = await userService.findAll({
+        searchType: 'name',
+        keyword: '존재하지않는이름',
+      });
+
+      expect(result.data).toHaveLength(0);
+      expect(result.total).toBe(0);
+    });
+
+    it('부분 일치로 이름을 검색한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({ name: '홍길동', email: 'hong@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ name: '홍길순', email: 'hong2@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ name: '김철수', email: 'kim@test.com' }),
+      );
+
+      const result = await userService.findAll({
+        searchType: 'name',
+        keyword: '홍길',
+      });
+
+      expect(result.data).toHaveLength(2);
+      expect(result.total).toBe(2);
+    });
+
+    it('검색 결과에 페이지네이션을 적용한다', async () => {
+      for (let i = 0; i < 15; i++) {
+        await fakeUserRepository.create(
+          makeUser({ name: `홍길동${i}`, email: `hong${i}@test.com` }),
+        );
+      }
+      await fakeUserRepository.create(
+        makeUser({ name: '김철수', email: 'kim@test.com' }),
+      );
+
+      const result = await userService.findAll({
+        searchType: 'name',
+        keyword: '홍길동',
+        page: 2,
+        pageSize: 10,
+      });
+
+      expect(result.data).toHaveLength(5);
+      expect(result.total).toBe(15);
+      expect(result.page).toBe(2);
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // 필터 추가 케이스
+  // ──────────────────────────────────────────────
+  describe('findAll 필터 추가 케이스', () => {
+    it('role 필터로 STAFF 유저만 조회한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({ role: 'STAFF', email: 'staff@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ role: 'ADMIN', email: 'admin@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ role: 'USER', email: 'user@test.com' }),
+      );
+
+      const result = await userService.findAll({ role: 'STAFF' });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].role).toBe('STAFF');
+      expect(result.total).toBe(1);
+    });
+
+    it('role 필터로 USER 유저만 조회한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({ role: 'ADMIN', email: 'admin@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ role: 'USER', email: 'user1@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ role: 'USER', email: 'user2@test.com' }),
+      );
+
+      const result = await userService.findAll({ role: 'USER' });
+
+      expect(result.data).toHaveLength(2);
+      expect(result.total).toBe(2);
+    });
+
+    it('provider 필터로 LOCAL 유저만 조회한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({ provider: 'LOCAL', email: 'local@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ provider: 'GOOGLE', email: 'google@test.com' }),
+      );
+
+      const result = await userService.findAll({ provider: 'LOCAL' });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].provider).toBe('LOCAL');
+    });
+
+    it('provider 필터로 KAKAO 유저만 조회한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({ provider: 'KAKAO', email: 'kakao@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ provider: 'LOCAL', email: 'local@test.com' }),
+      );
+
+      const result = await userService.findAll({ provider: 'KAKAO' });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].provider).toBe('KAKAO');
+    });
+
+    it('isBaptized=false로 세례받지 않은 유저만 조회한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({ isBaptized: true, email: 'baptized@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ isBaptized: false, email: 'not-baptized@test.com' }),
+      );
+
+      const result = await userService.findAll({ isBaptized: false });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].isBaptized).toBe(false);
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // 복합 필터
+  // ──────────────────────────────────────────────
+  describe('findAll 복합 필터', () => {
+    it('search + role 조합으로 조회한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({
+          name: '홍길동',
+          email: 'hong@test.com',
+          role: 'ADMIN',
+        }),
+      );
+      await fakeUserRepository.create(
+        makeUser({
+          name: '홍길순',
+          email: 'hong2@test.com',
+          role: 'USER',
+        }),
+      );
+      await fakeUserRepository.create(
+        makeUser({
+          name: '김철수',
+          email: 'kim@test.com',
+          role: 'ADMIN',
+        }),
+      );
+
+      const result = await userService.findAll({
+        searchType: 'name',
+        keyword: '홍',
+        role: 'ADMIN',
+      });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].name).toBe('홍길동');
+      expect(result.total).toBe(1);
+    });
+
+    it('role + provider 조합으로 조회한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({
+          role: 'ADMIN',
+          provider: 'GOOGLE',
+          email: 'admin-google@test.com',
+        }),
+      );
+      await fakeUserRepository.create(
+        makeUser({
+          role: 'ADMIN',
+          provider: 'LOCAL',
+          email: 'admin-local@test.com',
+        }),
+      );
+      await fakeUserRepository.create(
+        makeUser({
+          role: 'USER',
+          provider: 'GOOGLE',
+          email: 'user-google@test.com',
+        }),
+      );
+
+      const result = await userService.findAll({
+        role: 'ADMIN',
+        provider: 'GOOGLE',
+      });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].email).toBe('admin-google@test.com');
+    });
+
+    it('모든 필터를 동시에 적용한다', async () => {
+      await fakeUserRepository.create(
+        makeUser({
+          name: '홍길동',
+          email: 'hong@test.com',
+          role: 'ADMIN',
+          provider: 'LOCAL',
+          isBaptized: true,
+        }),
+      );
+      await fakeUserRepository.create(
+        makeUser({
+          name: '홍길순',
+          email: 'hong2@test.com',
+          role: 'ADMIN',
+          provider: 'LOCAL',
+          isBaptized: false,
+        }),
+      );
+      await fakeUserRepository.create(
+        makeUser({
+          name: '홍길동Jr',
+          email: 'hong3@test.com',
+          role: 'USER',
+          provider: 'LOCAL',
+          isBaptized: true,
+        }),
+      );
+
+      const result = await userService.findAll({
+        searchType: 'name',
+        keyword: '홍',
+        role: 'ADMIN',
+        provider: 'LOCAL',
+        isBaptized: true,
+      });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].name).toBe('홍길동');
+      expect(result.total).toBe(1);
+    });
+
+    it('필터 적용 후 total이 필터된 결과 수와 일치한다', async () => {
+      for (let i = 0; i < 20; i++) {
+        await fakeUserRepository.create(
+          makeUser({
+            email: `user${i}@test.com`,
+            role: i < 5 ? 'ADMIN' : 'USER',
+          }),
+        );
+      }
+
+      const result = await userService.findAll({
+        role: 'ADMIN',
+        page: 1,
+        pageSize: 3,
+      });
+
+      expect(result.data).toHaveLength(3);
+      expect(result.total).toBe(5);
+      expect(result.page).toBe(1);
+    });
+  });
 });

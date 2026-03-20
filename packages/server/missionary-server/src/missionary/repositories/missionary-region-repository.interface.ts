@@ -4,7 +4,6 @@ export interface MissionaryRegionCreateInput {
   id?: string;
   missionGroupId: string;
   name: string;
-  visitPurpose?: string | null;
   pastorName?: string | null;
   pastorPhone?: string | null;
   addressBasic?: string | null;
@@ -12,8 +11,8 @@ export interface MissionaryRegionCreateInput {
 }
 
 export interface MissionaryRegionUpdateInput {
+  missionaryId?: string;
   name?: string;
-  visitPurpose?: string | null;
   pastorName?: string | null;
   pastorPhone?: string | null;
   addressBasic?: string | null;

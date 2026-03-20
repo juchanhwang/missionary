@@ -323,12 +323,10 @@ describe('MissionaryService', () => {
 
       const dto = new CreateMissionaryRegionDto();
       dto.name = '제주 지교회';
-      dto.visitPurpose = '복음 전파';
 
       const result = await service.addRegion(group.id, dto);
 
       expect(result.name).toBe('제주 지교회');
-      expect(result.visitPurpose).toBe('복음 전파');
       expect(result.missionGroupId).toBe(group.id);
     });
 
@@ -673,7 +671,6 @@ describe('MissionaryService', () => {
         missionGroupId: group.id,
         name: '교회',
         pastorName: '김목사',
-        visitPurpose: '복음 전파',
       });
 
       const dto = new UpdateMissionaryRegionDto();
@@ -683,7 +680,6 @@ describe('MissionaryService', () => {
 
       expect(result.name).toBe('수정된 교회');
       expect(result.pastorName).toBe('김목사');
-      expect(result.visitPurpose).toBe('복음 전파');
     });
   });
 });
