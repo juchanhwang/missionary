@@ -14,6 +14,7 @@ import { FakeMissionaryRepository } from '@/testing/fakes/fake-missionary.reposi
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
 import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
+import { UpdateMissionaryRegionDto } from './dto/update-missionary-region.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
 import { MissionaryService } from './missionary.service';
 import {
@@ -552,6 +553,221 @@ describe('MissionaryService', () => {
       await expect(
         service.removePoster(missionary.id, poster.id),
       ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // findAllRegions
+  // ──────────────────────────────────────────────
+  describe('findAllRegions', () => {
+    let missionary1: Awaited<ReturnType<typeof fakeMissionaryRepo.create>>;
+    let missionary2: Awaited<ReturnType<typeof fakeMissionaryRepo.create>>;
+    const groupId = 'group-1';
+
+    beforeEach(async () => {
+      missionary1 = await fakeMissionaryRepo.create({
+        name: '1차',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-06-30'),
+        missionGroupId: groupId,
+        order: 1,
+        createdById: 'user-1',
+      });
+      missionary2 = await fakeMissionaryRepo.create({
+        name: '2차',
+        startDate: new Date('2024-07-01'),
+        endDate: new Date('2024-12-31'),
+        missionGroupId: groupId,
+        order: 2,
+        createdById: 'user-1',
+      });
+
+      fakeRegionRepo.setMissionary(missionary1.id, {
+        id: missionary1.id,
+        name: '1차',
+        order: 1,
+        missionGroupId: groupId,
+        missionGroup: { id: groupId, name: '장흥선교' },
+      });
+      fakeRegionRepo.setMissionary(missionary2.id, {
+        id: missionary2.id,
+        name: '2차',
+        order: 2,
+        missionGroupId: groupId,
+        missionGroup: { id: groupId, name: '장흥선교' },
+      });
+
+      await fakeRegionRepo.create({
+        missionaryId: missionary1.id,
+        name: 'OO교회',
+        pastorName: '김목사',
+      });
+      await fakeRegionRepo.create({
+        missionaryId: missionary1.id,
+        name: 'XX교회',
+        pastorName: '이목사',
+      });
+      await fakeRegionRepo.create({
+        missionaryId: missionary2.id,
+        name: 'AA교회',
+        pastorName: '박목사',
+      });
+    });
+
+    it('필터 없이 호출하면 전체 연계지를 반환한다', async () => {
+      const result = await service.findAllRegions({});
+
+      expect(result.data).toHaveLength(3);
+      expect(result.total).toBe(3);
+    });
+
+    it('missionGroupId로 필터링하면 해당 그룹의 연계지만 반환한다', async () => {
+      const result = await service.findAllRegions({
+        missionGroupId: groupId,
+      });
+
+      expect(result.data).toHaveLength(3);
+      expect(result.total).toBe(3);
+    });
+
+    it('missionaryId로 필터링하면 해당 차수의 연계지만 반환한다', async () => {
+      const result = await service.findAllRegions({
+        missionaryId: missionary1.id,
+      });
+
+      expect(result.data).toHaveLength(2);
+      expect(result.total).toBe(2);
+    });
+
+    it('missionaryId와 missionGroupId를 동시에 전달하면 missionaryId가 우선 적용된다', async () => {
+      const result = await service.findAllRegions({
+        missionaryId: missionary1.id,
+        missionGroupId: groupId,
+      });
+
+      expect(result.data).toHaveLength(2);
+      expect(result.total).toBe(2);
+      result.data.forEach((r) => {
+        expect(r.missionaryId).toBe(missionary1.id);
+      });
+    });
+
+    it('query로 검색하면 이름/목사명에 매치되는 연계지만 반환한다', async () => {
+      const result = await service.findAllRegions({ query: '김목사' });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].name).toBe('OO교회');
+    });
+
+    it('필터와 검색을 동시에 적용할 수 있다', async () => {
+      const result = await service.findAllRegions({
+        missionaryId: missionary1.id,
+        query: 'OO',
+      });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].name).toBe('OO교회');
+    });
+
+    it('total은 필터/검색 조건에 맞는 전체 건수를 반환한다', async () => {
+      const result = await service.findAllRegions({
+        missionaryId: missionary1.id,
+      });
+
+      expect(result.total).toBe(2);
+    });
+
+    it('limit과 offset으로 페이지네이션을 적용한다', async () => {
+      const result = await service.findAllRegions({ limit: 1, offset: 0 });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.total).toBe(3);
+    });
+
+    it('연계지가 없으면 빈 배열과 total 0을 반환한다', async () => {
+      fakeRegionRepo.clear();
+
+      const result = await service.findAllRegions({});
+
+      expect(result.data).toEqual([]);
+      expect(result.total).toBe(0);
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // updateRegion
+  // ──────────────────────────────────────────────
+  describe('updateRegion', () => {
+    it('존재하는 연계지를 수정하면 수정된 데이터를 반환한다', async () => {
+      const missionary = await fakeMissionaryRepo.create({
+        name: '선교',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-12-31'),
+        createdById: 'user-1',
+      });
+
+      const region = await fakeRegionRepo.create({
+        missionaryId: missionary.id,
+        name: '원래 교회',
+        pastorName: '김목사',
+      });
+
+      const dto = new UpdateMissionaryRegionDto();
+      dto.name = '수정된 교회';
+
+      const result = await service.updateRegion(missionary.id, region.id, dto);
+
+      expect(result.name).toBe('수정된 교회');
+    });
+
+    it('존재하지 않는 missionaryId로 수정하면 NotFoundException을 던진다', async () => {
+      const dto = new UpdateMissionaryRegionDto();
+      dto.name = '수정';
+
+      await expect(
+        service.updateRegion('non-existent-id', 'region-id', dto),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('존재하지 않는 regionId로 수정하면 NotFoundException을 던진다', async () => {
+      const missionary = await fakeMissionaryRepo.create({
+        name: '선교',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-12-31'),
+        createdById: 'user-1',
+      });
+
+      const dto = new UpdateMissionaryRegionDto();
+      dto.name = '수정';
+
+      await expect(
+        service.updateRegion(missionary.id, 'non-existent-region', dto),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('일부 필드만 전달하면 해당 필드만 수정된다', async () => {
+      const missionary = await fakeMissionaryRepo.create({
+        name: '선교',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-12-31'),
+        createdById: 'user-1',
+      });
+
+      const region = await fakeRegionRepo.create({
+        missionaryId: missionary.id,
+        name: '교회',
+        pastorName: '김목사',
+        visitPurpose: '복음 전파',
+      });
+
+      const dto = new UpdateMissionaryRegionDto();
+      dto.name = '수정된 교회';
+
+      const result = await service.updateRegion(missionary.id, region.id, dto);
+
+      expect(result.name).toBe('수정된 교회');
+      expect(result.pastorName).toBe('김목사');
+      expect(result.visitPurpose).toBe('복음 전파');
     });
   });
 });

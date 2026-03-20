@@ -12,6 +12,10 @@ export { PrismaMissionaryRegionRepository } from './prisma-missionary-region.rep
 export type {
   MissionaryRegionRepository,
   MissionaryRegionCreateInput,
+  MissionaryRegionUpdateInput,
+  RegionWithMissionary,
+  FindAllRegionsParams,
+  FindAllRegionsResult,
 } from './missionary-region-repository.interface';
 export { MISSIONARY_REGION_REPOSITORY } from './missionary-region-repository.interface';
 

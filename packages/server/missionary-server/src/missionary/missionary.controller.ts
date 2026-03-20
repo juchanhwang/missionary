@@ -18,6 +18,7 @@ import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.i
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
 import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
+import { UpdateMissionaryRegionDto } from './dto/update-missionary-region.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
 import { MissionaryService } from './missionary.service';
 
@@ -79,6 +80,17 @@ export class MissionaryController {
   @ApiOperation({ summary: '선교 연계지 목록 조회' })
   getRegions(@Param('id', ParseUUIDPipe) id: string) {
     return this.missionaryService.getRegions(id);
+  }
+
+  @Patch(':id/regions/:regionId')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: '선교 연계지 수정 (관리자 전용)' })
+  updateRegion(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('regionId', ParseUUIDPipe) regionId: string,
+    @Body() dto: UpdateMissionaryRegionDto,
+  ) {
+    return this.missionaryService.updateRegion(id, regionId, dto);
   }
 
   @Delete(':id/regions/:regionId')
