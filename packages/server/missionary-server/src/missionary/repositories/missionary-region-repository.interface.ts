@@ -2,60 +2,62 @@ import type { MissionaryRegion } from '../../../prisma/generated/prisma';
 
 export interface MissionaryRegionCreateInput {
   id?: string;
-  missionaryId: string;
+  missionGroupId: string;
   name: string;
   pastorName?: string | null;
   pastorPhone?: string | null;
   addressBasic?: string | null;
   addressDetail?: string | null;
+  note?: string | null;
 }
 
 export interface MissionaryRegionUpdateInput {
-  missionaryId?: string;
   name?: string;
   pastorName?: string | null;
   pastorPhone?: string | null;
   addressBasic?: string | null;
   addressDetail?: string | null;
+  note?: string | null;
 }
 
-export interface RegionWithMissionary extends MissionaryRegion {
-  missionary: {
+export interface RegionWithMissionGroup extends MissionaryRegion {
+  missionGroup: {
     id: string;
     name: string;
-    order: number | null;
-    missionGroupId: string | null;
-    missionGroup: {
-      id: string;
-      name: string;
-    } | null;
   };
 }
 
 export interface FindAllRegionsParams {
   missionGroupId?: string;
-  missionaryId?: string;
   query?: string;
   limit?: number;
   offset?: number;
 }
 
 export interface FindAllRegionsResult {
-  data: RegionWithMissionary[];
+  data: RegionWithMissionGroup[];
   total: number;
 }
 
 export interface MissionaryRegionRepository {
   create(data: MissionaryRegionCreateInput): Promise<MissionaryRegion>;
-  findByMissionary(missionaryId: string): Promise<MissionaryRegion[]>;
-  findByIdAndMissionary(
+  findByMissionGroup(missionGroupId: string): Promise<MissionaryRegion[]>;
+  findByIdAndMissionGroup(
     id: string,
-    missionaryId: string,
+    missionGroupId: string,
   ): Promise<MissionaryRegion | null>;
   delete(id: string): Promise<MissionaryRegion>;
   findAllWithFilters(
     params: FindAllRegionsParams,
   ): Promise<FindAllRegionsResult>;
+  findDeletedWithFilters(
+    params: FindAllRegionsParams,
+  ): Promise<FindAllRegionsResult>;
+  findDeletedByIdAndMissionGroup(
+    id: string,
+    missionGroupId: string,
+  ): Promise<MissionaryRegion | null>;
+  restore(id: string): Promise<MissionaryRegion>;
   update(
     id: string,
     data: MissionaryRegionUpdateInput,

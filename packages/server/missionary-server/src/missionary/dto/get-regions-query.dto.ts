@@ -8,14 +8,6 @@ export class GetRegionsQueryDto {
   @IsUUID()
   declare missionGroupId?: string;
 
-  @ApiPropertyOptional({
-    description:
-      '차수(선교) ID 필터. missionGroupId와 동시 전달 시 이 값이 우선 적용됨.',
-  })
-  @IsOptional()
-  @IsUUID()
-  declare missionaryId?: string;
-
   @ApiPropertyOptional({ description: '검색어 (이름, 목사명)' })
   @IsOptional()
   @IsString()

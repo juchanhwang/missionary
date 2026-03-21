@@ -5,15 +5,13 @@ import { queryKeys } from 'lib/queryKeys';
 
 import { ITEMS_PER_PAGE } from './useRegionFilterParams';
 
-interface UseGetMissionaryRegionsParams {
+interface UseGetDeletedRegionsParams {
   missionGroupId?: string;
   query?: string;
   page?: number;
 }
 
-export function useGetMissionaryRegions(
-  params: UseGetMissionaryRegionsParams = {},
-) {
+export function useGetDeletedRegions(params: UseGetDeletedRegionsParams = {}) {
   const { page = 1, ...filterParams } = params;
   const apiParams = stripEmpty({
     ...filterParams,
@@ -22,9 +20,9 @@ export function useGetMissionaryRegions(
   });
 
   return useQuery({
-    queryKey: queryKeys.missionaryRegions.list(apiParams),
+    queryKey: [...queryKeys.missionaryRegions.all, 'deleted', apiParams],
     queryFn: async () => {
-      const response = await missionaryRegionApi.getRegions(apiParams);
+      const response = await missionaryRegionApi.getDeletedRegions(apiParams);
       return response.data;
     },
     placeholderData: keepPreviousData,

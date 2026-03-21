@@ -25,7 +25,7 @@ describe('useRegionFilterParams', () => {
 
   it('URL에서 파라미터를 파싱한다', () => {
     mockSearchParams = new URLSearchParams(
-      'query=서울&missionGroupId=g1&missionaryId=m1&page=3',
+      'query=서울&missionGroupId=g1&page=3',
     );
 
     const { result } = renderHook(() => useRegionFilterParams());
@@ -33,7 +33,6 @@ describe('useRegionFilterParams', () => {
     expect(result.current.params).toEqual({
       query: '서울',
       missionGroupId: 'g1',
-      missionaryId: 'm1',
       page: 3,
     });
   });
@@ -44,7 +43,6 @@ describe('useRegionFilterParams', () => {
     expect(result.current.params).toEqual({
       query: '',
       missionGroupId: '',
-      missionaryId: '',
       page: 1,
     });
   });
@@ -65,10 +63,8 @@ describe('useRegionFilterParams', () => {
     expect(result.current.params.page).toBe(1);
   });
 
-  it('missionGroupId 변경 시 missionaryId와 page가 리셋된다', () => {
-    mockSearchParams = new URLSearchParams(
-      'missionGroupId=g1&missionaryId=m1&page=3',
-    );
+  it('missionGroupId 변경 시 page가 리셋된다', () => {
+    mockSearchParams = new URLSearchParams('missionGroupId=g1&page=3');
 
     const { result } = renderHook(() => useRegionFilterParams());
 

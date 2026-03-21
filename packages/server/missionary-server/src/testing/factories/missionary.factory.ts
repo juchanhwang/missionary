@@ -64,11 +64,12 @@ export function makeMissionaryRegion(
   return {
     id: randomUUID(),
     name: '테스트지역',
+    note: null,
     pastorName: null,
     pastorPhone: null,
     addressBasic: null,
     addressDetail: null,
-    missionaryId: randomUUID(),
+    missionGroupId: randomUUID(),
     createdAt: new Date('2024-01-01T00:00:00Z'),
     updatedAt: new Date('2024-01-01T00:00:00Z'),
     createdBy: null,

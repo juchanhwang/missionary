@@ -1,6 +1,9 @@
 import { type AuthUser } from 'apis/auth';
 import { type Missionary } from 'apis/missionary';
-import { type RegionListItem } from 'apis/missionaryRegion';
+import {
+  type DeletedRegionListItem,
+  type RegionListItem,
+} from 'apis/missionaryRegion';
 import { type MissionGroup, type MissionGroupDetail } from 'apis/missionGroup';
 import { type User } from 'apis/user';
 
@@ -103,13 +106,11 @@ export function createMockRegion(
     pastorPhone: '010-1234-5678',
     addressBasic: '서울 강남구 테헤란로 123',
     addressDetail: '4층',
-    missionaryId: 'missionary-1',
-    missionary: {
-      id: 'missionary-1',
-      name: '1차 선교',
-      order: 1,
-      missionGroup: { id: 'group-1', name: '필리핀 선교' },
-    },
+    note: null,
+    missionGroupId: 'group-1',
+    missionGroup: { id: 'group-1', name: '필리핀 선교' },
+    createdAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-01-01T00:00:00.000Z',
     ...overrides,
   };
 }
@@ -119,7 +120,28 @@ export function createMockRegionList(count: number): RegionListItem[] {
     createMockRegion({
       id: `region-${i + 1}`,
       name: `교회${i + 1}`,
-      missionaryId: `missionary-${i + 1}`,
+    }),
+  );
+}
+
+export function createMockDeletedRegion(
+  overrides: Partial<DeletedRegionListItem> = {},
+): DeletedRegionListItem {
+  return {
+    ...createMockRegion(),
+    deletedAt: '2026-03-15T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+export function createMockDeletedRegionList(
+  count: number,
+): DeletedRegionListItem[] {
+  return Array.from({ length: count }, (_, i) =>
+    createMockDeletedRegion({
+      id: `deleted-region-${i + 1}`,
+      name: `삭제교회${i + 1}`,
+      deletedAt: new Date(2026, 2, 15 - i).toISOString(),
     }),
   );
 }

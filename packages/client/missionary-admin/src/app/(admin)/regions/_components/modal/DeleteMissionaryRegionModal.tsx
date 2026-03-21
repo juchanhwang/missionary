@@ -31,7 +31,7 @@ export function DeleteMissionaryRegionModal({
 
   const handleConfirm = () => {
     mutate(
-      { missionaryId: region.missionaryId, regionId: region.id },
+      { missionGroupId: region.missionGroupId, regionId: region.id },
       {
         onSuccess: () => {
           toast.success('연계지가 삭제되었습니다');

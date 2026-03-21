@@ -125,6 +125,7 @@ model MissionGroup {
 
   // Relations
   missionaries Missionary[]
+  regions      MissionaryRegion[]
 
   @@map("mission_group")
 }
@@ -177,7 +178,6 @@ model Missionary {
   creator         User                  @relation("MissionaryCreator", fields: [createdById], references: [id])
   posters         MissionaryPoster[]
   staff           MissionaryStaff[]
-  regions         MissionaryRegion[]
   boards          MissionaryBoard[]
   participations  Participation[]
   teams           Team[]
@@ -239,6 +239,7 @@ model MissionaryStaff {
 model MissionaryRegion {
   id   String @id @default(uuid())
   name String
+  note String? @db.Text
 
   // Pastor embedded object (flattened)
   pastorName  String? @map("pastor_name")
@@ -249,7 +250,7 @@ model MissionaryRegion {
   addressDetail String? @map("address_detail")
 
   // Foreign keys
-  missionaryId String @map("missionary_id")
+  missionGroupId String @map("mission_group_id")
 
   // Audit fields
   createdAt DateTime @default(now()) @map("created_at")
@@ -262,7 +263,7 @@ model MissionaryRegion {
   deletedAt DateTime? @map("deleted_at")
 
   // Relations
-  missionary Missionary @relation(fields: [missionaryId], references: [id])
+  missionGroup MissionGroup @relation(fields: [missionGroupId], references: [id])
 
   @@map("missionary_region")
 }

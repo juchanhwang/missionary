@@ -35,7 +35,6 @@ export class PrismaMissionaryRepository implements MissionaryRepository {
       include: {
         missionGroup: true,
         posters: true,
-        regions: true,
       },
     });
   }

@@ -16,6 +16,8 @@ interface MissionGroupSelectProps {
   disabled?: boolean;
   showLockIcon?: boolean;
   label?: string;
+  placeholder?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export function MissionGroupSelect({
@@ -24,6 +26,8 @@ export function MissionGroupSelect({
   disabled,
   showLockIcon,
   label = '선교 그룹',
+  placeholder = '전체',
+  size = 'md',
 }: MissionGroupSelectProps) {
   const { data: groups = [] } = useGetMissionGroups();
 
@@ -35,8 +39,8 @@ export function MissionGroupSelect({
       onChange={(v?: string | string[] | null) =>
         onChange(((v as string) ?? '') as string)
       }
-      label={label}
-      size="md"
+      label={label || undefined}
+      size={size}
     >
       <Select.Trigger
         disabled={disabled}
@@ -52,7 +56,7 @@ export function MissionGroupSelect({
               </span>
             </>
           ) : (
-            '전체'
+            placeholder
           )}
         </span>
       </Select.Trigger>

@@ -13,7 +13,7 @@ export type {
   MissionaryRegionRepository,
   MissionaryRegionCreateInput,
   MissionaryRegionUpdateInput,
-  RegionWithMissionary,
+  RegionWithMissionGroup,
   FindAllRegionsParams,
   FindAllRegionsResult,
 } from './missionary-region-repository.interface';

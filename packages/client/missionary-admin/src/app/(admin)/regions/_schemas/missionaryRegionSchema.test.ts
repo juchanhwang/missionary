@@ -3,7 +3,6 @@ import { missionaryRegionSchema } from './missionaryRegionSchema';
 describe('missionaryRegionSchema', () => {
   const validInput = {
     missionGroupId: 'group-1',
-    missionaryId: 'missionary-1',
     name: '서울교회',
   };
 
@@ -20,17 +19,6 @@ describe('missionaryRegionSchema', () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues[0].message).toBe('선교 그룹을 선택해주세요');
-    }
-  });
-
-  it('missionaryId가 빈 문자열이면 검증에 실패한다', () => {
-    const result = missionaryRegionSchema.safeParse({
-      ...validInput,
-      missionaryId: '',
-    });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues[0].message).toBe('차수를 선택해주세요');
     }
   });
 

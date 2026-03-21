@@ -8,7 +8,6 @@ export const ITEMS_PER_PAGE = 20;
 export interface RegionFilterParams {
   query: string;
   missionGroupId: string;
-  missionaryId: string;
   page: number;
 }
 
@@ -20,7 +19,6 @@ export function useRegionFilterParams() {
   const params: RegionFilterParams = {
     query: searchParams.get('query') ?? '',
     missionGroupId: searchParams.get('missionGroupId') ?? '',
-    missionaryId: searchParams.get('missionaryId') ?? '',
     page: Math.max(1, Number(searchParams.get('page')) || 1),
   };
 
@@ -37,14 +35,6 @@ export function useRegionFilterParams() {
   const setMissionGroupId = (value: string) => {
     updateParams({
       missionGroupId: value || null,
-      missionaryId: null,
-      page: null,
-    });
-  };
-
-  const setMissionaryId = (value: string) => {
-    updateParams({
-      missionaryId: value || null,
       page: null,
     });
   };
@@ -78,7 +68,6 @@ export function useRegionFilterParams() {
     params,
     setQuery,
     setMissionGroupId,
-    setMissionaryId,
     setPage,
     clearQuery,
   };

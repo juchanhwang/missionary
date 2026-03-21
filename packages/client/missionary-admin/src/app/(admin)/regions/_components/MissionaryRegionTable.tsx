@@ -3,6 +3,8 @@
 import { Button } from '@samilhero/design-system';
 import { Pencil, Trash2 } from 'lucide-react';
 
+import { formatDate } from '../_utils/formatDate';
+
 import type { RegionListItem } from 'apis/missionaryRegion';
 
 interface MissionaryRegionTableProps {
@@ -22,10 +24,7 @@ function SkeletonRows({ isAdmin }: { isAdmin: boolean }) {
             <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
           </td>
           <td className="px-5 py-3.5">
-            <div className="h-4 w-14 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-20 bg-gray-100 rounded-md animate-pulse" />
+            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
           </td>
           <td className="px-5 py-3.5">
             <div className="h-4 w-12 bg-gray-100 rounded animate-pulse" />
@@ -35,6 +34,15 @@ function SkeletonRows({ isAdmin }: { isAdmin: boolean }) {
           </td>
           <td className="px-5 py-3.5">
             <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-24 bg-gray-100 rounded animate-pulse" />
           </td>
           {isAdmin && (
             <td className="px-5 py-3.5">
@@ -64,7 +72,7 @@ export function MissionaryRegionTable({
 }: MissionaryRegionTableProps) {
   return (
     <div className="flex-1 min-h-0 overflow-auto">
-      <table className="w-full text-left min-w-[1200px]">
+      <table className="w-full text-left min-w-[900px]">
         <caption className="sr-only">연계지 목록</caption>
         <thead className="sticky top-0 z-10">
           <tr className="border-b border-gray-200 bg-gray-50">
@@ -73,12 +81,6 @@ export function MissionaryRegionTable({
               className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[140px]"
             >
               선교 그룹
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
-            >
-              차수
             </th>
             <th
               scope="col"
@@ -104,6 +106,24 @@ export function MissionaryRegionTable({
             >
               주소
             </th>
+            <th
+              scope="col"
+              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
+            >
+              생성일
+            </th>
+            <th
+              scope="col"
+              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
+            >
+              수정일
+            </th>
+            <th
+              scope="col"
+              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[150px]"
+            >
+              비고
+            </th>
             {isAdmin && (
               <th
                 scope="col"
@@ -120,7 +140,7 @@ export function MissionaryRegionTable({
           ) : regions.length === 0 ? (
             <tr>
               <td
-                colSpan={isAdmin ? 7 : 6}
+                colSpan={isAdmin ? 9 : 8}
                 className="px-5 py-16 text-center text-sm text-gray-400"
               >
                 조건에 맞는 연계지가 없습니다
@@ -145,10 +165,7 @@ export function MissionaryRegionTable({
                   tabIndex={isAdmin ? 0 : undefined}
                 >
                   <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {region.missionary.missionGroup?.name ?? '—'}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {region.missionary.order ?? '—'}
+                    {region.missionGroup?.name ?? '—'}
                   </td>
                   <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
                     {region.name}
@@ -165,6 +182,20 @@ export function MissionaryRegionTable({
                       title={fullAddress || undefined}
                     >
                       {fullAddress || '—'}
+                    </div>
+                  </td>
+                  <td className="px-5 py-3.5 text-xs text-gray-400 whitespace-nowrap">
+                    {formatDate(region.createdAt)}
+                  </td>
+                  <td className="px-5 py-3.5 text-xs text-gray-400 whitespace-nowrap">
+                    {formatDate(region.updatedAt)}
+                  </td>
+                  <td className="px-5 py-3.5 text-sm text-gray-500">
+                    <div
+                      className="truncate max-w-[150px]"
+                      title={region.note || undefined}
+                    >
+                      {region.note || '—'}
                     </div>
                   </td>
                   {isAdmin && (

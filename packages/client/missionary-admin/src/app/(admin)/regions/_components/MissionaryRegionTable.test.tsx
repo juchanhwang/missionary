@@ -17,18 +17,20 @@ describe('MissionaryRegionTable', () => {
     vi.clearAllMocks();
   });
 
-  it('테이블 헤더 7개 컬럼을 렌더링한다 (isAdmin=true)', () => {
+  it('테이블 헤더 9개 컬럼을 렌더링한다 (isAdmin=true)', () => {
     render(<MissionaryRegionTable {...defaultProps} />);
 
     const headers = screen.getAllByRole('columnheader');
-    expect(headers).toHaveLength(7);
+    expect(headers).toHaveLength(9);
     expect(headers.map((h) => h.textContent)).toEqual([
       '선교 그룹',
-      '차수',
       '연계지',
       '목사명',
       '목사연락처',
       '주소',
+      '생성일',
+      '수정일',
+      '비고',
       '액션',
     ]);
   });
@@ -38,12 +40,7 @@ describe('MissionaryRegionTable', () => {
       name: '부산교회',
       pastorName: '박목사',
       pastorPhone: '010-9999-8888',
-      missionary: {
-        id: 'm1',
-        name: '2차 선교',
-        order: 2,
-        missionGroup: { id: 'g1', name: '인도 선교' },
-      },
+      missionGroup: { id: 'g1', name: '인도 선교' },
     });
 
     render(<MissionaryRegionTable {...defaultProps} regions={[region]} />);
@@ -56,17 +53,16 @@ describe('MissionaryRegionTable', () => {
     const cells = within(dataRow).getAllByRole('cell');
 
     expect(cells[0]).toHaveTextContent('인도 선교');
-    expect(cells[1]).toHaveTextContent('2');
-    expect(cells[2]).toHaveTextContent('부산교회');
-    expect(cells[3]).toHaveTextContent('박목사');
-    expect(cells[4]).toHaveTextContent('010-9999-8888');
+    expect(cells[1]).toHaveTextContent('부산교회');
+    expect(cells[2]).toHaveTextContent('박목사');
+    expect(cells[3]).toHaveTextContent('010-9999-8888');
   });
 
-  it('isAdmin=false이면 액션 컬럼이 표시되지 않는다 (6컬럼)', () => {
+  it('isAdmin=false이면 액션 컬럼이 표시되지 않는다 (8컬럼)', () => {
     render(<MissionaryRegionTable {...defaultProps} isAdmin={false} />);
 
     const headers = screen.getAllByRole('columnheader');
-    expect(headers).toHaveLength(6);
+    expect(headers).toHaveLength(8);
     expect(headers.map((h) => h.textContent)).not.toContain('액션');
   });
 
@@ -97,12 +93,12 @@ describe('MissionaryRegionTable', () => {
         <MissionaryRegionTable {...defaultProps} isLoading regions={[]} />,
       );
 
-      // 스켈레톤: 5행 × 7컬럼(isAdmin) = 35 셀
+      // 스켈레톤: 5행 × 9컬럼(isAdmin) = 45 셀
       const cells = screen.getAllByRole('cell');
-      expect(cells).toHaveLength(35);
+      expect(cells).toHaveLength(45);
     });
 
-    it('isAdmin=false이면 스켈레톤 컬럼이 6개이다', () => {
+    it('isAdmin=false이면 스켈레톤 컬럼이 5개이다', () => {
       render(
         <MissionaryRegionTable
           {...defaultProps}
@@ -112,9 +108,9 @@ describe('MissionaryRegionTable', () => {
         />,
       );
 
-      // 스켈레톤: 5행 × 6컬럼 = 30 셀
+      // 스켈레톤: 5행 × 8컬럼 = 40 셀
       const cells = screen.getAllByRole('cell');
-      expect(cells).toHaveLength(30);
+      expect(cells).toHaveLength(40);
     });
   });
 
@@ -130,7 +126,7 @@ describe('MissionaryRegionTable', () => {
     const cells = within(rows[1]).getAllByRole('cell');
 
     // 목사명, 목사연락처
+    expect(cells[2]).toHaveTextContent('—');
     expect(cells[3]).toHaveTextContent('—');
-    expect(cells[4]).toHaveTextContent('—');
   });
 });
