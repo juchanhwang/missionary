@@ -18,6 +18,8 @@ async function refreshTokens(refreshToken: string): Promise<Response | null> {
   }
 }
 
+const ALLOWED_COOKIES = ['access_token', 'refresh_token'];
+
 function setCookiesFromResponse(
   response: NextResponse,
   apiResponse: Response,
@@ -25,11 +27,13 @@ function setCookiesFromResponse(
   const setCookieHeaders = apiResponse.headers.getSetCookie();
 
   for (const cookie of setCookieHeaders) {
-    response.headers.append('Set-Cookie', cookie);
+    if (ALLOWED_COOKIES.some((name) => cookie.startsWith(`${name}=`))) {
+      response.headers.append('Set-Cookie', cookie);
+    }
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
