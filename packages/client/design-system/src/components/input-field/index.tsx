@@ -26,6 +26,7 @@ export function InputField({
   onClear,
   value,
   disabled,
+  readOnly,
   className,
   id: providedId,
   size = 'md',
@@ -60,7 +61,7 @@ export function InputField({
           'focus-within:ring-1 focus-within:ring-gray-400 focus-within:border-gray-400',
           disabled &&
             'cursor-not-allowed opacity-50 bg-gray-100 border-gray-100',
-          !disabled && 'hover:border-gray-300',
+          !disabled && !readOnly && 'hover:border-gray-300',
           error &&
             'border-error-60 focus-within:border-error-60 focus-within:ring-error-60',
         )}
@@ -69,6 +70,7 @@ export function InputField({
           id={inputId}
           value={value}
           disabled={disabled}
+          readOnly={readOnly}
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
           ref={ref}
@@ -97,7 +99,6 @@ export function InputField({
         <div
           id={errorId}
           role="alert"
-          aria-live="polite"
           className="mt-1 text-error-60 text-xs leading-[1.5]"
         >
           {error}
