@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 async function refreshTokens(refreshToken: string): Promise<Response | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const apiUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL;
 
   try {
     return await fetch(`${apiUrl}/auth/refresh`, {
@@ -27,7 +27,7 @@ function setCookiesFromResponse(
   }
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
@@ -48,7 +48,7 @@ export async function proxy(request: NextRequest) {
     const apiResponse = await refreshTokens(refreshToken);
 
     if (apiResponse?.ok) {
-      const response = NextResponse.next();
+      const response = NextResponse.redirect(request.url);
       setCookiesFromResponse(response, apiResponse);
 
       return response;

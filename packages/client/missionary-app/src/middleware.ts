@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const PUBLIC_PATHS = ['/login', '/signup'];
 
 async function refreshTokens(refreshToken: string): Promise<Response | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const apiUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL;
 
   try {
     return await fetch(`${apiUrl}/auth/refresh`, {
@@ -54,7 +54,7 @@ export async function middleware(request: NextRequest) {
     const apiResponse = await refreshTokens(refreshToken);
 
     if (apiResponse?.ok) {
-      const response = NextResponse.next();
+      const response = NextResponse.redirect(request.url);
       setCookiesFromResponse(response, apiResponse);
 
       return response;
