@@ -15,6 +15,7 @@ export { Chips } from './chips';
 export { TopButton } from './top-button';
 export { SearchBox } from './search-box';
 export { InputField } from './input-field';
+export { TextareaField } from './textarea-field';
 export { Pagination } from './pagination';
 export { IconButton } from './icon-button';
 export { NavItem } from './nav-item';

@@ -20,3 +20,21 @@ export const formSizeClasses: Record<
     icon: 20,
   },
 };
+
+export const textareaSizeClasses: Record<
+  FormSize,
+  { container: string; text: string }
+> = {
+  sm: {
+    container: 'px-2.5 py-1.5',
+    text: 'text-xs',
+  },
+  md: {
+    container: 'px-3 py-2',
+    text: 'text-sm',
+  },
+  lg: {
+    container: 'px-4 py-3',
+    text: 'text-sm',
+  },
+};
