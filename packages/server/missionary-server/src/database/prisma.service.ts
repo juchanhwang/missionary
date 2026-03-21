@@ -62,7 +62,8 @@ export class PrismaService
     // 설정되지 않은 경우에만 deletedAt: null 필터를 자동 적용한다.
     const addSoftDeleteFilter = <T extends Record<string, unknown>>(
       where: T = {} as T,
-    ): T => ('deletedAt' in where ? where : { ...where, deletedAt: null });
+    ): T =>
+      where.deletedAt !== undefined ? where : { ...where, deletedAt: null };
 
     return this.$extends({
       query: {
