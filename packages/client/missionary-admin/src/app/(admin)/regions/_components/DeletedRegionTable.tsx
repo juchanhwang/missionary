@@ -3,6 +3,8 @@
 import { Button } from '@samilhero/design-system';
 import { RotateCcw } from 'lucide-react';
 
+import { formatDate } from '../_utils/formatDate';
+
 import type { DeletedRegionListItem } from 'apis/missionaryRegion';
 
 interface DeletedRegionTableProps {
@@ -35,6 +37,15 @@ function SkeletonRows() {
             <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
           </td>
           <td className="px-4 py-3">
+            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-4 py-3">
+            <div className="h-4 w-24 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-4 py-3">
+            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-4 py-3">
             <div className="h-6 w-12 bg-gray-100 rounded animate-pulse" />
           </td>
         </tr>
@@ -46,15 +57,6 @@ function SkeletonRows() {
 function formatAddress(region: DeletedRegionListItem): string {
   const parts = [region.addressBasic, region.addressDetail].filter(Boolean);
   return parts.join(' ') || '';
-}
-
-function formatDeletedAt(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
 }
 
 export function DeletedRegionTable({
@@ -100,7 +102,25 @@ export function DeletedRegionTable({
             </th>
             <th
               scope="col"
-              className="px-4 py-2.5 text-xs font-semibold text-gray-400 whitespace-nowrap w-[110px]"
+              className="px-4 py-2.5 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
+            >
+              생성일
+            </th>
+            <th
+              scope="col"
+              className="px-4 py-2.5 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
+            >
+              수정일
+            </th>
+            <th
+              scope="col"
+              className="px-4 py-2.5 text-xs font-semibold text-gray-400 whitespace-nowrap w-[150px]"
+            >
+              비고
+            </th>
+            <th
+              scope="col"
+              className="px-4 py-2.5 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
             >
               삭제일
             </th>
@@ -118,7 +138,7 @@ export function DeletedRegionTable({
           ) : regions.length === 0 ? (
             <tr>
               <td
-                colSpan={7}
+                colSpan={10}
                 className="px-4 py-12 text-center text-sm text-gray-400"
               >
                 삭제된 연계지가 없습니다
@@ -154,7 +174,21 @@ export function DeletedRegionTable({
                     </div>
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
-                    {formatDeletedAt(region.deletedAt)}
+                    {formatDate(region.createdAt)}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
+                    {formatDate(region.updatedAt)}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-400">
+                    <div
+                      className="truncate max-w-[150px]"
+                      title={region.note || undefined}
+                    >
+                      {region.note || '—'}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
+                    {formatDate(region.deletedAt)}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <Button

@@ -17,17 +17,20 @@ describe('MissionaryRegionTable', () => {
     vi.clearAllMocks();
   });
 
-  it('테이블 헤더 6개 컬럼을 렌더링한다 (isAdmin=true)', () => {
+  it('테이블 헤더 9개 컬럼을 렌더링한다 (isAdmin=true)', () => {
     render(<MissionaryRegionTable {...defaultProps} />);
 
     const headers = screen.getAllByRole('columnheader');
-    expect(headers).toHaveLength(6);
+    expect(headers).toHaveLength(9);
     expect(headers.map((h) => h.textContent)).toEqual([
       '선교 그룹',
       '연계지',
       '목사명',
       '목사연락처',
       '주소',
+      '생성일',
+      '수정일',
+      '비고',
       '액션',
     ]);
   });
@@ -55,11 +58,11 @@ describe('MissionaryRegionTable', () => {
     expect(cells[3]).toHaveTextContent('010-9999-8888');
   });
 
-  it('isAdmin=false이면 액션 컬럼이 표시되지 않는다 (5컬럼)', () => {
+  it('isAdmin=false이면 액션 컬럼이 표시되지 않는다 (8컬럼)', () => {
     render(<MissionaryRegionTable {...defaultProps} isAdmin={false} />);
 
     const headers = screen.getAllByRole('columnheader');
-    expect(headers).toHaveLength(5);
+    expect(headers).toHaveLength(8);
     expect(headers.map((h) => h.textContent)).not.toContain('액션');
   });
 
@@ -90,9 +93,9 @@ describe('MissionaryRegionTable', () => {
         <MissionaryRegionTable {...defaultProps} isLoading regions={[]} />,
       );
 
-      // 스켈레톤: 5행 × 6컬럼(isAdmin) = 30 셀
+      // 스켈레톤: 5행 × 9컬럼(isAdmin) = 45 셀
       const cells = screen.getAllByRole('cell');
-      expect(cells).toHaveLength(30);
+      expect(cells).toHaveLength(45);
     });
 
     it('isAdmin=false이면 스켈레톤 컬럼이 5개이다', () => {
@@ -105,9 +108,9 @@ describe('MissionaryRegionTable', () => {
         />,
       );
 
-      // 스켈레톤: 5행 × 5컬럼 = 25 셀
+      // 스켈레톤: 5행 × 8컬럼 = 40 셀
       const cells = screen.getAllByRole('cell');
-      expect(cells).toHaveLength(25);
+      expect(cells).toHaveLength(40);
     });
   });
 

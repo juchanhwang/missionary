@@ -16,6 +16,8 @@ export interface RegionListItem {
     id: string;
     name: string;
   } | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface DeletedRegionListItem extends RegionListItem {

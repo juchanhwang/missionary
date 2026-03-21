@@ -109,6 +109,8 @@ export function createMockRegion(
     note: null,
     missionGroupId: 'group-1',
     missionGroup: { id: 'group-1', name: '필리핀 선교' },
+    createdAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-01-01T00:00:00.000Z',
     ...overrides,
   };
 }

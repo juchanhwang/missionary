@@ -10,6 +10,7 @@ import {
   missionaryRegionSchema,
   type MissionaryRegionFormValues,
 } from '../../_schemas/missionaryRegionSchema';
+import { formatDate } from '../../_utils/formatDate';
 import { MissionGroupSelect } from '../MissionGroupSelect';
 
 import type { RegionListItem } from 'apis/missionaryRegion';
@@ -38,7 +39,7 @@ export function MissionaryRegionForm({
 
   const form = useForm<MissionaryRegionFormValues>({
     resolver: zodResolver(missionaryRegionSchema),
-    mode: 'onSubmit',
+    mode: 'onBlur',
     defaultValues: {
       missionGroupId: isEdit
         ? (region?.missionGroup?.id ?? '')
@@ -153,6 +154,21 @@ export function MissionaryRegionForm({
             rows={3}
             {...form.register('note')}
           />
+
+          {isEdit && region && (
+            <div className="grid grid-cols-2 gap-4">
+              <InputField
+                label="생성일"
+                value={formatDate(region.createdAt)}
+                readOnly
+              />
+              <InputField
+                label="수정일"
+                value={formatDate(region.updatedAt)}
+                readOnly
+              />
+            </div>
+          )}
         </div>
       </div>
 

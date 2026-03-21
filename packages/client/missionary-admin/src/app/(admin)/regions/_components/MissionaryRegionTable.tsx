@@ -3,6 +3,8 @@
 import { Button } from '@samilhero/design-system';
 import { Pencil, Trash2 } from 'lucide-react';
 
+import { formatDate } from '../_utils/formatDate';
+
 import type { RegionListItem } from 'apis/missionaryRegion';
 
 interface MissionaryRegionTableProps {
@@ -32,6 +34,15 @@ function SkeletonRows({ isAdmin }: { isAdmin: boolean }) {
           </td>
           <td className="px-5 py-3.5">
             <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
+          </td>
+          <td className="px-5 py-3.5">
+            <div className="h-4 w-24 bg-gray-100 rounded animate-pulse" />
           </td>
           {isAdmin && (
             <td className="px-5 py-3.5">
@@ -95,6 +106,24 @@ export function MissionaryRegionTable({
             >
               주소
             </th>
+            <th
+              scope="col"
+              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
+            >
+              생성일
+            </th>
+            <th
+              scope="col"
+              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
+            >
+              수정일
+            </th>
+            <th
+              scope="col"
+              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[150px]"
+            >
+              비고
+            </th>
             {isAdmin && (
               <th
                 scope="col"
@@ -111,7 +140,7 @@ export function MissionaryRegionTable({
           ) : regions.length === 0 ? (
             <tr>
               <td
-                colSpan={isAdmin ? 6 : 5}
+                colSpan={isAdmin ? 9 : 8}
                 className="px-5 py-16 text-center text-sm text-gray-400"
               >
                 조건에 맞는 연계지가 없습니다
@@ -153,6 +182,20 @@ export function MissionaryRegionTable({
                       title={fullAddress || undefined}
                     >
                       {fullAddress || '—'}
+                    </div>
+                  </td>
+                  <td className="px-5 py-3.5 text-xs text-gray-400 whitespace-nowrap">
+                    {formatDate(region.createdAt)}
+                  </td>
+                  <td className="px-5 py-3.5 text-xs text-gray-400 whitespace-nowrap">
+                    {formatDate(region.updatedAt)}
+                  </td>
+                  <td className="px-5 py-3.5 text-sm text-gray-500">
+                    <div
+                      className="truncate max-w-[150px]"
+                      title={region.note || undefined}
+                    >
+                      {region.note || '—'}
                     </div>
                   </td>
                   {isAdmin && (
