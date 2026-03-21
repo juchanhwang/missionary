@@ -1,5 +1,5 @@
 import { cn } from '@lib/utils';
-import React, { useEffect, useId, useRef } from 'react';
+import React, { useId, useLayoutEffect, useRef } from 'react';
 
 import { textareaSizeClasses } from '../form-size';
 
@@ -63,19 +63,19 @@ export function TextareaField({
   const showCounter = showCount || maxLength != null;
   const hasFooter = !!error || showCounter;
 
-  // H-1: autoResize 초기 높이 적용 + value 변경 시 높이 재계산
-  useEffect(() => {
+  if (process.env.NODE_ENV !== 'production') {
+    if ((showCount || maxLength != null) && value === undefined) {
+      console.warn(
+        'TextareaField: showCount/maxLength는 controlled 모드(value prop)에서만 정확하게 동작합니다.',
+      );
+    }
+  }
+
+  useLayoutEffect(() => {
     if (autoResize && internalRef.current) {
       applyAutoHeight(internalRef.current);
     }
   }, [autoResize, value]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (autoResize) {
-      applyAutoHeight(e.target);
-    }
-    onChange?.(e);
-  };
 
   const setRefs = (el: HTMLTextAreaElement | null) => {
     internalRef.current = el;
@@ -86,7 +86,6 @@ export function TextareaField({
     }
   };
 
-  // M-3: aria-describedby에 error + counter 모두 연결
   const describedByIds = [
     error ? errorId : null,
     showCounter ? counterId : null,
@@ -119,7 +118,6 @@ export function TextareaField({
             'border-error-60 focus-within:border-error-60 focus-within:ring-error-60',
         )}
       >
-        {/* M-2: native maxLength 제거 → 소프트 한도 */}
         <textarea
           id={textareaId}
           value={value}
@@ -129,7 +127,7 @@ export function TextareaField({
           aria-invalid={!!error}
           aria-describedby={describedByIds || undefined}
           ref={setRefs}
-          onChange={handleChange}
+          onChange={onChange}
           className={cn(
             'flex-1 border-0 bg-transparent text-black leading-[1.428] focus:outline-none placeholder:text-gray-400',
             'disabled:cursor-not-allowed',

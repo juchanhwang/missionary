@@ -99,7 +99,6 @@ export function InputField({
         <div
           id={errorId}
           role="alert"
-          aria-live="polite"
           className="mt-1 text-error-60 text-xs leading-[1.5]"
         >
           {error}
