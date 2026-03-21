@@ -106,6 +106,7 @@ export function createMockRegion(
     pastorPhone: '010-1234-5678',
     addressBasic: '서울 강남구 테헤란로 123',
     addressDetail: '4층',
+    note: null,
     missionGroupId: 'group-1',
     missionGroup: { id: 'group-1', name: '필리핀 선교' },
     ...overrides,

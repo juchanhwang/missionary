@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, InputField } from '@samilhero/design-system';
+import { Button, InputField, TextareaField } from '@samilhero/design-system';
 import { useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -48,6 +48,7 @@ export function MissionaryRegionForm({
       pastorPhone: region?.pastorPhone ?? '',
       addressBasic: region?.addressBasic ?? '',
       addressDetail: region?.addressDetail ?? '',
+      note: region?.note ?? '',
     },
   });
 
@@ -143,6 +144,14 @@ export function MissionaryRegionForm({
             placeholder="상세 주소를 입력하세요"
             {...form.register('addressDetail')}
             ref={addressDetailRef}
+          />
+
+          {/* 비고 */}
+          <TextareaField
+            label="비고"
+            placeholder="메모를 입력하세요"
+            rows={3}
+            {...form.register('note')}
           />
         </div>
       </div>

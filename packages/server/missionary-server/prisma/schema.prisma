@@ -239,6 +239,7 @@ model MissionaryStaff {
 model MissionaryRegion {
   id   String @id @default(uuid())
   name String
+  note String? @db.Text
 
   // Pastor embedded object (flattened)
   pastorName  String? @map("pastor_name")

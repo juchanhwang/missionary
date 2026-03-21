@@ -14,6 +14,7 @@ export const missionaryRegionSchema = z.object({
     .optional(),
   addressBasic: z.string().optional(),
   addressDetail: z.string().optional(),
+  note: z.string().optional(),
 });
 
 export type MissionaryRegionFormValues = z.infer<typeof missionaryRegionSchema>;

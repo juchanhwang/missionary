@@ -179,6 +179,7 @@ export class MissionaryService {
     if (dto.pastorPhone !== undefined) data.pastorPhone = dto.pastorPhone;
     if (dto.addressBasic !== undefined) data.addressBasic = dto.addressBasic;
     if (dto.addressDetail !== undefined) data.addressDetail = dto.addressDetail;
+    if (dto.note !== undefined) data.note = dto.note;
 
     return this.missionaryRegionRepository.update(regionId, data);
   }
@@ -193,6 +194,7 @@ export class MissionaryService {
       pastorPhone: dto.pastorPhone,
       addressBasic: dto.addressBasic,
       addressDetail: dto.addressDetail,
+      note: dto.note,
     });
   }
 

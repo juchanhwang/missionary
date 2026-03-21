@@ -10,6 +10,7 @@ export interface RegionListItem {
   pastorPhone: string | null;
   addressBasic: string | null;
   addressDetail: string | null;
+  note: string | null;
   missionGroupId: string;
   missionGroup: {
     id: string;
@@ -44,6 +45,7 @@ export interface CreateRegionPayload {
   pastorPhone?: string;
   addressBasic?: string;
   addressDetail?: string;
+  note?: string;
 }
 
 export interface UpdateRegionPayload {
@@ -52,6 +54,7 @@ export interface UpdateRegionPayload {
   pastorPhone?: string;
   addressBasic?: string;
   addressDetail?: string;
+  note?: string;
 }
 
 // === API ===

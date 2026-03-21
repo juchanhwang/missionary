@@ -122,6 +122,7 @@ export function MissionaryRegionFormModal({
       pastorPhone: data.pastorPhone || undefined,
       addressBasic: data.addressBasic || undefined,
       addressDetail: data.addressDetail || undefined,
+      note: data.note || undefined,
     };
 
     if (isCreate) {

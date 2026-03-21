@@ -8,6 +8,7 @@ export interface MissionaryRegionCreateInput {
   pastorPhone?: string | null;
   addressBasic?: string | null;
   addressDetail?: string | null;
+  note?: string | null;
 }
 
 export interface MissionaryRegionUpdateInput {
@@ -16,6 +17,7 @@ export interface MissionaryRegionUpdateInput {
   pastorPhone?: string | null;
   addressBasic?: string | null;
   addressDetail?: string | null;
+  note?: string | null;
 }
 
 export interface RegionWithMissionGroup extends MissionaryRegion {

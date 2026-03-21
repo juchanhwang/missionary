@@ -45,4 +45,13 @@ export class CreateMissionaryRegionDto {
   @IsOptional()
   @IsString()
   declare addressDetail?: string;
+
+  @ApiProperty({
+    example: '주차 공간 협소, 사전 연락 필수',
+    description: '비고',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  declare note?: string;
 }
