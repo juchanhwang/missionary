@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const PUBLIC_PATHS = ['/login', '/signup'];
+
 async function refreshTokens(refreshToken: string): Promise<Response | null> {
   const apiUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL;
 
@@ -36,7 +38,11 @@ export async function proxy(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
 
-  if (pathname === '/login') {
+  const isPublicPath = PUBLIC_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
+  );
+
+  if (isPublicPath) {
     if (accessToken) {
       return NextResponse.redirect(new URL('/', request.url));
     }
@@ -64,6 +70,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|fonts|.*\\.(?:svg|png|jpg|jpeg|gif|ico)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|fonts|.*\\.(?:svg|png|jpg|jpeg|gif|ico)$).*)',
   ],
 };
