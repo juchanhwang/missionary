@@ -108,7 +108,7 @@ export function TextareaField({
       )}
       <div
         className={cn(
-          'flex w-full rounded-lg border border-gray-200 bg-gray-50 transition-colors',
+          'flex w-full rounded-lg border border-gray-200 bg-white transition-colors',
           sizeClass.container,
           'focus-within:ring-1 focus-within:ring-gray-400 focus-within:border-gray-400',
           disabled &&
