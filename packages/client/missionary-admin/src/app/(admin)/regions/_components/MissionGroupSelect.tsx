@@ -1,9 +1,8 @@
 'use client';
 
 import { Select } from '@samilhero/design-system';
+import { useGetMissionGroups } from 'hooks/missionGroup';
 import { Lock } from 'lucide-react';
-
-import { useGetMissionGroups } from '../_hooks/useGetMissionGroups';
 
 const CATEGORY_LABELS: Record<string, string> = {
   DOMESTIC: '국내',

@@ -2,9 +2,9 @@
 
 import { Badge } from '@samilhero/design-system';
 import { ROLE_LABELS } from 'lib/constants/role';
+import { formatDate } from 'lib/utils/formatDate';
 import { Check, X } from 'lucide-react';
 
-import { formatDate } from '../_utils/formatDate';
 import { maskIdentityNumber } from '../_utils/maskIdentityNumber';
 
 import type { User } from 'apis/user';

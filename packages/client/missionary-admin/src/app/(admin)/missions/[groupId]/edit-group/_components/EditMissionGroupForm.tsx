@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@samilhero/design-system';
-import { LoadingSpinner } from 'components/loading/LoadingSpinner';
+import { LoadingSpinner } from 'components/loading';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
