@@ -86,7 +86,7 @@ export function MissionaryRegionsPageClient() {
     <div className="flex flex-col flex-1 min-h-0 min-w-0">
       <div className="flex flex-col flex-1 p-8 min-h-0 gap-4 overflow-y-auto">
         {/* 활성 연계지 카드 */}
-        <div className="shrink-0 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="shrink-0 bg-white rounded-xl border border-gray-200 shadow-sm">
           {/* 카드 헤더 */}
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200">
             <p className="text-[15px] font-semibold text-gray-900 flex items-center gap-2">
