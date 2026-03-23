@@ -38,7 +38,7 @@ export function MissionaryRegionFilters({
       <div className="flex-1 max-w-[280px]">
         <SearchBox
           value={localKeyword}
-          placeholder="이름, 목사명으로 검색..."
+          placeholder="연계지명, 목사명으로 검색..."
           onChange={handleKeywordInput}
           size="sm"
           aria-label={searchLabel}
