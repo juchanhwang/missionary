@@ -34,26 +34,29 @@ describe('missionaryRegionSchema', () => {
   });
 
   describe('pastorPhone 검증', () => {
-    it('유효한 전화번호 형식을 통과한다', () => {
+    it.each([
+      ['010-1234-5678', '휴대폰'],
+      ['02-755-9857', '서울 지역번호'],
+      ['031-123-4567', '경기 지역번호'],
+      ['1588-1234', '대표번호'],
+      ['070-1234-5678', '인터넷전화'],
+    ])('%s (%s) 유효한 번호를 통과한다', (phone) => {
       const result = missionaryRegionSchema.safeParse({
         ...validInput,
-        pastorPhone: '010-1234-5678',
+        pastorPhone: phone,
       });
       expect(result.success).toBe(true);
     });
 
-    it('숫자와 하이픈이 아닌 문자가 포함되면 실패한다', () => {
+    it.each([
+      ['abc', '문자열'],
+      ['123456', '패턴 불일치'],
+      ['020-1234-5678', '잘못된 접두사'],
+      ['010-1234', '자릿수 부족'],
+    ])('%s (%s) 유효하지 않은 번호는 실패한다', (phone) => {
       const result = missionaryRegionSchema.safeParse({
         ...validInput,
-        pastorPhone: 'abc',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('7자 미만이면 실패한다', () => {
-      const result = missionaryRegionSchema.safeParse({
-        ...validInput,
-        pastorPhone: '123456',
+        pastorPhone: phone,
       });
       expect(result.success).toBe(false);
     });

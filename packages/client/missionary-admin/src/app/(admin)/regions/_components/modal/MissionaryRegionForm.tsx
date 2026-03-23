@@ -11,6 +11,7 @@ import {
   type MissionaryRegionFormValues,
 } from '../../_schemas/missionaryRegionSchema';
 import { formatDate } from '../../_utils/formatDate';
+import { formatPhoneNumber } from '../../_utils/formatPhoneNumber';
 import { MissionGroupSelect } from '../MissionGroupSelect';
 
 import type { RegionListItem } from 'apis/missionaryRegion';
@@ -46,7 +47,7 @@ export function MissionaryRegionForm({
         : (defaultMissionGroupId ?? ''),
       name: region?.name ?? '',
       pastorName: region?.pastorName ?? '',
-      pastorPhone: region?.pastorPhone ?? '',
+      pastorPhone: formatPhoneNumber(region?.pastorPhone ?? ''),
       addressBasic: region?.addressBasic ?? '',
       addressDetail: region?.addressDetail ?? '',
       note: region?.note ?? '',
@@ -108,11 +109,25 @@ export function MissionaryRegionForm({
               placeholder="담당 목사 이름"
               {...form.register('pastorName')}
             />
-            <InputField
-              label="목사연락처"
-              placeholder="010-0000-0000"
-              {...form.register('pastorPhone')}
-              error={form.formState.errors.pastorPhone?.message}
+            <Controller
+              name="pastorPhone"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <InputField
+                  label="목사연락처"
+                  placeholder="010-0000-0000"
+                  value={field.value ?? ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    field.onChange(formatPhoneNumber(e.target.value));
+                  }}
+                  onBlur={field.onBlur}
+                  ref={field.ref}
+                  name={field.name}
+                  error={fieldState.error?.message}
+                  inputMode="numeric"
+                  maxLength={13}
+                />
+              )}
             />
           </div>
 
