@@ -58,13 +58,16 @@ const NAV_ITEMS: NavItemConfig[] = [
 function SidebarNavItem({
   item,
   isActive,
+  onClick,
 }: {
   item: NavItemConfig;
   isActive: boolean;
+  onClick: () => void;
 }) {
   return (
     <Link
       href={item.href}
+      onClick={onClick}
       className={`
         relative flex items-center gap-3 h-11 mx-3 px-3 rounded-lg
         text-sm font-medium transition-colors duration-150
@@ -134,7 +137,12 @@ export function Sidebar() {
                 : pathname.startsWith(item.href);
 
             return (
-              <SidebarNavItem key={item.href} item={item} isActive={isActive} />
+              <SidebarNavItem
+                key={item.href}
+                item={item}
+                isActive={isActive}
+                onClick={close}
+              />
             );
           })}
         </nav>

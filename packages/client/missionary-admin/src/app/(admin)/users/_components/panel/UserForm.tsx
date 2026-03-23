@@ -12,6 +12,7 @@ import {
 } from '@samilhero/design-system';
 import { useAuth } from 'lib/auth/AuthContext';
 import { ROLE_LABELS } from 'lib/constants/role';
+import { formatDate } from 'lib/utils/formatDate';
 import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -22,7 +23,6 @@ import {
   userUpdateSchema,
   type UserUpdateFormValues,
 } from '../../_schemas/userSchema';
-import { formatDate } from '../../_utils/formatDate';
 import { maskIdentityNumber } from '../../_utils/maskIdentityNumber';
 
 import type { User } from 'apis/user';

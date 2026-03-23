@@ -1,9 +1,8 @@
 'use client';
 
 import { Button } from '@samilhero/design-system';
+import { formatDate } from 'lib/utils/formatDate';
 import { Pencil, Trash2 } from 'lucide-react';
-
-import { formatDate } from '../_utils/formatDate';
 
 import type { RegionListItem } from 'apis/missionaryRegion';
 

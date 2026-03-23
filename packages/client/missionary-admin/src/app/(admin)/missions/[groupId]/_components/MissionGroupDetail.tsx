@@ -2,12 +2,12 @@
 
 import { Button } from '@samilhero/design-system';
 import { type MissionGroupDetail as MissionGroupDetailType } from 'apis/missionGroup';
+import { formatDateDotted } from 'lib/utils/formatDate';
 import { CalendarX, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 
 import { MissionStatusBadge } from '../../_components/MissionStatusBadge';
-import { formatDate } from '../../_utils/formatDate';
 
 interface MissionGroupDetailProps {
   group: MissionGroupDetailType;
@@ -124,8 +124,8 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
                     {mission.order}차
                   </td>
                   <td className="px-5 py-3.5 text-sm text-gray-500">
-                    {formatDate(mission.startDate)} ~{' '}
-                    {formatDate(mission.endDate)}
+                    {formatDateDotted(mission.startDate)} ~{' '}
+                    {formatDateDotted(mission.endDate)}
                   </td>
                   <td className="px-5 py-3.5 text-sm text-gray-500">
                     {mission.pastorName || '—'}

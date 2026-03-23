@@ -1,11 +1,10 @@
 'use client';
 
+import { useGetMissionGroups } from 'hooks/missionGroup';
 import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
 import { useMemo, useState } from 'react';
-
-import { useGetMissionGroups } from '../_hooks/useGetMissionGroups';
 
 type GroupFilter = 'ALL' | 'DOMESTIC' | 'ABROAD';
 

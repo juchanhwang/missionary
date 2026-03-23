@@ -1,7 +1,7 @@
 'use client';
 
 import { useSafeContext } from '@samilhero/design-system';
-import { createContext, useCallback, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 
 interface SidebarContextValue {
   isOpen: boolean;
@@ -31,8 +31,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     return () => mql.removeEventListener('change', handleChange);
   }, []);
 
-  const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
-  const close = useCallback(() => setIsOpen(false), []);
+  const toggle = () => setIsOpen((prev) => !prev);
+  const close = () => setIsOpen(false);
 
   return (
     <SidebarContext.Provider value={{ isOpen, toggle, close }}>

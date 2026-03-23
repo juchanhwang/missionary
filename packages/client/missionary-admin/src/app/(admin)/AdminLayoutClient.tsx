@@ -6,8 +6,8 @@ import {
   AuthErrorFallback,
   AuthLoadingFallback,
 } from 'components/boundary';
-import { Header } from 'components/header/Header';
-import { Sidebar } from 'components/sidebar/Sidebar';
+import { Header } from 'components/header';
+import { Sidebar } from 'components/sidebar';
 import { AuthProvider } from 'lib/auth/AuthContext';
 import { SidebarProvider } from 'lib/sidebar/SidebarContext';
 

@@ -1,10 +1,10 @@
+import { useGetMissionGroups } from 'hooks/missionGroup';
 import { render, screen } from 'test/test-utils';
 import { vi } from 'vitest';
 
 import { GroupPanel } from './GroupPanel';
-import { useGetMissionGroups } from '../_hooks/useGetMissionGroups';
 
-vi.mock('../_hooks/useGetMissionGroups', () => ({
+vi.mock('hooks/missionGroup', () => ({
   useGetMissionGroups: vi.fn(),
 }));
 
