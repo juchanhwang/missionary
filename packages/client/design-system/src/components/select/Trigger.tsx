@@ -38,7 +38,7 @@ export const SelectTrigger = ({
       type="button"
       data-state={data.open ? 'open' : 'closed'}
       className={cn(
-        'flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 transition-colors hover:border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:cursor-not-allowed disabled:opacity-50',
+        'flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white transition-colors hover:border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50 disabled:border-gray-100',
         sizeClass.container,
         sizeClass.text,
         'data-[state=open]:border-gray-400 data-[state=open]:ring-1 data-[state=open]:ring-gray-400',
