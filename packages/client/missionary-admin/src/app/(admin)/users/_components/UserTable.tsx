@@ -1,12 +1,16 @@
 'use client';
 
-import { Badge } from '@samilhero/design-system';
 import {
-  AdminTable,
-  NULL_PLACEHOLDER,
-  TABLE_STYLES,
-  type Column,
-} from 'components/table';
+  Badge,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@samilhero/design-system';
+import { TableEmptyState, TableSkeleton } from 'components/table';
 import { ROLE_LABELS } from 'lib/constants/role';
 import { formatDate } from 'lib/utils/formatDate';
 import { Check, X } from 'lucide-react';
@@ -14,6 +18,23 @@ import { Check, X } from 'lucide-react';
 import { maskIdentityNumber } from '../_utils/maskIdentityNumber';
 
 import type { User } from 'apis/user';
+import type { SkeletonColumn } from 'components/table';
+
+const NULL_PLACEHOLDER = '—';
+
+const SKELETON_COLUMNS: SkeletonColumn[] = [
+  { width: 'w-16' },
+  { width: 'w-32' },
+  { width: 'w-12', rounded: 'full' },
+  { width: 'w-14', rounded: 'full' },
+  { width: 'w-20' },
+  { width: 'w-28' },
+  { width: 'w-20' },
+  { width: 'w-6' },
+  { width: 'w-5', rounded: 'full' },
+  { width: 'w-24' },
+  { width: 'w-20' },
+];
 
 interface UserTableProps {
   users: User[];
@@ -51,91 +72,55 @@ function formatGender(gender: string | null): string {
   return gender;
 }
 
-function buildColumns(
-  selectedUserId: string | null | undefined,
-): Column<User>[] {
-  return [
-    {
-      key: 'name',
-      header: '이름',
-      headerClassName: 'sticky left-0 bg-gray-50 z-20',
-      cellClassName:
-        'px-5 py-3.5 whitespace-nowrap sticky left-0 z-10 bg-white relative',
-      render: (user) => {
-        const isSelected = selectedUserId === user.id;
-        return (
-          <>
-            <div
-              className={`absolute inset-0 pointer-events-none transition-colors ${
-                isSelected ? 'bg-blue-50/5' : 'group-hover:bg-gray-50'
-              }`}
-            />
-            <span className="relative text-sm font-semibold text-gray-900">
-              {user.name || NULL_PLACEHOLDER}
-            </span>
-          </>
-        );
-      },
-      skeleton: { width: 'w-16' },
-    },
-    {
-      key: 'email',
-      header: '이메일',
-      render: (user) => user.email || NULL_PLACEHOLDER,
-      skeleton: { width: 'w-32' },
-    },
-    {
-      key: 'role',
-      header: '역할',
-      cellClassName: 'px-5 py-3.5 whitespace-nowrap',
-      render: (user) => (
+function UserRow({
+  user,
+  isSelected,
+  onRowClick,
+}: {
+  user: User;
+  isSelected: boolean;
+  onRowClick: (id: string) => void;
+}) {
+  return (
+    <TableRow
+      role="button"
+      className={`cursor-pointer group ${
+        isSelected ? 'bg-blue-50/5' : 'hover:bg-gray-50'
+      }`}
+      onClick={() => onRowClick(user.id)}
+      onKeyDown={(e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') onRowClick(user.id);
+      }}
+      tabIndex={0}
+      aria-current={isSelected ? 'true' : undefined}
+    >
+      <TableCell className="sticky left-0 z-10 bg-white relative">
+        <div
+          className={`absolute inset-0 pointer-events-none transition-colors ${
+            isSelected ? 'bg-blue-50/5' : 'group-hover:bg-gray-50'
+          }`}
+        />
+        <span className="relative text-sm font-semibold text-gray-900">
+          {user.name || NULL_PLACEHOLDER}
+        </span>
+      </TableCell>
+      <TableCell>{user.email || NULL_PLACEHOLDER}</TableCell>
+      <TableCell>
         <Badge variant={getRoleBadgeVariant(user.role)}>
           {ROLE_LABELS[user.role] ?? user.role}
         </Badge>
-      ),
-      skeleton: { width: 'w-12', rounded: 'full' },
-    },
-    {
-      key: 'provider',
-      header: '인증방식',
-      cellClassName: 'px-5 py-3.5 whitespace-nowrap',
-      render: (user) => (
+      </TableCell>
+      <TableCell>
         <Badge variant={getProviderBadgeVariant(user.provider)}>
           {user.provider || NULL_PLACEHOLDER}
         </Badge>
-      ),
-      skeleton: { width: 'w-14', rounded: 'full' },
-    },
-    {
-      key: 'loginId',
-      header: '로그인ID',
-      render: (user) => user.loginId || NULL_PLACEHOLDER,
-      skeleton: { width: 'w-20' },
-    },
-    {
-      key: 'phoneNumber',
-      header: '전화번호',
-      render: (user) => user.phoneNumber || NULL_PLACEHOLDER,
-      skeleton: { width: 'w-28' },
-    },
-    {
-      key: 'birthDate',
-      header: '생년월일',
-      render: (user) => formatDate(user.birthDate),
-      skeleton: { width: 'w-20' },
-    },
-    {
-      key: 'gender',
-      header: '성별',
-      render: (user) => formatGender(user.gender),
-      skeleton: { width: 'w-6' },
-    },
-    {
-      key: 'isBaptized',
-      header: '세례',
-      cellClassName: 'px-5 py-3.5 whitespace-nowrap',
-      render: (user) =>
-        user.isBaptized ? (
+      </TableCell>
+      <TableCell>{user.loginId || NULL_PLACEHOLDER}</TableCell>
+      <TableCell>{user.phoneNumber || NULL_PLACEHOLDER}</TableCell>
+      <TableCell>{formatDate(user.birthDate)}</TableCell>
+      <TableCell>{formatGender(user.gender)}</TableCell>
+      <TableCell>
+        {user.isBaptized ? (
           <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-10 text-green-60">
             <Check size={12} strokeWidth={2.5} />
           </span>
@@ -143,23 +128,14 @@ function buildColumns(
           <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-300">
             <X size={12} strokeWidth={2.5} />
           </span>
-        ),
-      skeleton: { width: 'w-5', rounded: 'full' },
-    },
-    {
-      key: 'identityNumber',
-      header: '주민번호',
-      render: (user) => maskIdentityNumber(user.identityNumber),
-      skeleton: { width: 'w-24' },
-    },
-    {
-      key: 'createdAt',
-      header: '가입일',
-      cellClassName: TABLE_STYLES.bodyCellDate,
-      render: (user) => formatDate(user.createdAt),
-      skeleton: { width: 'w-20' },
-    },
-  ];
+        )}
+      </TableCell>
+      <TableCell>{maskIdentityNumber(user.identityNumber)}</TableCell>
+      <TableCell className="text-xs text-gray-400">
+        {formatDate(user.createdAt)}
+      </TableCell>
+    </TableRow>
+  );
 }
 
 export function UserTable({
@@ -168,21 +144,47 @@ export function UserTable({
   selectedUserId,
   onRowClick,
 }: UserTableProps) {
-  const columns = buildColumns(selectedUserId);
-
   return (
-    <AdminTable
-      data={users}
-      columns={columns}
-      caption="유저 목록"
-      getRowKey={(user) => user.id}
-      isLoading={isLoading}
-      onRowClick={(user) => onRowClick(user.id)}
-      isRowSelected={(user) => selectedUserId === user.id}
-      rowClassName="group"
-      stickyHeader
-      minWidth="1200px"
-      emptyMessage="조건에 맞는 유저가 없습니다"
-    />
+    <div className="flex-1 min-h-0 overflow-auto">
+      <Table style={{ minWidth: '1200px' }}>
+        <TableCaption>유저 목록</TableCaption>
+        <TableHeader className="sticky top-0 z-10">
+          <TableRow>
+            <TableHead className="sticky left-0 bg-gray-50 z-20">
+              이름
+            </TableHead>
+            <TableHead>이메일</TableHead>
+            <TableHead>역할</TableHead>
+            <TableHead>인증방식</TableHead>
+            <TableHead>로그인ID</TableHead>
+            <TableHead>전화번호</TableHead>
+            <TableHead>생년월일</TableHead>
+            <TableHead>성별</TableHead>
+            <TableHead>세례</TableHead>
+            <TableHead>주민번호</TableHead>
+            <TableHead>가입일</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading ? (
+            <TableSkeleton columns={SKELETON_COLUMNS} />
+          ) : users.length === 0 ? (
+            <TableEmptyState
+              colSpan={11}
+              message="조건에 맞는 유저가 없습니다"
+            />
+          ) : (
+            users.map((user) => (
+              <UserRow
+                key={user.id}
+                user={user}
+                isSelected={selectedUserId === user.id}
+                onRowClick={onRowClick}
+              />
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

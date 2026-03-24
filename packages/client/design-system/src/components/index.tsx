@@ -20,5 +20,15 @@ export { Pagination } from './pagination';
 export { IconButton } from './icon-button';
 export { NavItem } from './nav-item';
 export { DatePicker } from './date-picker';
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableRow,
+  TableHead,
+  TableCell,
+  TableCaption,
+} from './table';
 
 export type { FormSize } from './form-size';

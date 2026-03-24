@@ -1,5 +1,5 @@
 import { createMockRegion, createMockRegionList } from 'test/mocks/data';
-import { render, screen, within } from 'test/test-utils';
+import { render, screen } from 'test/test-utils';
 import { vi } from 'vitest';
 
 import { MissionaryRegionTable } from './MissionaryRegionTable';
@@ -45,13 +45,12 @@ describe('MissionaryRegionTable', () => {
 
     render(<MissionaryRegionTable {...defaultProps} regions={[region]} />);
 
-    const rows = screen.getAllByRole('row');
-    // 헤더 1행 + 데이터 1행
-    expect(rows).toHaveLength(2);
+    // isAdmin=true인 행은 role="button"이므로 tbody tr로 직접 조회
+    const table = screen.getByRole('table');
+    const dataRows = table.querySelectorAll('tbody tr');
+    expect(dataRows).toHaveLength(1);
 
-    const dataRow = rows[1];
-    const cells = within(dataRow).getAllByRole('cell');
-
+    const cells = dataRows[0].querySelectorAll('td');
     expect(cells[0]).toHaveTextContent('인도 선교');
     expect(cells[1]).toHaveTextContent('부산교회');
     expect(cells[2]).toHaveTextContent('박목사');
@@ -122,10 +121,10 @@ describe('MissionaryRegionTable', () => {
 
     render(<MissionaryRegionTable {...defaultProps} regions={[region]} />);
 
-    const rows = screen.getAllByRole('row');
-    const cells = within(rows[1]).getAllByRole('cell');
+    const table = screen.getByRole('table');
+    const cells = table.querySelectorAll('tbody tr td');
 
-    // 목사명, 목사연락처
+    // 목사명(index 2), 목사연락처(index 3)
     expect(cells[2]).toHaveTextContent('—');
     expect(cells[3]).toHaveTextContent('—');
   });
