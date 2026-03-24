@@ -1,7 +1,9 @@
 'use client';
 
 import { Button } from '@samilhero/design-system';
+import { type Missionary } from 'apis/missionary';
 import { type MissionGroupDetail as MissionGroupDetailType } from 'apis/missionGroup';
+import { AdminTable, NULL_PLACEHOLDER, type Column } from 'components/table';
 import { formatDateDotted } from 'lib/utils/formatDate';
 import { CalendarX, Pencil } from 'lucide-react';
 import Link from 'next/link';
@@ -13,12 +15,67 @@ interface MissionGroupDetailProps {
   group: MissionGroupDetailType;
 }
 
+function buildColumns(groupId: string): Column<Missionary>[] {
+  return [
+    {
+      key: 'name',
+      header: '선교명',
+      cellClassName: 'px-5 py-3.5 text-sm font-medium text-gray-900',
+      render: (m) => (
+        <Link
+          href={`/missions/${groupId}/${m.id}/edit`}
+          className="text-sm font-medium text-gray-900 hover:text-primary-60 hover:underline"
+        >
+          {m.name}
+        </Link>
+      ),
+      skeleton: { width: 'w-24' },
+    },
+    {
+      key: 'order',
+      header: '차수',
+      render: (m) => `${m.order}차`,
+      skeleton: { width: 'w-12' },
+    },
+    {
+      key: 'period',
+      header: '선교 기간',
+      render: (m) =>
+        `${formatDateDotted(m.startDate)} ~ ${formatDateDotted(m.endDate)}`,
+      skeleton: { width: 'w-32' },
+    },
+    {
+      key: 'pastorName',
+      header: '담당 교역자',
+      render: (m) => m.pastorName || NULL_PLACEHOLDER,
+      skeleton: { width: 'w-16' },
+    },
+    {
+      key: 'maxParticipants',
+      header: '최대 인원',
+      render: (m) =>
+        m.maximumParticipantCount != null
+          ? `${m.maximumParticipantCount}명`
+          : NULL_PLACEHOLDER,
+      skeleton: { width: 'w-12' },
+    },
+    {
+      key: 'status',
+      header: '상태',
+      cellClassName: 'px-5 py-3.5',
+      render: (m) => <MissionStatusBadge status={m.status} />,
+      skeleton: { width: 'w-16', rounded: 'full' },
+    },
+  ];
+}
+
 export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
   const router = useRouter();
   const params = useParams();
   const groupId = params.groupId as string;
 
-  const missionCount = group.missionaries?.length ?? 0;
+  const missionaries = group.missionaries ?? [];
+  const columns = buildColumns(groupId);
 
   return (
     <div className="flex flex-col flex-1 p-8 gap-5 overflow-y-auto">
@@ -63,86 +120,22 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
           <p className="text-sm font-semibold text-gray-900">
             선교 목록
             <span className="ml-1.5 text-xs font-normal text-gray-400">
-              {missionCount}건
+              {missionaries.length}건
             </span>
           </p>
         </div>
 
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                선교명
-              </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                차수
-              </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                선교 기간
-              </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                담당 교역자
-              </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                최대 인원
-              </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                상태
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {missionCount === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-5 py-16 text-center">
-                  <div className="flex flex-col items-center gap-2">
-                    <CalendarX size={32} className="text-gray-300" />
-                    <p className="text-sm text-gray-500">
-                      등록된 선교가 없습니다
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      &apos;선교 추가&apos; 버튼으로 새 선교를 등록하세요
-                    </p>
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              group.missionaries?.map((mission) => (
-                <tr
-                  key={mission.id}
-                  className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-5 py-3.5 text-sm font-medium text-gray-900">
-                    <Link
-                      href={`/missions/${groupId}/${mission.id}/edit`}
-                      className="text-sm font-medium text-gray-900 hover:text-primary-60 hover:underline"
-                    >
-                      {mission.name}
-                    </Link>
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    {mission.order}차
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    {formatDateDotted(mission.startDate)} ~{' '}
-                    {formatDateDotted(mission.endDate)}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    {mission.pastorName || '—'}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    {mission.maximumParticipantCount != null
-                      ? `${mission.maximumParticipantCount}명`
-                      : '—'}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <MissionStatusBadge status={mission.status} />
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <AdminTable
+          data={missionaries}
+          columns={columns}
+          caption={`${group.name} 선교 목록`}
+          getRowKey={(m) => m.id}
+          emptyIcon={<CalendarX size={32} className="text-gray-300" />}
+          emptyMessage="등록된 선교가 없습니다"
+          emptySubMessage="'선교 추가' 버튼으로 새 선교를 등록하세요"
+          rowClassName="hover:bg-gray-50"
+          wrapperClassName=""
+        />
       </div>
     </div>
   );

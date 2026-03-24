@@ -1,6 +1,12 @@
 'use client';
 
 import { Badge } from '@samilhero/design-system';
+import {
+  AdminTable,
+  NULL_PLACEHOLDER,
+  TABLE_STYLES,
+  type Column,
+} from 'components/table';
 import { ROLE_LABELS } from 'lib/constants/role';
 import { formatDate } from 'lib/utils/formatDate';
 import { Check, X } from 'lucide-react';
@@ -39,54 +45,121 @@ function getProviderBadgeVariant(provider: string | null) {
 }
 
 function formatGender(gender: string | null): string {
-  if (!gender) return '-';
+  if (!gender) return NULL_PLACEHOLDER;
   if (gender === 'M' || gender === 'MALE') return '남';
   if (gender === 'F' || gender === 'FEMALE') return '여';
   return gender;
 }
 
-function SkeletonRows() {
-  return (
-    <>
-      {Array.from({ length: 5 }, (_, i) => (
-        <tr key={i} className="border-b border-gray-200">
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-16 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-5 w-12 bg-gray-100 rounded-full animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-5 w-14 bg-gray-100 rounded-full animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-28 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-6 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-5 w-5 bg-gray-100 rounded-full animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-24 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
-          </td>
-        </tr>
-      ))}
-    </>
-  );
+function buildColumns(
+  selectedUserId: string | null | undefined,
+): Column<User>[] {
+  return [
+    {
+      key: 'name',
+      header: '이름',
+      headerClassName: 'sticky left-0 bg-gray-50 z-20',
+      cellClassName:
+        'px-5 py-3.5 whitespace-nowrap sticky left-0 z-10 bg-white relative',
+      render: (user) => {
+        const isSelected = selectedUserId === user.id;
+        return (
+          <>
+            <div
+              className={`absolute inset-0 pointer-events-none transition-colors ${
+                isSelected ? 'bg-blue-50/5' : 'group-hover:bg-gray-50'
+              }`}
+            />
+            <span className="relative text-sm font-semibold text-gray-900">
+              {user.name || NULL_PLACEHOLDER}
+            </span>
+          </>
+        );
+      },
+      skeleton: { width: 'w-16' },
+    },
+    {
+      key: 'email',
+      header: '이메일',
+      render: (user) => user.email || NULL_PLACEHOLDER,
+      skeleton: { width: 'w-32' },
+    },
+    {
+      key: 'role',
+      header: '역할',
+      cellClassName: 'px-5 py-3.5 whitespace-nowrap',
+      render: (user) => (
+        <Badge variant={getRoleBadgeVariant(user.role)}>
+          {ROLE_LABELS[user.role] ?? user.role}
+        </Badge>
+      ),
+      skeleton: { width: 'w-12', rounded: 'full' },
+    },
+    {
+      key: 'provider',
+      header: '인증방식',
+      cellClassName: 'px-5 py-3.5 whitespace-nowrap',
+      render: (user) => (
+        <Badge variant={getProviderBadgeVariant(user.provider)}>
+          {user.provider || NULL_PLACEHOLDER}
+        </Badge>
+      ),
+      skeleton: { width: 'w-14', rounded: 'full' },
+    },
+    {
+      key: 'loginId',
+      header: '로그인ID',
+      render: (user) => user.loginId || NULL_PLACEHOLDER,
+      skeleton: { width: 'w-20' },
+    },
+    {
+      key: 'phoneNumber',
+      header: '전화번호',
+      render: (user) => user.phoneNumber || NULL_PLACEHOLDER,
+      skeleton: { width: 'w-28' },
+    },
+    {
+      key: 'birthDate',
+      header: '생년월일',
+      render: (user) => formatDate(user.birthDate),
+      skeleton: { width: 'w-20' },
+    },
+    {
+      key: 'gender',
+      header: '성별',
+      render: (user) => formatGender(user.gender),
+      skeleton: { width: 'w-6' },
+    },
+    {
+      key: 'isBaptized',
+      header: '세례',
+      cellClassName: 'px-5 py-3.5 whitespace-nowrap',
+      render: (user) =>
+        user.isBaptized ? (
+          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-10 text-green-60">
+            <Check size={12} strokeWidth={2.5} />
+          </span>
+        ) : (
+          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-300">
+            <X size={12} strokeWidth={2.5} />
+          </span>
+        ),
+      skeleton: { width: 'w-5', rounded: 'full' },
+    },
+    {
+      key: 'identityNumber',
+      header: '주민번호',
+      render: (user) => maskIdentityNumber(user.identityNumber),
+      skeleton: { width: 'w-24' },
+    },
+    {
+      key: 'createdAt',
+      header: '가입일',
+      cellClassName: TABLE_STYLES.bodyCellDate,
+      render: (user) => formatDate(user.createdAt),
+      skeleton: { width: 'w-20' },
+    },
+  ];
 }
 
 export function UserTable({
@@ -95,162 +168,21 @@ export function UserTable({
   selectedUserId,
   onRowClick,
 }: UserTableProps) {
-  if (!isLoading && users.length === 0) {
-    return (
-      <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
-        조건에 맞는 유저가 없습니다
-      </div>
-    );
-  }
+  const columns = buildColumns(selectedUserId);
 
   return (
-    <div className="flex-1 min-h-0 overflow-auto">
-      <table className="w-full text-left min-w-[1200px]">
-        <caption className="sr-only">유저 목록</caption>
-        <thead className="sticky top-0 z-10">
-          <tr className="border-b border-gray-200 bg-gray-50">
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap sticky left-0 bg-gray-50 z-20"
-            >
-              이름
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              이메일
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              역할
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              인증방식
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              로그인ID
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              전화번호
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              생년월일
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              성별
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              세례
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              주민번호
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              가입일
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {isLoading ? (
-            <SkeletonRows />
-          ) : (
-            users.map((user) => {
-              const isSelected = selectedUserId === user.id;
-
-              return (
-                <tr
-                  key={user.id}
-                  onClick={() => onRowClick(user.id)}
-                  aria-selected={isSelected}
-                  className={`border-b border-gray-200 last:border-b-0 transition-colors duration-150 cursor-pointer group ${
-                    isSelected ? 'bg-blue-50/5' : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <td className="px-5 py-3.5 whitespace-nowrap sticky left-0 z-10 bg-white relative">
-                    <div
-                      className={`absolute inset-0 pointer-events-none transition-colors ${
-                        isSelected ? 'bg-blue-50/5' : 'group-hover:bg-gray-50'
-                      }`}
-                    />
-                    <span className="relative text-sm font-semibold text-gray-900">
-                      {user.name || '-'}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {user.email || '-'}
-                  </td>
-                  <td className="px-5 py-3.5 whitespace-nowrap">
-                    <Badge variant={getRoleBadgeVariant(user.role)}>
-                      {ROLE_LABELS[user.role] ?? user.role}
-                    </Badge>
-                  </td>
-                  <td className="px-5 py-3.5 whitespace-nowrap">
-                    <Badge variant={getProviderBadgeVariant(user.provider)}>
-                      {user.provider || '-'}
-                    </Badge>
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {user.loginId || '-'}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {user.phoneNumber || '-'}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {formatDate(user.birthDate)}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {formatGender(user.gender)}
-                  </td>
-                  <td className="px-5 py-3.5 whitespace-nowrap">
-                    {user.isBaptized ? (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-10 text-green-60">
-                        <Check size={12} strokeWidth={2.5} />
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 text-gray-300">
-                        <X size={12} strokeWidth={2.5} />
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {maskIdentityNumber(user.identityNumber)}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {formatDate(user.createdAt)}
-                  </td>
-                </tr>
-              );
-            })
-          )}
-        </tbody>
-      </table>
-    </div>
+    <AdminTable
+      data={users}
+      columns={columns}
+      caption="유저 목록"
+      getRowKey={(user) => user.id}
+      isLoading={isLoading}
+      onRowClick={(user) => onRowClick(user.id)}
+      isRowSelected={(user) => selectedUserId === user.id}
+      rowClassName="group"
+      stickyHeader
+      minWidth="1200px"
+      emptyMessage="조건에 맞는 유저가 없습니다"
+    />
   );
 }
