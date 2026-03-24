@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@samilhero/design-system';
-import { useEffect, useRef } from 'react';
+import { useEffect, useEffectEvent, useRef } from 'react';
 
 export interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -19,6 +19,10 @@ export function DeleteConfirmModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
+  const onClose = useEffectEvent((confirmed: boolean) => {
+    close(confirmed);
+  });
+
   useEffect(() => {
     if (!isOpen || !dialogRef.current) return;
 
@@ -33,7 +37,7 @@ export function DeleteConfirmModal({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        close(false);
+        onClose(false);
         return;
       }
 
@@ -60,7 +64,7 @@ export function DeleteConfirmModal({
       document.body.inert = false;
       previousFocusRef.current?.focus();
     };
-  }, [isOpen, close]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

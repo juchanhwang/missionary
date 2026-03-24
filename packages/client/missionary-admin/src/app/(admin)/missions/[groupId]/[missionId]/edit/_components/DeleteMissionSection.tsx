@@ -3,7 +3,13 @@
 import { overlay } from '@samilhero/design-system';
 import { Ellipsis, Trash2 } from 'lucide-react';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
-import { useEffect, useRef, useState, useTransition } from 'react';
+import {
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import { toast } from 'sonner';
 
 import { DeleteConfirmModal } from './DeleteConfirmModal';
@@ -25,10 +31,10 @@ export function DeleteMissionSection({
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const closeMenu = () => {
+  const closeMenu = useEffectEvent(() => {
     setIsMenuOpen(false);
     triggerRef.current?.focus();
-  };
+  });
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -51,7 +57,7 @@ export function DeleteMissionSection({
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isMenuOpen, closeMenu]);
+  }, [isMenuOpen]);
 
   const handleDelete = async () => {
     setIsMenuOpen(false);
