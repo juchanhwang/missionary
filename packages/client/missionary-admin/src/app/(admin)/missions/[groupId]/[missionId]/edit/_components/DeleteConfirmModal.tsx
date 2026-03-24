@@ -17,9 +17,13 @@ export function DeleteConfirmModal({
   isPending = false,
 }: DeleteConfirmModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!isOpen || !dialogRef.current) return;
+
+    previousFocusRef.current = document.activeElement as HTMLElement;
+    document.body.inert = true;
 
     const dialog = dialogRef.current;
     const focusable = dialog.querySelectorAll<HTMLElement>(
@@ -51,7 +55,11 @@ export function DeleteConfirmModal({
     };
 
     dialog.addEventListener('keydown', handleKeyDown);
-    return () => dialog.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      dialog.removeEventListener('keydown', handleKeyDown);
+      document.body.inert = false;
+      previousFocusRef.current?.focus();
+    };
   }, [isOpen, close]);
 
   if (!isOpen) return null;
