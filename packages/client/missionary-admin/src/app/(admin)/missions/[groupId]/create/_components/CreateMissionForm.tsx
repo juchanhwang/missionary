@@ -1,12 +1,13 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@samilhero/design-system';
 import { LoadingSpinner } from 'components/loading';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
+import { FormPageLayout } from '../../../_components/FormPageLayout';
 import { MissionForm } from '../../../_components/MissionForm';
 import {
   missionSchema,
@@ -14,12 +15,12 @@ import {
 } from '../../../_schemas/missionSchema';
 import { toMissionPayload } from '../../../_utils/toMissionPayload';
 import { useGetMissionGroup } from '../../_hooks/useGetMissionGroup';
+import { useMissionGroupId } from '../../_hooks/useMissionGroupId';
 import { useCreateMissionaryAction } from '../_hooks/useCreateMissionaryAction';
 
 export function CreateMissionForm() {
   const router = useRouter();
-  const params = useParams();
-  const groupId = params.groupId as string;
+  const groupId = useMissionGroupId();
 
   const { data: group, isLoading: isGroupLoading } =
     useGetMissionGroup(groupId);
@@ -56,8 +57,8 @@ export function CreateMissionForm() {
       onSuccess: () => {
         router.push(`/missions/${groupId}`);
       },
-      onError: (error) => {
-        console.error(error);
+      onError: () => {
+        toast.error('선교 생성에 실패했습니다');
       },
     });
   };
@@ -75,37 +76,16 @@ export function CreateMissionForm() {
   }
 
   return (
-    <form
+    <FormPageLayout
       onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col flex-1 p-8 gap-5 overflow-y-auto"
+      title="선교 생성"
+      description={`${group.name} 그룹에 새로운 선교를 추가합니다`}
+      onCancel={() => router.push(`/missions/${groupId}`)}
+      submitLabel="생성하기"
+      pendingLabel="생성 중..."
+      isPending={createMutation.isPending}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1.5">
-          <h2 className="text-lg font-semibold text-gray-900">선교 생성</h2>
-          <p className="text-sm text-gray-400">
-            {group.name} 그룹에 새로운 선교를 추가합니다
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <MissionForm form={form} isPending={createMutation.isPending} />
-      </div>
-
-      <div className="flex items-center justify-end gap-3">
-        <Button
-          type="button"
-          color="neutral"
-          variant="outline"
-          size="md"
-          onClick={() => router.push(`/missions/${groupId}`)}
-        >
-          취소
-        </Button>
-        <Button type="submit" disabled={createMutation.isPending} size="md">
-          {createMutation.isPending ? '생성 중...' : '생성하기'}
-        </Button>
-      </div>
-    </form>
+      <MissionForm form={form} isPending={createMutation.isPending} />
+    </FormPageLayout>
   );
 }

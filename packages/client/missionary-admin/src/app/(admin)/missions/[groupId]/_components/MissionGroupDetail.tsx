@@ -5,9 +5,11 @@ import { type MissionGroupDetail as MissionGroupDetailType } from 'apis/missionG
 import { formatDateDotted } from 'lib/utils/formatDate';
 import { CalendarX, Pencil } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
+import { CategoryBadge } from '../../_components/CategoryBadge';
 import { MissionStatusBadge } from '../../_components/MissionStatusBadge';
+import { useMissionGroupId } from '../_hooks/useMissionGroupId';
 
 interface MissionGroupDetailProps {
   group: MissionGroupDetailType;
@@ -15,10 +17,9 @@ interface MissionGroupDetailProps {
 
 export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
   const router = useRouter();
-  const params = useParams();
-  const groupId = params.groupId as string;
+  const groupId = useMissionGroupId();
 
-  const missionCount = group.missionaries?.length ?? 0;
+  const missionaries = group.missionaries ?? [];
 
   return (
     <div className="flex flex-col flex-1 p-8 gap-5 overflow-y-auto">
@@ -28,15 +29,7 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
             <h2 className="text-lg font-semibold text-gray-900">
               {group.name}
             </h2>
-            <span
-              className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
-                group.category === 'ABROAD'
-                  ? 'bg-blue-10 text-blue-60'
-                  : 'bg-green-10 text-green-60'
-              }`}
-            >
-              {group.category === 'ABROAD' ? '해외' : '국내'}
-            </span>
+            <CategoryBadge category={group.category} />
             <button
               type="button"
               onClick={() => router.push(`/missions/${groupId}/edit-group`)}
@@ -63,7 +56,7 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
           <p className="text-sm font-semibold text-gray-900">
             선교 목록
             <span className="ml-1.5 text-xs font-normal text-gray-400">
-              {missionCount}건
+              {missionaries.length}건
             </span>
           </p>
         </div>
@@ -92,7 +85,7 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
             </tr>
           </thead>
           <tbody>
-            {missionCount === 0 ? (
+            {missionaries.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-5 py-16 text-center">
                   <div className="flex flex-col items-center gap-2">
@@ -107,7 +100,7 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
                 </td>
               </tr>
             ) : (
-              group.missionaries?.map((mission) => (
+              missionaries.map((mission) => (
                 <tr
                   key={mission.id}
                   className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"

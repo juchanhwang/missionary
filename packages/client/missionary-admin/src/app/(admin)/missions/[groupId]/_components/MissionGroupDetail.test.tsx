@@ -79,7 +79,7 @@ describe('MissionGroupDetail', () => {
     expect(screen.getByText('2차 필리핀 선교')).toBeInTheDocument();
     expect(screen.getByText('2건')).toBeInTheDocument();
     expect(screen.getByText('30명')).toBeInTheDocument();
-    expect(screen.getByText('모집중')).toBeInTheDocument();
+    expect(screen.getByText('모집 중')).toBeInTheDocument();
     expect(screen.getByText('완료')).toBeInTheDocument();
   });
 

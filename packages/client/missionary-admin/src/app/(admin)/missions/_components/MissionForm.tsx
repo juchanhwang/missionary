@@ -1,17 +1,10 @@
 'use client';
 
 import { DatePicker, InputField, Select } from '@samilhero/design-system';
-import { type MissionStatus } from 'apis/missionary';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 
 import { type MissionFormData } from '../_schemas/missionSchema';
-
-const STATUS_LABELS: Record<MissionStatus, string> = {
-  ENROLLMENT_OPENED: '모집 중',
-  ENROLLMENT_CLOSED: '모집 종료',
-  IN_PROGRESS: '진행 중',
-  COMPLETED: '완료',
-};
+import { MISSION_STATUS_LABEL } from '../_utils/missionStatus';
 
 interface MissionFormProps {
   form: UseFormReturn<MissionFormData>;
@@ -47,18 +40,17 @@ export function MissionForm({ form, isPending }: MissionFormProps) {
               >
                 <Select.Trigger disabled={isPending}>
                   {field.value
-                    ? STATUS_LABELS[field.value]
+                    ? MISSION_STATUS_LABEL[field.value]
                     : '상태를 선택하세요'}
                 </Select.Trigger>
                 <Select.Options>
-                  <Select.Option item="ENROLLMENT_OPENED">
-                    모집 중
-                  </Select.Option>
-                  <Select.Option item="ENROLLMENT_CLOSED">
-                    모집 종료
-                  </Select.Option>
-                  <Select.Option item="IN_PROGRESS">진행 중</Select.Option>
-                  <Select.Option item="COMPLETED">완료</Select.Option>
+                  {Object.entries(MISSION_STATUS_LABEL).map(
+                    ([status, label]) => (
+                      <Select.Option key={status} item={status}>
+                        {label}
+                      </Select.Option>
+                    ),
+                  )}
                 </Select.Options>
               </Select>
             )}
