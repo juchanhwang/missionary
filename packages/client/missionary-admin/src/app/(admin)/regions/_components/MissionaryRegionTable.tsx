@@ -1,10 +1,23 @@
 'use client';
 
-import { Button } from '@samilhero/design-system';
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@samilhero/design-system';
+import { TableEmptyState, TableSkeleton } from 'components/table';
 import { formatDate } from 'lib/utils/formatDate';
 import { Pencil, Trash2 } from 'lucide-react';
 
 import type { RegionListItem } from 'apis/missionaryRegion';
+import type { SkeletonColumn } from 'components/table';
+
+const NULL_PLACEHOLDER = '—';
 
 interface MissionaryRegionTableProps {
   regions: RegionListItem[];
@@ -14,52 +27,118 @@ interface MissionaryRegionTableProps {
   onDelete: (region: RegionListItem) => void;
 }
 
-function SkeletonRows({ isAdmin }: { isAdmin: boolean }) {
-  return (
-    <>
-      {Array.from({ length: 5 }, (_, i) => (
-        <tr key={i} className="border-b border-gray-200">
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-12 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-28 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-20 bg-gray-100 rounded animate-pulse" />
-          </td>
-          <td className="px-5 py-3.5">
-            <div className="h-4 w-24 bg-gray-100 rounded animate-pulse" />
-          </td>
-          {isAdmin && (
-            <td className="px-5 py-3.5">
-              <div className="flex items-center justify-center gap-1">
-                <div className="h-7 w-7 bg-gray-100 rounded animate-pulse" />
-                <div className="h-7 w-7 bg-gray-100 rounded animate-pulse" />
-              </div>
-            </td>
-          )}
-        </tr>
-      ))}
-    </>
-  );
-}
-
 function formatAddress(region: RegionListItem): string {
   const parts = [region.addressBasic, region.addressDetail].filter(Boolean);
   return parts.join(' ') || '';
+}
+
+function getSkeletonColumns(isAdmin: boolean): SkeletonColumn[] {
+  const columns: SkeletonColumn[] = [
+    { width: 'w-20' },
+    { width: 'w-20' },
+    { width: 'w-12' },
+    { width: 'w-28' },
+    { width: 'w-32' },
+    { width: 'w-20' },
+    { width: 'w-20' },
+    { width: 'w-24' },
+  ];
+  if (isAdmin) {
+    columns.push({ width: 'w-7' });
+  }
+  return columns;
+}
+
+function RegionRow({
+  region,
+  isAdmin,
+  onEdit,
+  onDelete,
+}: {
+  region: RegionListItem;
+  isAdmin: boolean;
+  onEdit: (region: RegionListItem) => void;
+  onDelete: (region: RegionListItem) => void;
+}) {
+  const fullAddress = formatAddress(region);
+
+  return (
+    <TableRow
+      className={isAdmin ? 'cursor-pointer hover:bg-gray-50' : undefined}
+      onClick={isAdmin ? () => onEdit(region) : undefined}
+      tabIndex={isAdmin ? 0 : undefined}
+      onKeyDown={
+        isAdmin
+          ? (e: React.KeyboardEvent) => {
+              if (e.key === 'Enter') onEdit(region);
+            }
+          : undefined
+      }
+    >
+      <TableCell className="w-[140px]">
+        {region.missionGroup?.name ?? NULL_PLACEHOLDER}
+      </TableCell>
+      <TableCell className="w-[140px]">{region.name}</TableCell>
+      <TableCell className="w-[100px]">
+        {region.pastorName ?? NULL_PLACEHOLDER}
+      </TableCell>
+      <TableCell className="w-[130px]">
+        {region.pastorPhone ?? NULL_PLACEHOLDER}
+      </TableCell>
+      <TableCell className="whitespace-normal">
+        <div
+          className="truncate max-w-[200px]"
+          title={fullAddress || undefined}
+        >
+          {fullAddress || NULL_PLACEHOLDER}
+        </div>
+      </TableCell>
+      <TableCell className="w-[100px] text-xs text-gray-400">
+        {formatDate(region.createdAt)}
+      </TableCell>
+      <TableCell className="w-[100px] text-xs text-gray-400">
+        {formatDate(region.updatedAt)}
+      </TableCell>
+      <TableCell className="w-[150px] whitespace-normal">
+        <div
+          className="truncate max-w-[150px]"
+          title={region.note || undefined}
+        >
+          {region.note || NULL_PLACEHOLDER}
+        </div>
+      </TableCell>
+      {isAdmin && (
+        <TableCell className="w-[112px] text-center">
+          <div className="flex items-center justify-center gap-1">
+            <Button
+              variant="outline"
+              color="neutral"
+              size="sm"
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                onEdit(region);
+              }}
+              aria-label={`${region.name} 수정`}
+            >
+              <Pencil size={14} />
+            </Button>
+            <Button
+              variant="outline"
+              color="neutral"
+              size="sm"
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                onDelete(region);
+              }}
+              aria-label={`${region.name} 삭제`}
+            >
+              <Trash2 size={14} />
+            </Button>
+          </div>
+        </TableCell>
+      )}
+    </TableRow>
+  );
 }
 
 export function MissionaryRegionTable({
@@ -69,170 +148,49 @@ export function MissionaryRegionTable({
   onEdit,
   onDelete,
 }: MissionaryRegionTableProps) {
+  const colCount = isAdmin ? 9 : 8;
+  const skeletonColumns = getSkeletonColumns(isAdmin);
+
   return (
     <div className="flex-1 min-h-0 overflow-auto">
-      <table className="w-full text-left min-w-[900px]">
-        <caption className="sr-only">연계지 목록</caption>
-        <thead className="sticky top-0 z-10">
-          <tr className="border-b border-gray-200 bg-gray-50">
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[140px]"
-            >
-              선교 그룹
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[140px]"
-            >
-              연계지
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
-            >
-              목사명
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[130px]"
-            >
-              목사연락처
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap"
-            >
-              주소
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
-            >
-              생성일
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[100px]"
-            >
-              수정일
-            </th>
-            <th
-              scope="col"
-              className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[150px]"
-            >
-              비고
-            </th>
+      <Table style={{ minWidth: '900px' }}>
+        <TableCaption>연계지 목록</TableCaption>
+        <TableHeader className="sticky top-0 z-10">
+          <TableRow>
+            <TableHead className="w-[140px]">선교 그룹</TableHead>
+            <TableHead className="w-[140px]">연계지</TableHead>
+            <TableHead className="w-[100px]">목사명</TableHead>
+            <TableHead className="w-[130px]">목사연락처</TableHead>
+            <TableHead>주소</TableHead>
+            <TableHead className="w-[100px]">생성일</TableHead>
+            <TableHead className="w-[100px]">수정일</TableHead>
+            <TableHead className="w-[150px]">비고</TableHead>
             {isAdmin && (
-              <th
-                scope="col"
-                className="px-5 py-3 text-xs font-semibold text-gray-400 whitespace-nowrap w-[112px] text-center"
-              >
-                액션
-              </th>
+              <TableHead className="w-[112px] text-center">액션</TableHead>
             )}
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {isLoading ? (
-            <SkeletonRows isAdmin={isAdmin} />
+            <TableSkeleton columns={skeletonColumns} />
           ) : regions.length === 0 ? (
-            <tr>
-              <td
-                colSpan={isAdmin ? 9 : 8}
-                className="px-5 py-16 text-center text-sm text-gray-400"
-              >
-                조건에 맞는 연계지가 없습니다
-              </td>
-            </tr>
+            <TableEmptyState
+              colSpan={colCount}
+              message="조건에 맞는 연계지가 없습니다"
+            />
           ) : (
-            regions.map((region) => {
-              const fullAddress = formatAddress(region);
-
-              return (
-                <tr
-                  key={region.id}
-                  className={`border-b border-gray-200 last:border-b-0 transition-colors duration-150 ${isAdmin ? 'cursor-pointer hover:bg-gray-50' : ''}`}
-                  onClick={isAdmin ? () => onEdit(region) : undefined}
-                  onKeyDown={
-                    isAdmin
-                      ? (e: React.KeyboardEvent) => {
-                          if (e.key === 'Enter') onEdit(region);
-                        }
-                      : undefined
-                  }
-                  tabIndex={isAdmin ? 0 : undefined}
-                >
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {region.missionGroup?.name ?? '—'}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {region.name}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {region.pastorName ?? '—'}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500 whitespace-nowrap">
-                    {region.pastorPhone ?? '—'}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    <div
-                      className="truncate max-w-[200px]"
-                      title={fullAddress || undefined}
-                    >
-                      {fullAddress || '—'}
-                    </div>
-                  </td>
-                  <td className="px-5 py-3.5 text-xs text-gray-400 whitespace-nowrap">
-                    {formatDate(region.createdAt)}
-                  </td>
-                  <td className="px-5 py-3.5 text-xs text-gray-400 whitespace-nowrap">
-                    {formatDate(region.updatedAt)}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    <div
-                      className="truncate max-w-[150px]"
-                      title={region.note || undefined}
-                    >
-                      {region.note || '—'}
-                    </div>
-                  </td>
-                  {isAdmin && (
-                    <td className="px-5 py-3.5 whitespace-nowrap text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Button
-                          variant="outline"
-                          color="neutral"
-                          size="sm"
-                          onClick={(e: React.MouseEvent) => {
-                            e.stopPropagation();
-                            onEdit(region);
-                          }}
-                          aria-label={`${region.name} 수정`}
-                        >
-                          <Pencil size={14} />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          color="neutral"
-                          size="sm"
-                          onClick={(e: React.MouseEvent) => {
-                            e.stopPropagation();
-                            onDelete(region);
-                          }}
-                          aria-label={`${region.name} 삭제`}
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              );
-            })
+            regions.map((r) => (
+              <RegionRow
+                key={r.id}
+                region={r}
+                isAdmin={isAdmin}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            ))
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
