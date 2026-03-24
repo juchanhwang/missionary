@@ -92,6 +92,7 @@ export function AdminTable<T>({
               return (
                 <tr
                   key={getRowKey(item)}
+                  role={clickable ? 'button' : undefined}
                   className={[
                     TABLE_STYLES.bodyRow,
                     clickable && 'cursor-pointer',
