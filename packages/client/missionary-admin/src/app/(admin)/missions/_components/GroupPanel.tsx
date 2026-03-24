@@ -1,10 +1,14 @@
 'use client';
 
+import { Chips, SearchBox } from '@samilhero/design-system';
+import { LoadingSpinner } from 'components/loading';
 import { useGetMissionGroups } from 'hooks/missionGroup';
-import { Plus, Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+
+import { CategoryBadge } from './CategoryBadge';
 
 type GroupFilter = 'ALL' | 'DOMESTIC' | 'ABROAD';
 
@@ -23,16 +27,34 @@ export function GroupPanel() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<GroupFilter>('ALL');
 
-  const filteredGroups = useMemo(() => {
-    if (!groups) return [];
-    return groups.filter((g) => {
-      const matchesSearch = g.name.toLowerCase().includes(search.toLowerCase());
-      const matchesFilter = filter === 'ALL' || g.category === filter;
-      return matchesSearch && matchesFilter;
-    });
-  }, [groups, search, filter]);
+  const filteredGroups = groups
+    ? groups.filter((g) => {
+        const matchesSearch = g.name
+          .toLowerCase()
+          .includes(search.toLowerCase());
+        const matchesFilter = filter === 'ALL' || g.category === filter;
+        return matchesSearch && matchesFilter;
+      })
+    : [];
 
   const isCreatePage = pathname === '/missions/create';
+
+  const handleFilterKeyDown = (
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    currentIndex: number,
+  ) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      setFilter(FILTER_TABS[(currentIndex + 1) % FILTER_TABS.length].value);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      setFilter(
+        FILTER_TABS[
+          (currentIndex - 1 + FILTER_TABS.length) % FILTER_TABS.length
+        ].value,
+      );
+    }
+  };
 
   return (
     <aside className="flex flex-col w-[260px] shrink-0 bg-gray-50 border-r border-gray-200">
@@ -48,50 +70,43 @@ export function GroupPanel() {
       </div>
 
       <div className="px-3 pb-2">
-        <div className="relative">
-          <Search
-            size={14}
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="그룹 검색..."
-            aria-label="그룹 검색"
-            className="w-full h-8 pl-8 pr-3 rounded-md border border-gray-200 bg-white text-xs text-gray-900 placeholder:text-gray-400 focus:border-gray-300 focus:outline-none transition-colors"
-          />
-        </div>
+        <SearchBox
+          value={search}
+          onChange={setSearch}
+          placeholder="그룹 검색..."
+          size="sm"
+        />
       </div>
 
       <div
-        role="tablist"
+        role="radiogroup"
         aria-label="선교 그룹 유형 필터"
-        className="flex mx-3 mb-2 p-0.5 rounded-md bg-gray-200"
+        className="flex gap-1.5 mx-3 mb-2"
       >
-        {FILTER_TABS.map((tab) => (
+        {FILTER_TABS.map((tab, index) => (
           <button
             key={tab.value}
             type="button"
-            role="tab"
-            aria-selected={filter === tab.value}
+            role="radio"
+            aria-checked={filter === tab.value}
+            tabIndex={filter === tab.value ? 0 : -1}
             onClick={() => setFilter(tab.value)}
-            className={`flex-1 py-1 text-[11px] font-semibold rounded-[5px] transition-colors ${
-              filter === tab.value
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-400 hover:text-gray-700'
-            }`}
+            onKeyDown={(e) => handleFilterKeyDown(e, index)}
+            className="bg-transparent border-none p-0 cursor-pointer"
           >
-            {tab.label}
+            <Chips
+              variant={filter === tab.value ? 'accent' : 'default'}
+              size="sm"
+            >
+              {tab.label}
+            </Chips>
           </button>
         ))}
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 pb-2">
         {isLoading ? (
-          <div className="flex items-center justify-center py-10 text-xs text-gray-400">
-            불러오는 중...
-          </div>
+          <LoadingSpinner />
         ) : filteredGroups.length === 0 ? (
           <div className="flex items-center justify-center py-10 text-xs text-gray-400">
             {search ? '검색 결과가 없습니다' : '등록된 그룹이 없습니다'}
@@ -124,15 +139,7 @@ export function GroupPanel() {
                   )}
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span
-                    className={`text-[10px] font-semibold px-1.5 py-px rounded ${
-                      group.category === 'ABROAD'
-                        ? 'bg-blue-10 text-blue-60'
-                        : 'bg-green-10 text-green-60'
-                    }`}
-                  >
-                    {group.category === 'ABROAD' ? '해외' : '국내'}
-                  </span>
+                  <CategoryBadge category={group.category} />
                 </div>
               </Link>
             );

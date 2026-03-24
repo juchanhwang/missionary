@@ -16,9 +16,11 @@ import { TableEmptyState } from 'components/table';
 import { formatDateDotted } from 'lib/utils/formatDate';
 import { CalendarX, Pencil } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
+import { CategoryBadge } from '../../_components/CategoryBadge';
 import { MissionStatusBadge } from '../../_components/MissionStatusBadge';
+import { useMissionGroupId } from '../_hooks/useMissionGroupId';
 
 const NULL_PLACEHOLDER = '—';
 
@@ -62,8 +64,7 @@ function MissionaryRow({
 
 export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
   const router = useRouter();
-  const params = useParams();
-  const groupId = params.groupId as string;
+  const groupId = useMissionGroupId();
 
   const missionaries = group.missionaries ?? [];
 
@@ -75,15 +76,7 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
             <h2 className="text-lg font-semibold text-gray-900">
               {group.name}
             </h2>
-            <span
-              className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
-                group.category === 'ABROAD'
-                  ? 'bg-blue-10 text-blue-60'
-                  : 'bg-green-10 text-green-60'
-              }`}
-            >
-              {group.category === 'ABROAD' ? '해외' : '국내'}
-            </span>
+            <CategoryBadge category={group.category} />
             <button
               type="button"
               onClick={() => router.push(`/missions/${groupId}/edit-group`)}

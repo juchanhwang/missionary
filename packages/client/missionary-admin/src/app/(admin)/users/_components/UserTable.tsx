@@ -83,7 +83,6 @@ function UserRow({
 }) {
   return (
     <TableRow
-      role="button"
       className={`cursor-pointer group ${
         isSelected ? 'bg-blue-50/5' : 'hover:bg-gray-50'
       }`}

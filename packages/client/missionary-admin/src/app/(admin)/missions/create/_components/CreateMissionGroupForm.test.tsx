@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { server } from 'test/mocks/server';
 import { render, screen, waitFor } from 'test/test-utils';
 import { vi } from 'vitest';
@@ -8,6 +9,10 @@ import { CreateMissionGroupForm } from './CreateMissionGroupForm';
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
+}));
+
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn() },
 }));
 
 describe('CreateMissionGroupForm', () => {
@@ -70,9 +75,7 @@ describe('CreateMissionGroupForm', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('API 에러 발생 시 페이지 이동 없이 에러를 로깅한다', async () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
+  it('API 에러 발생 시 페이지 이동 없이 에러 토스트를 표시한다', async () => {
     server.use(
       http.post('http://localhost/mission-groups', () =>
         HttpResponse.json(
@@ -90,10 +93,8 @@ describe('CreateMissionGroupForm', () => {
     await user.click(screen.getByRole('button', { name: '생성하기' }));
 
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(toast.error).toHaveBeenCalledWith('선교 그룹 생성에 실패했습니다');
     });
     expect(mockPush).not.toHaveBeenCalled();
-
-    consoleSpy.mockRestore();
   });
 });

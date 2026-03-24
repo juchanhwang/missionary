@@ -1,24 +1,25 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@samilhero/design-system';
 import { LoadingSpinner } from 'components/loading';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
+import { FormPageLayout } from '../../../_components/FormPageLayout';
 import { MissionGroupForm } from '../../../_components/MissionGroupForm';
 import {
   missionGroupSchema,
   type MissionGroupSchemaType,
 } from '../../../_schemas/missionGroupSchema';
 import { useGetMissionGroup } from '../../_hooks/useGetMissionGroup';
+import { useMissionGroupId } from '../../_hooks/useMissionGroupId';
 import { useUpdateMissionGroupAction } from '../_hooks/useUpdateMissionGroupAction';
 
 export function EditMissionGroupForm() {
   const router = useRouter();
-  const params = useParams();
-  const groupId = params.groupId as string;
+  const groupId = useMissionGroupId();
 
   const { data: group, isLoading } = useGetMissionGroup(groupId);
   const { mutate: updateMissionGroup, isPending } =
@@ -49,8 +50,8 @@ export function EditMissionGroupForm() {
       onSuccess: () => {
         router.push(`/missions/${groupId}`);
       },
-      onError: (error) => {
-        console.error('Failed to update mission group:', error);
+      onError: () => {
+        toast.error('선교 그룹 수정에 실패했습니다');
       },
     });
   };
@@ -68,41 +69,17 @@ export function EditMissionGroupForm() {
   }
 
   return (
-    <form
+    <FormPageLayout
       onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col flex-1 p-8 gap-5 overflow-y-auto"
+      title="선교 그룹 수정"
+      description={group.name}
+      onCancel={() => router.push(`/missions/${groupId}`)}
+      submitLabel="수정하기"
+      pendingLabel="수정 중..."
+      isPending={isPending}
+      submitDisabled={!form.formState.isDirty || isPending}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1.5">
-          <h2 className="text-lg font-semibold text-gray-900">
-            선교 그룹 수정
-          </h2>
-          <p className="text-sm text-gray-400">{group.name}</p>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <MissionGroupForm form={form} isPending={isPending} />
-      </div>
-
-      <div className="flex items-center justify-end gap-3">
-        <Button
-          type="button"
-          color="neutral"
-          variant="outline"
-          size="md"
-          onClick={() => router.push(`/missions/${groupId}`)}
-        >
-          취소
-        </Button>
-        <Button
-          type="submit"
-          disabled={!form.formState.isDirty || isPending}
-          size="md"
-        >
-          {isPending ? '수정 중...' : '수정하기'}
-        </Button>
-      </div>
-    </form>
+      <MissionGroupForm form={form} isPending={isPending} />
+    </FormPageLayout>
   );
 }

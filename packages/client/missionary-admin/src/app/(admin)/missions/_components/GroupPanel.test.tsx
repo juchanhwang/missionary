@@ -85,7 +85,7 @@ describe('GroupPanel', () => {
   it('검색어를 입력하면 일치하는 그룹만 표시한다', async () => {
     const { user } = render(<GroupPanel />);
 
-    await user.type(screen.getByLabelText('그룹 검색'), '필리핀');
+    await user.type(screen.getByPlaceholderText('그룹 검색...'), '필리핀');
 
     expect(screen.getByText('필리핀 선교')).toBeInTheDocument();
     expect(screen.queryByText('제주도 선교')).not.toBeInTheDocument();
@@ -95,7 +95,10 @@ describe('GroupPanel', () => {
   it('검색 결과가 없을 때 안내 메시지를 표시한다', async () => {
     const { user } = render(<GroupPanel />);
 
-    await user.type(screen.getByLabelText('그룹 검색'), '존재하지않는그룹');
+    await user.type(
+      screen.getByPlaceholderText('그룹 검색...'),
+      '존재하지않는그룹',
+    );
 
     expect(screen.getByText('검색 결과가 없습니다')).toBeInTheDocument();
   });
@@ -103,7 +106,7 @@ describe('GroupPanel', () => {
   it('"국내" 필터를 선택하면 국내 그룹만 표시한다', async () => {
     const { user } = render(<GroupPanel />);
 
-    await user.click(screen.getByRole('tab', { name: '국내' }));
+    await user.click(screen.getByRole('radio', { name: '국내' }));
 
     expect(screen.getByText('제주도 선교')).toBeInTheDocument();
     expect(screen.queryByText('필리핀 선교')).not.toBeInTheDocument();
@@ -113,7 +116,7 @@ describe('GroupPanel', () => {
   it('"해외" 필터를 선택하면 해외 그룹만 표시한다', async () => {
     const { user } = render(<GroupPanel />);
 
-    await user.click(screen.getByRole('tab', { name: '해외' }));
+    await user.click(screen.getByRole('radio', { name: '해외' }));
 
     expect(screen.getByText('필리핀 선교')).toBeInTheDocument();
     expect(screen.getByText('태국 선교')).toBeInTheDocument();

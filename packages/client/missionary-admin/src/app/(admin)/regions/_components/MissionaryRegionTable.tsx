@@ -66,7 +66,6 @@ function RegionRow({
     <TableRow
       className={isAdmin ? 'cursor-pointer hover:bg-gray-50' : undefined}
       onClick={isAdmin ? () => onEdit(region) : undefined}
-      role={isAdmin ? 'button' : undefined}
       tabIndex={isAdmin ? 0 : undefined}
       onKeyDown={
         isAdmin
