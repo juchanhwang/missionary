@@ -1,13 +1,15 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@samilhero/design-system';
 import { type Missionary } from 'apis/missionary';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { DeleteMissionSection } from './DeleteMissionSection';
+import { FormPageLayout } from '../../../../_components/FormPageLayout';
 import { MissionForm } from '../../../../_components/MissionForm';
 import {
   missionSchema,
@@ -57,57 +59,38 @@ export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
     };
 
     startTransition(async () => {
-      await updateMissionaryAction(
-        missionary.id,
-        missionary.missionGroupId!,
-        payload,
-      );
+      try {
+        await updateMissionaryAction(
+          missionary.id,
+          missionary.missionGroupId!,
+          payload,
+        );
+      } catch (e) {
+        if (isRedirectError(e)) throw e;
+        toast.error('선교 수정에 실패했습니다');
+      }
     });
   };
 
   return (
-    <form
+    <FormPageLayout
       onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col flex-1 p-8 gap-5 overflow-y-auto"
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1.5">
-          <h2 className="text-lg font-semibold text-gray-900">선교 수정</h2>
-          <p className="text-sm text-gray-400">{missionary.name}</p>
-        </div>
+      title="선교 수정"
+      description={missionary.name}
+      headerAction={
         <DeleteMissionSection
           missionaryId={missionary.id}
           missionaryName={missionary.name}
           missionGroupId={missionary.missionGroupId!}
         />
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <MissionForm form={form} isPending={isPending} />
-      </div>
-
-      <div className="flex items-center justify-end">
-        <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            color="neutral"
-            variant="outline"
-            size="md"
-            onClick={() =>
-              router.push(`/missions/${missionary.missionGroupId}`)
-            }
-          >
-            취소
-          </Button>
-          <Button
-            type="submit"
-            disabled={!form.formState.isDirty || isPending}
-            size="md"
-          >
-            {isPending ? '수정 중...' : '수정하기'}
-          </Button>
-        </div>
-      </div>
-    </form>
+      }
+      onCancel={() => router.push(`/missions/${missionary.missionGroupId}`)}
+      submitLabel="수정하기"
+      pendingLabel="수정 중..."
+      isPending={isPending}
+      submitDisabled={!form.formState.isDirty || isPending}
+    >
+      <MissionForm form={form} isPending={isPending} />
+    </FormPageLayout>
   );
 }

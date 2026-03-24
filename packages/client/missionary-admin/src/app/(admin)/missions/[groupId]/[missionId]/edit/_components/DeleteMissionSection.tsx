@@ -2,7 +2,9 @@
 
 import { overlay } from '@samilhero/design-system';
 import { Ellipsis, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
+import { useEffect, useRef, useState, useTransition } from 'react';
+import { toast } from 'sonner';
 
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { deleteMissionaryAction } from '../_actions/missionaryActions';
@@ -23,10 +25,10 @@ export function DeleteMissionSection({
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const closeMenu = useCallback(() => {
+  const closeMenu = () => {
     setIsMenuOpen(false);
     triggerRef.current?.focus();
-  }, []);
+  };
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -70,7 +72,12 @@ export function DeleteMissionSection({
 
     if (confirmed) {
       startTransition(async () => {
-        await deleteMissionaryAction(missionaryId, missionGroupId);
+        try {
+          await deleteMissionaryAction(missionaryId, missionGroupId);
+        } catch (e) {
+          if (isRedirectError(e)) throw e;
+          toast.error('선교 삭제에 실패했습니다');
+        }
       });
     }
   };
