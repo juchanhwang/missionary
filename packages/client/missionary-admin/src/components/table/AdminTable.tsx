@@ -111,7 +111,9 @@ export function AdminTable<T>({
                       : undefined
                   }
                   tabIndex={clickable ? 0 : undefined}
-                  aria-selected={isRowSelected ? selected : undefined}
+                  aria-current={
+                    isRowSelected ? (selected ? 'true' : undefined) : undefined
+                  }
                 >
                   {columns.map((col) => (
                     <td
