@@ -15,6 +15,7 @@ import { type MissionGroupDetail as MissionGroupDetailType } from 'apis/missionG
 import { TableEmptyState } from 'components/table';
 import { formatDateDotted } from 'lib/utils/formatDate';
 import { CalendarX, Pencil } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { CategoryBadge } from '../../_components/CategoryBadge';
@@ -30,25 +31,21 @@ interface MissionGroupDetailProps {
 function MissionaryRow({
   missionary,
   groupId,
-  onRowClick,
 }: {
   missionary: Missionary;
   groupId: string;
-  onRowClick: (path: string) => void;
 }) {
-  const path = `/missions/${groupId}/${missionary.id}/edit`;
+  const href = `/missions/${groupId}/${missionary.id}/edit`;
 
   return (
-    <TableRow
-      className="cursor-pointer hover:bg-gray-50"
-      onClick={() => onRowClick(path)}
-      tabIndex={0}
-      onKeyDown={(e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') onRowClick(path);
-      }}
-    >
+    <TableRow className="relative hover:bg-gray-50">
       <TableCell className="font-semibold text-gray-900">
-        {missionary.name}
+        <Link
+          href={href}
+          className="after:absolute after:inset-0 hover:text-primary-60 hover:underline"
+        >
+          {missionary.name}
+        </Link>
       </TableCell>
       <TableCell>{`${missionary.order}차`}</TableCell>
       <TableCell>
@@ -135,12 +132,7 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
               />
             ) : (
               missionaries.map((m) => (
-                <MissionaryRow
-                  key={m.id}
-                  missionary={m}
-                  groupId={groupId}
-                  onRowClick={(path) => router.push(path)}
-                />
+                <MissionaryRow key={m.id} missionary={m} groupId={groupId} />
               ))
             )}
           </TableBody>
