@@ -1,6 +1,7 @@
 'use client';
 
 import { DatePicker, InputField, Select } from '@samilhero/design-system';
+import { useEffect } from 'react';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 
 import { type MissionFormData } from '../_schemas/missionSchema';
@@ -9,9 +10,20 @@ import { MISSION_STATUS_LABEL } from '../_utils/missionStatus';
 interface MissionFormProps {
   form: UseFormReturn<MissionFormData>;
   isPending: boolean;
+  groupName: string;
 }
 
-export function MissionForm({ form, isPending }: MissionFormProps) {
+export function MissionForm({ form, isPending, groupName }: MissionFormProps) {
+  const order = form.watch('order');
+
+  useEffect(() => {
+    if (Number.isFinite(order) && groupName) {
+      form.setValue('name', `${order}차 ${groupName}`, {
+        shouldDirty: true,
+      });
+    }
+  }, [order, groupName]);
+
   return (
     <div className="flex flex-col gap-8">
       {/* 기본 정보 */}
@@ -59,10 +71,10 @@ export function MissionForm({ form, isPending }: MissionFormProps) {
 
         <InputField
           label="선교 이름"
-          placeholder="선교 이름을 입력하세요"
+          placeholder="차수 입력 시 자동 생성됩니다"
           {...form.register('name')}
           error={form.formState.errors.name?.message}
-          disabled={isPending}
+          readOnly
         />
 
         <InputField

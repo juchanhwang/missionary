@@ -131,14 +131,11 @@ describe('CreateMissionForm', () => {
 
     await screen.findByText('선교 생성');
 
-    // 자동 설정된 이름을 지워서 빈 상태로 만든다
-    const nameInput = screen.getByLabelText('선교 이름');
-    await user.clear(nameInput);
-
     await user.click(screen.getByRole('button', { name: '생성하기' }));
 
     expect(
-      await screen.findByText('선교 이름을 입력해주세요'),
+      await screen.findByText('선교 시작일을 선택해주세요'),
     ).toBeInTheDocument();
+    expect(screen.getByText('선교 종료일을 선택해주세요')).toBeInTheDocument();
   });
 });

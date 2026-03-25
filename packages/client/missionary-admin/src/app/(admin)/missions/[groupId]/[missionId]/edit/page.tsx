@@ -18,7 +18,7 @@ export default async function EditMissionPage({
     `/missionaries/${missionId}`,
   );
 
-  if (!missionary) {
+  if (!missionary || !missionary.missionGroup) {
     notFound();
   }
 

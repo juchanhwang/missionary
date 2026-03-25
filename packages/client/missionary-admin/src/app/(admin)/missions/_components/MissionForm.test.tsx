@@ -8,19 +8,23 @@ import { missionSchema, type MissionFormData } from '../_schemas/missionSchema';
 
 function TestHarness({
   isPending = false,
+  groupName = '군선교',
+  defaultValues,
   onSubmit = vi.fn(),
 }: {
   isPending?: boolean;
+  groupName?: string;
+  defaultValues?: Partial<MissionFormData>;
   onSubmit?: (data: MissionFormData) => void;
 }) {
   const form = useForm<MissionFormData>({
     resolver: zodResolver(missionSchema),
-    defaultValues: { name: '', pastorName: '' },
+    defaultValues: { name: '', pastorName: '', ...defaultValues },
   });
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
-      <MissionForm form={form} isPending={isPending} />
+      <MissionForm form={form} isPending={isPending} groupName={groupName} />
       <button type="submit">제출</button>
     </form>
   );
@@ -40,13 +44,18 @@ describe('MissionForm', () => {
   it('텍스트 필드를 입력할 수 있다', async () => {
     const { user } = render(<TestHarness />);
 
-    await user.type(screen.getByLabelText('선교 이름'), '필리핀 단기선교');
     await user.type(screen.getByLabelText('담당 교역자'), '김목사');
     await user.type(screen.getByLabelText('선교 설명'), '여름 선교');
 
-    expect(screen.getByLabelText('선교 이름')).toHaveValue('필리핀 단기선교');
     expect(screen.getByLabelText('담당 교역자')).toHaveValue('김목사');
     expect(screen.getByLabelText('선교 설명')).toHaveValue('여름 선교');
+  });
+
+  it('선교 이름은 readOnly이고 차수 입력 시 자동 생성된다', async () => {
+    render(<TestHarness groupName="군선교" defaultValues={{ order: 35 }} />);
+
+    expect(screen.getByLabelText('선교 이름')).toHaveAttribute('readonly');
+    expect(screen.getByLabelText('선교 이름')).toHaveValue('35차 군선교');
   });
 
   it('날짜 입력 필드를 렌더링한다', () => {
@@ -83,7 +92,6 @@ describe('MissionForm', () => {
   it('isPending이 true면 입력 필드가 비활성화된다', () => {
     render(<TestHarness isPending />);
 
-    expect(screen.getByLabelText('선교 이름')).toBeDisabled();
     expect(screen.getByLabelText('담당 교역자')).toBeDisabled();
     expect(screen.getByLabelText('선교 시작일')).toBeDisabled();
     expect(screen.getByLabelText('선교 종료일')).toBeDisabled();

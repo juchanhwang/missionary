@@ -85,7 +85,11 @@ export function CreateMissionForm() {
       pendingLabel="생성 중..."
       isPending={createMutation.isPending}
     >
-      <MissionForm form={form} isPending={createMutation.isPending} />
+      <MissionForm
+        form={form}
+        isPending={createMutation.isPending}
+        groupName={group.name}
+      />
     </FormPageLayout>
   );
 }
