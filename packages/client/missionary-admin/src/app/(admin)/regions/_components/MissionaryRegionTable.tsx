@@ -78,7 +78,9 @@ function RegionRow({
       <TableCell className="w-[140px]">
         {region.missionGroup?.name ?? NULL_PLACEHOLDER}
       </TableCell>
-      <TableCell className="w-[140px]">{region.name}</TableCell>
+      <TableCell className="w-[140px] font-semibold text-gray-900">
+        {region.name}
+      </TableCell>
       <TableCell className="w-[100px]">
         {region.pastorName ?? NULL_PLACEHOLDER}
       </TableCell>

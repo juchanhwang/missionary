@@ -113,10 +113,10 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
         </div>
 
         <div className="flex flex-col flex-1 min-h-0 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-b border-gray-200">
-            <p className="text-sm font-semibold text-gray-900">
+          <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-b border-gray-200 min-h-[61px]">
+            <p className="flex items-center gap-2 text-[15px] font-semibold text-gray-900">
               유저 목록
-              <span className="ml-1.5 text-xs font-normal text-gray-400">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
                 {total}건
               </span>
             </p>

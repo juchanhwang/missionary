@@ -99,7 +99,7 @@ function UserRow({
             isSelected ? 'bg-blue-50/5' : 'group-hover:bg-gray-50'
           }`}
         />
-        <span className="relative text-sm font-semibold text-gray-900">
+        <span className="relative font-semibold text-gray-900">
           {user.name || NULL_PLACEHOLDER}
         </span>
       </TableCell>
