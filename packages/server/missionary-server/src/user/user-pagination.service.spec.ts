@@ -131,6 +131,20 @@ describe('UserService 페이지네이션', () => {
       expect(result.data[0].phoneNumber).toBe('010-1234-5678');
     });
 
+    it('searchType만 있고 keyword가 없으면 검색하지 않는다', async () => {
+      await fakeUserRepository.create(
+        makeUser({ name: '홍길동', email: 'hong@test.com' }),
+      );
+      await fakeUserRepository.create(
+        makeUser({ name: '김철수', email: 'kim@test.com' }),
+      );
+
+      const result = await userService.findAll({ searchType: 'name' } as any);
+
+      // 검색 조건이 무시되어 전체 2명이 반환되어야 한다
+      expect(result.data).toHaveLength(2);
+    });
+
     it('keyword만 있고 searchType이 없으면 검색하지 않는다', async () => {
       await fakeUserRepository.create(
         makeUser({ name: '홍길동', email: 'hong@test.com' }),
