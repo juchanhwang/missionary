@@ -1,7 +1,18 @@
 'use client';
 
-import { Button } from '@samilhero/design-system';
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@samilhero/design-system';
+import { type Missionary } from 'apis/missionary';
 import { type MissionGroupDetail as MissionGroupDetailType } from 'apis/missionGroup';
+import { TableEmptyState } from 'components/table';
 import { formatDateDotted } from 'lib/utils/formatDate';
 import { CalendarX, Pencil } from 'lucide-react';
 import Link from 'next/link';
@@ -11,8 +22,46 @@ import { CategoryBadge } from '../../_components/CategoryBadge';
 import { MissionStatusBadge } from '../../_components/MissionStatusBadge';
 import { useMissionGroupId } from '../_hooks/useMissionGroupId';
 
+const NULL_PLACEHOLDER = '—';
+
 interface MissionGroupDetailProps {
   group: MissionGroupDetailType;
+}
+
+function MissionaryRow({
+  missionary,
+  groupId,
+}: {
+  missionary: Missionary;
+  groupId: string;
+}) {
+  const href = `/missions/${groupId}/${missionary.id}/edit`;
+
+  return (
+    <TableRow className="relative hover:bg-gray-50">
+      <TableCell className="font-semibold text-gray-900">
+        <Link
+          href={href}
+          className="after:absolute after:inset-0 hover:text-primary-60 hover:underline"
+        >
+          {missionary.name}
+        </Link>
+      </TableCell>
+      <TableCell>{`${missionary.order}차`}</TableCell>
+      <TableCell>
+        {`${formatDateDotted(missionary.startDate)} ~ ${formatDateDotted(missionary.endDate)}`}
+      </TableCell>
+      <TableCell>{missionary.pastorName || NULL_PLACEHOLDER}</TableCell>
+      <TableCell>
+        {missionary.maximumParticipantCount != null
+          ? `${missionary.maximumParticipantCount}명`
+          : NULL_PLACEHOLDER}
+      </TableCell>
+      <TableCell>
+        <MissionStatusBadge status={missionary.status} />
+      </TableCell>
+    </TableRow>
+  );
 }
 
 export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
@@ -51,91 +100,43 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200">
-          <p className="text-sm font-semibold text-gray-900">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-clip">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200 min-h-[61px]">
+          <p className="flex items-center gap-2 text-[15px] font-semibold text-gray-900">
             선교 목록
-            <span className="ml-1.5 text-xs font-normal text-gray-400">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
               {missionaries.length}건
             </span>
           </p>
         </div>
 
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                선교명
-              </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                차수
-              </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                선교 기간
-              </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                담당 교역자
-              </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                최대 인원
-              </th>
-              <th className="px-5 py-3 text-xs font-medium text-gray-400">
-                상태
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableCaption>{`${group.name} 선교 목록`}</TableCaption>
+          <TableHeader className="sticky top-0 z-10">
+            <TableRow>
+              <TableHead>선교명</TableHead>
+              <TableHead>차수</TableHead>
+              <TableHead>선교 기간</TableHead>
+              <TableHead>담당 교역자</TableHead>
+              <TableHead>최대 인원</TableHead>
+              <TableHead>상태</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {missionaries.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-5 py-16 text-center">
-                  <div className="flex flex-col items-center gap-2">
-                    <CalendarX size={32} className="text-gray-300" />
-                    <p className="text-sm text-gray-500">
-                      등록된 선교가 없습니다
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      &apos;선교 추가&apos; 버튼으로 새 선교를 등록하세요
-                    </p>
-                  </div>
-                </td>
-              </tr>
+              <TableEmptyState
+                colSpan={6}
+                icon={<CalendarX size={32} className="text-gray-300" />}
+                message="등록된 선교가 없습니다"
+                subMessage="'선교 추가' 버튼으로 새 선교를 등록하세요"
+              />
             ) : (
-              missionaries.map((mission) => (
-                <tr
-                  key={mission.id}
-                  className="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-5 py-3.5 text-sm font-medium text-gray-900">
-                    <Link
-                      href={`/missions/${groupId}/${mission.id}/edit`}
-                      className="text-sm font-medium text-gray-900 hover:text-primary-60 hover:underline"
-                    >
-                      {mission.name}
-                    </Link>
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    {mission.order}차
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    {formatDateDotted(mission.startDate)} ~{' '}
-                    {formatDateDotted(mission.endDate)}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    {mission.pastorName || '—'}
-                  </td>
-                  <td className="px-5 py-3.5 text-sm text-gray-500">
-                    {mission.maximumParticipantCount != null
-                      ? `${mission.maximumParticipantCount}명`
-                      : '—'}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <MissionStatusBadge status={mission.status} />
-                  </td>
-                </tr>
+              missionaries.map((m) => (
+                <MissionaryRow key={m.id} missionary={m} groupId={groupId} />
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

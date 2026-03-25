@@ -46,12 +46,11 @@ describe('MissionaryRegionTable', () => {
     render(<MissionaryRegionTable {...defaultProps} regions={[region]} />);
 
     const rows = screen.getAllByRole('row');
-    // 헤더 1행 + 데이터 1행
-    expect(rows).toHaveLength(2);
+    // 첫 번째 row는 header, 나머지가 data rows
+    const dataRows = rows.slice(1);
+    expect(dataRows).toHaveLength(1);
 
-    const dataRow = rows[1];
-    const cells = within(dataRow).getAllByRole('cell');
-
+    const cells = within(dataRows[0]).getAllByRole('cell');
     expect(cells[0]).toHaveTextContent('인도 선교');
     expect(cells[1]).toHaveTextContent('부산교회');
     expect(cells[2]).toHaveTextContent('박목사');
@@ -123,9 +122,10 @@ describe('MissionaryRegionTable', () => {
     render(<MissionaryRegionTable {...defaultProps} regions={[region]} />);
 
     const rows = screen.getAllByRole('row');
-    const cells = within(rows[1]).getAllByRole('cell');
+    const dataRow = rows.slice(1)[0];
+    const cells = within(dataRow).getAllByRole('cell');
 
-    // 목사명, 목사연락처
+    // 목사명(index 2), 목사연락처(index 3)
     expect(cells[2]).toHaveTextContent('—');
     expect(cells[3]).toHaveTextContent('—');
   });
