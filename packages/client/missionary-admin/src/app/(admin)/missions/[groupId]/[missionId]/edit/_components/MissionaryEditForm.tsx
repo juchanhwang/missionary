@@ -90,7 +90,11 @@ export function MissionaryEditForm({ missionary }: MissionaryEditFormProps) {
       isPending={isPending}
       submitDisabled={!form.formState.isDirty || isPending}
     >
-      <MissionForm form={form} isPending={isPending} />
+      <MissionForm
+        form={form}
+        isPending={isPending}
+        groupName={missionary.missionGroup?.name ?? ''}
+      />
     </FormPageLayout>
   );
 }

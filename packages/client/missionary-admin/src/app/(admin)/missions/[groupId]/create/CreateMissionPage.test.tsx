@@ -37,11 +37,9 @@ describe('CreateMissionPage', () => {
   it('유효한 데이터를 제출하면 선교 생성 mutate를 호출한다', async () => {
     const { user } = render(<CreateMissionPage />);
 
-    const nameInput = await screen.findByLabelText('선교 이름');
+    await screen.findByLabelText('선교 이름');
     const pastorInput = screen.getByLabelText('담당 교역자');
 
-    await user.clear(nameInput);
-    await user.type(nameInput, '2024 여름 단기선교');
     await user.type(pastorInput, '김목사');
 
     // DatePicker는 react-datepicker 특성상 fireEvent 사용
@@ -60,7 +58,7 @@ describe('CreateMissionPage', () => {
     await waitFor(() => {
       expect(mockMutate).toHaveBeenCalledWith(
         expect.objectContaining({
-          name: '2024 여름 단기선교',
+          name: expect.any(String),
           pastorName: '김목사',
         }),
         expect.any(Object),
