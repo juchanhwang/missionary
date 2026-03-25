@@ -22,7 +22,7 @@ export function MissionForm({ form, isPending, groupName }: MissionFormProps) {
         shouldDirty: true,
       });
     }
-  }, [order, groupName, form]);
+  }, [order, groupName]);
 
   return (
     <div className="flex flex-col gap-8">
