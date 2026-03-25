@@ -15,7 +15,6 @@ import { type MissionGroupDetail as MissionGroupDetailType } from 'apis/missionG
 import { TableEmptyState } from 'components/table';
 import { formatDateDotted } from 'lib/utils/formatDate';
 import { CalendarX, Pencil } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { CategoryBadge } from '../../_components/CategoryBadge';
@@ -31,19 +30,25 @@ interface MissionGroupDetailProps {
 function MissionaryRow({
   missionary,
   groupId,
+  onRowClick,
 }: {
   missionary: Missionary;
   groupId: string;
+  onRowClick: (path: string) => void;
 }) {
+  const path = `/missions/${groupId}/${missionary.id}/edit`;
+
   return (
-    <TableRow className="hover:bg-gray-50">
-      <TableCell className="text-sm font-medium text-gray-900">
-        <Link
-          href={`/missions/${groupId}/${missionary.id}/edit`}
-          className="text-sm font-medium text-gray-900 hover:text-primary-60 hover:underline"
-        >
-          {missionary.name}
-        </Link>
+    <TableRow
+      className="cursor-pointer hover:bg-gray-50"
+      onClick={() => onRowClick(path)}
+      tabIndex={0}
+      onKeyDown={(e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') onRowClick(path);
+      }}
+    >
+      <TableCell className="font-semibold text-gray-900">
+        {missionary.name}
       </TableCell>
       <TableCell>{`${missionary.order}차`}</TableCell>
       <TableCell>
@@ -98,11 +103,11 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200">
-          <p className="text-sm font-semibold text-gray-900">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-clip">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200 min-h-[61px]">
+          <p className="flex items-center gap-2 text-[15px] font-semibold text-gray-900">
             선교 목록
-            <span className="ml-1.5 text-xs font-normal text-gray-400">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
               {missionaries.length}건
             </span>
           </p>
@@ -110,7 +115,7 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
 
         <Table>
           <TableCaption>{`${group.name} 선교 목록`}</TableCaption>
-          <TableHeader>
+          <TableHeader className="sticky top-0 z-10">
             <TableRow>
               <TableHead>선교명</TableHead>
               <TableHead>차수</TableHead>
@@ -130,7 +135,12 @@ export function MissionGroupDetail({ group }: MissionGroupDetailProps) {
               />
             ) : (
               missionaries.map((m) => (
-                <MissionaryRow key={m.id} missionary={m} groupId={groupId} />
+                <MissionaryRow
+                  key={m.id}
+                  missionary={m}
+                  groupId={groupId}
+                  onRowClick={(path) => router.push(path)}
+                />
               ))
             )}
           </TableBody>
