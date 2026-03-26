@@ -4,6 +4,7 @@ import { PrismaService } from '@/database/prisma.service';
 
 import type {
   FindAllFilters,
+  FindAllResult,
   ParticipationCreateInput,
   ParticipationRepository,
   ParticipationUpdateInput,
@@ -13,6 +14,17 @@ import type { Participation, Prisma } from '../../../prisma/generated/prisma';
 
 @Injectable()
 export class PrismaParticipationRepository implements ParticipationRepository {
+  private static readonly RELATIONS_INCLUDE = {
+    missionary: true,
+    user: true,
+    team: true,
+    attendanceOption: true,
+    formAnswers: {
+      include: { formField: true },
+      where: { deletedAt: null },
+    },
+  } as const;
+
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: ParticipationCreateInput): Promise<Participation> {
@@ -68,13 +80,11 @@ export class PrismaParticipationRepository implements ParticipationRepository {
   ): Promise<ParticipationWithRelations> {
     return this.prisma.participation.create({
       data,
-      include: { missionary: true, user: true },
-    });
+      include: PrismaParticipationRepository.RELATIONS_INCLUDE,
+    }) as Promise<ParticipationWithRelations>;
   }
 
-  async findAllFiltered(
-    filters: FindAllFilters,
-  ): Promise<ParticipationWithRelations[]> {
+  async findAllFiltered(filters: FindAllFilters): Promise<FindAllResult> {
     const where: Prisma.ParticipationWhereInput = {};
 
     if (filters.missionaryId) {
@@ -89,11 +99,29 @@ export class PrismaParticipationRepository implements ParticipationRepository {
       where.isPaid = filters.isPaid;
     }
 
-    return this.prisma.participation.findMany({
-      where,
-      include: { missionary: true, user: true },
-      orderBy: { createdAt: 'desc' },
-    });
+    if (filters.attendanceType) {
+      where.attendanceOption = { type: filters.attendanceType };
+    }
+
+    if (filters.query) {
+      where.name = { contains: filters.query, mode: 'insensitive' };
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.participation.findMany({
+        where,
+        include: PrismaParticipationRepository.RELATIONS_INCLUDE,
+        orderBy: { createdAt: 'desc' },
+        take: filters.limit ?? 20,
+        skip: filters.offset ?? 0,
+      }),
+      this.prisma.participation.count({ where }),
+    ]);
+
+    return {
+      data: data as ParticipationWithRelations[],
+      total,
+    };
   }
 
   async findOneWithRelations(
@@ -101,8 +129,8 @@ export class PrismaParticipationRepository implements ParticipationRepository {
   ): Promise<ParticipationWithRelations | null> {
     return this.prisma.participation.findFirst({
       where: { id, deletedAt: null },
-      include: { missionary: true, user: true },
-    });
+      include: PrismaParticipationRepository.RELATIONS_INCLUDE,
+    }) as Promise<ParticipationWithRelations | null>;
   }
 
   async updateWithRelations(
@@ -112,8 +140,8 @@ export class PrismaParticipationRepository implements ParticipationRepository {
     return this.prisma.participation.update({
       where: { id },
       data,
-      include: { missionary: true, user: true },
-    });
+      include: PrismaParticipationRepository.RELATIONS_INCLUDE,
+    }) as Promise<ParticipationWithRelations>;
   }
 
   async approvePayments(ids: string[]): Promise<number> {
@@ -154,7 +182,7 @@ export class PrismaParticipationRepository implements ParticipationRepository {
     return this.prisma.$transaction(async (tx) => {
       const participation = await tx.participation.create({
         data,
-        include: { missionary: true, user: true },
+        include: PrismaParticipationRepository.RELATIONS_INCLUDE,
       });
 
       await tx.missionary.update({
@@ -164,7 +192,7 @@ export class PrismaParticipationRepository implements ParticipationRepository {
         },
       });
 
-      return participation;
+      return participation as ParticipationWithRelations;
     });
   }
 }

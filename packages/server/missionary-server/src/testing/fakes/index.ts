@@ -11,3 +11,6 @@ export { FakeTeamRepository } from './fake-team.repository';
 export { FakeTermsAgreementRepository } from './fake-terms-agreement.repository';
 export { FakeTermsRepository } from './fake-terms.repository';
 export { FakeUserRepository } from './fake-user.repository';
+export { FakeAttendanceOptionRepository } from './fake-attendance-option.repository';
+export { FakeFormFieldRepository } from './fake-form-field.repository';
+export { FakeFormAnswerRepository } from './fake-form-answer.repository';

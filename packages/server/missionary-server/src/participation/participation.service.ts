@@ -8,16 +8,24 @@ import {
 import { Queue } from 'bullmq';
 
 import { EncryptionService } from '@/common/encryption/encryption.service';
+import { UserRole } from '@/common/enums/user-role.enum';
+import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 
 import { CreateParticipationDto } from './dto/create-participation.dto';
 import { UpdateParticipationDto } from './dto/update-participation.dto';
 import {
+  FORM_ANSWER_REPOSITORY,
+  type FormAnswerRepository,
+} from './repositories/form-answer-repository.interface';
+import {
   PARTICIPATION_REPOSITORY,
   type FindAllFilters,
+  type FindAllResult,
   type ParticipationRepository,
   type ParticipationUpdateInput,
 } from './repositories/participation-repository.interface';
 
+import type { UpdateFormAnswersDto } from './dto/update-form-answers.dto';
 import type { Participation } from '../../prisma/generated/prisma';
 
 export type { FindAllFilters } from './repositories/participation-repository.interface';
@@ -27,6 +35,8 @@ export class ParticipationService {
   constructor(
     @Inject(PARTICIPATION_REPOSITORY)
     private readonly participationRepository: ParticipationRepository,
+    @Inject(FORM_ANSWER_REPOSITORY)
+    private readonly formAnswerRepository: FormAnswerRepository,
     private readonly encryptionService: EncryptionService,
     @InjectQueue('participation-queue') private readonly queue: Queue,
   ) {}
@@ -38,7 +48,7 @@ export class ParticipationService {
     return this.encryptionService.encrypt(identificationNumber);
   }
 
-  private decryptParticipation(participation: Participation): Participation {
+  private decryptParticipation<T extends Participation>(participation: T): T {
     if (participation.identificationNumber) {
       return {
         ...participation,
@@ -50,15 +60,7 @@ export class ParticipationService {
     return participation;
   }
 
-  private decryptParticipationNullable(
-    participation: Participation | null,
-  ): Participation | null {
-    if (!participation) return null;
-    return this.decryptParticipation(participation);
-  }
-
   async create(dto: CreateParticipationDto, userId: string) {
-    // Enqueue job to BullMQ for async processing
     const job = await this.queue.add('create-participation', {
       dto,
       userId,
@@ -70,11 +72,13 @@ export class ParticipationService {
     };
   }
 
-  async findAll(filters: FindAllFilters = {}) {
-    const participations =
-      await this.participationRepository.findAllFiltered(filters);
+  async findAll(filters: FindAllFilters = {}): Promise<FindAllResult> {
+    const result = await this.participationRepository.findAllFiltered(filters);
 
-    return participations.map((p) => this.decryptParticipation(p));
+    return {
+      data: result.data.map((p) => this.decryptParticipation(p)),
+      total: result.total,
+    };
   }
 
   async findOne(id: string) {
@@ -88,28 +92,34 @@ export class ParticipationService {
     return this.decryptParticipation(participation);
   }
 
-  async update(id: string, dto: UpdateParticipationDto, userId: string) {
+  async update(
+    id: string,
+    dto: UpdateParticipationDto,
+    user: AuthenticatedUser,
+  ) {
     const participation = await this.participationRepository.findFirst({ id });
 
     if (!participation) {
       throw new NotFoundException(`Participation with ID ${id} not found`);
     }
 
-    if (participation.userId !== userId) {
+    if (user.role !== UserRole.ADMIN && participation.userId !== user.id) {
       throw new ForbiddenException(
         'You can only update your own participations',
       );
     }
 
+    const { answers, ...fixedFields } = dto;
+
     const updateData: ParticipationUpdateInput = {
-      ...dto,
-      updatedBy: userId,
+      ...fixedFields,
+      updatedBy: user.id,
       version: { increment: 1 },
     };
 
-    if (dto.identificationNumber) {
+    if (fixedFields.identificationNumber) {
       updateData.identificationNumber = this.encryptIdentificationNumber(
-        dto.identificationNumber,
+        fixedFields.identificationNumber,
       );
     }
 
@@ -118,10 +128,21 @@ export class ParticipationService {
       updateData,
     );
 
-    return this.decryptParticipation(updated);
+    if (answers && answers.length > 0) {
+      await this.formAnswerRepository.upsertMany(
+        answers.map((a) => ({
+          participationId: id,
+          formFieldId: a.formFieldId,
+          value: a.value,
+          updatedBy: user.id,
+        })),
+      );
+    }
+
+    return this.findOne(id);
   }
 
-  async remove(id: string, userId: string) {
+  async remove(id: string, user: AuthenticatedUser) {
     const participation =
       await this.participationRepository.findOneWithRelations(id);
 
@@ -129,7 +150,7 @@ export class ParticipationService {
       throw new NotFoundException(`Participation with ID ${id} not found`);
     }
 
-    if (participation.userId !== userId) {
+    if (user.role !== UserRole.ADMIN && participation.userId !== user.id) {
       throw new ForbiddenException(
         'You can only delete your own participations',
       );
@@ -137,7 +158,7 @@ export class ParticipationService {
 
     await this.participationRepository.softDeleteWithCountDecrement(
       id,
-      userId,
+      user.id,
       participation.missionaryId,
     );
 
@@ -150,5 +171,36 @@ export class ParticipationService {
     return {
       message: `${participationIds.length} participation(s) approved`,
     };
+  }
+
+  async updateAnswers(
+    participationId: string,
+    dto: UpdateFormAnswersDto,
+    user: AuthenticatedUser,
+  ) {
+    const participation = await this.participationRepository.findFirst({
+      id: participationId,
+    });
+
+    if (!participation) {
+      throw new NotFoundException(
+        `Participation with ID ${participationId} not found`,
+      );
+    }
+
+    if (user.role !== UserRole.ADMIN && participation.userId !== user.id) {
+      throw new ForbiddenException(
+        'You can only update your own participations',
+      );
+    }
+
+    const inputs = dto.answers.map((a) => ({
+      participationId,
+      formFieldId: a.formFieldId,
+      value: a.value,
+      updatedBy: user.id,
+    }));
+
+    return this.formAnswerRepository.upsertMany(inputs);
   }
 }

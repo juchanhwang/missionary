@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import type { BaseRepository } from '@/common/repositories';
 import type {
   FindAllFilters,
+  FindAllResult,
   ParticipationCreateInput,
   ParticipationRepository,
   ParticipationUpdateInput,
@@ -11,7 +12,10 @@ import type {
 
 import type {
   Missionary,
+  MissionaryAttendanceOption,
   Participation,
+  ParticipationFormAnswer,
+  Team,
   User,
 } from '../../../prisma/generated/prisma';
 
@@ -32,6 +36,9 @@ export class FakeParticipationRepository
    */
   private missionaries = new Map<string, Missionary>();
   private users = new Map<string, User>();
+  private teams = new Map<string, Team>();
+  private attendanceOptions = new Map<string, MissionaryAttendanceOption>();
+  private formAnswers = new Map<string, ParticipationFormAnswer[]>();
 
   // --- BaseRepository 구현 ---
 
@@ -121,9 +128,7 @@ export class FakeParticipationRepository
     return this.withRelations(entity);
   }
 
-  async findAllFiltered(
-    filters: FindAllFilters,
-  ): Promise<ParticipationWithRelations[]> {
+  async findAllFiltered(filters: FindAllFilters): Promise<FindAllResult> {
     let results = [...this.store.values()].filter((p) => p.deletedAt === null);
 
     if (filters.missionaryId) {
@@ -138,9 +143,32 @@ export class FakeParticipationRepository
       results = results.filter((p) => p.isPaid === filters.isPaid);
     }
 
-    return results
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .map((p) => this.withRelations(p));
+    if (filters.attendanceType) {
+      results = results.filter((p) => {
+        if (!p.attendanceOptionId) return false;
+        const option = this.attendanceOptions.get(p.attendanceOptionId);
+        return option?.type === filters.attendanceType;
+      });
+    }
+
+    if (filters.query) {
+      const q = filters.query.toLowerCase();
+      results = results.filter((p) => p.name.toLowerCase().includes(q));
+    }
+
+    const sorted = results.sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    );
+
+    const total = sorted.length;
+    const offset = filters.offset ?? 0;
+    const limit = filters.limit ?? 20;
+    const paged = sorted.slice(offset, offset + limit);
+
+    return {
+      data: paged.map((p) => this.withRelations(p)),
+      total,
+    };
   }
 
   async findOneWithRelations(
@@ -237,10 +265,28 @@ export class FakeParticipationRepository
     this.users.set(id, user);
   }
 
+  setTeam(id: string, team: Team): void {
+    this.teams.set(id, team);
+  }
+
+  setAttendanceOption(id: string, option: MissionaryAttendanceOption): void {
+    this.attendanceOptions.set(id, option);
+  }
+
+  setFormAnswers(
+    participationId: string,
+    answers: ParticipationFormAnswer[],
+  ): void {
+    this.formAnswers.set(participationId, answers);
+  }
+
   clear(): void {
     this.store.clear();
     this.missionaries.clear();
     this.users.clear();
+    this.teams.clear();
+    this.attendanceOptions.clear();
+    this.formAnswers.clear();
   }
 
   getAll(): Participation[] {
@@ -263,6 +309,11 @@ export class FakeParticipationRepository
       userId: data.userId as string,
       memberId: (data.memberId as string) ?? null,
       teamId: (data.teamId as string) ?? null,
+      affiliation: (data.affiliation as string) ?? null,
+      attendanceOptionId: (data.attendanceOptionId as string) ?? null,
+      cohort: (data.cohort as number) ?? null,
+      hasPastParticipation: (data.hasPastParticipation as boolean) ?? null,
+      isCollegeStudent: (data.isCollegeStudent as boolean) ?? null,
       createdAt: now,
       updatedAt: now,
       createdBy: (data.createdBy as string) ?? null,
@@ -290,7 +341,20 @@ export class FakeParticipationRepository
       );
     }
 
-    return { ...entity, missionary, user };
+    const team = entity.teamId ? (this.teams.get(entity.teamId) ?? null) : null;
+    const attendanceOption = entity.attendanceOptionId
+      ? (this.attendanceOptions.get(entity.attendanceOptionId) ?? null)
+      : null;
+    const answers = this.formAnswers.get(entity.id) ?? [];
+
+    return {
+      ...entity,
+      missionary,
+      user,
+      team,
+      attendanceOption,
+      formAnswers: answers,
+    };
   }
 
   /**

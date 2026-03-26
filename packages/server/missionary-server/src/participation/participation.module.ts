@@ -9,7 +9,9 @@ import { MissionaryModule } from '@/missionary/missionary.module';
 import { ParticipationController } from './participation.controller';
 import { ParticipationProcessor } from './participation.processor';
 import { ParticipationService } from './participation.service';
+import { FORM_ANSWER_REPOSITORY } from './repositories/form-answer-repository.interface';
 import { PARTICIPATION_REPOSITORY } from './repositories/participation-repository.interface';
+import { PrismaFormAnswerRepository } from './repositories/prisma-form-answer.repository';
 import { PrismaParticipationRepository } from './repositories/prisma-participation.repository';
 
 @Module({
@@ -29,6 +31,10 @@ import { PrismaParticipationRepository } from './repositories/prisma-participati
     {
       provide: PARTICIPATION_REPOSITORY,
       useClass: PrismaParticipationRepository,
+    },
+    {
+      provide: FORM_ANSWER_REPOSITORY,
+      useClass: PrismaFormAnswerRepository,
     },
   ],
   exports: [ParticipationService],
