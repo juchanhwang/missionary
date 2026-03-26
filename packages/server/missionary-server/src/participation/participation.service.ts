@@ -123,10 +123,7 @@ export class ParticipationService {
       );
     }
 
-    const updated = await this.participationRepository.updateWithRelations(
-      id,
-      updateData,
-    );
+    await this.participationRepository.updateWithRelations(id, updateData);
 
     if (answers && answers.length > 0) {
       await this.formAnswerRepository.upsertMany(
