@@ -61,9 +61,12 @@ export const formFieldApi = {
     return api.delete(`/missionaries/${missionaryId}/form-fields/${fieldId}`);
   },
 
-  reorderFormFields(missionaryId: string, fieldIds: string[]) {
+  reorderFormFields(
+    missionaryId: string,
+    items: { id: string; order: number }[],
+  ) {
     return api.patch(`/missionaries/${missionaryId}/form-fields/reorder`, {
-      fieldIds,
+      items,
     });
   },
 };

@@ -223,8 +223,11 @@ export function FormBuilderSection({ missionaryId }: FormBuilderSectionProps) {
       }
 
       // 4. 순서 변경
-      const finalFieldIds = localFields.map((f) => idMap.get(f.id) ?? f.id);
-      await reorderFields.mutateAsync(finalFieldIds);
+      const reorderItems = localFields.map((f, index) => ({
+        id: idMap.get(f.id) ?? f.id,
+        order: index,
+      }));
+      await reorderFields.mutateAsync(reorderItems);
 
       setIsDirty(false);
       setActiveFieldId(null);

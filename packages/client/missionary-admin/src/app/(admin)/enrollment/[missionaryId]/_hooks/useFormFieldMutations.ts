@@ -58,8 +58,8 @@ export function useReorderFormFields(missionaryId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (fieldIds: string[]) =>
-      formFieldApi.reorderFormFields(missionaryId, fieldIds),
+    mutationFn: (items: { id: string; order: number }[]) =>
+      formFieldApi.reorderFormFields(missionaryId, items),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.formFields.list(missionaryId),

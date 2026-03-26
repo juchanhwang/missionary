@@ -17,11 +17,15 @@ import { ParticipantPanel } from './panel/ParticipantPanel';
 import { ParticipantTable } from './ParticipantTable';
 import { useBulkApprovePayment } from '../_hooks/useBulkApprovePayment';
 import { useGetAttendanceOptions } from '../_hooks/useGetAttendanceOptions';
+import { useGetMissionEnrollmentSummary } from '../_hooks/useGetMissionEnrollmentSummary';
 import { useGetParticipations } from '../_hooks/useGetParticipations';
 import { useTogglePayment } from '../_hooks/useTogglePayment';
 import { downloadCsv } from '../_utils/csvDownload';
 
-import type { EnrollmentMissionSummary } from 'apis/enrollment';
+import type {
+  EnrollmentMissionSummary,
+  MissionEnrollmentSummary,
+} from 'apis/enrollment';
 import type {
   AttendanceOption,
   FormFieldDefinition,
@@ -33,6 +37,7 @@ const PAGE_SIZE = 20;
 interface EnrollmentDetailPageProps {
   mission: EnrollmentMissionSummary;
   initialParticipations: PaginatedParticipationsResponse;
+  initialEnrollmentSummary: MissionEnrollmentSummary;
   formFields: FormFieldDefinition[];
   attendanceOptions: AttendanceOption[];
 }
@@ -40,6 +45,7 @@ interface EnrollmentDetailPageProps {
 export function EnrollmentDetailPage({
   mission,
   initialParticipations,
+  initialEnrollmentSummary,
   formFields,
   attendanceOptions: initialAttendanceOptions,
 }: EnrollmentDetailPageProps) {
@@ -74,6 +80,12 @@ export function EnrollmentDetailPage({
       missionaryId: mission.id,
       initialData: initialAttendanceOptions,
     });
+
+  // 등록 통계
+  const { data: enrollmentSummary } = useGetMissionEnrollmentSummary({
+    missionaryId: mission.id,
+    initialData: initialEnrollmentSummary,
+  });
 
   // 데이터 훅
   const { data, isLoading } = useGetParticipations({
@@ -213,11 +225,8 @@ export function EnrollmentDetailPage({
           status={mission.status}
         />
 
-        {data && (
-          <EnrollmentSummaryCard
-            participations={data}
-            maximumParticipantCount={mission.maximumParticipantCount}
-          />
+        {enrollmentSummary && (
+          <EnrollmentSummaryCard summary={enrollmentSummary} />
         )}
 
         <EnrollmentToolbar

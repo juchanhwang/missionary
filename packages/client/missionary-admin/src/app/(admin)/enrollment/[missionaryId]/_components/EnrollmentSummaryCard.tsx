@@ -3,33 +3,28 @@
 import { SummaryStatItem } from './SummaryStatItem';
 import { ProgressBar } from '../../_components/ProgressBar';
 
-import type { PaginatedParticipationsResponse } from 'apis/participation';
+import type { MissionEnrollmentSummary } from 'apis/enrollment';
 
 interface EnrollmentSummaryCardProps {
-  participations: PaginatedParticipationsResponse;
-  maximumParticipantCount: number | null;
+  summary: MissionEnrollmentSummary;
 }
 
-export function EnrollmentSummaryCard({
-  participations,
-  maximumParticipantCount,
-}: EnrollmentSummaryCardProps) {
-  const total = participations.total;
-  const paidCount = participations.data.filter((p) => p.isPaid).length;
-  const unpaidCount = participations.data.filter((p) => !p.isPaid).length;
-  const fullCount = participations.data.filter(
-    (p) => p.attendanceOption?.type === 'FULL',
-  ).length;
-  const partialCount = participations.data.filter(
-    (p) => p.attendanceOption?.type === 'PARTIAL',
-  ).length;
+export function EnrollmentSummaryCard({ summary }: EnrollmentSummaryCardProps) {
+  const {
+    totalParticipants,
+    maxParticipants,
+    paidCount,
+    unpaidCount,
+    fullAttendanceCount,
+    partialAttendanceCount,
+  } = summary;
 
-  const progressPercent = maximumParticipantCount
-    ? Math.round((total / maximumParticipantCount) * 100)
+  const progressPercent = maxParticipants
+    ? Math.round((totalParticipants / maxParticipants) * 100)
     : null;
 
   const isOverCapacity =
-    maximumParticipantCount !== null && total > maximumParticipantCount;
+    maxParticipants !== null && totalParticipants > maxParticipants;
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5">
@@ -38,12 +33,8 @@ export function EnrollmentSummaryCard({
         <div className="flex flex-col gap-3">
           <SummaryStatItem
             label="총 등록자"
-            value={`${total}명`}
-            subValue={
-              maximumParticipantCount
-                ? `정원 ${maximumParticipantCount}명`
-                : undefined
-            }
+            value={`${totalParticipants}명`}
+            subValue={maxParticipants ? `정원 ${maxParticipants}명` : undefined}
             valueClassName={isOverCapacity ? 'text-warning-70' : ''}
           />
           {progressPercent !== null && (
@@ -64,8 +55,8 @@ export function EnrollmentSummaryCard({
         {/* 참석 유형 */}
         <SummaryStatItem
           label="풀참석"
-          value={`${fullCount}명`}
-          subValue={`옵션참여 ${partialCount}명`}
+          value={`${fullAttendanceCount}명`}
+          subValue={`옵션참여 ${partialAttendanceCount}명`}
         />
       </div>
     </div>

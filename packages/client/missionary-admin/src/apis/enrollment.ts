@@ -31,10 +31,27 @@ export interface GetEnrollmentSummaryResponse {
   totalRecruitingParticipants: number;
 }
 
+// === 상세 페이지 등록 통계 ===
+
+export interface MissionEnrollmentSummary {
+  totalParticipants: number;
+  maxParticipants: number | null;
+  paidCount: number;
+  unpaidCount: number;
+  fullAttendanceCount: number;
+  partialAttendanceCount: number;
+}
+
 // === API 함수 ===
 
 export const enrollmentApi = {
   getEnrollmentSummary() {
     return api.get<GetEnrollmentSummaryResponse>('/enrollment/summary');
+  },
+
+  getMissionEnrollmentSummary(missionaryId: string) {
+    return api.get<MissionEnrollmentSummary>(
+      `/missionaries/${missionaryId}/enrollment-summary`,
+    );
   },
 };

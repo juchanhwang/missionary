@@ -29,6 +29,8 @@ export const queryKeys = {
   enrollmentSummary: {
     all: ['enrollmentSummary'] as const,
     list: () => [...queryKeys.enrollmentSummary.all, 'list'] as const,
+    detail: (missionaryId: string) =>
+      [...queryKeys.enrollmentSummary.all, 'detail', missionaryId] as const,
   },
   participations: {
     all: ['participations'] as const,

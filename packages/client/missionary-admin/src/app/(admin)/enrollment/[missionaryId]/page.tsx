@@ -27,11 +27,19 @@ export default async function EnrollmentDetailRoute({
     );
   }
 
-  // TODO: formFields, attendanceOptions는 BE API 완성 후 실제 데이터로 교체
+  // TODO: BE API 완성 후 실제 SSR 데이터로 교체
   return (
     <EnrollmentDetailPage
       mission={mission}
       initialParticipations={participationsData}
+      initialEnrollmentSummary={{
+        totalParticipants: mission.currentParticipantCount,
+        maxParticipants: mission.maximumParticipantCount,
+        paidCount: mission.paidCount,
+        unpaidCount: mission.currentParticipantCount - mission.paidCount,
+        fullAttendanceCount: 0,
+        partialAttendanceCount: 0,
+      }}
       formFields={[]}
       attendanceOptions={[]}
     />
