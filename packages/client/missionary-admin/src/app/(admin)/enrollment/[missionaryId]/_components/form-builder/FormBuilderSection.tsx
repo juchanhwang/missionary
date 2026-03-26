@@ -181,13 +181,15 @@ export function FormBuilderSection({ missionaryId }: FormBuilderSectionProps) {
 
       // 2. 새 필드 생성 (임시 ID → 서버 ID 매핑)
       const idMap = new Map<string, string>();
-      for (const field of localFields) {
+      for (let i = 0; i < localFields.length; i++) {
+        const field = localFields[i];
         if (!serverFieldIds.has(field.id)) {
           const response = await createField.mutateAsync({
             fieldType: field.fieldType as FormFieldType,
             label: field.label,
             placeholder: field.placeholder ?? undefined,
             isRequired: field.isRequired,
+            order: i,
             options: field.options ?? undefined,
           });
           idMap.set(field.id, response.data.id);

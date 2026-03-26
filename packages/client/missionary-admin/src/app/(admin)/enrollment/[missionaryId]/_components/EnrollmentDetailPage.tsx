@@ -79,8 +79,8 @@ export function EnrollmentDetailPage({
   const { data, isLoading } = useGetParticipations({
     params: {
       missionaryId: mission.id,
-      page: currentPage,
-      pageSize: PAGE_SIZE,
+      limit: PAGE_SIZE,
+      offset: (currentPage - 1) * PAGE_SIZE,
       isPaid:
         isPaidFilter === 'true'
           ? true
@@ -159,7 +159,7 @@ export function EnrollmentDetailPage({
   };
 
   const handleCheckAll = () => {
-    const items = data?.items ?? [];
+    const items = data?.data ?? [];
     const allChecked = items.every((p) => checkedIds.has(p.id));
     if (allChecked) {
       setCheckedIds(new Set());
@@ -266,7 +266,7 @@ export function EnrollmentDetailPage({
         <ParticipantPanel
           key={mountedParticipantId}
           participantId={mountedParticipantId}
-          participants={data?.items ?? []}
+          participants={data?.data ?? []}
           attendanceOptions={attendanceOptions}
           formFields={formFields}
           missionName={mission.name}

@@ -19,6 +19,7 @@ export interface CreateFormFieldPayload {
   label: string;
   placeholder?: string;
   isRequired: boolean;
+  order: number;
   options?: string[];
 }
 

@@ -48,7 +48,7 @@ export function ParticipantTable({
   pageSize,
   onPageChange,
 }: ParticipantTableProps) {
-  const participants = data?.items ?? [];
+  const participants = data?.data ?? [];
 
   // 클라이언트 사이드 이름 검색
   const filteredParticipants = searchQuery

@@ -9,6 +9,7 @@ export type { AttendanceOption };
 export interface CreateAttendanceOptionPayload {
   type: 'FULL' | 'PARTIAL';
   label: string;
+  order: number;
 }
 
 export interface UpdateAttendanceOptionPayload {

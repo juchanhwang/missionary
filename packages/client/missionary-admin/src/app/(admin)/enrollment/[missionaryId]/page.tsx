@@ -14,7 +14,7 @@ export default async function EnrollmentDetailRoute({
 
   const [summaryData, participationsData] = await Promise.all([
     getServerEnrollmentSummary(),
-    getServerParticipations({ missionaryId, page: 1, pageSize: 20 }),
+    getServerParticipations({ missionaryId, limit: 20, offset: 0 }),
   ]);
 
   const mission = summaryData.missions.find((m) => m.id === missionaryId);

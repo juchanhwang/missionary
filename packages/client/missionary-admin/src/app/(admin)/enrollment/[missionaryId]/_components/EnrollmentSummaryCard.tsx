@@ -15,12 +15,12 @@ export function EnrollmentSummaryCard({
   maximumParticipantCount,
 }: EnrollmentSummaryCardProps) {
   const total = participations.total;
-  const paidCount = participations.items.filter((p) => p.isPaid).length;
-  const unpaidCount = participations.items.filter((p) => !p.isPaid).length;
-  const fullCount = participations.items.filter(
+  const paidCount = participations.data.filter((p) => p.isPaid).length;
+  const unpaidCount = participations.data.filter((p) => !p.isPaid).length;
+  const fullCount = participations.data.filter(
     (p) => p.attendanceOption?.type === 'FULL',
   ).length;
-  const partialCount = participations.items.filter(
+  const partialCount = participations.data.filter(
     (p) => p.attendanceOption?.type === 'PARTIAL',
   ).length;
 

@@ -38,7 +38,7 @@ export function AttendanceOptionManager({
     }
 
     createOption.mutate(
-      { type: newType, label: trimmed },
+      { type: newType, label: trimmed, order: options.length },
       {
         onSuccess: () => {
           setNewLabel('');

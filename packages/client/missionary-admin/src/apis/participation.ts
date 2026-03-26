@@ -49,7 +49,7 @@ export interface Participation {
   createdAt: string;
   affiliation: string;
   attendanceOptionId: string;
-  attendanceOption: AttendanceOption;
+  attendanceOption: AttendanceOption | null;
   cohort: number;
   hasPastParticipation: boolean | null;
   isCollegeStudent: boolean | null;
@@ -58,17 +58,16 @@ export interface Participation {
 
 export interface GetParticipationsParams {
   missionaryId: string;
-  page?: number;
-  pageSize?: number;
+  limit?: number;
+  offset?: number;
   isPaid?: boolean;
   attendanceType?: 'FULL' | 'PARTIAL';
+  query?: string;
 }
 
 export interface PaginatedParticipationsResponse {
-  items: Participation[];
+  data: Participation[];
   total: number;
-  page: number;
-  pageSize: number;
 }
 
 export interface UpdateParticipationPayload {
@@ -98,8 +97,8 @@ export const participationApi = {
     return api.patch<Participation>(`/participations/${id}`, data);
   },
 
-  bulkApprovePayment(ids: string[]) {
-    return api.put('/participations/approve', { ids });
+  bulkApprovePayment(participationIds: string[]) {
+    return api.put('/participations/approve', { participationIds });
   },
 
   downloadCsv(missionaryId: string) {

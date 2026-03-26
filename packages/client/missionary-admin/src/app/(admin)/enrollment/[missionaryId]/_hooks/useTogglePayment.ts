@@ -29,7 +29,7 @@ export function useTogglePayment() {
           if (!old) return old;
           return {
             ...old,
-            items: old.items.map((item) =>
+            data: old.data.map((item) =>
               item.id === id ? { ...item, isPaid } : item,
             ),
           };
