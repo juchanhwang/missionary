@@ -1,4 +1,7 @@
+import { getServerAttendanceOptions } from 'apis/attendanceOption.server';
 import { getServerEnrollmentSummary } from 'apis/enrollment.server';
+import { getServerMissionEnrollmentSummary } from 'apis/enrollment.summary.server';
+import { getServerFormFields } from 'apis/formField.server';
 import { getServerParticipations } from 'apis/participation.server';
 
 import { EnrollmentDetailPage } from './_components/EnrollmentDetailPage';
@@ -12,9 +15,18 @@ export default async function EnrollmentDetailRoute({
 }: EnrollmentDetailPageParams) {
   const { missionaryId } = await params;
 
-  const [summaryData, participationsData] = await Promise.all([
+  const [
+    summaryData,
+    participationsData,
+    enrollmentSummaryData,
+    formFieldsData,
+    attendanceOptionsData,
+  ] = await Promise.all([
     getServerEnrollmentSummary(),
     getServerParticipations({ missionaryId, limit: 20, offset: 0 }),
+    getServerMissionEnrollmentSummary(missionaryId),
+    getServerFormFields(missionaryId),
+    getServerAttendanceOptions(missionaryId),
   ]);
 
   const mission = summaryData.missions.find((m) => m.id === missionaryId);
@@ -27,21 +39,13 @@ export default async function EnrollmentDetailRoute({
     );
   }
 
-  // TODO: BE API 완성 후 실제 SSR 데이터로 교체
   return (
     <EnrollmentDetailPage
       mission={mission}
       initialParticipations={participationsData}
-      initialEnrollmentSummary={{
-        totalParticipants: mission.currentParticipantCount,
-        maxParticipants: mission.maximumParticipantCount,
-        paidCount: mission.paidCount,
-        unpaidCount: mission.currentParticipantCount - mission.paidCount,
-        fullAttendanceCount: 0,
-        partialAttendanceCount: 0,
-      }}
-      formFields={[]}
-      attendanceOptions={[]}
+      initialEnrollmentSummary={enrollmentSummaryData}
+      formFields={formFieldsData}
+      attendanceOptions={attendanceOptionsData}
     />
   );
 }

@@ -51,7 +51,7 @@ export const enrollmentApi = {
 
   getMissionEnrollmentSummary(missionaryId: string) {
     return api.get<MissionEnrollmentSummary>(
-      `/missionaries/${missionaryId}/enrollment-summary`,
+      `/participations/enrollment-summary/${missionaryId}`,
     );
   },
 };
