@@ -23,14 +23,14 @@ export class PrismaAttendanceOptionRepository implements AttendanceOptionReposit
     missionaryId: string,
   ): Promise<MissionaryAttendanceOption[]> {
     return this.prisma.missionaryAttendanceOption.findMany({
-      where: { missionaryId },
+      where: { missionaryId, deletedAt: null },
       orderBy: { order: 'asc' },
     });
   }
 
   async findById(id: string): Promise<MissionaryAttendanceOption | null> {
     return this.prisma.missionaryAttendanceOption.findFirst({
-      where: { id },
+      where: { id, deletedAt: null },
     });
   }
 
@@ -45,8 +45,9 @@ export class PrismaAttendanceOptionRepository implements AttendanceOptionReposit
   }
 
   async delete(id: string): Promise<MissionaryAttendanceOption> {
-    return this.prisma.missionaryAttendanceOption.delete({
+    return this.prisma.missionaryAttendanceOption.update({
       where: { id },
+      data: { deletedAt: new Date() },
     });
   }
 

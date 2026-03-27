@@ -1,5 +1,6 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import {
+  BadRequestException,
   Inject,
   Injectable,
   NotFoundException,
@@ -10,6 +11,10 @@ import { Queue } from 'bullmq';
 import { EncryptionService } from '@/common/encryption/encryption.service';
 import { UserRole } from '@/common/enums/user-role.enum';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
+import {
+  FORM_FIELD_REPOSITORY,
+  type FormFieldRepository,
+} from '@/missionary/repositories/form-field-repository.interface';
 
 import { CreateParticipationDto } from './dto/create-participation.dto';
 import { UpdateParticipationDto } from './dto/update-participation.dto';
@@ -37,6 +42,8 @@ export class ParticipationService {
     private readonly participationRepository: ParticipationRepository,
     @Inject(FORM_ANSWER_REPOSITORY)
     private readonly formAnswerRepository: FormAnswerRepository,
+    @Inject(FORM_FIELD_REPOSITORY)
+    private readonly formFieldRepository: FormFieldRepository,
     private readonly encryptionService: EncryptionService,
     @InjectQueue('participation-queue') private readonly queue: Queue,
   ) {}
@@ -191,6 +198,20 @@ export class ParticipationService {
       );
     }
 
+    const validFields = await this.formFieldRepository.findByMissionary(
+      participation.missionaryId,
+    );
+    const validFieldIds = new Set(validFields.map((f) => f.id));
+    const invalidIds = dto.answers
+      .filter((a) => !validFieldIds.has(a.formFieldId))
+      .map((a) => a.formFieldId);
+
+    if (invalidIds.length > 0) {
+      throw new BadRequestException(
+        `Invalid formFieldIds: ${invalidIds.join(', ')}`,
+      );
+    }
+
     const inputs = dto.answers.map((a) => ({
       participationId,
       formFieldId: a.formFieldId,
@@ -199,5 +220,9 @@ export class ParticipationService {
     }));
 
     return this.formAnswerRepository.upsertMany(inputs);
+  }
+
+  async getEnrollmentSummary(missionaryId: string) {
+    return this.participationRepository.getEnrollmentSummary(missionaryId);
   }
 }

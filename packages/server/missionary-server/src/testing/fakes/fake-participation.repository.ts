@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 
 import type { BaseRepository } from '@/common/repositories';
 import type {
+  EnrollmentSummary,
   FindAllFilters,
   FindAllResult,
   ParticipationCreateInput,
@@ -162,8 +163,11 @@ export class FakeParticipationRepository
 
     const total = sorted.length;
     const offset = filters.offset ?? 0;
-    const limit = filters.limit ?? 20;
-    const paged = sorted.slice(offset, offset + limit);
+    const limit = filters.limit;
+    const paged =
+      limit !== undefined
+        ? sorted.slice(offset, offset + limit)
+        : sorted.slice(offset);
 
     return {
       data: paged.map((p) => this.withRelations(p)),
@@ -253,6 +257,39 @@ export class FakeParticipationRepository
     }
 
     return result;
+  }
+
+  async getEnrollmentSummary(missionaryId: string): Promise<EnrollmentSummary> {
+    const active = [...this.store.values()].filter(
+      (p) => p.missionaryId === missionaryId && p.deletedAt === null,
+    );
+
+    const missionary = this.missionaries.get(missionaryId);
+
+    let fullAttendanceCount = 0;
+    let partialAttendanceCount = 0;
+    let paidCount = 0;
+    let unpaidCount = 0;
+
+    for (const p of active) {
+      if (p.isPaid) paidCount++;
+      else unpaidCount++;
+
+      if (p.attendanceOptionId) {
+        const option = this.attendanceOptions.get(p.attendanceOptionId);
+        if (option?.type === 'FULL') fullAttendanceCount++;
+        else if (option?.type === 'PARTIAL') partialAttendanceCount++;
+      }
+    }
+
+    return {
+      totalParticipants: active.length,
+      maxParticipants: missionary?.maximumParticipantCount ?? null,
+      paidCount,
+      unpaidCount,
+      fullAttendanceCount,
+      partialAttendanceCount,
+    };
   }
 
   // --- 테스트 헬퍼 ---

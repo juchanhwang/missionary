@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
 
 import type {
+  EnrollmentSummary,
   FindAllFilters,
   FindAllResult,
   ParticipationCreateInput,
@@ -112,7 +113,7 @@ export class PrismaParticipationRepository implements ParticipationRepository {
         where,
         include: PrismaParticipationRepository.RELATIONS_INCLUDE,
         orderBy: { createdAt: 'desc' },
-        take: filters.limit ?? 20,
+        ...(filters.limit !== undefined ? { take: filters.limit } : {}),
         skip: filters.offset ?? 0,
       }),
       this.prisma.participation.count({ where }),
@@ -194,5 +195,53 @@ export class PrismaParticipationRepository implements ParticipationRepository {
 
       return participation as ParticipationWithRelations;
     });
+  }
+
+  async getEnrollmentSummary(missionaryId: string): Promise<EnrollmentSummary> {
+    const [missionary, paidGroups, attendanceGroups, options] =
+      await Promise.all([
+        this.prisma.missionary.findUnique({
+          where: { id: missionaryId },
+          select: { maximumParticipantCount: true },
+        }),
+        this.prisma.participation.groupBy({
+          by: ['isPaid'],
+          where: { missionaryId, deletedAt: null },
+          _count: true,
+        }),
+        this.prisma.participation.groupBy({
+          by: ['attendanceOptionId'],
+          where: { missionaryId, deletedAt: null },
+          _count: true,
+        }),
+        this.prisma.missionaryAttendanceOption.findMany({
+          where: { missionaryId, deletedAt: null },
+          select: { id: true, type: true },
+        }),
+      ]);
+
+    const optionTypeMap = new Map(options.map((o) => [o.id, o.type]));
+
+    let fullAttendanceCount = 0;
+    let partialAttendanceCount = 0;
+    for (const ag of attendanceGroups) {
+      if (ag.attendanceOptionId) {
+        const type = optionTypeMap.get(ag.attendanceOptionId);
+        if (type === 'FULL') fullAttendanceCount += ag._count;
+        else if (type === 'PARTIAL') partialAttendanceCount += ag._count;
+      }
+    }
+
+    const paidCount = paidGroups.find((p) => p.isPaid === true)?._count ?? 0;
+    const unpaidCount = paidGroups.find((p) => p.isPaid === false)?._count ?? 0;
+
+    return {
+      totalParticipants: paidCount + unpaidCount,
+      maxParticipants: missionary?.maximumParticipantCount ?? null,
+      paidCount,
+      unpaidCount,
+      fullAttendanceCount,
+      partialAttendanceCount,
+    };
   }
 }

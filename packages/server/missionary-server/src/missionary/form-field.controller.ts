@@ -16,6 +16,7 @@ import { UserRole } from '@/common/enums/user-role.enum';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 
 import { CreateFormFieldDto } from './dto/create-form-field.dto';
+import { ReorderFormFieldsDto } from './dto/reorder-form-fields.dto';
 import { UpdateFormFieldDto } from './dto/update-form-field.dto';
 import { FormFieldService } from './form-field.service';
 
@@ -35,8 +36,18 @@ export class FormFieldController {
     return this.service.create(missionaryId, dto, user.id);
   }
 
+  @Patch('reorder')
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: '커스텀 폼 필드 순서 일괄 변경 (관리자 전용)' })
+  reorder(
+    @Param('missionaryId', ParseUUIDPipe) missionaryId: string,
+    @Body() dto: ReorderFormFieldsDto,
+  ) {
+    return this.service.reorder(missionaryId, dto.items);
+  }
+
   @Get()
-  @ApiOperation({ summary: '커스텀 폼 필드 목록 조회' })
+  @ApiOperation({ summary: '커스텀 폼 필드 목록 조회 (hasAnswers 포함)' })
   findAll(@Param('missionaryId', ParseUUIDPipe) missionaryId: string) {
     return this.service.findByMissionary(missionaryId);
   }

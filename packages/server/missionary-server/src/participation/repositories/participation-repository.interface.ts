@@ -33,6 +33,15 @@ export interface FindAllResult {
   total: number;
 }
 
+export interface EnrollmentSummary {
+  totalParticipants: number;
+  maxParticipants: number | null;
+  paidCount: number;
+  unpaidCount: number;
+  fullAttendanceCount: number;
+  partialAttendanceCount: number;
+}
+
 export type ParticipationCreateInput = Prisma.ParticipationUncheckedCreateInput;
 
 export type ParticipationUpdateInput = Prisma.ParticipationUncheckedUpdateInput;
@@ -61,6 +70,7 @@ export interface ParticipationRepository extends BaseRepository<
     data: ParticipationCreateInput,
     missionaryId: string,
   ): Promise<ParticipationWithRelations>;
+  getEnrollmentSummary(missionaryId: string): Promise<EnrollmentSummary>;
 }
 
 export const PARTICIPATION_REPOSITORY = Symbol('PARTICIPATION_REPOSITORY');

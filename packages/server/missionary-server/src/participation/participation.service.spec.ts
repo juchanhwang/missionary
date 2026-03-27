@@ -4,10 +4,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { EncryptionService } from '@/common/encryption/encryption.service';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
+import { FORM_FIELD_REPOSITORY } from '@/missionary/repositories/form-field-repository.interface';
 import { makeMissionary } from '@/testing/factories/missionary.factory';
 import { makeParticipation } from '@/testing/factories/participation.factory';
 import { makeUser } from '@/testing/factories/user.factory';
 import { FakeFormAnswerRepository } from '@/testing/fakes/fake-form-answer.repository';
+import { FakeFormFieldRepository } from '@/testing/fakes/fake-form-field.repository';
 import { FakeParticipationRepository } from '@/testing/fakes/fake-participation.repository';
 
 import { CreateParticipationDto } from './dto/create-participation.dto';
@@ -30,12 +32,14 @@ describe('ParticipationService', () => {
   let service: ParticipationService;
   let fakeParticipationRepo: FakeParticipationRepository;
   let fakeFormAnswerRepo: FakeFormAnswerRepository;
+  let fakeFormFieldRepo: FakeFormFieldRepository;
   let mockEncryptionService: { encrypt: jest.Mock; decrypt: jest.Mock };
   let mockQueue: { add: jest.Mock };
 
   beforeEach(async () => {
     fakeParticipationRepo = new FakeParticipationRepository();
     fakeFormAnswerRepo = new FakeFormAnswerRepository();
+    fakeFormFieldRepo = new FakeFormFieldRepository();
 
     mockEncryptionService = {
       encrypt: jest.fn((value: string) => `encrypted-${value}`),
@@ -57,6 +61,10 @@ describe('ParticipationService', () => {
           provide: FORM_ANSWER_REPOSITORY,
           useValue: fakeFormAnswerRepo,
         },
+        {
+          provide: FORM_FIELD_REPOSITORY,
+          useValue: fakeFormFieldRepo,
+        },
         { provide: EncryptionService, useValue: mockEncryptionService },
         {
           provide: getQueueToken('participation-queue'),
@@ -71,6 +79,7 @@ describe('ParticipationService', () => {
   afterEach(() => {
     fakeParticipationRepo.clear();
     fakeFormAnswerRepo.clear();
+    fakeFormFieldRepo.clear();
   });
 
   describe('create', () => {

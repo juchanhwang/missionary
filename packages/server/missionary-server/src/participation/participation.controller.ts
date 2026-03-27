@@ -52,6 +52,15 @@ export class ParticipationController {
     return this.participationService.approvePayments(dto.participationIds);
   }
 
+  @Get('enrollment-summary/:missionaryId')
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
+  @ApiOperation({ summary: '등록 현황 요약 조회 (관리자/스태프 전용)' })
+  getEnrollmentSummary(
+    @Param('missionaryId', ParseUUIDPipe) missionaryId: string,
+  ) {
+    return this.participationService.getEnrollmentSummary(missionaryId);
+  }
+
   @Get('download/:missionaryId')
   @Roles(UserRole.ADMIN, UserRole.STAFF)
   @ApiOperation({ summary: '참가 신청 CSV 다운로드 (관리자/스태프 전용)' })
@@ -61,8 +70,6 @@ export class ParticipationController {
   ) {
     const result = await this.participationService.findAll({
       missionaryId,
-      limit: 10000,
-      offset: 0,
     });
 
     const formFields =

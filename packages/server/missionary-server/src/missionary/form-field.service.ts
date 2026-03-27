@@ -17,6 +17,11 @@ import {
 
 import type { CreateFormFieldDto } from './dto/create-form-field.dto';
 import type { UpdateFormFieldDto } from './dto/update-form-field.dto';
+import type { MissionaryFormField } from '../../prisma/generated/prisma';
+
+export type FormFieldWithHasAnswers = MissionaryFormField & {
+  hasAnswers: boolean;
+};
 
 @Injectable()
 export class FormFieldService {
@@ -54,8 +59,20 @@ export class FormFieldService {
     });
   }
 
-  async findByMissionary(missionaryId: string) {
-    return this.repo.findByMissionary(missionaryId);
+  async findByMissionary(
+    missionaryId: string,
+  ): Promise<FormFieldWithHasAnswers[]> {
+    const fields = await this.repo.findByMissionary(missionaryId);
+
+    if (fields.length === 0) return [];
+
+    const fieldIds = fields.map((f) => f.id);
+    const answerCounts = await this.repo.countAnswersByFields(fieldIds);
+
+    return fields.map((f) => ({
+      ...f,
+      hasAnswers: (answerCounts[f.id] ?? 0) > 0,
+    }));
   }
 
   async update(fieldId: string, dto: UpdateFormFieldDto, userId: string) {
@@ -74,6 +91,15 @@ export class FormFieldService {
     }
 
     return this.repo.update(fieldId, updateData);
+  }
+
+  async reorder(missionaryId: string, items: { id: string; order: number }[]) {
+    const missionary = await this.missionaryRepo.findWithDetails(missionaryId);
+    if (!missionary) throw new NotFoundException('Missionary not found');
+
+    await this.repo.reorderBulk(items);
+
+    return { message: `${items.length} field(s) reordered` };
   }
 
   async remove(fieldId: string) {

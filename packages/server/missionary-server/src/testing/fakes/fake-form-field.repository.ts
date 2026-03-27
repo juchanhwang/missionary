@@ -10,6 +10,7 @@ import type { MissionaryFormField } from '../../../prisma/generated/prisma';
 
 export class FakeFormFieldRepository implements FormFieldRepository {
   private store = new Map<string, MissionaryFormField>();
+  private answerCounts = new Map<string, number>();
 
   async create(data: FormFieldCreateInput): Promise<MissionaryFormField> {
     const now = new Date();
@@ -70,7 +71,34 @@ export class FakeFormFieldRepository implements FormFieldRepository {
     return deleted;
   }
 
+  async reorderBulk(items: { id: string; order: number }[]): Promise<void> {
+    for (const item of items) {
+      const entity = this.store.get(item.id);
+      if (entity) {
+        this.store.set(item.id, { ...entity, order: item.order });
+      }
+    }
+  }
+
+  async countAnswersByFields(
+    fieldIds: string[],
+  ): Promise<Record<string, number>> {
+    const result: Record<string, number> = {};
+    for (const id of fieldIds) {
+      const count = this.answerCounts.get(id);
+      if (count !== undefined && count > 0) {
+        result[id] = count;
+      }
+    }
+    return result;
+  }
+
+  setAnswerCount(fieldId: string, count: number): void {
+    this.answerCounts.set(fieldId, count);
+  }
+
   clear(): void {
     this.store.clear();
+    this.answerCounts.clear();
   }
 }

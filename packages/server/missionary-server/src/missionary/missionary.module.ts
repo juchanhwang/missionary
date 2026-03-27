@@ -63,6 +63,7 @@ import { PrismaMissionaryRepository } from './repositories/prisma-missionary.rep
   ],
   exports: [
     MissionaryService,
+    FormFieldService,
     MISSIONARY_REPOSITORY,
     ATTENDANCE_OPTION_REPOSITORY,
     FORM_FIELD_REPOSITORY,

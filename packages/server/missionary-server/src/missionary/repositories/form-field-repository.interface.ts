@@ -31,6 +31,8 @@ export interface FormFieldRepository {
   findById(id: string): Promise<MissionaryFormField | null>;
   update(id: string, data: FormFieldUpdateInput): Promise<MissionaryFormField>;
   delete(id: string): Promise<MissionaryFormField>;
+  reorderBulk(items: { id: string; order: number }[]): Promise<void>;
+  countAnswersByFields(fieldIds: string[]): Promise<Record<string, number>>;
 }
 
 export const FORM_FIELD_REPOSITORY = Symbol('FORM_FIELD_REPOSITORY');
