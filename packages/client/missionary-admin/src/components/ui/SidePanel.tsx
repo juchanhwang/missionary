@@ -77,18 +77,6 @@ export function SidePanel({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen]);
 
-  // Esc 키로 닫기
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
-
   const handleTransitionEnd = (e: React.TransitionEvent) => {
     if (e.propertyName === 'translate' && !isVisible && !hasExitedRef.current) {
       hasExitedRef.current = true;

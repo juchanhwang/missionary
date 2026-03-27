@@ -2,7 +2,7 @@
 
 import { Badge, overlay } from '@samilhero/design-system';
 import { PANEL_TRANSITION_MS, SidePanel } from 'components/ui/SidePanel';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { ParticipantForm } from './ParticipantForm';
 import { useGetParticipation } from '../../_hooks/useGetParticipation';
@@ -85,6 +85,18 @@ export function ParticipantPanel({
       onClose();
     }
   };
+
+  // Escape 키 → dirty guard 경유하여 닫기
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        requestClose();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const navigateTo = async (id: string) => {
     if (!(await confirmIfDirty())) return;

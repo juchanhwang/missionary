@@ -3,7 +3,7 @@
 import { overlay } from '@samilhero/design-system';
 import { PANEL_TRANSITION_MS, SidePanel } from 'components/ui/SidePanel';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { DeleteUserModal } from './DeleteUserModal';
 import { UnsavedChangesModal } from './UnsavedChangesModal';
@@ -65,6 +65,18 @@ export function UserEditPanel({
       onClose();
     }
   };
+
+  // Escape 키 → dirty guard 경유하여 닫기
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        requestClose();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const navigateToUser = async (targetUserId: string) => {
     if (!(await confirmIfDirty())) return;
