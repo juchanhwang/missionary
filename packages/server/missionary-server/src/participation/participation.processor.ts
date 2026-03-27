@@ -1,5 +1,6 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
@@ -9,6 +10,10 @@ import {
 import { Job } from 'bullmq';
 
 import { EncryptionService } from '@/common/encryption/encryption.service';
+import {
+  ATTENDANCE_OPTION_REPOSITORY,
+  type AttendanceOptionRepository,
+} from '@/missionary/repositories/attendance-option-repository.interface';
 import {
   MISSIONARY_REPOSITORY,
   type MissionaryRepository,
@@ -31,6 +36,8 @@ export class ParticipationProcessor extends WorkerHost {
     private readonly participationRepository: ParticipationRepository,
     @Inject(MISSIONARY_REPOSITORY)
     private readonly missionaryRepository: MissionaryRepository,
+    @Inject(ATTENDANCE_OPTION_REPOSITORY)
+    private readonly attendanceOptionRepository: AttendanceOptionRepository,
     private readonly encryptionService: EncryptionService,
   ) {
     super();
@@ -58,6 +65,19 @@ export class ParticipationProcessor extends WorkerHost {
       throw new ConflictException('Missionary is at full capacity');
     }
 
+    // TRAP-4: attendanceOptionId cross-validation
+    const attendanceOption = await this.attendanceOptionRepository.findById(
+      dto.attendanceOptionId,
+    );
+    if (
+      !attendanceOption ||
+      attendanceOption.missionaryId !== dto.missionaryId
+    ) {
+      throw new BadRequestException(
+        `Attendance option ${dto.attendanceOptionId} does not belong to missionary ${dto.missionaryId}`,
+      );
+    }
+
     const encryptedIdentificationNumber = this.encryptionService.encrypt(
       dto.identificationNumber,
     );
@@ -72,6 +92,11 @@ export class ParticipationProcessor extends WorkerHost {
         missionaryId: dto.missionaryId,
         userId,
         createdBy: userId,
+        affiliation: dto.affiliation,
+        attendanceOptionId: dto.attendanceOptionId,
+        cohort: dto.cohort,
+        hasPastParticipation: dto.hasPastParticipation ?? null,
+        isCollegeStudent: dto.isCollegeStudent ?? null,
       },
       dto.missionaryId,
     );

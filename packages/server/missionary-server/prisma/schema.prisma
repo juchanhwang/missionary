@@ -43,6 +43,20 @@ enum MissionaryStaffRole {
   MEMBER
 }
 
+enum AttendanceType {
+  FULL
+  PARTIAL
+}
+
+enum FormFieldType {
+  TEXT
+  TEXTAREA
+  NUMBER
+  BOOLEAN
+  SELECT
+  DATE
+}
+
 enum MissionStatus {
   ENROLLMENT_OPENED
   ENROLLMENT_CLOSED
@@ -174,13 +188,15 @@ model Missionary {
   deletedAt DateTime? @map("deleted_at")
 
   // Relations
-  missionGroup    MissionGroup?         @relation(fields: [missionGroupId], references: [id])
-  creator         User                  @relation("MissionaryCreator", fields: [createdById], references: [id])
-  posters         MissionaryPoster[]
-  staff           MissionaryStaff[]
-  boards          MissionaryBoard[]
-  participations  Participation[]
-  teams           Team[]
+  missionGroup       MissionGroup?         @relation(fields: [missionGroupId], references: [id])
+  creator            User                  @relation("MissionaryCreator", fields: [createdById], references: [id])
+  posters            MissionaryPoster[]
+  staff              MissionaryStaff[]
+  boards             MissionaryBoard[]
+  participations     Participation[]
+  teams              Team[]
+  attendanceOptions  MissionaryAttendanceOption[]
+  formFields         MissionaryFormField[]
 
   @@unique([missionGroupId, order])
   @@map("missionary")
@@ -327,6 +343,13 @@ model Participation {
   identificationNumber  String?  @map("identification_number") // Will be AES-encrypted in service layer
   isOwnCar              Boolean  @default(false) @map("is_own_car")
 
+  // 등록 관리 신규 필드 (기존 데이터 호환을 위해 nullable, DTO에서 필수 강제)
+  affiliation           String?
+  attendanceOptionId    String?  @map("attendance_option_id")
+  cohort                Int?
+  hasPastParticipation  Boolean? @map("has_past_participation")
+  isCollegeStudent      Boolean? @map("is_college_student")
+
   // Foreign keys
   missionaryId String  @map("missionary_id")
   userId       String  @map("user_id")
@@ -344,11 +367,94 @@ model Participation {
   deletedAt DateTime? @map("deleted_at")
 
   // Relations
-  missionary Missionary @relation(fields: [missionaryId], references: [id])
-  user       User       @relation(fields: [userId], references: [id])
-  team       Team?      @relation(fields: [teamId], references: [id])
+  missionary       Missionary                  @relation(fields: [missionaryId], references: [id])
+  user             User                        @relation(fields: [userId], references: [id])
+  team             Team?                       @relation(fields: [teamId], references: [id])
+  attendanceOption MissionaryAttendanceOption?  @relation(fields: [attendanceOptionId], references: [id])
+  formAnswers      ParticipationFormAnswer[]
 
   @@map("participation")
+}
+
+model MissionaryAttendanceOption {
+  id            String         @id @default(uuid())
+  type          AttendanceType
+  label         String
+  order         Int
+
+  // Foreign keys
+  missionaryId  String         @map("missionary_id")
+
+  // Audit fields
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  createdBy     String?        @map("created_by")
+  updatedBy     String?        @map("updated_by")
+  version       Int            @default(0)
+
+  // Soft delete
+  deletedAt     DateTime?      @map("deleted_at")
+
+  // Relations
+  missionary     Missionary      @relation(fields: [missionaryId], references: [id])
+  participations Participation[]
+
+  @@map("missionary_attendance_option")
+}
+
+model MissionaryFormField {
+  id            String        @id @default(uuid())
+  fieldType     FormFieldType @map("field_type")
+  label         String
+  placeholder   String?
+  isRequired    Boolean       @default(false) @map("is_required")
+  order         Int
+  options       Json?
+
+  // Foreign keys
+  missionaryId  String        @map("missionary_id")
+
+  // Audit fields
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  createdBy     String?       @map("created_by")
+  updatedBy     String?       @map("updated_by")
+  version       Int           @default(0)
+
+  // Soft delete
+  deletedAt     DateTime?     @map("deleted_at")
+
+  // Relations
+  missionary    Missionary              @relation(fields: [missionaryId], references: [id])
+  formAnswers   ParticipationFormAnswer[]
+
+  @@map("missionary_form_field")
+}
+
+model ParticipationFormAnswer {
+  id              String    @id @default(uuid())
+  value           String
+
+  // Foreign keys
+  participationId String    @map("participation_id")
+  formFieldId     String    @map("form_field_id")
+
+  // Audit fields
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdBy       String?   @map("created_by")
+  updatedBy       String?   @map("updated_by")
+  version         Int       @default(0)
+
+  // Soft delete
+  deletedAt       DateTime? @map("deleted_at")
+
+  // Relations
+  participation   Participation       @relation(fields: [participationId], references: [id])
+  formField       MissionaryFormField @relation(fields: [formFieldId], references: [id])
+
+  @@unique([participationId, formFieldId])
+  @@map("participation_form_answer")
 }
 
 model Team {
