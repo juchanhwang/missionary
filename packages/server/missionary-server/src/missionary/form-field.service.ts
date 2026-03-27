@@ -97,6 +97,18 @@ export class FormFieldService {
     const missionary = await this.missionaryRepo.findWithDetails(missionaryId);
     if (!missionary) throw new NotFoundException('Missionary not found');
 
+    const fields = await this.repo.findByMissionary(missionaryId);
+    const validIds = new Set(fields.map((f) => f.id));
+    const invalidIds = items
+      .filter((i) => !validIds.has(i.id))
+      .map((i) => i.id);
+
+    if (invalidIds.length > 0) {
+      throw new BadRequestException(
+        `Invalid fieldIds for this missionary: ${invalidIds.join(', ')}`,
+      );
+    }
+
     await this.repo.reorderBulk(items);
 
     return { message: `${items.length} field(s) reordered` };

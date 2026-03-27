@@ -14,12 +14,10 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response as ExpressResponse } from 'express';
 
-import { CsvExportService } from '@/common/csv/csv-export.service';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums/user-role.enum';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
-import { FormFieldService } from '@/missionary/form-field.service';
 
 import { ApprovePaymentDto } from './dto/approve-payment.dto';
 import { CreateParticipationDto } from './dto/create-participation.dto';
@@ -30,11 +28,7 @@ import { ParticipationService, FindAllFilters } from './participation.service';
 @ApiTags('Participations')
 @Controller('participations')
 export class ParticipationController {
-  constructor(
-    private readonly participationService: ParticipationService,
-    private readonly csvExportService: CsvExportService,
-    private readonly formFieldService: FormFieldService,
-  ) {}
+  constructor(private readonly participationService: ParticipationService) {}
 
   @Post()
   @ApiOperation({ summary: '참가 신청 생성 (비동기 처리)' })
@@ -68,33 +62,8 @@ export class ParticipationController {
     @Param('missionaryId', ParseUUIDPipe) missionaryId: string,
     @Response() res: ExpressResponse,
   ) {
-    const result = await this.participationService.findAll({
-      missionaryId,
-    });
-
-    const formFields =
-      await this.formFieldService.findByMissionary(missionaryId);
-
-    const rows = result.data.map((p) => ({
-      name: p.name,
-      birthDate: p.birthDate,
-      affiliation: p.affiliation,
-      cohort: p.cohort,
-      attendanceOptionLabel: p.attendanceOption?.label ?? null,
-      applyFee: p.applyFee,
-      isPaid: p.isPaid,
-      isOwnCar: p.isOwnCar,
-      hasPastParticipation: p.hasPastParticipation,
-      isCollegeStudent: p.isCollegeStudent,
-      teamName: p.team?.teamName ?? null,
-      createdAt: p.createdAt,
-      formAnswers: p.formAnswers,
-    }));
-
-    const csvBuffer = await this.csvExportService.generateParticipationCsv(
-      rows,
-      formFields,
-    );
+    const csvBuffer =
+      await this.participationService.generateCsvBuffer(missionaryId);
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader(

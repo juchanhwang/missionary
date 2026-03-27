@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Queue } from 'bullmq';
 
+import { CsvExportService } from '@/common/csv/csv-export.service';
 import { EncryptionService } from '@/common/encryption/encryption.service';
 import { UserRole } from '@/common/enums/user-role.enum';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
@@ -45,6 +46,7 @@ export class ParticipationService {
     @Inject(FORM_FIELD_REPOSITORY)
     private readonly formFieldRepository: FormFieldRepository,
     private readonly encryptionService: EncryptionService,
+    private readonly csvExportService: CsvExportService,
     @InjectQueue('participation-queue') private readonly queue: Queue,
   ) {}
 
@@ -104,7 +106,10 @@ export class ParticipationService {
     dto: UpdateParticipationDto,
     user: AuthenticatedUser,
   ) {
-    const participation = await this.participationRepository.findFirst({ id });
+    const participation = await this.participationRepository.findFirst({
+      id,
+      deletedAt: null,
+    });
 
     if (!participation) {
       throw new NotFoundException(`Participation with ID ${id} not found`);
@@ -184,6 +189,7 @@ export class ParticipationService {
   ) {
     const participation = await this.participationRepository.findFirst({
       id: participationId,
+      deletedAt: null,
     });
 
     if (!participation) {
@@ -224,5 +230,30 @@ export class ParticipationService {
 
   async getEnrollmentSummary(missionaryId: string) {
     return this.participationRepository.getEnrollmentSummary(missionaryId);
+  }
+
+  async generateCsvBuffer(missionaryId: string): Promise<Buffer> {
+    const [result, formFields] = await Promise.all([
+      this.findAll({ missionaryId }),
+      this.formFieldRepository.findByMissionary(missionaryId),
+    ]);
+
+    const rows = result.data.map((p) => ({
+      name: p.name,
+      birthDate: p.birthDate,
+      affiliation: p.affiliation,
+      cohort: p.cohort,
+      attendanceOptionLabel: p.attendanceOption?.label ?? null,
+      applyFee: p.applyFee,
+      isPaid: p.isPaid,
+      isOwnCar: p.isOwnCar,
+      hasPastParticipation: p.hasPastParticipation,
+      isCollegeStudent: p.isCollegeStudent,
+      teamName: p.team?.teamName ?? null,
+      createdAt: p.createdAt,
+      formAnswers: p.formAnswers,
+    }));
+
+    return this.csvExportService.generateParticipationCsv(rows, formFields);
   }
 }

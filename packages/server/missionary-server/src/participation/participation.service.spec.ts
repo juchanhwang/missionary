@@ -2,6 +2,7 @@ import { getQueueToken } from '@nestjs/bullmq';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { CsvExportService } from '@/common/csv/csv-export.service';
 import { EncryptionService } from '@/common/encryption/encryption.service';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 import { FORM_FIELD_REPOSITORY } from '@/missionary/repositories/form-field-repository.interface';
@@ -34,6 +35,7 @@ describe('ParticipationService', () => {
   let fakeFormAnswerRepo: FakeFormAnswerRepository;
   let fakeFormFieldRepo: FakeFormFieldRepository;
   let mockEncryptionService: { encrypt: jest.Mock; decrypt: jest.Mock };
+  let mockCsvExportService: { generateParticipationCsv: jest.Mock };
   let mockQueue: { add: jest.Mock };
 
   beforeEach(async () => {
@@ -44,6 +46,10 @@ describe('ParticipationService', () => {
     mockEncryptionService = {
       encrypt: jest.fn((value: string) => `encrypted-${value}`),
       decrypt: jest.fn((value: string) => value.replace('encrypted-', '')),
+    };
+
+    mockCsvExportService = {
+      generateParticipationCsv: jest.fn().mockResolvedValue(Buffer.from('')),
     };
 
     mockQueue = {
@@ -66,6 +72,7 @@ describe('ParticipationService', () => {
           useValue: fakeFormFieldRepo,
         },
         { provide: EncryptionService, useValue: mockEncryptionService },
+        { provide: CsvExportService, useValue: mockCsvExportService },
         {
           provide: getQueueToken('participation-queue'),
           useValue: mockQueue,
