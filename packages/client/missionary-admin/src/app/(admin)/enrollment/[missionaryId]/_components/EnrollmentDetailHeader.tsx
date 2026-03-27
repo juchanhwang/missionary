@@ -7,9 +7,9 @@ import { useRouter } from 'next/navigation';
 import type { EnrollmentStatus } from 'apis/enrollment';
 
 const STATUS_LABELS: Record<EnrollmentStatus, string> = {
-  ENROLLMENT_PREPARING: '준비 중',
   ENROLLMENT_OPENED: '모집 중',
   ENROLLMENT_CLOSED: '모집 마감',
+  IN_PROGRESS: '진행 중',
   COMPLETED: '종료',
 };
 
@@ -17,9 +17,9 @@ const STATUS_VARIANTS: Record<
   EnrollmentStatus,
   'success' | 'warning' | 'default' | 'info'
 > = {
-  ENROLLMENT_PREPARING: 'info',
   ENROLLMENT_OPENED: 'success',
   ENROLLMENT_CLOSED: 'warning',
+  IN_PROGRESS: 'info',
   COMPLETED: 'default',
 };
 

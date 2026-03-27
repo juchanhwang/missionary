@@ -15,6 +15,7 @@ const PAGE_SIZE = 20;
 const STATUS_LABELS: Record<string, string> = {
   ENROLLMENT_OPENED: '모집 중',
   ENROLLMENT_CLOSED: '모집 마감',
+  IN_PROGRESS: '진행 중',
   COMPLETED: '종료',
 };
 
@@ -24,13 +25,15 @@ const STATUS_VARIANTS: Record<
 > = {
   ENROLLMENT_OPENED: 'success',
   ENROLLMENT_CLOSED: 'warning',
+  IN_PROGRESS: 'info',
   COMPLETED: 'default',
 };
 
 const STATUS_SORT_ORDER: Record<string, number> = {
   ENROLLMENT_OPENED: 0,
   ENROLLMENT_CLOSED: 1,
-  COMPLETED: 2,
+  IN_PROGRESS: 2,
+  COMPLETED: 3,
 };
 
 function getDaysUntilDeadline(deadline: string | null): number | null {
@@ -52,10 +55,7 @@ export function MissionEnrollmentTable({
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  // ENROLLMENT_PREPARING 제외
-  const tableMissions = missions.filter(
-    (m) => m.status !== 'ENROLLMENT_PREPARING',
-  );
+  const tableMissions = missions;
 
   // 상태 필터
   const filteredByStatus =
