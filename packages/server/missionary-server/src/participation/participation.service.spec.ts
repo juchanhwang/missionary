@@ -2,29 +2,54 @@ import { getQueueToken } from '@nestjs/bullmq';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { CsvExportService } from '@/common/csv/csv-export.service';
 import { EncryptionService } from '@/common/encryption/encryption.service';
+import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
+import { FORM_FIELD_REPOSITORY } from '@/missionary/repositories/form-field-repository.interface';
 import { makeMissionary } from '@/testing/factories/missionary.factory';
 import { makeParticipation } from '@/testing/factories/participation.factory';
 import { makeUser } from '@/testing/factories/user.factory';
+import { FakeFormAnswerRepository } from '@/testing/fakes/fake-form-answer.repository';
+import { FakeFormFieldRepository } from '@/testing/fakes/fake-form-field.repository';
 import { FakeParticipationRepository } from '@/testing/fakes/fake-participation.repository';
 
 import { CreateParticipationDto } from './dto/create-participation.dto';
 import { UpdateParticipationDto } from './dto/update-participation.dto';
 import { ParticipationService } from './participation.service';
+import { FORM_ANSWER_REPOSITORY } from './repositories/form-answer-repository.interface';
 import { PARTICIPATION_REPOSITORY } from './repositories/participation-repository.interface';
+
+const makeAuthUser = (
+  overrides: Partial<AuthenticatedUser> = {},
+): AuthenticatedUser => ({
+  id: 'user-1',
+  email: 'test@test.com',
+  role: 'USER',
+  provider: null,
+  ...overrides,
+});
 
 describe('ParticipationService', () => {
   let service: ParticipationService;
   let fakeParticipationRepo: FakeParticipationRepository;
+  let fakeFormAnswerRepo: FakeFormAnswerRepository;
+  let fakeFormFieldRepo: FakeFormFieldRepository;
   let mockEncryptionService: { encrypt: jest.Mock; decrypt: jest.Mock };
+  let mockCsvExportService: { generateParticipationCsv: jest.Mock };
   let mockQueue: { add: jest.Mock };
 
   beforeEach(async () => {
     fakeParticipationRepo = new FakeParticipationRepository();
+    fakeFormAnswerRepo = new FakeFormAnswerRepository();
+    fakeFormFieldRepo = new FakeFormFieldRepository();
 
     mockEncryptionService = {
       encrypt: jest.fn((value: string) => `encrypted-${value}`),
       decrypt: jest.fn((value: string) => value.replace('encrypted-', '')),
+    };
+
+    mockCsvExportService = {
+      generateParticipationCsv: jest.fn().mockResolvedValue(Buffer.from('')),
     };
 
     mockQueue = {
@@ -38,7 +63,16 @@ describe('ParticipationService', () => {
           provide: PARTICIPATION_REPOSITORY,
           useValue: fakeParticipationRepo,
         },
+        {
+          provide: FORM_ANSWER_REPOSITORY,
+          useValue: fakeFormAnswerRepo,
+        },
+        {
+          provide: FORM_FIELD_REPOSITORY,
+          useValue: fakeFormFieldRepo,
+        },
         { provide: EncryptionService, useValue: mockEncryptionService },
+        { provide: CsvExportService, useValue: mockCsvExportService },
         {
           provide: getQueueToken('participation-queue'),
           useValue: mockQueue,
@@ -51,6 +85,8 @@ describe('ParticipationService', () => {
 
   afterEach(() => {
     fakeParticipationRepo.clear();
+    fakeFormAnswerRepo.clear();
+    fakeFormFieldRepo.clear();
   });
 
   describe('create', () => {
@@ -62,6 +98,9 @@ describe('ParticipationService', () => {
         applyFee: 10000,
         identificationNumber: '900101-1234567',
         isOwnCar: false,
+        affiliation: '서울교회',
+        attendanceOptionId: 'option-1',
+        cohort: 1,
       };
       const userId = 'user-1';
 
@@ -87,6 +126,9 @@ describe('ParticipationService', () => {
         applyFee: 20000,
         identificationNumber: '950515-1234567',
         isOwnCar: true,
+        affiliation: '부산교회',
+        attendanceOptionId: 'option-1',
+        cohort: 2,
       };
 
       const result = await service.create(dto, 'user-2');
@@ -114,8 +156,9 @@ describe('ParticipationService', () => {
 
       const result = await service.findAll();
 
-      expect(result).toHaveLength(1);
-      expect(result[0].identificationNumber).toBe('900101-1234567');
+      expect(result.data).toHaveLength(1);
+      expect(result.total).toBe(1);
+      expect(result.data[0].identificationNumber).toBe('900101-1234567');
       expect(mockEncryptionService.decrypt).toHaveBeenCalledWith(
         'encrypted-900101-1234567',
       );
@@ -144,8 +187,8 @@ describe('ParticipationService', () => {
         missionaryId: missionaryId1,
       });
 
-      expect(result).toHaveLength(1);
-      expect(result[0].missionaryId).toBe(missionaryId1);
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].missionaryId).toBe(missionaryId1);
     });
 
     it('identificationNumber가 없는 참가는 복호화를 건너뛴다', async () => {
@@ -167,8 +210,8 @@ describe('ParticipationService', () => {
 
       const result = await service.findAll();
 
-      expect(result).toHaveLength(1);
-      expect(result[0].identificationNumber).toBeNull();
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].identificationNumber).toBeNull();
       expect(mockEncryptionService.decrypt).not.toHaveBeenCalled();
     });
   });
@@ -222,8 +265,9 @@ describe('ParticipationService', () => {
       await fakeParticipationRepo.create(participation);
 
       const dto: UpdateParticipationDto = { name: '수정된이름' };
+      const authUser = makeAuthUser({ id: userId });
 
-      const result = await service.update('participation-1', dto, userId);
+      const result = await service.update('participation-1', dto, authUser);
 
       expect(result.name).toBe('수정된이름');
     });
@@ -247,8 +291,9 @@ describe('ParticipationService', () => {
       const dto: UpdateParticipationDto = {
         identificationNumber: '950515-1234567',
       };
+      const authUser = makeAuthUser({ id: userId });
 
-      const result = await service.update('participation-1', dto, userId);
+      const result = await service.update('participation-1', dto, authUser);
 
       expect(mockEncryptionService.encrypt).toHaveBeenCalledWith(
         '950515-1234567',
@@ -258,9 +303,10 @@ describe('ParticipationService', () => {
 
     it('존재하지 않는 참가 수정 시 NotFoundException을 던진다', async () => {
       const dto: UpdateParticipationDto = { name: '수정된이름' };
+      const authUser = makeAuthUser();
 
       await expect(
-        service.update('non-existent-id', dto, 'user-1'),
+        service.update('non-existent-id', dto, authUser),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -277,10 +323,35 @@ describe('ParticipationService', () => {
       await fakeParticipationRepo.create(participation);
 
       const dto: UpdateParticipationDto = { name: '수정된이름' };
+      const authUser = makeAuthUser({ id: otherUserId });
 
       await expect(
-        service.update('participation-1', dto, otherUserId),
+        service.update('participation-1', dto, authUser),
       ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('ADMIN이 타인 participation을 수정할 수 있다', async () => {
+      const ownerId = 'owner-1';
+      const adminId = 'admin-1';
+      const missionaryId = 'missionary-1';
+      const user = makeUser({ id: ownerId });
+      const missionary = makeMissionary({ id: missionaryId });
+
+      fakeParticipationRepo.setUser(ownerId, user);
+      fakeParticipationRepo.setMissionary(missionaryId, missionary);
+
+      const participation = makeParticipation({
+        id: 'participation-1',
+        userId: ownerId,
+        missionaryId,
+      });
+      await fakeParticipationRepo.create(participation);
+
+      const adminUser = makeAuthUser({ id: adminId, role: 'ADMIN' });
+      const dto: UpdateParticipationDto = { name: '관리자수정' };
+
+      const result = await service.update('participation-1', dto, adminUser);
+      expect(result.name).toBe('관리자수정');
     });
   });
 
@@ -301,7 +372,8 @@ describe('ParticipationService', () => {
       });
       await fakeParticipationRepo.create(participation);
 
-      const result = await service.remove('participation-1', userId);
+      const authUser = makeAuthUser({ id: userId });
+      const result = await service.remove('participation-1', authUser);
 
       expect(result).toEqual({
         message: 'Participation deleted successfully',
@@ -309,7 +381,8 @@ describe('ParticipationService', () => {
     });
 
     it('존재하지 않는 참가 삭제 시 NotFoundException을 던진다', async () => {
-      await expect(service.remove('non-existent-id', 'user-1')).rejects.toThrow(
+      const authUser = makeAuthUser();
+      await expect(service.remove('non-existent-id', authUser)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -331,9 +404,11 @@ describe('ParticipationService', () => {
       });
       await fakeParticipationRepo.create(participation);
 
-      await expect(
-        service.remove('participation-1', otherUserId),
-      ).rejects.toThrow(ForbiddenException);
+      const authUser = makeAuthUser({ id: otherUserId });
+
+      await expect(service.remove('participation-1', authUser)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 

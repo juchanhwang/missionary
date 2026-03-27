@@ -4,6 +4,8 @@ import {
   IsDateString,
   IsInt,
   IsBoolean,
+  IsOptional,
+  Min,
 } from 'class-validator';
 
 export class CreateParticipationDto {
@@ -24,4 +26,22 @@ export class CreateParticipationDto {
 
   @IsBoolean()
   declare isOwnCar: boolean;
+
+  @IsString()
+  declare affiliation: string;
+
+  @IsUUID()
+  declare attendanceOptionId: string;
+
+  @IsInt()
+  @Min(1)
+  declare cohort: number;
+
+  @IsOptional()
+  @IsBoolean()
+  hasPastParticipation?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isCollegeStudent?: boolean;
 }
