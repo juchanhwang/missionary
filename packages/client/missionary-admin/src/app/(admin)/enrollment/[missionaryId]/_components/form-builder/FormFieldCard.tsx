@@ -2,15 +2,11 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Badge } from '@samilhero/design-system';
-import {
-  ChevronDown,
-  ChevronUp,
-  GripVertical,
-  Lock,
-  Trash2,
-} from 'lucide-react';
+import { Badge, overlay } from '@samilhero/design-system';
+import { PANEL_TRANSITION_MS } from 'components/ui/SidePanel';
+import { ChevronDown, ChevronUp, GripVertical, Trash2 } from 'lucide-react';
 
+import { DeleteFieldConfirmModal } from './DeleteFieldConfirmModal';
 import { FormFieldSettings, type LocalFormField } from './FormFieldSettings';
 
 const FIELD_TYPE_LABELS: Record<string, string> = {
@@ -55,7 +51,28 @@ export function FormFieldCard({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const canDelete = !field.hasAnswers;
+  const handleDelete = async () => {
+    if (!field.hasAnswers) {
+      onDelete();
+      return;
+    }
+
+    const confirmed = await overlay.openAsync<boolean>(
+      ({ isOpen, close, unmount }) => (
+        <DeleteFieldConfirmModal
+          isOpen={isOpen}
+          close={(result) => {
+            close(result);
+            setTimeout(unmount, PANEL_TRANSITION_MS);
+          }}
+        />
+      ),
+    );
+
+    if (confirmed) {
+      onDelete();
+    }
+  };
 
   return (
     <div
@@ -101,23 +118,14 @@ export function FormFieldCard({
           {isActive ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </button>
 
-        {canDelete ? (
-          <button
-            type="button"
-            onClick={onDelete}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 hover:bg-error-10 hover:text-error-60"
-            aria-label="필드 삭제"
-          >
-            <Trash2 size={14} />
-          </button>
-        ) : (
-          <span
-            className="flex h-7 w-7 items-center justify-center text-gray-300"
-            title="답변이 있는 필드는 삭제할 수 없습니다."
-          >
-            <Lock size={14} />
-          </span>
-        )}
+        <button
+          type="button"
+          onClick={handleDelete}
+          className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 hover:bg-error-10 hover:text-error-60"
+          aria-label="필드 삭제"
+        >
+          <Trash2 size={14} />
+        </button>
       </div>
 
       {/* 확장 (편집 활성) */}

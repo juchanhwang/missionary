@@ -14,7 +14,6 @@ import type {
 interface ParticipantTableProps {
   data: PaginatedParticipationsResponse | undefined;
   isLoading: boolean;
-  searchQuery: string;
   selectedParticipantId: string | null;
   checkedIds: Set<string>;
   showCheckbox: boolean;
@@ -33,7 +32,6 @@ interface ParticipantTableProps {
 export function ParticipantTable({
   data,
   isLoading,
-  searchQuery,
   selectedParticipantId,
   checkedIds,
   showCheckbox,
@@ -50,19 +48,11 @@ export function ParticipantTable({
 }: ParticipantTableProps) {
   const participants = data?.data ?? [];
 
-  // 클라이언트 사이드 이름 검색
-  const filteredParticipants = searchQuery
-    ? participants.filter((p) =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : participants;
-
   const displayedFields = customFields.slice(0, 3);
   const colCount = 9 + displayedFields.length + (showCheckbox ? 1 : 0);
 
   const isAllChecked =
-    filteredParticipants.length > 0 &&
-    filteredParticipants.every((p) => checkedIds.has(p.id));
+    participants.length > 0 && participants.every((p) => checkedIds.has(p.id));
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -123,18 +113,10 @@ export function ParticipantTable({
                 }))}
                 rows={10}
               />
-            ) : filteredParticipants.length === 0 ? (
-              <TableEmptyState
-                colSpan={colCount}
-                message="등록자가 없습니다"
-                subMessage={
-                  searchQuery
-                    ? '검색 결과가 없습니다. 검색어를 확인해주세요.'
-                    : undefined
-                }
-              />
+            ) : participants.length === 0 ? (
+              <TableEmptyState colSpan={colCount} message="등록자가 없습니다" />
             ) : (
-              filteredParticipants.map((participant) => (
+              participants.map((participant) => (
                 <ParticipantRow
                   key={participant.id}
                   participant={participant}

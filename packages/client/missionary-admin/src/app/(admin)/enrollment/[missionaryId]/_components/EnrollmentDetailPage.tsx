@@ -2,9 +2,10 @@
 
 import { overlay } from '@samilhero/design-system';
 import { PANEL_TRANSITION_MS } from 'components/ui/SidePanel';
+import { useDebounce } from 'hooks/useDebounce';
 import { useAuth } from 'lib/auth/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { BulkApproveModal } from './BulkApproveModal';
@@ -65,12 +66,15 @@ export function EnrollmentDetailPage({
     string | null
   >(null);
 
-  if (selectedParticipantId && selectedParticipantId !== mountedParticipantId) {
-    setMountedParticipantId(selectedParticipantId);
-  }
+  useEffect(() => {
+    if (selectedParticipantId) {
+      setMountedParticipantId(selectedParticipantId);
+    }
+  }, [selectedParticipantId]);
 
   // 로컬 상태
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
   const [isCsvDownloading, setIsCsvDownloading] = useState(false);
 
@@ -87,6 +91,12 @@ export function EnrollmentDetailPage({
     initialData: initialEnrollmentSummary,
   });
 
+  // attendanceType 검증
+  const validAttendanceType =
+    attendanceTypeFilter === 'FULL' || attendanceTypeFilter === 'PARTIAL'
+      ? attendanceTypeFilter
+      : undefined;
+
   // 데이터 훅
   const { data, isLoading } = useGetParticipations({
     params: {
@@ -99,7 +109,8 @@ export function EnrollmentDetailPage({
           : isPaidFilter === 'false'
             ? false
             : undefined,
-      attendanceType: (attendanceTypeFilter as 'FULL' | 'PARTIAL') || undefined,
+      attendanceType: validAttendanceType,
+      query: debouncedSearchQuery || undefined,
     },
     initialData: initialParticipations,
   });
@@ -245,7 +256,6 @@ export function EnrollmentDetailPage({
         <ParticipantTable
           data={data}
           isLoading={isLoading}
-          searchQuery={searchQuery}
           selectedParticipantId={selectedParticipantId}
           checkedIds={checkedIds}
           showCheckbox={isAdmin}

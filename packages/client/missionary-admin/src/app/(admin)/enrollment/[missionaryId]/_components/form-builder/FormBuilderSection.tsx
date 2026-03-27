@@ -15,6 +15,8 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from 'lib/queryKeys';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -60,6 +62,7 @@ function createEmptyField(): LocalFormFieldWithMeta {
 }
 
 export function FormBuilderSection({ missionaryId }: FormBuilderSectionProps) {
+  const queryClient = useQueryClient();
   const { data: serverFields = [] } = useGetFormFields({ missionaryId });
 
   const [localFields, setLocalFields] = useState<LocalFormFieldWithMeta[]>([]);
@@ -232,7 +235,14 @@ export function FormBuilderSection({ missionaryId }: FormBuilderSectionProps) {
       setIsDirty(false);
       setActiveFieldId(null);
     } catch {
-      toast.error('일부 필드 저장에 실패했습니다. 다시 시도해주세요.');
+      // 부분 성공 상태를 서버와 재동기화
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.formFields.list(missionaryId),
+      });
+      setIsDirty(false);
+      toast.error(
+        '일부 필드 저장에 실패했습니다. 서버 상태를 다시 불러옵니다.',
+      );
     } finally {
       setIsSaving(false);
     }
