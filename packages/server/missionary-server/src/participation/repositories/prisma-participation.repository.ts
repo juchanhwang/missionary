@@ -86,7 +86,7 @@ export class PrismaParticipationRepository implements ParticipationRepository {
   }
 
   async findAllFiltered(filters: FindAllFilters): Promise<FindAllResult> {
-    const where: Prisma.ParticipationWhereInput = {};
+    const where: Prisma.ParticipationWhereInput = { deletedAt: null };
 
     if (filters.missionaryId) {
       where.missionaryId = filters.missionaryId;
