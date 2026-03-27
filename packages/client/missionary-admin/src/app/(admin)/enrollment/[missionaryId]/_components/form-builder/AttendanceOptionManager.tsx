@@ -12,8 +12,8 @@ import {
 import { useGetAttendanceOptions } from '../../_hooks/useGetAttendanceOptions';
 
 const TYPE_LABELS: Record<string, string> = {
-  FULL: '전체 참석',
-  PARTIAL: '부분 참석',
+  FULL: '풀참석',
+  PARTIAL: '옵션참여',
 };
 
 interface AttendanceOptionManagerProps {
@@ -98,8 +98,8 @@ export function AttendanceOptionManager({
           >
             <Select.Trigger>{TYPE_LABELS[newType]}</Select.Trigger>
             <Select.Options>
-              <Select.Option item="FULL">전체 참석</Select.Option>
-              <Select.Option item="PARTIAL">부분 참석</Select.Option>
+              <Select.Option item="FULL">풀참석</Select.Option>
+              <Select.Option item="PARTIAL">옵션참여</Select.Option>
             </Select.Options>
           </Select>
         </div>

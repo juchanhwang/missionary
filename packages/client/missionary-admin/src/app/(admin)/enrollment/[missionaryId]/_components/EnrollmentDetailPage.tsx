@@ -236,6 +236,8 @@ export function EnrollmentDetailPage({
           status={mission.status}
         />
 
+        {isAdmin && <AttendanceOptionManager missionaryId={mission.id} />}
+
         {enrollmentSummary && (
           <EnrollmentSummaryCard summary={enrollmentSummary} />
         )}
@@ -271,13 +273,8 @@ export function EnrollmentDetailPage({
           onPageChange={handlePageChange}
         />
 
-        {/* ADMIN 전용: 폼 빌더 + 참석 옵션 관리 */}
-        {isAdmin && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <FormBuilderSection missionaryId={mission.id} />
-            <AttendanceOptionManager missionaryId={mission.id} />
-          </div>
-        )}
+        {/* ADMIN 전용: 폼 빌더 */}
+        {isAdmin && <FormBuilderSection missionaryId={mission.id} />}
       </div>
 
       {/* 등록자 상세 패널 */}
