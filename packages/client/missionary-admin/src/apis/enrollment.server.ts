@@ -27,6 +27,7 @@ export async function getServerEnrollmentSummary(): Promise<GetEnrollmentSummary
     currentParticipantCount: m.currentParticipantCount,
     paidCount: 0,
     managerName: m.pastorName ?? null,
+    missionGroupName: m.missionGroup?.name ?? null,
   }));
 
   const recruiting = missions.filter((m) => m.status === 'ENROLLMENT_OPENED');
