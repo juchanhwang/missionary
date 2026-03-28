@@ -26,4 +26,27 @@ export const queryKeys = {
     list: (params?: object) =>
       [...queryKeys.missionaryRegions.all, 'list', params] as const,
   },
+  enrollmentSummary: {
+    all: ['enrollmentSummary'] as const,
+    list: () => [...queryKeys.enrollmentSummary.all, 'list'] as const,
+    detail: (missionaryId: string) =>
+      [...queryKeys.enrollmentSummary.all, 'detail', missionaryId] as const,
+  },
+  participations: {
+    all: ['participations'] as const,
+    list: (params?: object) =>
+      [...queryKeys.participations.all, 'list', params] as const,
+    detail: (id: string) =>
+      [...queryKeys.participations.all, 'detail', id] as const,
+  },
+  formFields: {
+    all: ['formFields'] as const,
+    list: (missionaryId: string) =>
+      [...queryKeys.formFields.all, 'list', missionaryId] as const,
+  },
+  attendanceOptions: {
+    all: ['attendanceOptions'] as const,
+    list: (missionaryId: string) =>
+      [...queryKeys.attendanceOptions.all, 'list', missionaryId] as const,
+  },
 } as const;
