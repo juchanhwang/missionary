@@ -1,5 +1,7 @@
 'use client';
 
+import { TableCell, TableRow } from '@samilhero/design-system';
+
 import { PaymentBadge } from './PaymentBadge';
 import { formatDateTime } from '../_utils/formatParticipant';
 
@@ -27,14 +29,14 @@ export function ParticipantRow({
   onTogglePayment,
 }: ParticipantRowProps) {
   return (
-    <tr
+    <TableRow
       onClick={() => onClick(participant.id)}
-      className={`cursor-pointer transition-colors hover:bg-gray-50 ${
+      className={`cursor-pointer hover:bg-gray-50 ${
         isSelected ? 'bg-blue-10' : ''
       }`}
     >
       {showCheckbox && (
-        <td className="w-[44px] px-3 py-3">
+        <TableCell className="w-[44px] px-3">
           <input
             type="checkbox"
             checked={isChecked}
@@ -45,51 +47,51 @@ export function ParticipantRow({
             onClick={(e) => e.stopPropagation()}
             className="h-4 w-4 rounded border-gray-300"
           />
-        </td>
+        </TableCell>
       )}
-      <td className="w-[140px] px-4 py-3 text-gray-500 text-xs">
+      <TableCell className="text-xs">
         {formatDateTime(participant.createdAt)}
-      </td>
-      <td className="w-[100px] px-4 py-3 font-medium text-gray-900">
+      </TableCell>
+      <TableCell className="font-semibold text-gray-900">
         {participant.name}
-      </td>
-      <td className="w-[110px] px-4 py-3 text-gray-500 text-xs">
+      </TableCell>
+      <TableCell className="text-xs">
         {participant.birthDate
           ? new Date(participant.birthDate).toLocaleDateString('ko-KR')
-          : '-'}
-      </td>
-      <td className="w-[120px] px-4 py-3 text-gray-500 text-xs">
-        {participant.affiliation || '-'}
-      </td>
-      <td className="w-[110px] px-4 py-3 text-gray-500 text-xs">
-        {participant.attendanceOption?.label ?? '-'}
-      </td>
-      <td className="w-[70px] px-4 py-3 text-center text-gray-500 text-xs">
-        {participant.cohort ?? '-'}
-      </td>
-      <td className="w-[90px] px-4 py-3">
+          : '—'}
+      </TableCell>
+      <TableCell className="text-xs">
+        {participant.affiliation || '—'}
+      </TableCell>
+      <TableCell className="text-xs">
+        {participant.attendanceOption?.label ?? '—'}
+      </TableCell>
+      <TableCell className="text-center text-xs">
+        {participant.cohort ?? '—'}
+      </TableCell>
+      <TableCell>
         <PaymentBadge
           isPaid={participant.isPaid}
           onToggle={() => onTogglePayment(participant.id, !participant.isPaid)}
         />
-      </td>
-      <td className="w-[90px] px-4 py-3 text-gray-500 text-xs">
-        {participant.team?.teamName ?? '-'}
-      </td>
-      {/* 커스텀 필드 (최대 3개) */}
-      {customFields.slice(0, 3).map((field) => {
+      </TableCell>
+      <TableCell className="text-xs">
+        {participant.team?.teamName ?? '—'}
+      </TableCell>
+      {customFields.map((field) => {
         const answer = participant.formAnswers.find(
           (a) => a.formFieldId === field.id,
         );
         return (
-          <td
-            key={field.id}
-            className="w-[100px] px-4 py-3 text-gray-500 text-xs"
-          >
-            {answer?.value || <span className="text-gray-300">미입력</span>}
-          </td>
+          <TableCell key={field.id} className="text-xs">
+            {answer?.value != null && answer.value !== '' ? (
+              answer.value
+            ) : (
+              <span className="text-gray-300">미입력</span>
+            )}
+          </TableCell>
         );
       })}
-    </tr>
+    </TableRow>
   );
 }

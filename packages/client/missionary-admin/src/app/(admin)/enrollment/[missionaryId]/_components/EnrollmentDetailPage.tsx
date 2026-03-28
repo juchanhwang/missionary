@@ -12,8 +12,6 @@ import { BulkApproveModal } from './BulkApproveModal';
 import { EnrollmentDetailHeader } from './EnrollmentDetailHeader';
 import { EnrollmentSummaryCard } from './EnrollmentSummaryCard';
 import { EnrollmentToolbar } from './EnrollmentToolbar';
-import { AttendanceOptionManager } from './form-builder/AttendanceOptionManager';
-import { FormBuilderSection } from './form-builder/FormBuilderSection';
 import { ParticipantPanel } from './panel/ParticipantPanel';
 import { ParticipantTable } from './ParticipantTable';
 import { useBulkApprovePayment } from '../_hooks/useBulkApprovePayment';
@@ -231,33 +229,29 @@ export function EnrollmentDetailPage({
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0">
       <div className="flex flex-col flex-1 p-8 gap-5 min-h-0">
-        <EnrollmentDetailHeader
-          missionName={mission.name}
-          status={mission.status}
-        />
-
-        {isAdmin && <AttendanceOptionManager missionaryId={mission.id} />}
+        <EnrollmentDetailHeader mission={mission} />
 
         {enrollmentSummary && (
           <EnrollmentSummaryCard summary={enrollmentSummary} />
         )}
 
-        <EnrollmentToolbar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          isPaidFilter={isPaidFilter}
-          onIsPaidFilterChange={handleIsPaidFilterChange}
-          attendanceTypeFilter={attendanceTypeFilter}
-          onAttendanceTypeFilterChange={handleAttendanceTypeFilterChange}
-          selectedCount={checkedIds.size}
-          onBulkApprove={handleBulkApprove}
-          onCsvDownload={handleCsvDownload}
-          isCsvDownloading={isCsvDownloading}
-        />
-
         <ParticipantTable
           data={data}
           isLoading={isLoading}
+          toolbar={
+            <EnrollmentToolbar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              isPaidFilter={isPaidFilter}
+              onIsPaidFilterChange={handleIsPaidFilterChange}
+              attendanceTypeFilter={attendanceTypeFilter}
+              onAttendanceTypeFilterChange={handleAttendanceTypeFilterChange}
+              selectedCount={checkedIds.size}
+              onBulkApprove={handleBulkApprove}
+              onCsvDownload={handleCsvDownload}
+              isCsvDownloading={isCsvDownloading}
+            />
+          }
           selectedParticipantId={selectedParticipantId}
           checkedIds={checkedIds}
           showCheckbox={isAdmin}
@@ -272,9 +266,6 @@ export function EnrollmentDetailPage({
           pageSize={PAGE_SIZE}
           onPageChange={handlePageChange}
         />
-
-        {/* ADMIN 전용: 폼 빌더 */}
-        {isAdmin && <FormBuilderSection missionaryId={mission.id} />}
       </div>
 
       {/* 등록자 상세 패널 */}
