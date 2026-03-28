@@ -11,11 +11,7 @@ const srcPath = resolve(__dirname, 'src');
 
 export default defineConfig({
   plugins: [
-    react({
-      babel: {
-        plugins: ['babel-plugin-react-compiler'],
-      },
-    }),
+    react(),
     tsconfigPaths(),
     tailwindcss(),
     svgr({
