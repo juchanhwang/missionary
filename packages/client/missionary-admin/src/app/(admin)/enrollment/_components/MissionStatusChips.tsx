@@ -24,7 +24,7 @@ export function MissionStatusChips({
   onChange,
 }: MissionStatusChipsProps) {
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-1.5">
       {STATUS_OPTIONS.map((option) => {
         const isActive = value === option.value;
         return (
@@ -32,7 +32,7 @@ export function MissionStatusChips({
             key={option.value}
             type="button"
             onClick={() => onChange(option.value)}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
               isActive
                 ? 'bg-gray-900 text-white'
                 : 'bg-gray-100 text-gray-500 hover:bg-gray-200'

@@ -20,16 +20,19 @@ export function EnrollmentListPage({ initialData }: EnrollmentListPageProps) {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 p-8 gap-6">
-      {/* 헤더 */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">등록 관리</h1>
-        {data && (
-          <p className="text-sm text-gray-400">
-            모집 중 {data.totalRecruitingCount}개 · 등록자{' '}
-            {data.totalRecruitingParticipants}명
-          </p>
-        )}
-      </div>
+      {/* 요약 통계 */}
+      {data && (
+        <div className="flex justify-end">
+          <div className="flex items-center gap-3 text-sm text-gray-500">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-blue-60 inline-block" />
+              모집 중 {data.totalRecruitingCount}건
+            </span>
+            <span className="text-gray-300">|</span>
+            <span>총 신청 {data.totalRecruitingParticipants}명</span>
+          </div>
+        </div>
+      )}
 
       {/* Section A: 마감 임박 카드 */}
       <HighlightCardSection missions={missions} />
