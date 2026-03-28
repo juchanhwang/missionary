@@ -1,6 +1,6 @@
 'use client';
 
-import { InputField, Select, Switch } from '@samilhero/design-system';
+import { Select, Switch } from '@samilhero/design-system';
 
 import { TagInput } from './TagInput';
 
@@ -33,15 +33,12 @@ export type { LocalFormField };
 
 export function FormFieldSettings({ field, onChange }: FormFieldSettingsProps) {
   return (
-    <div className="space-y-4 p-4 bg-blue-10/30 rounded-b-xl">
-      <InputField
-        label="라벨"
-        value={field.label}
-        onChange={(e) => onChange({ label: e.target.value })}
-        placeholder="필드 라벨"
-      />
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-gray-500">필드 타입</label>
+    <div className="flex flex-col gap-4">
+      {/* 필드 유형 */}
+      <div className="flex items-center gap-3">
+        <label className="text-xs font-medium text-gray-500 w-16 shrink-0">
+          필드 유형
+        </label>
         <Select
           value={field.fieldType}
           onChange={(v) =>
@@ -61,19 +58,8 @@ export function FormFieldSettings({ field, onChange }: FormFieldSettingsProps) {
           </Select.Options>
         </Select>
       </div>
-      <InputField
-        label="플레이스홀더"
-        value={field.placeholder ?? ''}
-        onChange={(e) => onChange({ placeholder: e.target.value || null })}
-        placeholder="입력 안내 문구 (선택)"
-      />
-      <div className="flex items-center justify-between">
-        <label className="text-xs font-medium text-gray-500">필수 입력</label>
-        <Switch
-          checked={field.isRequired}
-          onChange={(e) => onChange({ isRequired: e.target.checked })}
-        />
-      </div>
+
+      {/* 선택지 (SELECT 타입) */}
       {field.fieldType === 'SELECT' && (
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-gray-500">선택지</label>
@@ -83,6 +69,20 @@ export function FormFieldSettings({ field, onChange }: FormFieldSettingsProps) {
           />
         </div>
       )}
+
+      {/* 필수 항목 토글 */}
+      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-gray-50">
+        <div>
+          <p className="text-sm font-medium text-gray-900">필수 항목</p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            응답자가 반드시 입력해야 합니다
+          </p>
+        </div>
+        <Switch
+          checked={field.isRequired}
+          onChange={(e) => onChange({ isRequired: e.target.checked })}
+        />
+      </div>
     </div>
   );
 }

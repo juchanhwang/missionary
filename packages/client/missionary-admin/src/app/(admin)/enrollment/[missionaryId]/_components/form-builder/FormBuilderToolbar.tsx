@@ -1,39 +1,91 @@
 'use client';
 
-import { Button } from '@samilhero/design-system';
-import { Loader2 } from 'lucide-react';
+import { Badge, Button } from '@samilhero/design-system';
+import { ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+
+import type { EnrollmentMissionSummary } from 'apis/enrollment';
+
+const STATUS_LABELS: Record<string, string> = {
+  ENROLLMENT_OPENED: '모집 중',
+  ENROLLMENT_CLOSED: '모집 마감',
+  IN_PROGRESS: '진행 중',
+  COMPLETED: '종료',
+};
+
+const STATUS_VARIANTS: Record<
+  string,
+  'success' | 'warning' | 'info' | 'outline'
+> = {
+  ENROLLMENT_OPENED: 'info',
+  ENROLLMENT_CLOSED: 'warning',
+  IN_PROGRESS: 'success',
+  COMPLETED: 'outline',
+};
 
 interface FormBuilderToolbarProps {
+  mission: EnrollmentMissionSummary;
   isDirty: boolean;
   isSaving: boolean;
   onSave: () => void;
 }
 
 export function FormBuilderToolbar({
+  mission,
   isDirty,
   isSaving,
   onSave,
 }: FormBuilderToolbarProps) {
   return (
-    <div className="sticky top-0 z-10 flex items-center justify-between rounded-xl bg-white/90 backdrop-blur-sm border border-gray-200 px-4 py-2.5">
-      <div className="flex items-center gap-2">
-        <h3 className="text-sm font-semibold text-gray-900">커스텀 폼 필드</h3>
-        {isDirty && (
-          <span className="inline-flex items-center rounded-full bg-warning-10 px-2 py-0.5 text-xs font-medium text-warning-70">
-            미저장
-          </span>
-        )}
+    <div className="sticky top-0 z-20 flex items-center justify-between px-8 py-4 bg-gray-100/95 backdrop-blur-sm border-b border-gray-200">
+      <div className="flex flex-col gap-1">
+        {/* 브레드크럼 */}
+        <div className="flex items-center gap-1.5 text-sm text-gray-400">
+          <Link href="/enrollment" className="hover:text-gray-700">
+            등록 관리
+          </Link>
+          <ChevronRight size={14} />
+          <Link
+            href={`/enrollment/${mission.id}`}
+            className="hover:text-gray-700"
+          >
+            {mission.name}
+          </Link>
+          <ChevronRight size={14} />
+          <span className="text-gray-700 font-medium">신청 폼 관리</span>
+        </div>
+        {/* 제목 */}
+        <div className="flex items-center gap-2.5">
+          <Link
+            href={`/enrollment/${mission.id}`}
+            className="flex items-center justify-center w-7 h-7 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-200"
+            aria-label="등록 상세로 돌아가기"
+          >
+            <ArrowLeft size={16} />
+          </Link>
+          <h2 className="text-lg font-semibold text-gray-900">신청 폼 관리</h2>
+          <Badge variant="outline">{mission.name}</Badge>
+          <Badge variant={STATUS_VARIANTS[mission.status] ?? 'outline'}>
+            {STATUS_LABELS[mission.status] ?? mission.status}
+          </Badge>
+        </div>
       </div>
-      <Button
-        variant="filled"
-        color="primary"
-        size="sm"
-        onClick={onSave}
-        disabled={!isDirty || isSaving}
-      >
-        {isSaving && <Loader2 size={14} className="animate-spin" />}
-        저장
-      </Button>
+      {/* 저장 영역 */}
+      <div className="flex items-center gap-2">
+        {isDirty && (
+          <span className="text-xs text-gray-400">미저장 변경사항 있음</span>
+        )}
+        <Button
+          variant="filled"
+          color="neutral"
+          size="sm"
+          onClick={onSave}
+          disabled={!isDirty || isSaving}
+        >
+          {isSaving && <Loader2 size={14} className="animate-spin" />}
+          저장
+        </Button>
+      </div>
     </div>
   );
 }
