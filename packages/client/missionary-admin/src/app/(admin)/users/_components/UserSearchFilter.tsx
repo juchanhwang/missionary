@@ -40,6 +40,7 @@ interface UserSearchFilterProps {
   isBaptized: string;
   onSearchTypeChange: (value: UserSearchType) => void;
   onKeywordChange: (value: string) => void;
+  onClearKeyword: () => void;
   onRoleChange: (value: UserRole | '') => void;
   onProviderChange: (value: AuthProvider | '') => void;
   onBaptizedChange: (value: string) => void;
@@ -53,6 +54,7 @@ export function UserSearchFilter({
   isBaptized,
   onSearchTypeChange,
   onKeywordChange,
+  onClearKeyword,
   onRoleChange,
   onProviderChange,
   onBaptizedChange,
@@ -65,7 +67,11 @@ export function UserSearchFilter({
 
   const handleKeywordInput = (value: string) => {
     setLocalKeyword(value);
-    onKeywordChange(value);
+    if (value) {
+      onKeywordChange(value);
+    } else {
+      onClearKeyword();
+    }
   };
 
   return (

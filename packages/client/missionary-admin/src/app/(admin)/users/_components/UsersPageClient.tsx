@@ -55,6 +55,7 @@ export function UsersPageClient() {
             isBaptized={filter.params.isBaptized}
             onSearchTypeChange={filter.setSearchType}
             onKeywordChange={filter.setKeyword}
+            onClearKeyword={filter.clearKeyword}
             onRoleChange={filter.setRole}
             onProviderChange={filter.setProvider}
             onBaptizedChange={filter.setIsBaptized}

@@ -62,6 +62,7 @@ describe('UserSearchFilter', () => {
     isBaptized: '',
     onSearchTypeChange: vi.fn(),
     onKeywordChange: vi.fn(),
+    onClearKeyword: vi.fn(),
     onRoleChange: vi.fn(),
     onProviderChange: vi.fn(),
     onBaptizedChange: vi.fn(),
