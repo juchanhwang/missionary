@@ -44,15 +44,8 @@ describe('FormFieldService', () => {
     service = module.get<FormFieldService>(FormFieldService);
 
     // 기본 missionary 세팅
-    const missionary = makeMissionary({ id: MISSIONARY_ID });
-    await fakeMissionaryRepo.create({
-      name: missionary.name,
-      startDate: missionary.startDate,
-      endDate: missionary.endDate,
-      createdById: USER_ID,
-    });
     // fakeMissionaryRepo는 create 시 자체 ID를 생성하므로, 직접 세팅
-    fakeMissionaryRepo.clear();
+    const missionary = makeMissionary({ id: MISSIONARY_ID });
     fakeMissionaryRepo['store'].set(MISSIONARY_ID, missionary);
   });
 
@@ -249,7 +242,7 @@ describe('FormFieldService', () => {
         label: '셔틀',
         isRequired: true,
         order: 0,
-        options: ['탑승', '미탑승'] as unknown as null,
+        options: ['탑승', '미탑승'],
       });
 
       const result = await service.update(
