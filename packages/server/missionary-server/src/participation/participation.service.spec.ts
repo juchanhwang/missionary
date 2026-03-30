@@ -558,7 +558,7 @@ describe('ParticipationService', () => {
     });
 
     it('다른 사용자의 참가에 답변하면 ForbiddenException을 던진다', async () => {
-      // 소유권 검사는 필드 유효성 검증보다 먼저 수행된다
+      // 전제: 소유권 검사(ForbiddenException)는 필드 유효성 검증보다 먼저 수행된다
       const participation = makeParticipation({
         id: 'p-1',
         userId: 'other-user',
