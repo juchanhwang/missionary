@@ -17,6 +17,19 @@ export function UsersPageClient() {
   const [mountedUserId, setMountedUserId] = useState<string | null>(
     selectedUserId,
   );
+  const [isPanelOpen, setIsPanelOpen] = useState(!!selectedUserId);
+
+  // URL 변경 시 패널 상태 동기화 (브라우저 뒤로가기/앞으로가기 대응)
+  const [prevSelectedUserId, setPrevSelectedUserId] = useState(selectedUserId);
+  if (selectedUserId !== prevSelectedUserId) {
+    setPrevSelectedUserId(selectedUserId);
+    if (selectedUserId) {
+      setMountedUserId(selectedUserId);
+      setIsPanelOpen(true);
+    } else {
+      setIsPanelOpen(false);
+    }
+  }
 
   const filter = useUserFilterParams();
 
@@ -31,12 +44,14 @@ export function UsersPageClient() {
 
   const selectUser = (id: string) => {
     setMountedUserId(id);
+    setIsPanelOpen(true);
     const params = new URLSearchParams(searchParams.toString());
     params.set('userId', id);
     router.push(`/users?${params.toString()}`);
   };
 
   const handlePanelClose = () => {
+    setIsPanelOpen(false);
     const params = new URLSearchParams(searchParams.toString());
     params.delete('userId');
     const queryString = params.toString();
@@ -117,7 +132,7 @@ export function UsersPageClient() {
           userId={mountedUserId}
           users={users}
           initialData={users.find((u) => u.id === mountedUserId)}
-          isOpen={!!selectedUserId}
+          isOpen={isPanelOpen}
           onClose={handlePanelClose}
           onExited={() => setMountedUserId(null)}
           onNavigateToUser={selectUser}
