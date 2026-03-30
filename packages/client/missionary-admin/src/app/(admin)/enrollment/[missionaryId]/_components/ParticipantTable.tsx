@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  overlay,
   Pagination,
   Table,
   TableBody,
@@ -10,8 +11,16 @@ import {
   TableRow,
 } from '@samilhero/design-system';
 import { TableEmptyState, TableSkeleton } from 'components/table';
+import { PANEL_TRANSITION_MS } from 'components/ui/SidePanel';
+import { useAuth } from 'lib/auth/AuthContext';
+import { useState } from 'react';
 
+import { BulkApproveModal } from './BulkApproveModal';
+import { EnrollmentToolbar } from './EnrollmentToolbar';
 import { ParticipantRow } from './ParticipantRow';
+import { useBulkApprovePayment } from '../_hooks/useBulkApprovePayment';
+import { useEnrollmentUrl } from '../_hooks/useEnrollmentUrl';
+import { useTogglePayment } from '../_hooks/useTogglePayment';
 
 import type {
   FormFieldDefinition,
@@ -19,54 +28,120 @@ import type {
 } from 'apis/participation';
 import type { SkeletonColumn } from 'components/table';
 
+const PAGE_SIZE = 20;
+
 interface ParticipantTableProps {
   data: PaginatedParticipationsResponse | undefined;
   isLoading: boolean;
-  selectedParticipantId: string | null;
-  checkedIds: Set<string>;
-  showCheckbox: boolean;
-  customFields: FormFieldDefinition[];
-  toolbar?: React.ReactNode;
-  onCheck: (id: string) => void;
-  onCheckAll: () => void;
-  onClick: (id: string) => void;
-  onTogglePayment: (id: string, isPaid: boolean) => void;
-  currentPage: number;
-  totalPages: number;
-  total: number;
-  pageSize: number;
-  onPageChange: (page: number) => void;
+  formFields: FormFieldDefinition[];
+  missionaryId: string;
+  missionName: string;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
 }
 
 export function ParticipantTable({
   data,
   isLoading,
-  selectedParticipantId,
-  checkedIds,
-  showCheckbox,
-  customFields,
-  toolbar,
-  onCheck,
-  onCheckAll,
-  onClick,
-  onTogglePayment,
-  currentPage,
-  totalPages,
-  total,
-  pageSize,
-  onPageChange,
+  formFields,
+  missionaryId,
+  missionName,
+  searchQuery,
+  onSearchChange,
 }: ParticipantTableProps) {
-  const participants = data?.data ?? [];
+  const { searchParams, updateSearchParams } = useEnrollmentUrl();
+  const { user } = useAuth();
+  const isAdmin = user.role === 'ADMIN';
 
-  const displayedFields = customFields.slice(0, 3);
-  const baseColCount = 8 + displayedFields.length;
-  const colCount = baseColCount + (showCheckbox ? 1 : 0);
+  const selectedParticipantId = searchParams.get('participantId');
+  const currentPage = Number(searchParams.get('page') ?? '1');
+
+  // 체크 선택 상태
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
+
+  // Mutations
+  const togglePayment = useTogglePayment();
+  const bulkApprove = useBulkApprovePayment();
+
+  const participants = data?.data ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const displayedFields = formFields.slice(0, 3);
 
   const isAllChecked =
     participants.length > 0 && participants.every((p) => checkedIds.has(p.id));
 
+  // 필터/페이지 변경 시 체크 초기화 (렌더 시점 조건부 리셋)
+  const filterKey = `${searchParams.get('isPaid') ?? ''}|${searchParams.get('attendanceType') ?? ''}|${currentPage}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (prevFilterKey !== filterKey) {
+    setPrevFilterKey(filterKey);
+    setCheckedIds(new Set());
+  }
+
+  // --- 핸들러 ---
+
+  const handleCheck = (id: string) => {
+    setCheckedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleCheckAll = () => {
+    if (isAllChecked) {
+      setCheckedIds(new Set());
+    } else {
+      setCheckedIds(new Set(participants.map((p) => p.id)));
+    }
+  };
+
+  const handleRowClick = (id: string) => {
+    updateSearchParams({ participantId: id });
+  };
+
+  const handlePageChange = (page: number) => {
+    updateSearchParams({ page: page > 1 ? String(page) : '' });
+  };
+
+  const handleTogglePayment = (id: string, isPaid: boolean) => {
+    togglePayment.mutate({ id, isPaid });
+  };
+
+  const handleBulkApprove = async () => {
+    const ids = Array.from(checkedIds);
+    const confirmed = await overlay.openAsync<boolean>(
+      ({ isOpen, close, unmount }) => (
+        <BulkApproveModal
+          isOpen={isOpen}
+          close={(result) => {
+            close(result);
+            setTimeout(unmount, PANEL_TRANSITION_MS);
+          }}
+          count={ids.length}
+        />
+      ),
+    );
+
+    if (confirmed) {
+      bulkApprove.mutate(ids, {
+        onSuccess: () => setCheckedIds(new Set()),
+      });
+    }
+  };
+
+  // --- Skeleton ---
+
+  const baseColCount = 8 + displayedFields.length;
+  const colCount = baseColCount + (isAdmin ? 1 : 0);
+
   const skeletonColumns: SkeletonColumn[] = [
-    ...(showCheckbox ? [{ width: 'w-4' as const }] : []),
+    ...(isAdmin ? [{ width: 'w-4' as const }] : []),
     { width: 'w-24' as const },
     { width: 'w-16' as const },
     { width: 'w-20' as const },
@@ -88,7 +163,14 @@ export function ParticipantTable({
             {total}건
           </span>
         </p>
-        {toolbar}
+        <EnrollmentToolbar
+          missionaryId={missionaryId}
+          missionName={missionName}
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+          selectedCount={checkedIds.size}
+          onBulkApprove={handleBulkApprove}
+        />
       </div>
 
       <div className="flex-1 min-h-0 overflow-auto">
@@ -96,12 +178,12 @@ export function ParticipantTable({
           <TableCaption>등록자 목록</TableCaption>
           <TableHeader className="sticky top-0 z-10">
             <TableRow>
-              {showCheckbox && (
+              {isAdmin && (
                 <TableHead className="w-[44px] px-3">
                   <input
                     type="checkbox"
                     checked={isAllChecked}
-                    onChange={onCheckAll}
+                    onChange={handleCheckAll}
                     aria-label="전체 선택"
                     className="h-4 w-4 rounded border-gray-300"
                   />
@@ -134,11 +216,11 @@ export function ParticipantTable({
                   participant={participant}
                   isSelected={participant.id === selectedParticipantId}
                   isChecked={checkedIds.has(participant.id)}
-                  showCheckbox={showCheckbox}
+                  showCheckbox={isAdmin}
                   customFields={displayedFields}
-                  onCheck={onCheck}
-                  onClick={onClick}
-                  onTogglePayment={onTogglePayment}
+                  onCheck={handleCheck}
+                  onClick={handleRowClick}
+                  onTogglePayment={handleTogglePayment}
                 />
               ))
             )}
@@ -150,14 +232,14 @@ export function ParticipantTable({
       <div className="shrink-0 flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
         <p className="text-xs text-gray-400">
           {total > 0
-            ? `${(currentPage - 1) * pageSize + 1} - ${Math.min(currentPage * pageSize, total)} / 전체 ${total}건`
+            ? `${(currentPage - 1) * PAGE_SIZE + 1} - ${Math.min(currentPage * PAGE_SIZE, total)} / 전체 ${total}건`
             : '0건'}
         </p>
         {totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={onPageChange}
+            onPageChange={handlePageChange}
           />
         )}
       </div>

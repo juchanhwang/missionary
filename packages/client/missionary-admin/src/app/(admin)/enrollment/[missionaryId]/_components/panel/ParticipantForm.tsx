@@ -13,8 +13,8 @@ import {
   type ParticipantFormValues,
 } from '../../_schemas/participantSchema';
 import {
-  formatBirthDate,
   formatDateTime,
+  maskIdentificationNumber,
 } from '../../_utils/formatParticipant';
 
 import type {
@@ -22,6 +22,21 @@ import type {
   FormFieldDefinition,
   Participation,
 } from 'apis/participation';
+
+function ReadonlyField({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-xs font-medium text-gray-500">{label}</span>
+      <input
+        type="text"
+        className="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-500 outline-none"
+        value={value}
+        readOnly
+        tabIndex={-1}
+      />
+    </div>
+  );
+}
 
 interface ParticipantFormProps {
   participant: Participation;
@@ -81,10 +96,41 @@ export function ParticipantForm({
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col flex-1 overflow-y-auto"
     >
-      <div className="flex-1 space-y-6 p-5">
+      <div className="flex-1 p-5">
+        {/* 기본 정보 (읽기 전용) */}
+        <section className="space-y-3">
+          <div className="flex items-center gap-1.5">
+            <Lock size={11} className="text-gray-400" />
+            <h4 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              기본 정보
+            </h4>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <ReadonlyField label="이름" value={participant.name} />
+            <ReadonlyField
+              label="주민등록번호"
+              value={
+                participant.identificationNumber
+                  ? maskIdentificationNumber(participant.identificationNumber)
+                  : '-'
+              }
+            />
+            <ReadonlyField
+              label="등록일시"
+              value={formatDateTime(participant.createdAt)}
+            />
+            <ReadonlyField
+              label="소속 팀"
+              value={participant.team?.teamName ?? '-'}
+            />
+          </div>
+        </section>
+
+        <hr className="my-4 border-gray-100" />
+
         {/* 참석 정보 (편집 가능) */}
         <section className="space-y-4">
-          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <h4 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
             참석 정보
           </h4>
           <Controller
@@ -105,7 +151,7 @@ export function ParticipantForm({
             render={({ field }) => (
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-gray-500">
-                  참석 일정
+                  참석 일정 <span className="text-red-600">*</span>
                 </label>
                 <Select
                   value={field.value}
@@ -132,133 +178,104 @@ export function ParticipantForm({
             control={control}
             name="cohort"
             render={({ field }) => (
-              <InputField
-                label="기수"
-                type="number"
-                value={String(field.value)}
-                onChange={(e) => field.onChange(Number(e.target.value))}
-                disabled={!isAdmin}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="hasPastParticipation"
-            render={({ field }) => (
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-gray-500">
-                  과거 참여 여부
+                  기수 <span className="text-red-600">*</span>
                 </label>
-                <Switch
-                  checked={field.value ?? false}
-                  onChange={(e) => field.onChange(e.target.checked)}
+                <InputField
+                  type="number"
+                  value={String(field.value)}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
                   disabled={!isAdmin}
                 />
               </div>
             )}
           />
-          <Controller
-            control={control}
-            name="isCollegeStudent"
-            render={({ field }) => (
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-gray-500">
-                  대학생 여부
-                </label>
-                <Switch
-                  checked={field.value ?? false}
-                  onChange={(e) => field.onChange(e.target.checked)}
-                  disabled={!isAdmin}
-                />
-              </div>
-            )}
-          />
-        </section>
-
-        {/* 개인 정보 (읽기 전용) */}
-        <section className="space-y-4 rounded-lg bg-gray-50 p-4">
-          <div className="flex items-center gap-1.5">
-            <Lock size={12} className="text-gray-400" />
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              개인 정보
-            </h4>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-400">이름</span>
-            <span className="text-sm text-gray-900">{participant.name}</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-400">생년월일</span>
-            <span className="text-sm text-gray-900">
-              {participant.birthDate
-                ? formatBirthDate(participant.birthDate)
-                : '-'}
-            </span>
-          </div>
-        </section>
-
-        {/* 기본 정보 (읽기 전용) */}
-        <section className="space-y-4 rounded-lg bg-gray-50 p-4">
-          <div className="flex items-center gap-1.5">
-            <Lock size={12} className="text-gray-400" />
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              기본 정보
-            </h4>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-400">등록일시</span>
-            <span className="text-sm text-gray-900">
-              {formatDateTime(participant.createdAt)}
-            </span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-400">소속 팀</span>
-            <span className="text-sm text-gray-900">
-              {participant.team?.teamName ?? '-'}
-            </span>
+          <div className="grid grid-cols-2 gap-3">
+            <Controller
+              control={control}
+              name="hasPastParticipation"
+              render={({ field }) => (
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-medium text-gray-500 leading-none">
+                    과거 참여 여부
+                  </label>
+                  <Switch
+                    className="shrink-0"
+                    checked={field.value ?? false}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                    disabled={!isAdmin}
+                  />
+                </div>
+              )}
+            />
+            <Controller
+              control={control}
+              name="isCollegeStudent"
+              render={({ field }) => (
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-medium text-gray-500 leading-none">
+                    대학생 여부
+                  </label>
+                  <Switch
+                    className="shrink-0"
+                    checked={field.value ?? false}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                    disabled={!isAdmin}
+                  />
+                </div>
+              )}
+            />
           </div>
         </section>
 
         {/* 추가 신청 정보 (커스텀 필드) */}
         {formFields.length > 0 && (
-          <section className="space-y-4">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              추가 신청 정보
-            </h4>
-            <Controller
-              control={control}
-              name="answers"
-              render={({ field: answersField }) => (
-                <div className="space-y-4">
-                  {formFields.map((formField, index) => {
-                    const answerValue = answersField.value[index]?.value ?? '';
-                    return (
-                      <CustomFieldInput
-                        key={formField.id}
-                        field={formField}
-                        value={answerValue}
-                        readOnly={!isAdmin}
-                        onChange={(value) => {
-                          const newAnswers = [...answersField.value];
-                          newAnswers[index] = {
-                            formFieldId: formField.id,
-                            value,
-                          };
-                          answersField.onChange(newAnswers);
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-            />
-          </section>
+          <>
+            <hr className="my-4 border-gray-100" />
+            <section className="space-y-3">
+              <div className="flex items-center gap-1.5">
+                <Lock size={11} className="text-gray-400" />
+                <h4 className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  추가 신청 정보
+                </h4>
+              </div>
+              <Controller
+                control={control}
+                name="answers"
+                render={({ field: answersField }) => (
+                  <div className="space-y-3">
+                    {formFields.map((formField, index) => {
+                      const answerValue =
+                        answersField.value[index]?.value ?? '';
+                      return (
+                        <CustomFieldInput
+                          key={formField.id}
+                          field={formField}
+                          value={answerValue}
+                          readOnly={!isAdmin}
+                          onChange={(value) => {
+                            const newAnswers = [...answersField.value];
+                            newAnswers[index] = {
+                              formFieldId: formField.id,
+                              value,
+                            };
+                            answersField.onChange(newAnswers);
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              />
+            </section>
+          </>
         )}
       </div>
 
-      {/* 푸터 액션 (ADMIN만) */}
+      {/* 푸터 액션 (ADMIN만) — 하단 고정 */}
       {isAdmin && (
-        <div className="shrink-0 flex items-center justify-end gap-2 border-t border-gray-200 px-5 py-3">
+        <div className="sticky bottom-0 flex items-center justify-end gap-2 border-t border-gray-200 bg-white px-5 py-3">
           <Button
             type="button"
             variant="outline"

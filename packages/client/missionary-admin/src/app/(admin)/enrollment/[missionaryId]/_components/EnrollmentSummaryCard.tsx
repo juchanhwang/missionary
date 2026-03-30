@@ -3,14 +3,26 @@
 import { AlertCircle, Check, Users } from 'lucide-react';
 
 import { ProgressBar } from '../../_components/ProgressBar';
+import { useGetMissionEnrollmentSummary } from '../_hooks/useGetMissionEnrollmentSummary';
 
 import type { MissionEnrollmentSummary } from 'apis/enrollment';
 
 interface EnrollmentSummaryCardProps {
-  summary: MissionEnrollmentSummary;
+  missionaryId: string;
+  initialData: MissionEnrollmentSummary;
 }
 
-export function EnrollmentSummaryCard({ summary }: EnrollmentSummaryCardProps) {
+export function EnrollmentSummaryCard({
+  missionaryId,
+  initialData,
+}: EnrollmentSummaryCardProps) {
+  const { data: summary } = useGetMissionEnrollmentSummary({
+    missionaryId,
+    initialData,
+  });
+
+  if (!summary) return null;
+
   const { totalParticipants, maxParticipants, paidCount, unpaidCount } =
     summary;
 

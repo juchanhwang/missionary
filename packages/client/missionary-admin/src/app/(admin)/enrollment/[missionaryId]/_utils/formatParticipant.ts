@@ -23,3 +23,11 @@ export function formatBirthDate(dateString: string): string {
     day: '2-digit',
   });
 }
+
+export function maskIdentificationNumber(idNumber: string): string {
+  const digits = idNumber.replace(/-/g, '');
+  if (digits.length < 7) return idNumber;
+  const front = digits.slice(0, 6);
+  const firstBack = digits[6];
+  return `${front}-${firstBack}******`;
+}

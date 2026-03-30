@@ -3,34 +3,58 @@
 import { Button, SearchBox, Select } from '@samilhero/design-system';
 import { useAuth } from 'lib/auth/AuthContext';
 import { Check, Download, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import { useEnrollmentUrl } from '../_hooks/useEnrollmentUrl';
+import { downloadCsv } from '../_utils/csvDownload';
 
 interface EnrollmentToolbarProps {
+  missionaryId: string;
+  missionName: string;
   searchQuery: string;
   onSearchChange: (value: string) => void;
-  isPaidFilter: string;
-  onIsPaidFilterChange: (value: string) => void;
-  attendanceTypeFilter: string;
-  onAttendanceTypeFilterChange: (value: string) => void;
   selectedCount: number;
   onBulkApprove: () => void;
-  onCsvDownload: () => void;
-  isCsvDownloading: boolean;
 }
 
 export function EnrollmentToolbar({
+  missionaryId,
+  missionName,
   searchQuery,
   onSearchChange,
-  isPaidFilter,
-  onIsPaidFilterChange,
-  attendanceTypeFilter,
-  onAttendanceTypeFilterChange,
   selectedCount,
   onBulkApprove,
-  onCsvDownload,
-  isCsvDownloading,
 }: EnrollmentToolbarProps) {
   const { user } = useAuth();
   const isAdmin = user.role === 'ADMIN';
+  const { searchParams, updateSearchParams } = useEnrollmentUrl();
+
+  // URL 기반 필터 상태 (직접 읽기/쓰기)
+  const isPaidFilter = searchParams.get('isPaid') ?? '';
+  const attendanceTypeFilter = searchParams.get('attendanceType') ?? '';
+
+  // CSV 다운로드 상태
+  const [isCsvDownloading, setIsCsvDownloading] = useState(false);
+
+  const handleFilterChange = (
+    key: string,
+    value?: string | string[] | null,
+  ) => {
+    const strValue = typeof value === 'string' ? value : '';
+    updateSearchParams({ [key]: strValue, page: '' });
+  };
+
+  const handleCsvDownload = async () => {
+    setIsCsvDownloading(true);
+    try {
+      await downloadCsv(missionaryId, `${missionName}_등록자`);
+    } catch {
+      toast.error('CSV 다운로드에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsCsvDownloading(false);
+    }
+  };
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
@@ -44,7 +68,7 @@ export function EnrollmentToolbar({
       </div>
       <Select
         value={isPaidFilter}
-        onChange={onIsPaidFilterChange}
+        onChange={(value) => handleFilterChange('isPaid', value)}
         className="w-28"
       >
         <Select.Trigger>
@@ -62,7 +86,7 @@ export function EnrollmentToolbar({
       </Select>
       <Select
         value={attendanceTypeFilter}
-        onChange={onAttendanceTypeFilterChange}
+        onChange={(value) => handleFilterChange('attendanceType', value)}
         className="w-28"
       >
         <Select.Trigger>
@@ -82,7 +106,7 @@ export function EnrollmentToolbar({
         variant="outline"
         color="neutral"
         size="sm"
-        onClick={onCsvDownload}
+        onClick={handleCsvDownload}
         disabled={isCsvDownloading}
       >
         {isCsvDownloading ? (

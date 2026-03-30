@@ -91,15 +91,9 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
         </div>
 
         {/* 선교명 + 부제 */}
-        <h3 className="text-base font-bold text-gray-900 mb-0.5 group-hover:text-primary-50 transition-colors">
+        <h3 className="text-base font-bold text-gray-900 mb-0.5 group-hover:text-primary-50 transition-colors mb-4">
           {mission.name}
         </h3>
-        {mission.missionGroupName && (
-          <p className="text-xs text-gray-400 mb-4">
-            {mission.missionGroupName}
-          </p>
-        )}
-        {!mission.missionGroupName && <div className="mb-4" />}
 
         {/* 선교 기간 */}
         <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">

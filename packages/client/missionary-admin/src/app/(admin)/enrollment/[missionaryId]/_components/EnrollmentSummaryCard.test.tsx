@@ -3,13 +3,20 @@ import { render, screen } from 'test/test-utils';
 
 import { EnrollmentSummaryCard } from './EnrollmentSummaryCard';
 
+const TEST_MISSIONARY_ID = 'test-missionary-id';
+
 describe('EnrollmentSummaryCard', () => {
   it('총 신청 수를 렌더링한다', () => {
     const summary = createMockMissionEnrollmentSummary({
       totalParticipants: 42,
     });
 
-    render(<EnrollmentSummaryCard summary={summary} />);
+    render(
+      <EnrollmentSummaryCard
+        missionaryId={TEST_MISSIONARY_ID}
+        initialData={summary}
+      />,
+    );
 
     expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('총 신청')).toBeInTheDocument();
@@ -18,7 +25,12 @@ describe('EnrollmentSummaryCard', () => {
   it('납부완료 수를 렌더링한다', () => {
     const summary = createMockMissionEnrollmentSummary({ paidCount: 25 });
 
-    render(<EnrollmentSummaryCard summary={summary} />);
+    render(
+      <EnrollmentSummaryCard
+        missionaryId={TEST_MISSIONARY_ID}
+        initialData={summary}
+      />,
+    );
 
     expect(screen.getByText('25')).toBeInTheDocument();
     expect(screen.getByText('납부완료')).toBeInTheDocument();
@@ -27,7 +39,12 @@ describe('EnrollmentSummaryCard', () => {
   it('미납 수를 렌더링한다', () => {
     const summary = createMockMissionEnrollmentSummary({ unpaidCount: 17 });
 
-    render(<EnrollmentSummaryCard summary={summary} />);
+    render(
+      <EnrollmentSummaryCard
+        missionaryId={TEST_MISSIONARY_ID}
+        initialData={summary}
+      />,
+    );
 
     expect(screen.getByText('17')).toBeInTheDocument();
     expect(screen.getByText('미납')).toBeInTheDocument();
@@ -39,7 +56,12 @@ describe('EnrollmentSummaryCard', () => {
       maxParticipants: 50,
     });
 
-    render(<EnrollmentSummaryCard summary={summary} />);
+    render(
+      <EnrollmentSummaryCard
+        missionaryId={TEST_MISSIONARY_ID}
+        initialData={summary}
+      />,
+    );
 
     expect(screen.getByText(/정원 대비/)).toBeInTheDocument();
     expect(screen.getByText(/30 \/ 50명/)).toBeInTheDocument();
@@ -51,7 +73,12 @@ describe('EnrollmentSummaryCard', () => {
       maxParticipants: null,
     });
 
-    render(<EnrollmentSummaryCard summary={summary} />);
+    render(
+      <EnrollmentSummaryCard
+        missionaryId={TEST_MISSIONARY_ID}
+        initialData={summary}
+      />,
+    );
 
     expect(screen.queryByText(/정원 대비/)).not.toBeInTheDocument();
   });
@@ -63,7 +90,12 @@ describe('EnrollmentSummaryCard', () => {
       unpaidCount: 0,
     });
 
-    render(<EnrollmentSummaryCard summary={summary} />);
+    render(
+      <EnrollmentSummaryCard
+        missionaryId={TEST_MISSIONARY_ID}
+        initialData={summary}
+      />,
+    );
 
     const percentTexts = screen.getAllByText(/0%/);
     expect(percentTexts.length).toBeGreaterThanOrEqual(2);
