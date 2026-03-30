@@ -4,6 +4,8 @@ import { SearchBox, Select } from '@samilhero/design-system';
 import { ROLE_LABELS } from 'lib/constants/role';
 import { useEffect, useState } from 'react';
 
+import { getSelectValue } from '../_utils/getSelectValue';
+
 import type { AuthProvider, UserRole, UserSearchType } from 'apis/user';
 
 const SEARCH_TYPE_LABELS: Record<UserSearchType, string> = {
@@ -70,9 +72,9 @@ export function UserSearchFilter({
     <div className="flex items-center gap-3 mb-5">
       <Select
         value={searchType}
-        onChange={(value?: string | string[] | null) => {
-          if (!value || typeof value !== 'string') return;
-          onSearchTypeChange(value as UserSearchType);
+        onChange={(value) => {
+          const v = getSelectValue<UserSearchType>(value);
+          if (v) onSearchTypeChange(v);
         }}
         size="md"
       >
@@ -97,9 +99,7 @@ export function UserSearchFilter({
 
       <Select
         value={role || null}
-        onChange={(value?: string | string[] | null) =>
-          onRoleChange(((value as string) ?? '') as UserRole | '')
-        }
+        onChange={(value) => onRoleChange(getSelectValue<UserRole>(value))}
         size="md"
       >
         <Select.Trigger>
@@ -117,8 +117,8 @@ export function UserSearchFilter({
 
       <Select
         value={provider || null}
-        onChange={(value?: string | string[] | null) =>
-          onProviderChange(((value as string) ?? '') as AuthProvider | '')
+        onChange={(value) =>
+          onProviderChange(getSelectValue<AuthProvider>(value))
         }
         size="md"
       >
@@ -135,9 +135,7 @@ export function UserSearchFilter({
 
       <Select
         value={isBaptized || null}
-        onChange={(value?: string | string[] | null) =>
-          onBaptizedChange((value as string) ?? '')
-        }
+        onChange={(value) => onBaptizedChange(getSelectValue(value))}
         size="md"
       >
         <Select.Trigger>
