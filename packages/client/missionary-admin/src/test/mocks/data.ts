@@ -1,10 +1,19 @@
 import { type AuthUser } from 'apis/auth';
+import {
+  type EnrollmentMissionSummary,
+  type MissionEnrollmentSummary,
+} from 'apis/enrollment';
 import { type Missionary } from 'apis/missionary';
 import {
   type DeletedRegionListItem,
   type RegionListItem,
 } from 'apis/missionaryRegion';
 import { type MissionGroup, type MissionGroupDetail } from 'apis/missionGroup';
+import {
+  type AttendanceOption,
+  type FormFieldDefinition,
+  type Participation,
+} from 'apis/participation';
 import { type User } from 'apis/user';
 
 export function createMockAuthUser(
@@ -143,6 +152,109 @@ export function createMockDeletedRegionList(
       id: `deleted-region-${i + 1}`,
       name: `삭제교회${i + 1}`,
       deletedAt: new Date(2026, 2, 15 - i).toISOString(),
+    }),
+  );
+}
+
+// === Enrollment ===
+
+export function createMockEnrollmentSummary(
+  overrides: Partial<EnrollmentMissionSummary> = {},
+): EnrollmentMissionSummary {
+  return {
+    id: 'missionary-1',
+    name: '2026 여름 단기선교',
+    order: 1,
+    category: 'ABROAD',
+    status: 'ENROLLMENT_OPENED',
+    enrollmentDeadline: '2026-06-30T00:00:00.000Z',
+    missionStartDate: '2026-07-01',
+    missionEndDate: '2026-07-15',
+    maximumParticipantCount: 50,
+    currentParticipantCount: 30,
+    paidCount: 20,
+    managerName: '김목사',
+    missionGroupName: '필리핀 선교',
+    ...overrides,
+  };
+}
+
+export function createMockMissionEnrollmentSummary(
+  overrides: Partial<MissionEnrollmentSummary> = {},
+): MissionEnrollmentSummary {
+  return {
+    totalParticipants: 30,
+    maxParticipants: 50,
+    paidCount: 20,
+    unpaidCount: 10,
+    fullAttendanceCount: 25,
+    partialAttendanceCount: 5,
+    ...overrides,
+  };
+}
+
+export function createMockAttendanceOption(
+  overrides: Partial<AttendanceOption> = {},
+): AttendanceOption {
+  return {
+    id: 'att-opt-1',
+    missionaryId: 'missionary-1',
+    type: 'FULL',
+    label: '전체 참석',
+    order: 0,
+    ...overrides,
+  };
+}
+
+export function createMockFormFieldDefinition(
+  overrides: Partial<FormFieldDefinition> = {},
+): FormFieldDefinition {
+  return {
+    id: 'field-1',
+    missionaryId: 'missionary-1',
+    fieldType: 'TEXT',
+    label: '교회명',
+    placeholder: null,
+    isRequired: false,
+    order: 0,
+    options: null,
+    hasAnswers: false,
+    ...overrides,
+  };
+}
+
+export function createMockParticipation(
+  overrides: Partial<Participation> = {},
+): Participation {
+  return {
+    id: 'part-1',
+    name: '홍길동',
+    birthDate: '1999-01-01',
+    applyFee: 500000,
+    isPaid: false,
+    identificationNumber: '990101-1234567',
+    isOwnCar: false,
+    missionaryId: 'missionary-1',
+    userId: 'user-1',
+    teamId: null,
+    team: null,
+    createdAt: '2026-03-01T00:00:00.000Z',
+    affiliation: '서울교회',
+    attendanceOptionId: 'att-opt-1',
+    attendanceOption: createMockAttendanceOption(),
+    cohort: 1,
+    hasPastParticipation: false,
+    isCollegeStudent: false,
+    formAnswers: [],
+    ...overrides,
+  };
+}
+
+export function createMockParticipationList(count: number): Participation[] {
+  return Array.from({ length: count }, (_, i) =>
+    createMockParticipation({
+      id: `part-${i + 1}`,
+      name: `참가자${i + 1}`,
     }),
   );
 }

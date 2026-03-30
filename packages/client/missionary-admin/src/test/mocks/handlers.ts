@@ -1,10 +1,14 @@
 import { http, HttpResponse } from 'msw';
 
 import {
+  createMockAttendanceOption,
   createMockAuthUser,
+  createMockFormFieldDefinition,
   createMockMissionary,
   createMockMissionGroup,
   createMockMissionGroupDetail,
+  createMockParticipation,
+  createMockParticipationList,
   createMockUser,
   createMockUserList,
 } from './data';
@@ -100,5 +104,99 @@ export const handlers = [
   http.delete(
     `${API_URL}/users/:id`,
     () => new HttpResponse(null, { status: 204 }),
+  ),
+
+  // Participations
+  http.get(`${API_URL}/participations`, ({ request }) => {
+    const url = new URL(request.url);
+    const limit = Number(url.searchParams.get('limit') ?? '10');
+    return HttpResponse.json({
+      data: createMockParticipationList(limit),
+      total: 30,
+    });
+  }),
+
+  http.get(`${API_URL}/participations/:id`, ({ params }) =>
+    HttpResponse.json(createMockParticipation({ id: params.id as string })),
+  ),
+
+  http.patch(`${API_URL}/participations/:id`, ({ params }) =>
+    HttpResponse.json(createMockParticipation({ id: params.id as string })),
+  ),
+
+  http.put(`${API_URL}/participations/approve`, () =>
+    HttpResponse.json({ success: true }),
+  ),
+
+  // Attendance Options
+  http.get(`${API_URL}/missionaries/:id/attendance-options`, () =>
+    HttpResponse.json([
+      createMockAttendanceOption(),
+      createMockAttendanceOption({
+        id: 'att-opt-2',
+        type: 'PARTIAL',
+        label: '부분 참석',
+        order: 1,
+      }),
+    ]),
+  ),
+
+  http.post(`${API_URL}/missionaries/:id/attendance-options`, () =>
+    HttpResponse.json(createMockAttendanceOption({ id: 'att-opt-new' }), {
+      status: 201,
+    }),
+  ),
+
+  http.patch(
+    `${API_URL}/missionaries/:missionaryId/attendance-options/:optionId`,
+    ({ params }) =>
+      HttpResponse.json(
+        createMockAttendanceOption({ id: params.optionId as string }),
+      ),
+  ),
+
+  http.delete(
+    `${API_URL}/missionaries/:missionaryId/attendance-options/:optionId`,
+    () => new HttpResponse(null, { status: 204 }),
+  ),
+
+  // Form Fields
+  http.get(`${API_URL}/missionaries/:id/form-fields`, () =>
+    HttpResponse.json([createMockFormFieldDefinition()]),
+  ),
+
+  http.post(`${API_URL}/missionaries/:id/form-fields`, () =>
+    HttpResponse.json(createMockFormFieldDefinition({ id: 'field-new' }), {
+      status: 201,
+    }),
+  ),
+
+  http.patch(
+    `${API_URL}/missionaries/:missionaryId/form-fields/:fieldId`,
+    ({ params }) =>
+      HttpResponse.json(
+        createMockFormFieldDefinition({ id: params.fieldId as string }),
+      ),
+  ),
+
+  http.delete(
+    `${API_URL}/missionaries/:missionaryId/form-fields/:fieldId`,
+    () => new HttpResponse(null, { status: 204 }),
+  ),
+
+  http.patch(`${API_URL}/missionaries/:id/form-fields/reorder`, () =>
+    HttpResponse.json({ success: true }),
+  ),
+
+  // Enrollment Summary
+  http.get(`${API_URL}/participations/enrollment-summary/:id`, () =>
+    HttpResponse.json({
+      totalParticipants: 30,
+      maxParticipants: 50,
+      paidCount: 20,
+      unpaidCount: 10,
+      fullAttendanceCount: 25,
+      partialAttendanceCount: 5,
+    }),
   ),
 ];
