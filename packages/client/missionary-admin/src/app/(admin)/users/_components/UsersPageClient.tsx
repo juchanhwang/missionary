@@ -14,12 +14,9 @@ export function UsersPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedUserId = searchParams.get('userId');
-  const [mountedUserId, setMountedUserId] = useState<string | null>(null);
-
-  // 새 유저 선택 시 패널 마운트 (렌더 중 파생 상태)
-  if (selectedUserId && selectedUserId !== mountedUserId) {
-    setMountedUserId(selectedUserId);
-  }
+  const [mountedUserId, setMountedUserId] = useState<string | null>(
+    selectedUserId,
+  );
 
   const filter = useUserFilterParams();
 
@@ -32,7 +29,8 @@ export function UsersPageClient() {
   const currentPage = data?.page ?? filter.params.page;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const handleRowClick = (id: string) => {
+  const selectUser = (id: string) => {
+    setMountedUserId(id);
     const params = new URLSearchParams(searchParams.toString());
     params.set('userId', id);
     router.push(`/users?${params.toString()}`);
@@ -91,7 +89,7 @@ export function UsersPageClient() {
               users={users}
               isLoading={isLoading}
               selectedUserId={selectedUserId}
-              onRowClick={handleRowClick}
+              onRowClick={selectUser}
             />
           )}
 
@@ -121,6 +119,7 @@ export function UsersPageClient() {
           isOpen={!!selectedUserId}
           onClose={handlePanelClose}
           onExited={() => setMountedUserId(null)}
+          onNavigateToUser={selectUser}
         />
       )}
     </div>

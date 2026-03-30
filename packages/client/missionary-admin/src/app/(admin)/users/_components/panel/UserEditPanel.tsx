@@ -2,7 +2,6 @@
 
 import { overlay } from '@samilhero/design-system';
 import { PANEL_TRANSITION_MS, SidePanel } from 'components/ui/SidePanel';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
 import { DeleteUserModal } from './DeleteUserModal';
@@ -20,6 +19,7 @@ interface UserEditPanelProps {
   isOpen: boolean;
   onClose: () => void;
   onExited: () => void;
+  onNavigateToUser: (id: string) => void;
 }
 
 export function UserEditPanel({
@@ -29,9 +29,8 @@ export function UserEditPanel({
   isOpen,
   onClose,
   onExited,
+  onNavigateToUser,
 }: UserEditPanelProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const isDirtyRef = useRef(false);
 
   const { data: user, isLoading, isError } = useGetUser(userId, initialData);
@@ -80,10 +79,7 @@ export function UserEditPanel({
 
   const navigateToUser = async (targetUserId: string) => {
     if (!(await confirmIfDirty())) return;
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('userId', targetUserId);
-    router.push(`/users?${params.toString()}`);
+    onNavigateToUser(targetUserId);
   };
 
   const handleDirtyChange = (dirty: boolean) => {
