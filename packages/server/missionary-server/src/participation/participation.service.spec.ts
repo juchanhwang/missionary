@@ -1,11 +1,17 @@
 import { getQueueToken } from '@nestjs/bullmq';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { CsvExportService } from '@/common/csv/csv-export.service';
 import { EncryptionService } from '@/common/encryption/encryption.service';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 import { FORM_FIELD_REPOSITORY } from '@/missionary/repositories/form-field-repository.interface';
+import { makeMissionaryAttendanceOption } from '@/testing/factories/attendance-option.factory';
+import { makeMissionaryFormField } from '@/testing/factories/form-field.factory';
 import { makeMissionary } from '@/testing/factories/missionary.factory';
 import { makeParticipation } from '@/testing/factories/participation.factory';
 import { makeUser } from '@/testing/factories/user.factory';
@@ -14,6 +20,7 @@ import { FakeFormFieldRepository } from '@/testing/fakes/fake-form-field.reposit
 import { FakeParticipationRepository } from '@/testing/fakes/fake-participation.repository';
 
 import { CreateParticipationDto } from './dto/create-participation.dto';
+import { UpdateFormAnswersDto } from './dto/update-form-answers.dto';
 import { UpdateParticipationDto } from './dto/update-participation.dto';
 import { ParticipationService } from './participation.service';
 import { FORM_ANSWER_REPOSITORY } from './repositories/form-answer-repository.interface';
@@ -471,6 +478,228 @@ describe('ParticipationService', () => {
       expect(result).toEqual({
         message: '0 participation(s) approved',
       });
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // updateAnswers
+  // ──────────────────────────────────────────────
+
+  describe('updateAnswers', () => {
+    const missionaryId = 'missionary-1';
+    const userId = 'user-1';
+
+    beforeEach(() => {
+      const user = makeUser({ id: userId });
+      const missionary = makeMissionary({ id: missionaryId });
+      fakeParticipationRepo.setUser(userId, user);
+      fakeParticipationRepo.setMissionary(missionaryId, missionary);
+    });
+
+    it('유효한 formFieldId로 답변을 저장한다', async () => {
+      const field = makeMissionaryFormField({
+        id: 'field-1',
+        missionaryId,
+      });
+      // create가 자체 ID를 생성하므로 직접 store에 세팅
+      fakeFormFieldRepo['store'].set('field-1', field);
+
+      const participation = makeParticipation({
+        id: 'p-1',
+        userId,
+        missionaryId,
+      });
+      await fakeParticipationRepo.create(participation);
+
+      const dto: UpdateFormAnswersDto = {
+        answers: [{ formFieldId: 'field-1', value: '탑승' }],
+      };
+      const authUser = makeAuthUser({ id: userId });
+
+      const result = await service.updateAnswers('p-1', dto, authUser);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].value).toBe('탑승');
+    });
+
+    it('다른 missionary의 formFieldId로 답변하면 BadRequestException을 던진다', async () => {
+      const otherField = makeMissionaryFormField({
+        id: 'other-field',
+        missionaryId: 'other-missionary',
+      });
+      fakeFormFieldRepo['store'].set('other-field', otherField);
+
+      const participation = makeParticipation({
+        id: 'p-1',
+        userId,
+        missionaryId,
+      });
+      await fakeParticipationRepo.create(participation);
+
+      const dto: UpdateFormAnswersDto = {
+        answers: [{ formFieldId: 'other-field', value: '답변' }],
+      };
+      const authUser = makeAuthUser({ id: userId });
+
+      await expect(service.updateAnswers('p-1', dto, authUser)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('존재하지 않는 참가에 답변하면 NotFoundException을 던진다', async () => {
+      const dto: UpdateFormAnswersDto = {
+        answers: [{ formFieldId: 'field-1', value: '답변' }],
+      };
+      const authUser = makeAuthUser({ id: userId });
+
+      await expect(
+        service.updateAnswers('non-existent', dto, authUser),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('다른 사용자의 참가에 답변하면 ForbiddenException을 던진다', async () => {
+      // 전제: 소유권 검사(ForbiddenException)는 필드 유효성 검증보다 먼저 수행된다
+      const participation = makeParticipation({
+        id: 'p-1',
+        userId: 'other-user',
+        missionaryId,
+      });
+      await fakeParticipationRepo.create(participation);
+
+      const dto: UpdateFormAnswersDto = {
+        answers: [{ formFieldId: 'field-1', value: '답변' }],
+      };
+      const authUser = makeAuthUser({ id: userId });
+
+      await expect(service.updateAnswers('p-1', dto, authUser)).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // getEnrollmentSummary
+  // ──────────────────────────────────────────────
+
+  describe('getEnrollmentSummary', () => {
+    const missionaryId = 'missionary-1';
+    const userId = 'user-1';
+
+    beforeEach(() => {
+      const user = makeUser({ id: userId });
+      const missionary = makeMissionary({
+        id: missionaryId,
+        maximumParticipantCount: 100,
+      });
+      fakeParticipationRepo.setUser(userId, user);
+      fakeParticipationRepo.setMissionary(missionaryId, missionary);
+    });
+
+    it('납부/미납/참석유형별 통계를 반환한다', async () => {
+      const fullOption = makeMissionaryAttendanceOption({
+        id: 'opt-full',
+        type: 'FULL',
+        missionaryId,
+      });
+      const partialOption = makeMissionaryAttendanceOption({
+        id: 'opt-partial',
+        type: 'PARTIAL',
+        missionaryId,
+      });
+      fakeParticipationRepo.setAttendanceOption('opt-full', fullOption);
+      fakeParticipationRepo.setAttendanceOption('opt-partial', partialOption);
+
+      await fakeParticipationRepo.create(
+        makeParticipation({
+          userId,
+          missionaryId,
+          isPaid: true,
+          attendanceOptionId: 'opt-full',
+        }),
+      );
+      await fakeParticipationRepo.create(
+        makeParticipation({
+          userId,
+          missionaryId,
+          isPaid: true,
+          attendanceOptionId: 'opt-partial',
+        }),
+      );
+      await fakeParticipationRepo.create(
+        makeParticipation({
+          userId,
+          missionaryId,
+          isPaid: false,
+          attendanceOptionId: 'opt-full',
+        }),
+      );
+
+      const result = await service.getEnrollmentSummary(missionaryId);
+
+      expect(result.totalParticipants).toBe(3);
+      expect(result.maxParticipants).toBe(100);
+      expect(result.paidCount).toBe(2);
+      expect(result.unpaidCount).toBe(1);
+      expect(result.fullAttendanceCount).toBe(2);
+      expect(result.partialAttendanceCount).toBe(1);
+    });
+
+    it('참가자가 없으면 모든 카운트가 0이다', async () => {
+      const result = await service.getEnrollmentSummary(missionaryId);
+
+      expect(result.totalParticipants).toBe(0);
+      expect(result.paidCount).toBe(0);
+      expect(result.unpaidCount).toBe(0);
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // generateCsvBuffer
+  // ──────────────────────────────────────────────
+
+  describe('generateCsvBuffer', () => {
+    const missionaryId = 'missionary-1';
+    const userId = 'user-1';
+
+    beforeEach(() => {
+      const user = makeUser({ id: userId });
+      const missionary = makeMissionary({ id: missionaryId });
+      fakeParticipationRepo.setUser(userId, user);
+      fakeParticipationRepo.setMissionary(missionaryId, missionary);
+    });
+
+    it('참가 데이터와 폼 필드를 기반으로 CSV 버퍼 생성을 호출한다', async () => {
+      await fakeParticipationRepo.create(
+        makeParticipation({ userId, missionaryId }),
+      );
+
+      const field = makeMissionaryFormField({
+        id: 'field-1',
+        missionaryId,
+      });
+      fakeFormFieldRepo['store'].set('field-1', field);
+
+      const result = await service.generateCsvBuffer(missionaryId);
+
+      expect(result).toBeInstanceOf(Buffer);
+      expect(
+        mockCsvExportService.generateParticipationCsv,
+      ).toHaveBeenCalledTimes(1);
+
+      // rows와 formFields가 전달되었는지 확인
+      const [rows, formFields] =
+        mockCsvExportService.generateParticipationCsv.mock.calls[0];
+      expect(rows).toHaveLength(1);
+      expect(rows[0].name).toBeDefined();
+      expect(formFields).toHaveLength(1);
+    });
+
+    it('참가 데이터가 없으면 빈 rows로 호출한다', async () => {
+      await service.generateCsvBuffer(missionaryId);
+
+      const [rows] =
+        mockCsvExportService.generateParticipationCsv.mock.calls[0];
+      expect(rows).toHaveLength(0);
     });
   });
 });
