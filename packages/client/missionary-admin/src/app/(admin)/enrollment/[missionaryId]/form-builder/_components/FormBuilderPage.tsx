@@ -1,6 +1,6 @@
 'use client';
 
-import { FormBuilderSection } from '../../_components/form-builder/FormBuilderSection';
+import { FormBuilderSection } from './FormBuilderSection';
 
 import type { EnrollmentMissionSummary } from 'apis/enrollment';
 

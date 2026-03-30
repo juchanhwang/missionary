@@ -2,7 +2,7 @@
 
 import { Select, Switch } from '@samilhero/design-system';
 
-import { TagInput } from './TagInput';
+import { SelectOptionsEditor } from './SelectOptionsEditor';
 
 import type { FormFieldType } from 'apis/formField';
 
@@ -63,7 +63,7 @@ export function FormFieldSettings({ field, onChange }: FormFieldSettingsProps) {
       {field.fieldType === 'SELECT' && (
         <div className="flex flex-col gap-1">
           <label className="text-xs font-medium text-gray-500">선택지</label>
-          <TagInput
+          <SelectOptionsEditor
             values={field.options ?? []}
             onChange={(options) => onChange({ options })}
           />

@@ -1,7 +1,7 @@
 'use client';
 
 import { Badge, Button } from '@samilhero/design-system';
-import { ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Eye, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 import type { EnrollmentMissionSummary } from 'apis/enrollment';
@@ -28,6 +28,7 @@ interface FormBuilderToolbarProps {
   isDirty: boolean;
   isSaving: boolean;
   onSave: () => void;
+  onPreview: () => void;
 }
 
 export function FormBuilderToolbar({
@@ -35,6 +36,7 @@ export function FormBuilderToolbar({
   isDirty,
   isSaving,
   onSave,
+  onPreview,
 }: FormBuilderToolbarProps) {
   return (
     <div className="sticky top-0 z-20 flex items-center justify-between px-8 py-4 bg-gray-100/95 backdrop-blur-sm border-b border-gray-200">
@@ -70,11 +72,15 @@ export function FormBuilderToolbar({
           </Badge>
         </div>
       </div>
-      {/* 저장 영역 */}
+      {/* 액션 영역 */}
       <div className="flex items-center gap-2">
         {isDirty && (
           <span className="text-xs text-gray-400">미저장 변경사항 있음</span>
         )}
+        <Button variant="outline" color="neutral" size="sm" onClick={onPreview}>
+          <Eye size={14} />
+          미리보기
+        </Button>
         <Button
           variant="filled"
           color="neutral"

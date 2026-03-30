@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { overlay } from '@samilhero/design-system';
 import { PANEL_TRANSITION_MS } from 'components/ui/SidePanel';
-import { GripVertical, Pencil, Trash2 } from 'lucide-react';
+import { AlignLeft, GripVertical, Pencil, Trash2, X } from 'lucide-react';
 
 import { DeleteFieldConfirmModal } from './DeleteFieldConfirmModal';
 import { FormFieldSettings, type LocalFormField } from './FormFieldSettings';
@@ -55,7 +55,7 @@ export function FieldPreviewInput({
       return (
         <input
           type="number"
-          className={`${baseClass} w-[120px] h-9 px-3`}
+          className={`${baseClass} w-full h-9 px-3`}
           placeholder={placeholder || '0'}
           readOnly
           tabIndex={-1}
@@ -85,7 +85,7 @@ export function FieldPreviewInput({
       return (
         <input
           type="text"
-          className={`${baseClass} w-[160px] h-9 px-3`}
+          className={`${baseClass} w-full h-9 px-3`}
           placeholder={placeholder || 'YYYY-MM-DD'}
           readOnly
           tabIndex={-1}
@@ -223,11 +223,46 @@ export function FormFieldCard({
           </div>
         </div>
 
+        {/* 설명 (active: 토글 + 편집, view: 텍스트 표시) */}
+        {isActive &&
+          (field.placeholder !== null ? (
+            <div className="flex items-start gap-2 -mt-1 mb-2">
+              <AlignLeft size={12} className="shrink-0 text-gray-400 mt-1.5" />
+              <input
+                type="text"
+                value={field.placeholder}
+                onChange={(e) => onChange({ placeholder: e.target.value })}
+                className="flex-1 min-w-0 text-xs text-gray-500 bg-transparent border-b border-gray-200 focus:border-blue-400 outline-none py-1 transition-colors"
+                placeholder="안내 문구를 입력하세요"
+              />
+              <button
+                type="button"
+                onClick={() => onChange({ placeholder: null })}
+                className="shrink-0 p-0.5 text-gray-300 hover:text-gray-500 mt-1"
+                aria-label="설명 제거"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onChange({ placeholder: '' })}
+              className="flex items-center gap-1 text-xs text-gray-400 hover:text-blue-500 -mt-1 mb-2 transition-colors"
+            >
+              <AlignLeft size={12} />
+              <span>설명 추가</span>
+            </button>
+          ))}
+        {!isActive && field.placeholder && (
+          <p className="text-xs text-gray-400 -mt-1 mb-2 flex items-center gap-1.5">
+            <AlignLeft size={11} className="shrink-0" />
+            {field.placeholder}
+          </p>
+        )}
+
         {/* 프리뷰 인풋 */}
-        <FieldPreviewInput
-          fieldType={field.fieldType}
-          placeholder={field.placeholder}
-        />
+        <FieldPreviewInput fieldType={field.fieldType} placeholder={null} />
 
         {/* 응답 정보 (view 상태에서만) */}
         {!isActive && !field.isNew && !field.hasAnswers && (
