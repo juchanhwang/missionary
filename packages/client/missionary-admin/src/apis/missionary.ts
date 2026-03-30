@@ -22,6 +22,7 @@ export interface Missionary {
   price?: number;
   description?: string;
   maximumParticipantCount?: number;
+  currentParticipantCount: number;
   bankName?: string;
   bankAccountHolder?: string;
   bankAccountNumber?: string;

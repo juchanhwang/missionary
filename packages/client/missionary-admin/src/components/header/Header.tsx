@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 const PAGE_TITLES: Record<string, string> = {
   '/': '대시보드',
   '/missions': '선교 관리',
+  '/enrollment': '등록 관리',
   '/users': '유저 관리',
   '/regions': '연계지 관리',
   '/posts': '게시 관리',

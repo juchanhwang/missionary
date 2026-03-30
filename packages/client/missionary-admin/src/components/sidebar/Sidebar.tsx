@@ -4,6 +4,7 @@ import { useAuth } from 'lib/auth/AuthContext';
 import { ROLE_LABELS } from 'lib/constants/role';
 import { useSidebar } from 'lib/sidebar/SidebarContext';
 import {
+  ClipboardList,
   FileText,
   Globe,
   Hexagon,
@@ -27,6 +28,11 @@ const NAV_ITEMS: NavItemConfig[] = [
     label: '선교 관리',
     href: '/missions',
     icon: <Globe size={20} />,
+  },
+  {
+    label: '등록 관리',
+    href: '/enrollment',
+    icon: <ClipboardList size={20} />,
   },
   {
     label: '유저 관리',
