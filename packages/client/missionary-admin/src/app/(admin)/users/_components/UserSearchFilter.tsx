@@ -2,7 +2,7 @@
 
 import { SearchBox, Select } from '@samilhero/design-system';
 import { ROLE_LABELS } from 'lib/constants/role';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { AuthProvider, UserRole, UserSearchType } from 'apis/user';
 
@@ -56,7 +56,6 @@ export function UserSearchFilter({
   onBaptizedChange,
 }: UserSearchFilterProps) {
   const [localKeyword, setLocalKeyword] = useState(keyword);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setLocalKeyword(keyword);
@@ -64,23 +63,8 @@ export function UserSearchFilter({
 
   const handleKeywordInput = (value: string) => {
     setLocalKeyword(value);
-
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-
-    debounceRef.current = setTimeout(() => {
-      onKeywordChange(value);
-    }, 300);
+    onKeywordChange(value);
   };
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="flex items-center gap-3 mb-5">

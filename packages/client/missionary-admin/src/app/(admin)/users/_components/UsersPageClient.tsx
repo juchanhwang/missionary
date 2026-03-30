@@ -1,22 +1,16 @@
 'use client';
 
 import { Pagination } from '@samilhero/design-system';
-import {
-  type AuthProvider,
-  type GetUsersParams,
-  type PaginatedUsersResponse,
-  type UserRole,
-  type UserSearchType,
-} from 'apis/user';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { useGetUsers } from '../_hooks/useGetUsers';
+import { PAGE_SIZE, useUserFilterParams } from '../_hooks/useUserFilterParams';
 import { UserEditPanel } from './panel/UserEditPanel';
 import { UserSearchFilter } from './UserSearchFilter';
 import { UserTable } from './UserTable';
 
-const PAGE_SIZE = 20;
+import type { PaginatedUsersResponse } from 'apis/user';
 
 interface UsersPageClientProps {
   initialData: PaginatedUsersResponse;
@@ -33,49 +27,17 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
     setMountedUserId(selectedUserId);
   }
 
-  const handlePanelExited = () => {
-    setMountedUserId(null);
-  };
-
-  const [filterParams, setFilterParams] = useState<GetUsersParams>({
-    page: 1,
-    pageSize: PAGE_SIZE,
-    searchType: 'name',
-    keyword: '',
-    role: '',
-    provider: '',
-    isBaptized: '',
-  });
+  const filter = useUserFilterParams();
 
   const { data, isLoading, isError, refetch } = useGetUsers({
-    params: filterParams,
+    params: filter.queryParams,
     initialData,
   });
 
   const users = data?.data ?? [];
   const total = data?.total ?? 0;
-  const currentPage = data?.page ?? filterParams.page ?? 1;
+  const currentPage = data?.page ?? filter.params.page;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-
-  const handleSearchTypeChange = (searchType: UserSearchType) => {
-    setFilterParams((prev) => ({ ...prev, searchType, keyword: '', page: 1 }));
-  };
-
-  const handleKeywordChange = (keyword: string) => {
-    setFilterParams((prev) => ({ ...prev, keyword, page: 1 }));
-  };
-
-  const handleRoleChange = (role: UserRole | '') => {
-    setFilterParams((prev) => ({ ...prev, role, page: 1 }));
-  };
-
-  const handleProviderChange = (provider: AuthProvider | '') => {
-    setFilterParams((prev) => ({ ...prev, provider, page: 1 }));
-  };
-
-  const handleBaptizedChange = (isBaptized: string) => {
-    setFilterParams((prev) => ({ ...prev, isBaptized, page: 1 }));
-  };
 
   const handleRowClick = (id: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -90,25 +52,21 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
     router.push(queryString ? `/users?${queryString}` : '/users');
   };
 
-  const handlePageChange = (page: number) => {
-    setFilterParams((prev) => ({ ...prev, page }));
-  };
-
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0">
       <div className="flex flex-col flex-1 p-8 min-h-0">
         <div className="shrink-0">
           <UserSearchFilter
-            searchType={filterParams.searchType || 'name'}
-            keyword={filterParams.keyword ?? ''}
-            role={filterParams.role ?? ''}
-            provider={filterParams.provider ?? ''}
-            isBaptized={filterParams.isBaptized ?? ''}
-            onSearchTypeChange={handleSearchTypeChange}
-            onKeywordChange={handleKeywordChange}
-            onRoleChange={handleRoleChange}
-            onProviderChange={handleProviderChange}
-            onBaptizedChange={handleBaptizedChange}
+            searchType={filter.params.searchType}
+            keyword={filter.params.keyword}
+            role={filter.params.role}
+            provider={filter.params.provider}
+            isBaptized={filter.params.isBaptized}
+            onSearchTypeChange={filter.setSearchType}
+            onKeywordChange={filter.setKeyword}
+            onRoleChange={filter.setRole}
+            onProviderChange={filter.setProvider}
+            onBaptizedChange={filter.setIsBaptized}
           />
         </div>
 
@@ -154,7 +112,7 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPageChange={handlePageChange}
+                onPageChange={filter.setPage}
               />
             )}
           </div>
@@ -169,7 +127,7 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
           initialData={users.find((u) => u.id === mountedUserId)}
           isOpen={!!selectedUserId}
           onClose={handlePanelClose}
-          onExited={handlePanelExited}
+          onExited={() => setMountedUserId(null)}
         />
       )}
     </div>
