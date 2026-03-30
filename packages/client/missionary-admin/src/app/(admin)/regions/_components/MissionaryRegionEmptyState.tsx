@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@samilhero/design-system';
-import { AlertCircle, Building2, Search } from 'lucide-react';
+import { CircleAlert, Building2, Search } from 'lucide-react';
 
 interface MissionaryRegionEmptyStateProps {
   type: 'empty' | 'no-results' | 'error';
@@ -23,7 +23,7 @@ export function MissionaryRegionEmptyState({
   if (type === 'error') {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
-        <AlertCircle size={48} className="text-error-60" />
+        <CircleAlert size={48} className="text-error-60" />
         <p className="text-sm font-semibold text-gray-900">
           데이터를 불러오지 못했습니다
         </p>
