@@ -1,0 +1,92 @@
+'use client';
+
+import {
+  DatePicker,
+  InputField,
+  Radio,
+  RadioGroup,
+} from '@samilhero/design-system';
+import { Controller, useFormContext } from 'react-hook-form';
+
+import type { UserUpdateFormValues } from '../../_schemas/userSchema';
+import type { User } from 'apis/user';
+
+interface UserBasicInfoSectionProps {
+  user: User;
+  isEditable: boolean;
+}
+
+export function UserBasicInfoSection({
+  user,
+  isEditable,
+}: UserBasicInfoSectionProps) {
+  const form = useFormContext<UserUpdateFormValues>();
+
+  return (
+    <fieldset className="flex flex-col gap-4">
+      <legend className="text-sm font-semibold text-gray-800 mb-2">
+        기본 정보
+      </legend>
+
+      <div className="grid grid-cols-2 gap-4">
+        <InputField
+          label="이름"
+          disabled={!isEditable}
+          {...form.register('name')}
+          error={form.formState.errors.name?.message}
+        />
+        <InputField
+          label="이메일"
+          type="email"
+          value={user.email ?? ''}
+          disabled
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <InputField
+          label="전화번호"
+          type="tel"
+          disabled={!isEditable}
+          {...form.register('phoneNumber')}
+        />
+        <Controller
+          name="birthDate"
+          control={form.control}
+          render={({ field }) => (
+            <DatePicker
+              label="생년월일"
+              placeholder="YYYY-MM-DD"
+              value={field.value ? new Date(field.value) : null}
+              onChange={(date) =>
+                field.onChange(date ? date.toISOString().slice(0, 10) : '')
+              }
+              disabled={!isEditable}
+            />
+          )}
+        />
+      </div>
+
+      <div>
+        <p className="mb-1 text-xs font-normal leading-[1.833] text-gray-700">
+          성별
+        </p>
+        <Controller
+          name="gender"
+          control={form.control}
+          render={({ field }) => (
+            <RadioGroup
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              disabled={!isEditable}
+              className="flex items-center gap-4"
+            >
+              <Radio value="MALE" label="남" />
+              <Radio value="FEMALE" label="여" />
+            </RadioGroup>
+          )}
+        />
+      </div>
+    </fieldset>
+  );
+}
