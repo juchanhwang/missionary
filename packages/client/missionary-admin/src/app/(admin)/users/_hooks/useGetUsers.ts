@@ -1,23 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
-import {
-  type GetUsersParams,
-  type PaginatedUsersResponse,
-  userApi,
-} from 'apis/user';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { userApi } from 'apis/user';
 import { queryKeys } from 'lib/queryKeys';
+
+import type { GetUsersParams } from 'apis/user';
 
 interface UseGetUsersOptions {
   params?: GetUsersParams;
-  initialData?: PaginatedUsersResponse;
 }
 
-export function useGetUsers({ params, initialData }: UseGetUsersOptions = {}) {
+export function useGetUsers({ params }: UseGetUsersOptions = {}) {
   return useQuery({
     queryKey: queryKeys.users.list(params),
     queryFn: async () => {
       const response = await userApi.getUsers(params);
       return response.data;
     },
-    initialData,
+    placeholderData: keepPreviousData,
+    staleTime: 30 * 1000,
   });
 }

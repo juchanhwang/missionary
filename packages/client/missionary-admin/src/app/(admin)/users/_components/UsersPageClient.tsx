@@ -10,13 +10,7 @@ import { UserEditPanel } from './panel/UserEditPanel';
 import { UserSearchFilter } from './UserSearchFilter';
 import { UserTable } from './UserTable';
 
-import type { PaginatedUsersResponse } from 'apis/user';
-
-interface UsersPageClientProps {
-  initialData: PaginatedUsersResponse;
-}
-
-export function UsersPageClient({ initialData }: UsersPageClientProps) {
+export function UsersPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedUserId = searchParams.get('userId');
@@ -31,7 +25,6 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
 
   const { data, isLoading, isError, refetch } = useGetUsers({
     params: filter.queryParams,
-    initialData,
   });
 
   const users = data?.data ?? [];

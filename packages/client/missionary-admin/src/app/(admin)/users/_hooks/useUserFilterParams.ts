@@ -3,47 +3,17 @@
 import { useDebouncedCallback } from 'hooks/useDebouncedCallback';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import type {
-  AuthProvider,
-  GetUsersParams,
-  UserRole,
-  UserSearchType,
-} from 'apis/user';
+import {
+  buildUserQueryParams,
+  parseBaptized,
+  parseProvider,
+  parseRole,
+  parseSearchType,
+} from '../_utils/parseUserFilterParams';
 
-export const PAGE_SIZE = 20;
+import type { AuthProvider, UserRole, UserSearchType } from 'apis/user';
 
-const VALID_SEARCH_TYPES: UserSearchType[] = ['name', 'loginId', 'phone'];
-const VALID_ROLES: UserRole[] = ['USER', 'ADMIN', 'STAFF'];
-const VALID_PROVIDERS: AuthProvider[] = ['LOCAL', 'GOOGLE', 'KAKAO'];
-const VALID_BAPTIZED = ['true', 'false'];
-
-function parseSearchType(value: string | null): UserSearchType {
-  if (VALID_SEARCH_TYPES.includes(value as UserSearchType)) {
-    return value as UserSearchType;
-  }
-  return 'name';
-}
-
-function parseRole(value: string | null): UserRole | '' {
-  if (VALID_ROLES.includes(value as UserRole)) {
-    return value as UserRole;
-  }
-  return '';
-}
-
-function parseProvider(value: string | null): AuthProvider | '' {
-  if (VALID_PROVIDERS.includes(value as AuthProvider)) {
-    return value as AuthProvider;
-  }
-  return '';
-}
-
-function parseBaptized(value: string | null): string {
-  if (value && VALID_BAPTIZED.includes(value)) {
-    return value;
-  }
-  return '';
-}
+export { PAGE_SIZE } from '../_utils/parseUserFilterParams';
 
 export interface UserFilterParams {
   searchType: UserSearchType;
@@ -114,10 +84,14 @@ export function useUserFilterParams() {
     updateParams({ page: page > 1 ? String(page) : null });
   };
 
-  const queryParams: GetUsersParams = {
-    ...params,
-    pageSize: PAGE_SIZE,
-  };
+  const queryParams = buildUserQueryParams({
+    searchType: searchParams.get('searchType'),
+    keyword: searchParams.get('keyword'),
+    role: searchParams.get('role'),
+    provider: searchParams.get('provider'),
+    isBaptized: searchParams.get('isBaptized'),
+    page: searchParams.get('page'),
+  });
 
   return {
     params,
