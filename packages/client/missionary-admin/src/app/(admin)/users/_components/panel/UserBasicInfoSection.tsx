@@ -65,7 +65,7 @@ export function UserBasicInfoSection({
         <Controller
           name="birthDate"
           control={form.control}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <DatePicker
               label="생년월일"
               placeholder="YYYY-MM-DD"
@@ -74,6 +74,7 @@ export function UserBasicInfoSection({
                 field.onChange(date ? date.toISOString().slice(0, 10) : '')
               }
               disabled={!isEditable}
+              error={fieldState.error?.message}
             />
           )}
         />

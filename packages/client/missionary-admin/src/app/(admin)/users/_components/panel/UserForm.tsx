@@ -48,7 +48,7 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
 
   const form = useForm<UserUpdateFormValues>({
     resolver: zodResolver(userUpdateSchema),
-    mode: 'onSubmit',
+    mode: 'onBlur',
     defaultValues: toFormValues(user),
   });
 
