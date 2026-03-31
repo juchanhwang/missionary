@@ -4,7 +4,10 @@ import { z } from 'zod';
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 function isNotFutureDate(value: string): boolean {
-  return new Date(value) <= new Date();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const [y, m, d] = value.split('-').map(Number);
+  return new Date(y, m - 1, d) <= today;
 }
 
 export const userUpdateSchema = z
