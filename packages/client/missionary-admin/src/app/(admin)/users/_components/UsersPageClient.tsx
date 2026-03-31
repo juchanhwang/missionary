@@ -116,19 +116,7 @@ export function UsersPageClient() {
     <div className="flex flex-col flex-1 min-h-0 min-w-0">
       <div className="flex flex-col flex-1 p-8 min-h-0">
         <div className="shrink-0">
-          <UserSearchFilter
-            searchType={filter.params.searchType}
-            keyword={filter.params.keyword}
-            role={filter.params.role}
-            provider={filter.params.provider}
-            isBaptized={filter.params.isBaptized}
-            onSearchTypeChange={filter.setSearchType}
-            onKeywordChange={filter.setKeyword}
-            onClearKeyword={filter.clearKeyword}
-            onRoleChange={filter.setRole}
-            onProviderChange={filter.setProvider}
-            onBaptizedChange={filter.setIsBaptized}
-          />
+          <UserSearchFilter />
         </div>
 
         <div className="flex flex-col flex-1 min-h-0 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
