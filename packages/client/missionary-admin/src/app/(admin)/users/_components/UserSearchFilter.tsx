@@ -2,7 +2,10 @@
 
 import { SearchBox, Select } from '@samilhero/design-system';
 import { ROLE_LABELS } from 'lib/constants/role';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+
+import { useUserFilterParams } from '../_hooks/useUserFilterParams';
+import { getSelectValue } from '../_utils/getSelectValue';
 
 import type { AuthProvider, UserRole, UserSearchType } from 'apis/user';
 
@@ -30,65 +33,38 @@ const BAPTIZED_LABELS: Record<string, string> = {
   false: '안 받음',
 };
 
-interface UserSearchFilterProps {
-  searchType: UserSearchType;
-  keyword: string;
-  role: UserRole | '';
-  provider: AuthProvider | '';
-  isBaptized: string;
-  onSearchTypeChange: (value: UserSearchType) => void;
-  onKeywordChange: (value: string) => void;
-  onRoleChange: (value: UserRole | '') => void;
-  onProviderChange: (value: AuthProvider | '') => void;
-  onBaptizedChange: (value: string) => void;
-}
+export function UserSearchFilter() {
+  const {
+    params: { searchType, keyword, role, provider, isBaptized },
+    setSearchType,
+    setKeyword,
+    clearKeyword,
+    setRole,
+    setProvider,
+    setIsBaptized,
+  } = useUserFilterParams();
 
-export function UserSearchFilter({
-  searchType,
-  keyword,
-  role,
-  provider,
-  isBaptized,
-  onSearchTypeChange,
-  onKeywordChange,
-  onRoleChange,
-  onProviderChange,
-  onBaptizedChange,
-}: UserSearchFilterProps) {
   const [localKeyword, setLocalKeyword] = useState(keyword);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    setLocalKeyword(keyword);
-  }, [keyword]);
 
   const handleKeywordInput = (value: string) => {
     setLocalKeyword(value);
-
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
+    if (value) {
+      setKeyword(value);
+    } else {
+      clearKeyword();
     }
-
-    debounceRef.current = setTimeout(() => {
-      onKeywordChange(value);
-    }, 300);
   };
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="flex items-center gap-3 mb-5">
       <Select
         value={searchType}
-        onChange={(value?: string | string[] | null) => {
-          if (!value || typeof value !== 'string') return;
-          onSearchTypeChange(value as UserSearchType);
+        onChange={(value) => {
+          const v = getSelectValue<UserSearchType>(value);
+          if (v) {
+            setLocalKeyword('');
+            setSearchType(v);
+          }
         }}
         size="md"
       >
@@ -113,9 +89,7 @@ export function UserSearchFilter({
 
       <Select
         value={role || null}
-        onChange={(value?: string | string[] | null) =>
-          onRoleChange(((value as string) ?? '') as UserRole | '')
-        }
+        onChange={(value) => setRole(getSelectValue<UserRole>(value))}
         size="md"
       >
         <Select.Trigger>
@@ -133,9 +107,7 @@ export function UserSearchFilter({
 
       <Select
         value={provider || null}
-        onChange={(value?: string | string[] | null) =>
-          onProviderChange(((value as string) ?? '') as AuthProvider | '')
-        }
+        onChange={(value) => setProvider(getSelectValue<AuthProvider>(value))}
         size="md"
       >
         <Select.Trigger>
@@ -151,9 +123,7 @@ export function UserSearchFilter({
 
       <Select
         value={isBaptized || null}
-        onChange={(value?: string | string[] | null) =>
-          onBaptizedChange((value as string) ?? '')
-        }
+        onChange={(value) => setIsBaptized(getSelectValue(value))}
         size="md"
       >
         <Select.Trigger>

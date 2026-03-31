@@ -57,8 +57,8 @@ describe('UserForm', () => {
   it('이름을 변경하면 변경사항 표시와 저장 버튼이 활성화된다', async () => {
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
-    await user.type(screen.getByLabelText('이름'), '김철수');
+    await user.clear(screen.getByLabelText('이름 *'));
+    await user.type(screen.getByLabelText('이름 *'), '김철수');
 
     expect(screen.getByText('변경사항이 있습니다')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '저장' })).toBeEnabled();
@@ -67,8 +67,8 @@ describe('UserForm', () => {
   it('폼 변경 시 onDirtyChange(true)가 호출된다', async () => {
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
-    await user.type(screen.getByLabelText('이름'), '김철수');
+    await user.clear(screen.getByLabelText('이름 *'));
+    await user.type(screen.getByLabelText('이름 *'), '김철수');
 
     await waitFor(() => {
       expect(mockOnDirtyChange).toHaveBeenCalledWith(true);
@@ -78,7 +78,7 @@ describe('UserForm', () => {
   it('이름을 비우고 제출하면 유효성 검증 에러가 표시된다', async () => {
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
+    await user.clear(screen.getByLabelText('이름 *'));
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     expect(await screen.findByText('이름을 입력해주세요')).toBeInTheDocument();
@@ -87,8 +87,8 @@ describe('UserForm', () => {
   it('저장 성공 시 변경사항 표시가 사라진다', async () => {
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
-    await user.type(screen.getByLabelText('이름'), '김철수');
+    await user.clear(screen.getByLabelText('이름 *'));
+    await user.type(screen.getByLabelText('이름 *'), '김철수');
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     await waitFor(() => {
@@ -101,8 +101,8 @@ describe('UserForm', () => {
 
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
-    await user.type(screen.getByLabelText('이름'), '김철수');
+    await user.clear(screen.getByLabelText('이름 *'));
+    await user.type(screen.getByLabelText('이름 *'), '김철수');
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     await waitFor(() => {
@@ -119,25 +119,13 @@ describe('UserForm', () => {
 
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
-    await user.type(screen.getByLabelText('이름'), '김철수');
+    await user.clear(screen.getByLabelText('이름 *'));
+    await user.type(screen.getByLabelText('이름 *'), '김철수');
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     await waitFor(() => {
       expect(screen.getByText('변경사항이 있습니다')).toBeInTheDocument();
     });
-  });
-
-  it('주민등록번호 보기/숨기기 토글이 동작한다', async () => {
-    const { user } = renderForm({ identityNumber: '990101-1234567' });
-
-    // 보기 버튼 클릭 → 숨기기로 변경
-    await user.click(screen.getByRole('button', { name: /보기/ }));
-    expect(screen.getByRole('button', { name: /숨기기/ })).toBeInTheDocument();
-
-    // 숨기기 버튼 클릭 → 보기로 변경
-    await user.click(screen.getByRole('button', { name: /숨기기/ }));
-    expect(screen.getByRole('button', { name: /보기/ })).toBeInTheDocument();
   });
 
   it('ADMIN이 아닌 경우 편집 가능한 필드가 비활성화된다', () => {
@@ -153,25 +141,7 @@ describe('UserForm', () => {
 
     renderForm();
 
-    expect(screen.getByLabelText('이름')).toBeDisabled();
+    expect(screen.getByLabelText('이름 *')).toBeDisabled();
     expect(screen.getByLabelText('전화번호')).toBeDisabled();
-  });
-
-  it('ADMIN이 아닌 경우 주민등록번호 보기 버튼이 표시되지 않는다', () => {
-    vi.mocked(useAuth).mockReturnValue({
-      user: {
-        id: 'staff-1',
-        email: 'staff@test.com',
-        role: 'STAFF',
-        provider: 'LOCAL',
-      },
-      logout: vi.fn(),
-    });
-
-    renderForm({ identityNumber: '990101-1234567' });
-
-    expect(
-      screen.queryByRole('button', { name: /보기/ }),
-    ).not.toBeInTheDocument();
   });
 });

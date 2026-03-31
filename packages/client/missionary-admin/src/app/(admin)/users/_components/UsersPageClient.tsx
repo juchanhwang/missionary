@@ -1,115 +1,122 @@
 'use client';
 
-import { Pagination } from '@samilhero/design-system';
-import {
-  type AuthProvider,
-  type GetUsersParams,
-  type PaginatedUsersResponse,
-  type UserRole,
-  type UserSearchType,
-} from 'apis/user';
+import { overlay, Pagination } from '@samilhero/design-system';
+import { PANEL_TRANSITION_MS } from 'components/ui/SidePanel';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useGetUsers } from '../_hooks/useGetUsers';
+import { PAGE_SIZE, useUserFilterParams } from '../_hooks/useUserFilterParams';
 import { UserEditPanel } from './panel/UserEditPanel';
 import { UserSearchFilter } from './UserSearchFilter';
 import { UserTable } from './UserTable';
 
-const PAGE_SIZE = 20;
-
-interface UsersPageClientProps {
-  initialData: PaginatedUsersResponse;
-}
-
-export function UsersPageClient({ initialData }: UsersPageClientProps) {
+export function UsersPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedUserId = searchParams.get('userId');
-  const [mountedUserId, setMountedUserId] = useState<string | null>(null);
 
-  // 새 유저 선택 시 패널 마운트 (렌더 중 파생 상태)
-  if (selectedUserId && selectedUserId !== mountedUserId) {
-    setMountedUserId(selectedUserId);
-  }
-
-  const handlePanelExited = () => {
-    setMountedUserId(null);
-  };
-
-  const [filterParams, setFilterParams] = useState<GetUsersParams>({
-    page: 1,
-    pageSize: PAGE_SIZE,
-    searchType: 'name',
-    keyword: '',
-    role: '',
-    provider: '',
-    isBaptized: '',
-  });
+  const filter = useUserFilterParams();
 
   const { data, isLoading, isError, refetch } = useGetUsers({
-    params: filterParams,
-    initialData,
+    params: filter.queryParams,
   });
 
   const users = data?.data ?? [];
   const total = data?.total ?? 0;
-  const currentPage = data?.page ?? filterParams.page ?? 1;
+  const currentPage = data?.page ?? filter.params.page;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const handleSearchTypeChange = (searchType: UserSearchType) => {
-    setFilterParams((prev) => ({ ...prev, searchType, keyword: '', page: 1 }));
+  // overlay 생명주기 관리
+  const panelRef = useRef<{ close: () => void; unmount: () => void } | null>(
+    null,
+  );
+  const currentPanelUserIdRef = useRef<string | null>(null);
+
+  const openPanel = (userId: string) => {
+    if (currentPanelUserIdRef.current === userId) return;
+
+    // 기존 패널 즉시 닫기 (애니메이션 없이)
+    if (panelRef.current) {
+      panelRef.current.close();
+      panelRef.current.unmount();
+      panelRef.current = null;
+    }
+    currentPanelUserIdRef.current = userId;
+
+    overlay.open(({ isOpen, close, unmount }) => {
+      panelRef.current = { close, unmount };
+
+      return (
+        <UserEditPanel
+          userId={userId}
+          users={users}
+          initialData={users.find((u) => u.id === userId)}
+          isOpen={isOpen}
+          onClose={() => {
+            close();
+            setTimeout(unmount, PANEL_TRANSITION_MS);
+            panelRef.current = null;
+            currentPanelUserIdRef.current = null;
+            const params = new URLSearchParams(window.location.search);
+            params.delete('userId');
+            const qs = params.toString();
+            router.push(qs ? `/users?${qs}` : '/users');
+          }}
+          onExited={() => {}}
+          onNavigateToUser={(id) => {
+            close();
+            unmount();
+            panelRef.current = null;
+            currentPanelUserIdRef.current = null;
+            const params = new URLSearchParams(window.location.search);
+            params.set('userId', id);
+            router.push(`/users?${params.toString()}`);
+          }}
+        />
+      );
+    });
   };
 
-  const handleKeywordChange = (keyword: string) => {
-    setFilterParams((prev) => ({ ...prev, keyword, page: 1 }));
-  };
-
-  const handleRoleChange = (role: UserRole | '') => {
-    setFilterParams((prev) => ({ ...prev, role, page: 1 }));
-  };
-
-  const handleProviderChange = (provider: AuthProvider | '') => {
-    setFilterParams((prev) => ({ ...prev, provider, page: 1 }));
-  };
-
-  const handleBaptizedChange = (isBaptized: string) => {
-    setFilterParams((prev) => ({ ...prev, isBaptized, page: 1 }));
-  };
-
-  const handleRowClick = (id: string) => {
+  const selectUser = (id: string) => {
+    openPanel(id);
     const params = new URLSearchParams(searchParams.toString());
     params.set('userId', id);
     router.push(`/users?${params.toString()}`);
   };
 
-  const handlePanelClose = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('userId');
-    const queryString = params.toString();
-    router.push(queryString ? `/users?${queryString}` : '/users');
-  };
+  // URL 변경 감지: 초기 로드, 뒤로가기/앞으로가기, 패널 내 유저 전환
+  useEffect(() => {
+    if (selectedUserId) {
+      openPanel(selectedUserId);
+    } else if (currentPanelUserIdRef.current) {
+      if (panelRef.current) {
+        panelRef.current.close();
+        setTimeout(() => {
+          panelRef.current?.unmount();
+          panelRef.current = null;
+        }, PANEL_TRANSITION_MS);
+      }
+      currentPanelUserIdRef.current = null;
+    }
+  }, [selectedUserId]);
 
-  const handlePageChange = (page: number) => {
-    setFilterParams((prev) => ({ ...prev, page }));
-  };
+  // 컴포넌트 언마운트 시 overlay 정리
+  useEffect(() => {
+    return () => {
+      if (panelRef.current) {
+        panelRef.current.close();
+        panelRef.current.unmount();
+        panelRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0">
       <div className="flex flex-col flex-1 p-8 min-h-0">
         <div className="shrink-0">
-          <UserSearchFilter
-            searchType={filterParams.searchType || 'name'}
-            keyword={filterParams.keyword ?? ''}
-            role={filterParams.role ?? ''}
-            provider={filterParams.provider ?? ''}
-            isBaptized={filterParams.isBaptized ?? ''}
-            onSearchTypeChange={handleSearchTypeChange}
-            onKeywordChange={handleKeywordChange}
-            onRoleChange={handleRoleChange}
-            onProviderChange={handleProviderChange}
-            onBaptizedChange={handleBaptizedChange}
-          />
+          <UserSearchFilter />
         </div>
 
         <div className="flex flex-col flex-1 min-h-0 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -140,7 +147,7 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
               users={users}
               isLoading={isLoading}
               selectedUserId={selectedUserId}
-              onRowClick={handleRowClick}
+              onRowClick={selectUser}
             />
           )}
 
@@ -154,24 +161,12 @@ export function UsersPageClient({ initialData }: UsersPageClientProps) {
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPageChange={handlePageChange}
+                onPageChange={filter.setPage}
               />
             )}
           </div>
         </div>
       </div>
-
-      {mountedUserId && (
-        <UserEditPanel
-          key={mountedUserId}
-          userId={mountedUserId}
-          users={users}
-          initialData={users.find((u) => u.id === mountedUserId)}
-          isOpen={!!selectedUserId}
-          onClose={handlePanelClose}
-          onExited={handlePanelExited}
-        />
-      )}
     </div>
   );
 }

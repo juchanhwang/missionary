@@ -10,12 +10,10 @@ import type { Metadata } from 'next';
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko">
-      <QueryProvider>
-        <body>
-          {children}
-          <Toaster position="bottom-right" richColors />
-        </body>
-      </QueryProvider>
+      <body>
+        <QueryProvider>{children}</QueryProvider>
+        <Toaster position="bottom-right" richColors />
+      </body>
     </html>
   );
 };
