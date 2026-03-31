@@ -1,5 +1,6 @@
 'use client';
 
+import { OverlayProvider } from '@samilhero/design-system';
 import { type DehydratedState, HydrationBoundary } from '@tanstack/react-query';
 import {
   AsyncBoundary,
@@ -27,15 +28,19 @@ export function AdminLayoutClient({
         rejectedFallback={AuthErrorFallback}
       >
         <AuthProvider>
-          <SidebarProvider>
-            <div className="flex h-screen overflow-hidden">
-              <Sidebar />
-              <div className="flex flex-col flex-1 min-h-0 min-w-0 ml-0 lg:ml-[260px] bg-gray-50 transition-[margin-left] duration-300 ease-in-out">
-                <Header />
-                <main className="flex flex-col flex-1 min-h-0">{children}</main>
+          <OverlayProvider>
+            <SidebarProvider>
+              <div className="flex h-screen overflow-hidden">
+                <Sidebar />
+                <div className="flex flex-col flex-1 min-h-0 min-w-0 ml-0 lg:ml-[260px] bg-gray-50 transition-[margin-left] duration-300 ease-in-out">
+                  <Header />
+                  <main className="flex flex-col flex-1 min-h-0">
+                    {children}
+                  </main>
+                </div>
               </div>
-            </div>
-          </SidebarProvider>
+            </SidebarProvider>
+          </OverlayProvider>
         </AuthProvider>
       </AsyncBoundary>
     </HydrationBoundary>

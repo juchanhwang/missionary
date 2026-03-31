@@ -1,6 +1,5 @@
 'use client';
 
-import { OverlayProvider } from '@samilhero/design-system';
 import {
   MutationCache,
   isServer,
@@ -52,8 +51,6 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <OverlayProvider>{children}</OverlayProvider>
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 }

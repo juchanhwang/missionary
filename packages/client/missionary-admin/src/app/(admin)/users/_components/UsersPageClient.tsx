@@ -1,8 +1,9 @@
 'use client';
 
-import { Pagination } from '@samilhero/design-system';
+import { overlay, Pagination } from '@samilhero/design-system';
+import { PANEL_TRANSITION_MS } from 'components/ui/SidePanel';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useGetUsers } from '../_hooks/useGetUsers';
 import { PAGE_SIZE, useUserFilterParams } from '../_hooks/useUserFilterParams';
@@ -14,22 +15,6 @@ export function UsersPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedUserId = searchParams.get('userId');
-  const [mountedUserId, setMountedUserId] = useState<string | null>(
-    selectedUserId,
-  );
-  const [isPanelOpen, setIsPanelOpen] = useState(!!selectedUserId);
-
-  // URL 변경 시 패널 상태 동기화 (브라우저 뒤로가기/앞으로가기 대응)
-  const [prevSelectedUserId, setPrevSelectedUserId] = useState(selectedUserId);
-  if (selectedUserId !== prevSelectedUserId) {
-    setPrevSelectedUserId(selectedUserId);
-    if (selectedUserId) {
-      setMountedUserId(selectedUserId);
-      setIsPanelOpen(true);
-    } else {
-      setIsPanelOpen(false);
-    }
-  }
 
   const filter = useUserFilterParams();
 
@@ -42,21 +27,90 @@ export function UsersPageClient() {
   const currentPage = data?.page ?? filter.params.page;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  // overlay 생명주기 관리
+  const panelRef = useRef<{ close: () => void; unmount: () => void } | null>(
+    null,
+  );
+  const currentPanelUserIdRef = useRef<string | null>(null);
+
+  const openPanel = (userId: string) => {
+    if (currentPanelUserIdRef.current === userId) return;
+
+    // 기존 패널 즉시 닫기 (애니메이션 없이)
+    if (panelRef.current) {
+      panelRef.current.close();
+      panelRef.current.unmount();
+      panelRef.current = null;
+    }
+    currentPanelUserIdRef.current = userId;
+
+    overlay.open(({ isOpen, close, unmount }) => {
+      panelRef.current = { close, unmount };
+
+      return (
+        <UserEditPanel
+          userId={userId}
+          users={users}
+          initialData={users.find((u) => u.id === userId)}
+          isOpen={isOpen}
+          onClose={() => {
+            close();
+            setTimeout(unmount, PANEL_TRANSITION_MS);
+            panelRef.current = null;
+            currentPanelUserIdRef.current = null;
+            const params = new URLSearchParams(window.location.search);
+            params.delete('userId');
+            const qs = params.toString();
+            router.push(qs ? `/users?${qs}` : '/users');
+          }}
+          onExited={() => {}}
+          onNavigateToUser={(id) => {
+            close();
+            unmount();
+            panelRef.current = null;
+            currentPanelUserIdRef.current = null;
+            const params = new URLSearchParams(window.location.search);
+            params.set('userId', id);
+            router.push(`/users?${params.toString()}`);
+          }}
+        />
+      );
+    });
+  };
+
   const selectUser = (id: string) => {
-    setMountedUserId(id);
-    setIsPanelOpen(true);
+    openPanel(id);
     const params = new URLSearchParams(searchParams.toString());
     params.set('userId', id);
     router.push(`/users?${params.toString()}`);
   };
 
-  const handlePanelClose = () => {
-    setIsPanelOpen(false);
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('userId');
-    const queryString = params.toString();
-    router.push(queryString ? `/users?${queryString}` : '/users');
-  };
+  // URL 변경 감지: 초기 로드, 뒤로가기/앞으로가기, 패널 내 유저 전환
+  useEffect(() => {
+    if (selectedUserId) {
+      openPanel(selectedUserId);
+    } else if (currentPanelUserIdRef.current) {
+      if (panelRef.current) {
+        panelRef.current.close();
+        setTimeout(() => {
+          panelRef.current?.unmount();
+          panelRef.current = null;
+        }, PANEL_TRANSITION_MS);
+      }
+      currentPanelUserIdRef.current = null;
+    }
+  }, [selectedUserId]);
+
+  // 컴포넌트 언마운트 시 overlay 정리
+  useEffect(() => {
+    return () => {
+      if (panelRef.current) {
+        panelRef.current.close();
+        panelRef.current.unmount();
+        panelRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className="flex flex-col flex-1 min-h-0 min-w-0">
@@ -125,19 +179,6 @@ export function UsersPageClient() {
           </div>
         </div>
       </div>
-
-      {mountedUserId && (
-        <UserEditPanel
-          key={mountedUserId}
-          userId={mountedUserId}
-          users={users}
-          initialData={users.find((u) => u.id === mountedUserId)}
-          isOpen={isPanelOpen}
-          onClose={handlePanelClose}
-          onExited={() => setMountedUserId(null)}
-          onNavigateToUser={selectUser}
-        />
-      )}
     </div>
   );
 }
