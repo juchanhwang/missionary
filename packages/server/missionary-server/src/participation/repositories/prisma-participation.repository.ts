@@ -220,7 +220,9 @@ export class PrismaParticipationRepository implements ParticipationRepository {
         }),
       ]);
 
-    const optionTypeMap = new Map(options.map((o) => [o.id, o.type]));
+    const optionTypeMap = new Map(
+      options.map((o: { id: string; type: string }) => [o.id, o.type]),
+    );
 
     let fullAttendanceCount = 0;
     let partialAttendanceCount = 0;
@@ -232,8 +234,14 @@ export class PrismaParticipationRepository implements ParticipationRepository {
       }
     }
 
-    const paidCount = paidGroups.find((p) => p.isPaid === true)?._count ?? 0;
-    const unpaidCount = paidGroups.find((p) => p.isPaid === false)?._count ?? 0;
+    const paidCount =
+      paidGroups.find(
+        (p: { isPaid: boolean; _count: number }) => p.isPaid === true,
+      )?._count ?? 0;
+    const unpaidCount =
+      paidGroups.find(
+        (p: { isPaid: boolean; _count: number }) => p.isPaid === false,
+      )?._count ?? 0;
 
     return {
       totalParticipants: paidCount + unpaidCount,
