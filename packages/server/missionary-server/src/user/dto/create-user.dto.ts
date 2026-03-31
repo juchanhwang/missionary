@@ -37,6 +37,7 @@ export class CreateUserDto {
     description: '전화번호',
     required: false,
   })
+  @IsString()
   @Matches(
     /^(01[016789]-?\d{3,4}-?\d{4}|02-?\d{3,4}-?\d{4}|0[3-7]\d-?\d{3,4}-?\d{4}|1[5-9]\d{2}-?\d{4})$/,
     { message: '올바른 한국 전화번호 형식이 아닙니다' },
