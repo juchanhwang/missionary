@@ -31,7 +31,7 @@ export function UserBasicInfoSection({
 
       <div className="grid grid-cols-2 gap-4">
         <InputField
-          label="이름"
+          label="이름 *"
           disabled={!isEditable}
           {...form.register('name')}
           error={form.formState.errors.name?.message}

@@ -24,7 +24,7 @@ export function UserChurchInfoSection({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <p className="mb-1 text-xs font-normal leading-[1.833] text-gray-700">
-            세례 여부
+            세례 여부 *
           </p>
           <Controller
             name="isBaptized"

@@ -57,8 +57,8 @@ describe('UserForm', () => {
   it('이름을 변경하면 변경사항 표시와 저장 버튼이 활성화된다', async () => {
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
-    await user.type(screen.getByLabelText('이름'), '김철수');
+    await user.clear(screen.getByLabelText('이름 *'));
+    await user.type(screen.getByLabelText('이름 *'), '김철수');
 
     expect(screen.getByText('변경사항이 있습니다')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '저장' })).toBeEnabled();
@@ -67,8 +67,8 @@ describe('UserForm', () => {
   it('폼 변경 시 onDirtyChange(true)가 호출된다', async () => {
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
-    await user.type(screen.getByLabelText('이름'), '김철수');
+    await user.clear(screen.getByLabelText('이름 *'));
+    await user.type(screen.getByLabelText('이름 *'), '김철수');
 
     await waitFor(() => {
       expect(mockOnDirtyChange).toHaveBeenCalledWith(true);
@@ -78,7 +78,7 @@ describe('UserForm', () => {
   it('이름을 비우고 제출하면 유효성 검증 에러가 표시된다', async () => {
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
+    await user.clear(screen.getByLabelText('이름 *'));
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     expect(await screen.findByText('이름을 입력해주세요')).toBeInTheDocument();
@@ -87,8 +87,8 @@ describe('UserForm', () => {
   it('저장 성공 시 변경사항 표시가 사라진다', async () => {
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
-    await user.type(screen.getByLabelText('이름'), '김철수');
+    await user.clear(screen.getByLabelText('이름 *'));
+    await user.type(screen.getByLabelText('이름 *'), '김철수');
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     await waitFor(() => {
@@ -101,8 +101,8 @@ describe('UserForm', () => {
 
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
-    await user.type(screen.getByLabelText('이름'), '김철수');
+    await user.clear(screen.getByLabelText('이름 *'));
+    await user.type(screen.getByLabelText('이름 *'), '김철수');
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     await waitFor(() => {
@@ -119,8 +119,8 @@ describe('UserForm', () => {
 
     const { user } = renderForm();
 
-    await user.clear(screen.getByLabelText('이름'));
-    await user.type(screen.getByLabelText('이름'), '김철수');
+    await user.clear(screen.getByLabelText('이름 *'));
+    await user.type(screen.getByLabelText('이름 *'), '김철수');
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     await waitFor(() => {
@@ -141,7 +141,7 @@ describe('UserForm', () => {
 
     renderForm();
 
-    expect(screen.getByLabelText('이름')).toBeDisabled();
+    expect(screen.getByLabelText('이름 *')).toBeDisabled();
     expect(screen.getByLabelText('전화번호')).toBeDisabled();
   });
 });

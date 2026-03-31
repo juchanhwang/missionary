@@ -29,7 +29,11 @@ export function UserAuthInfoSection({
           name="role"
           control={form.control}
           render={({ field }) => (
-            <Select value={field.value} onChange={field.onChange} label="역할">
+            <Select
+              value={field.value}
+              onChange={field.onChange}
+              label="역할 *"
+            >
               <Select.Trigger disabled={!isAdmin}>
                 {field.value ? ROLE_LABELS[field.value] : '역할을 선택하세요'}
               </Select.Trigger>
