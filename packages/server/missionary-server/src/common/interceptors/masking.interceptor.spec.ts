@@ -31,7 +31,7 @@ describe('MaskingInterceptor', () => {
   };
 
   describe('intercept', () => {
-    it('should mask phoneNumber field (last 6 chars)', (done) => {
+    it('should not mask phoneNumber field', (done) => {
       const responseData = {
         phoneNumber: '010-1234-5678',
       };
@@ -40,7 +40,7 @@ describe('MaskingInterceptor', () => {
 
       interceptor.intercept(createMockContext(), mockCallHandler).subscribe({
         next: (data) => {
-          expect(data.phoneNumber).toBe('010-123******');
+          expect(data.phoneNumber).toBe('010-1234-5678');
           done();
         },
       });
@@ -89,7 +89,7 @@ describe('MaskingInterceptor', () => {
       interceptor.intercept(createMockContext(), mockCallHandler).subscribe({
         next: (data) => {
           expect(data.name).toBe('John Doe');
-          expect(data.phoneNumber).toBe('010-123******');
+          expect(data.phoneNumber).toBe('010-1234-5678');
           expect(data.identityNumber).toBe('123456-1******');
           expect(data.bankAccount).toBe('123-456-******');
           done();
@@ -97,7 +97,7 @@ describe('MaskingInterceptor', () => {
       });
     });
 
-    it('should mask PII fields in nested objects', (done) => {
+    it('should not mask phoneNumber in nested objects', (done) => {
       const responseData = {
         user: {
           phoneNumber: '010-9876-5432',
@@ -108,13 +108,13 @@ describe('MaskingInterceptor', () => {
 
       interceptor.intercept(createMockContext(), mockCallHandler).subscribe({
         next: (data) => {
-          expect(data.user.phoneNumber).toBe('010-987******');
+          expect(data.user.phoneNumber).toBe('010-9876-5432');
           done();
         },
       });
     });
 
-    it('should mask PII fields in arrays', (done) => {
+    it('should not mask phoneNumber in arrays', (done) => {
       const responseData = [
         { phoneNumber: '010-1111-2222' },
         { phoneNumber: '010-3333-4444' },
@@ -124,8 +124,8 @@ describe('MaskingInterceptor', () => {
 
       interceptor.intercept(createMockContext(), mockCallHandler).subscribe({
         next: (data) => {
-          expect(data[0].phoneNumber).toBe('010-111******');
-          expect(data[1].phoneNumber).toBe('010-333******');
+          expect(data[0].phoneNumber).toBe('010-1111-2222');
+          expect(data[1].phoneNumber).toBe('010-3333-4444');
           done();
         },
       });
@@ -133,14 +133,14 @@ describe('MaskingInterceptor', () => {
 
     it('should handle short strings (6 chars or less) by masking entire value', (done) => {
       const responseData = {
-        phoneNumber: '123456',
+        identityNumber: '123456',
       };
 
       mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
 
       interceptor.intercept(createMockContext(), mockCallHandler).subscribe({
         next: (data) => {
-          expect(data.phoneNumber).toBe('******');
+          expect(data.identityNumber).toBe('******');
           done();
         },
       });
@@ -148,14 +148,14 @@ describe('MaskingInterceptor', () => {
 
     it('should handle null values', (done) => {
       const responseData = {
-        phoneNumber: null,
+        identityNumber: null,
       };
 
       mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
 
       interceptor.intercept(createMockContext(), mockCallHandler).subscribe({
         next: (data) => {
-          expect(data.phoneNumber).toBe('******');
+          expect(data.identityNumber).toBe('******');
           done();
         },
       });
@@ -163,14 +163,14 @@ describe('MaskingInterceptor', () => {
 
     it('should handle undefined values', (done) => {
       const responseData = {
-        phoneNumber: undefined,
+        identityNumber: undefined,
       };
 
       mockCallHandler.handle = jest.fn().mockReturnValue(of(responseData));
 
       interceptor.intercept(createMockContext(), mockCallHandler).subscribe({
         next: (data) => {
-          expect(data.phoneNumber).toBe('******');
+          expect(data.identityNumber).toBe('******');
           done();
         },
       });
@@ -259,7 +259,7 @@ describe('MaskingInterceptor', () => {
             '2026-03-01T00:00:00.000Z',
           );
           expect(data.missionary.participationEndDate).toBeInstanceOf(Date);
-          expect(data.missionary.phoneNumber).toBe('010-123******');
+          expect(data.missionary.phoneNumber).toBe('010-1234-5678');
           done();
         },
       });
@@ -285,20 +285,17 @@ describe('MaskingInterceptor', () => {
           expect(data[0].startDate.toISOString()).toBe(
             '2026-01-01T00:00:00.000Z',
           );
-          expect(data[0].phoneNumber).toBe('010-111******');
+          expect(data[0].phoneNumber).toBe('010-1111-2222');
           expect(data[1].startDate).toBeInstanceOf(Date);
-          expect(data[1].phoneNumber).toBe('010-333******');
+          expect(data[1].phoneNumber).toBe('010-3333-4444');
           done();
         },
       });
     });
 
     describe('ADMIN 역할 + @SkipMasking 데코레이터 조건부 마스킹 해제', () => {
-      it('ADMIN + @SkipMasking → identityNumber, phoneNumber 마스킹 해제', (done) => {
-        mockReflector.getAllAndOverride.mockReturnValue([
-          'identityNumber',
-          'phoneNumber',
-        ]);
+      it('ADMIN + @SkipMasking → identityNumber 마스킹 해제, phoneNumber는 마스킹 대상 아님', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue(['identityNumber']);
 
         const responseData = {
           name: 'John Doe',
@@ -322,7 +319,7 @@ describe('MaskingInterceptor', () => {
           });
       });
 
-      it('ADMIN + @SkipMasking 미적용 → 마스킹 유지', (done) => {
+      it('ADMIN + @SkipMasking 미적용 → identityNumber 마스킹 유지, phoneNumber는 마스킹 대상 아님', (done) => {
         mockReflector.getAllAndOverride.mockReturnValue(undefined);
 
         const responseData = [
@@ -348,19 +345,16 @@ describe('MaskingInterceptor', () => {
           .subscribe({
             next: (data) => {
               expect(data[0].identityNumber).toBe('123456-1******');
-              expect(data[0].phoneNumber).toBe('010-123******');
+              expect(data[0].phoneNumber).toBe('010-1234-5678');
               expect(data[1].identityNumber).toBe('654321-7******');
-              expect(data[1].phoneNumber).toBe('010-987******');
+              expect(data[1].phoneNumber).toBe('010-9876-5432');
               done();
             },
           });
       });
 
-      it('STAFF + @SkipMasking → 마스킹 유지', (done) => {
-        mockReflector.getAllAndOverride.mockReturnValue([
-          'identityNumber',
-          'phoneNumber',
-        ]);
+      it('STAFF + @SkipMasking → identityNumber 마스킹 유지, phoneNumber는 마스킹 대상 아님', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue(['identityNumber']);
 
         const responseData = {
           name: 'John Doe',
@@ -378,46 +372,18 @@ describe('MaskingInterceptor', () => {
           .subscribe({
             next: (data) => {
               expect(data.identityNumber).toBe('123456-1******');
-              expect(data.phoneNumber).toBe('010-123******');
-              done();
-            },
-          });
-      });
-
-      it('ADMIN + @SkipMasking → phoneNumber 마스킹 해제', (done) => {
-        mockReflector.getAllAndOverride.mockReturnValue([
-          'identityNumber',
-          'phoneNumber',
-        ]);
-
-        const singleResponse = {
-          phoneNumber: '010-1234-5678',
-          identityNumber: '123456-1234567',
-        };
-
-        mockCallHandler.handle = jest.fn().mockReturnValue(of(singleResponse));
-
-        interceptor
-          .intercept(
-            createMockContext({ role: UserRole.ADMIN }),
-            mockCallHandler,
-          )
-          .subscribe({
-            next: (data) => {
               expect(data.phoneNumber).toBe('010-1234-5678');
               done();
             },
           });
       });
 
-      it('STAFF + @SkipMasking → phoneNumber 마스킹 유지', (done) => {
-        mockReflector.getAllAndOverride.mockReturnValue([
-          'identityNumber',
-          'phoneNumber',
-        ]);
+      it('phoneNumber는 역할과 무관하게 마스킹 대상 아님', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue(undefined);
 
         const singleResponse = {
           phoneNumber: '010-1234-5678',
+          identityNumber: '123456-1234567',
         };
 
         mockCallHandler.handle = jest.fn().mockReturnValue(of(singleResponse));
@@ -429,17 +395,15 @@ describe('MaskingInterceptor', () => {
           )
           .subscribe({
             next: (data) => {
-              expect(data.phoneNumber).toBe('010-123******');
+              expect(data.phoneNumber).toBe('010-1234-5678');
+              expect(data.identityNumber).toBe('123456-1******');
               done();
             },
           });
       });
 
       it('ADMIN + @SkipMasking + 중첩 객체 → identityNumber 마스킹 해제', (done) => {
-        mockReflector.getAllAndOverride.mockReturnValue([
-          'identityNumber',
-          'phoneNumber',
-        ]);
+        mockReflector.getAllAndOverride.mockReturnValue(['identityNumber']);
 
         const responseData = {
           user: {
@@ -464,11 +428,8 @@ describe('MaskingInterceptor', () => {
           });
       });
 
-      it('USER + @SkipMasking → 마스킹 유지', (done) => {
-        mockReflector.getAllAndOverride.mockReturnValue([
-          'identityNumber',
-          'phoneNumber',
-        ]);
+      it('USER + @SkipMasking → identityNumber 마스킹 유지, phoneNumber는 마스킹 대상 아님', (done) => {
+        mockReflector.getAllAndOverride.mockReturnValue(['identityNumber']);
 
         const responseData = {
           identityNumber: '123456-1234567',
@@ -485,17 +446,14 @@ describe('MaskingInterceptor', () => {
           .subscribe({
             next: (data) => {
               expect(data.identityNumber).toBe('123456-1******');
-              expect(data.phoneNumber).toBe('010-123******');
+              expect(data.phoneNumber).toBe('010-1234-5678');
               done();
             },
           });
       });
 
       it('ADMIN + @SkipMasking(기본값) → bankAccount 마스킹 유지', (done) => {
-        mockReflector.getAllAndOverride.mockReturnValue([
-          'identityNumber',
-          'phoneNumber',
-        ]);
+        mockReflector.getAllAndOverride.mockReturnValue(['identityNumber']);
 
         const responseData = {
           identityNumber: '123456-1234567',
@@ -537,7 +495,7 @@ describe('MaskingInterceptor', () => {
           .subscribe({
             next: (data) => {
               expect(data.identityNumber).toBe('123456-1******');
-              expect(data.phoneNumber).toBe('010-123******');
+              expect(data.phoneNumber).toBe('010-1234-5678');
               expect(data.bankAccount).toBe('123-456-789012');
               done();
             },
