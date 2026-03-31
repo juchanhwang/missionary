@@ -71,7 +71,7 @@ export function UserForm({ user, onDirtyChange }: UserFormProps) {
       },
       {
         onSuccess: () => {
-          form.reset(data);
+          form.reset(form.getValues());
           toast.success('유저 정보가 저장되었습니다');
         },
       },
