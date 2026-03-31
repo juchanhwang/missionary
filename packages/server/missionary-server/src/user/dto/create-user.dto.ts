@@ -3,9 +3,11 @@ import {
   IsBoolean,
   IsDateString,
   IsEmail,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   MinLength,
 } from 'class-validator';
 
@@ -36,6 +38,10 @@ export class CreateUserDto {
     required: false,
   })
   @IsString()
+  @Matches(
+    /^(01[016789]-?\d{3,4}-?\d{4}|02-?\d{3,4}-?\d{4}|0[3-7]\d-?\d{3,4}-?\d{4}|1[5-9]\d{2}-?\d{4})$/,
+    { message: '올바른 한국 전화번호 형식이 아닙니다' },
+  )
   @IsOptional()
   declare phoneNumber?: string;
 
@@ -49,11 +55,12 @@ export class CreateUserDto {
   declare birthDate?: string;
 
   @ApiProperty({
-    example: 'M',
+    example: 'MALE',
     description: '성별',
     required: false,
+    enum: ['MALE', 'FEMALE'],
   })
-  @IsString()
+  @IsIn(['MALE', 'FEMALE'], { message: '성별은 MALE 또는 FEMALE이어야 합니다' })
   @IsOptional()
   declare gender?: string;
 

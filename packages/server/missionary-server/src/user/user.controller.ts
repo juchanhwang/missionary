@@ -37,6 +37,7 @@ export class UserController {
 
   @Get()
   @Roles(UserRole.ADMIN, UserRole.STAFF)
+  @SkipMasking() // ADMIN 역할에 한해 identityNumber 마스킹 해제
   @ApiOperation({ summary: '전체 사용자 조회 (관리자/스태프)' })
   findAll(@Query() query: FindAllUsersQueryDto) {
     return this.userService.findAll(query);

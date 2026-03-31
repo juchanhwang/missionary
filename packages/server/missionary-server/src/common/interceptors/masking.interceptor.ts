@@ -13,11 +13,7 @@ import { UserRole } from '../enums/user-role.enum';
 
 @Injectable()
 export class MaskingInterceptor implements NestInterceptor {
-  private readonly PII_FIELDS = [
-    'phoneNumber',
-    'identityNumber',
-    'bankAccount',
-  ];
+  private readonly PII_FIELDS = ['identityNumber', 'bankAccount'];
 
   constructor(private readonly reflector: Reflector) {}
 
