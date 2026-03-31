@@ -2,7 +2,7 @@
 
 import { SearchBox, Select } from '@samilhero/design-system';
 import { ROLE_LABELS } from 'lib/constants/role';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useUserFilterParams } from '../_hooks/useUserFilterParams';
 import { getSelectValue } from '../_utils/getSelectValue';
@@ -46,10 +46,6 @@ export function UserSearchFilter() {
 
   const [localKeyword, setLocalKeyword] = useState(keyword);
 
-  useEffect(() => {
-    setLocalKeyword(keyword);
-  }, [keyword]);
-
   const handleKeywordInput = (value: string) => {
     setLocalKeyword(value);
     if (value) {
@@ -65,7 +61,10 @@ export function UserSearchFilter() {
         value={searchType}
         onChange={(value) => {
           const v = getSelectValue<UserSearchType>(value);
-          if (v) setSearchType(v);
+          if (v) {
+            setLocalKeyword('');
+            setSearchType(v);
+          }
         }}
         size="md"
       >
