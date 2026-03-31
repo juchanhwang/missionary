@@ -6,6 +6,7 @@ import {
   Radio,
   RadioGroup,
 } from '@samilhero/design-system';
+import { formatPhoneNumber } from 'lib/utils/formatPhoneNumber';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import type { UserUpdateFormValues } from '../../_schemas/userSchema';
@@ -44,11 +45,22 @@ export function UserBasicInfoSection({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <InputField
-          label="전화번호"
-          type="tel"
-          disabled={!isEditable}
-          {...form.register('phoneNumber')}
+        <Controller
+          name="phoneNumber"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <InputField
+              label="전화번호"
+              type="tel"
+              disabled={!isEditable}
+              value={field.value ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                field.onChange(formatPhoneNumber(e.target.value))
+              }
+              onBlur={field.onBlur}
+              error={fieldState.error?.message}
+            />
+          )}
         />
         <Controller
           name="birthDate"
