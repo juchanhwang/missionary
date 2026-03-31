@@ -30,12 +30,20 @@ export function UserBasicInfoSection({
       </legend>
 
       <div className="grid grid-cols-2 gap-4">
-        <InputField
-          label="이름 *"
-          disabled={!isEditable}
-          {...form.register('name')}
-          error={form.formState.errors.name?.message}
-        />
+        <div>
+          <label
+            htmlFor="user-name"
+            className="mb-1 text-xs font-normal leading-[1.833] text-gray-700"
+          >
+            이름 <span className="text-red-600">*</span>
+          </label>
+          <InputField
+            id="user-name"
+            disabled={!isEditable}
+            {...form.register('name')}
+            error={form.formState.errors.name?.message}
+          />
+        </div>
         <InputField
           label="이메일"
           type="email"

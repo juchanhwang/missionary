@@ -25,28 +25,29 @@ export function UserAuthInfoSection({
       </legend>
 
       <div className="grid grid-cols-2 gap-4">
-        <Controller
-          name="role"
-          control={form.control}
-          render={({ field }) => (
-            <Select
-              value={field.value}
-              onChange={field.onChange}
-              label="역할 *"
-            >
-              <Select.Trigger disabled={!isAdmin}>
-                {field.value ? ROLE_LABELS[field.value] : '역할을 선택하세요'}
-              </Select.Trigger>
-              <Select.Options>
-                {Object.entries(ROLE_LABELS).map(([value, label]) => (
-                  <Select.Option key={value} item={value}>
-                    {label}
-                  </Select.Option>
-                ))}
-              </Select.Options>
-            </Select>
-          )}
-        />
+        <div className="flex flex-col">
+          <label className="mb-1 text-xs font-normal leading-[1.833] text-gray-700">
+            역할 <span className="text-red-600">*</span>
+          </label>
+          <Controller
+            name="role"
+            control={form.control}
+            render={({ field }) => (
+              <Select value={field.value} onChange={field.onChange}>
+                <Select.Trigger disabled={!isAdmin}>
+                  {field.value ? ROLE_LABELS[field.value] : '역할을 선택하세요'}
+                </Select.Trigger>
+                <Select.Options>
+                  {Object.entries(ROLE_LABELS).map(([value, label]) => (
+                    <Select.Option key={value} item={value}>
+                      {label}
+                    </Select.Option>
+                  ))}
+                </Select.Options>
+              </Select>
+            )}
+          />
+        </div>
         <InputField label="인증방식" value={user.provider ?? '-'} disabled />
       </div>
 
