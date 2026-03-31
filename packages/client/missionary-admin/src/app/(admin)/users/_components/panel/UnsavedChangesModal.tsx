@@ -25,7 +25,7 @@ export function UnsavedChangesModal({
       onRequestClose={() => close(false)}
       contentLabel="변경사항 확인"
       className="fixed inset-0 flex items-center justify-center p-4"
-      overlayClassName="fixed inset-0 bg-black/30 flex items-center justify-center"
+      overlayClassName="fixed inset-0 z-40 bg-black/30 flex items-center justify-center"
       shouldCloseOnEsc
       shouldCloseOnOverlayClick
     >
