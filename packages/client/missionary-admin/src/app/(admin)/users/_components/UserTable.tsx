@@ -147,21 +147,35 @@ export function UserTable({
     <div className="flex-1 min-h-0 overflow-auto">
       <Table style={{ minWidth: '1200px' }}>
         <TableCaption>유저 목록</TableCaption>
-        <TableHeader className="sticky top-0 z-10">
+        <TableHeader>
           <TableRow>
-            <TableHead className="sticky left-0 bg-gray-50 z-20">
+            <TableHead className="sticky top-0 left-0 z-20 bg-gray-50">
               이름
             </TableHead>
-            <TableHead>이메일</TableHead>
-            <TableHead>역할</TableHead>
-            <TableHead>인증방식</TableHead>
-            <TableHead>로그인ID</TableHead>
-            <TableHead>전화번호</TableHead>
-            <TableHead>생년월일</TableHead>
-            <TableHead>성별</TableHead>
-            <TableHead>세례</TableHead>
-            <TableHead>주민번호</TableHead>
-            <TableHead>가입일</TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
+              이메일
+            </TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">역할</TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
+              인증방식
+            </TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
+              로그인ID
+            </TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
+              전화번호
+            </TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
+              생년월일
+            </TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">성별</TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">세례</TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
+              주민번호
+            </TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
+              가입일
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
