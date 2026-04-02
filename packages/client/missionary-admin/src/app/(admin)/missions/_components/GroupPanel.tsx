@@ -114,8 +114,6 @@ export function GroupPanel() {
         ) : (
           filteredGroups.map((group) => {
             const isActive = activeGroupId === group.id && !isCreatePage;
-            const count = group._count?.missionaries ?? 0;
-
             return (
               <Link
                 key={group.id}
@@ -124,20 +122,13 @@ export function GroupPanel() {
                   isActive ? 'bg-white shadow-sm' : 'hover:bg-gray-100'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span
-                    className={`text-[13px] font-semibold truncate ${
-                      isActive ? 'text-gray-900' : 'text-gray-700'
-                    }`}
-                  >
-                    {group.name}
-                  </span>
-                  {count > 0 && (
-                    <span className="text-[11px] text-gray-400 bg-gray-100 px-1.5 py-px rounded-full ml-2 shrink-0">
-                      {count}차
-                    </span>
-                  )}
-                </div>
+                <span
+                  className={`text-[13px] font-semibold truncate mb-1 block ${
+                    isActive ? 'text-gray-900' : 'text-gray-700'
+                  }`}
+                >
+                  {group.name}
+                </span>
                 <div className="flex items-center gap-1.5">
                   <CategoryBadge category={group.category} />
                 </div>
