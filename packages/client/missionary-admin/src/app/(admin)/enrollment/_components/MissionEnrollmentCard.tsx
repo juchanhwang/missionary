@@ -77,7 +77,7 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
           </Badge>
           {daysLeft !== null && (
             <span className="inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-bold bg-gray-100 text-gray-500">
-              {daysLeft < 0 ? '마감' : `D-${daysLeft}`}
+              {daysLeft < 0 ? '모집 종료' : `D-${daysLeft}`}
             </span>
           )}
         </div>
@@ -99,21 +99,21 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
           </span>
         </div>
 
-        {/* 신청 마감 */}
+        {/* 등록 마감 */}
         {mission.enrollmentDeadline && (
           <div className="flex items-center gap-1.5 text-xs mb-4">
             <Clock size={12} className="shrink-0 text-gray-400" />
             <span className="text-gray-500">
-              신청 마감 {formatDate(mission.enrollmentDeadline)}
+              등록 마감 {formatDate(mission.enrollmentDeadline)}
             </span>
           </div>
         )}
         {!mission.enrollmentDeadline && <div className="mb-4" />}
 
-        {/* 신청 현황 */}
+        {/* 등록 현황 */}
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-500 font-medium">신청 현황</span>
+            <span className="text-gray-500 font-medium">등록 현황</span>
             <span className="text-gray-900 font-bold">
               {mission.currentParticipantCount}
               {mission.maximumParticipantCount && (

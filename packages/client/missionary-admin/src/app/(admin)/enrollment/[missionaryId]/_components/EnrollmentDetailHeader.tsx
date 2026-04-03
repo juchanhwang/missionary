@@ -12,10 +12,10 @@ import type { EnrollmentMissionSummary } from 'apis/enrollment';
 
 const STATUS_VARIANTS: Record<
   string,
-  'success' | 'warning' | 'info' | 'outline'
+  'success' | 'destructive' | 'info' | 'outline'
 > = {
   ENROLLMENT_OPENED: 'info',
-  ENROLLMENT_CLOSED: 'warning',
+  ENROLLMENT_CLOSED: 'destructive',
   IN_PROGRESS: 'success',
   COMPLETED: 'outline',
 };

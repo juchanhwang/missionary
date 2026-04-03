@@ -86,10 +86,10 @@ describe('MissionEnrollmentCard', () => {
     render(<MissionEnrollmentCard mission={mission} />);
 
     expect(screen.queryByText(/D-/)).not.toBeInTheDocument();
-    expect(screen.queryByText('마감')).not.toBeInTheDocument();
+    expect(screen.queryByText('모집 종료')).not.toBeInTheDocument();
   });
 
-  it('마감일이 지났을 때 "마감" 배지를 표시한다', () => {
+  it('마감일이 지났을 때 "모집 종료" 배지를 표시한다', () => {
     const pastDate = new Date();
     pastDate.setDate(pastDate.getDate() - 1);
     const mission = createMockEnrollmentSummary({
@@ -98,7 +98,7 @@ describe('MissionEnrollmentCard', () => {
 
     render(<MissionEnrollmentCard mission={mission} />);
 
-    expect(screen.getByText('마감')).toBeInTheDocument();
+    expect(screen.getByText('모집 종료')).toBeInTheDocument();
   });
 
   it('링크가 올바른 경로로 연결된다', () => {
