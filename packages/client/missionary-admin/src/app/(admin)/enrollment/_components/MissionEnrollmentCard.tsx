@@ -40,7 +40,7 @@ function formatMissionPeriod(start: string, end: string): string {
 
 function getColorBarClass(daysLeft: number | null): string {
   if (daysLeft !== null && daysLeft < 0) return 'bg-red-600';
-  if (daysLeft !== null && daysLeft <= 7) return 'bg-warning-70';
+  if (daysLeft !== null && daysLeft <= 7) return 'bg-warning-50';
   return 'bg-blue-60';
 }
 
@@ -132,7 +132,7 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
             <ProgressBar
               value={progressPercent}
               className={`h-1.5 ${
-                progressPercent > 100 ? 'text-warning-70' : 'text-blue-60'
+                progressPercent > 100 ? 'text-warning-50' : 'text-blue-60'
               }`}
             />
           ) : (

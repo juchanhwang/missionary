@@ -238,14 +238,14 @@ export function MissionEnrollmentTable({
                             value={progressPercent}
                             className={`h-1.5 w-20 ${
                               progressPercent > 100
-                                ? 'text-warning-70'
+                                ? 'text-warning-50'
                                 : 'text-blue-60'
                             }`}
                           />
                           <span
                             className={`text-xs ${
                               progressPercent > 100
-                                ? 'font-semibold text-warning-70'
+                                ? 'font-semibold text-warning-50'
                                 : 'text-gray-500'
                             }`}
                           >
