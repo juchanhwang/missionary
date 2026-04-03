@@ -74,7 +74,7 @@ export default function EnrollmentLoading() {
           <div className="h-8 w-[280px] animate-pulse rounded-md bg-gray-200" />
           <div className="w-px h-[18px] bg-gray-200" />
           <div className="flex items-center gap-1.5">
-            {Array.from({ length: 4 }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
                 className="h-7 w-16 animate-pulse rounded-full bg-gray-200"
