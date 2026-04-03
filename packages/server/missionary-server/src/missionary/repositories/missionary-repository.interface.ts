@@ -41,6 +41,8 @@ export interface MissionaryUpdateInput {
   bankAccountHolder?: string | null;
   bankAccountNumber?: string | null;
   status?: MissionStatus;
+  isAcceptingResponses?: boolean;
+  closedMessage?: string | null;
 }
 
 export type MissionaryWithGroup = Missionary & {

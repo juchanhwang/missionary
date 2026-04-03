@@ -225,6 +225,8 @@ export class FakeTeamRepository
       bankAccountNumber: null,
       bankAccountHolder: null,
       status: 'ENROLLMENT_OPENED',
+      isAcceptingResponses: true,
+      closedMessage: null,
       missionGroupId: null,
       createdById: id,
       order: null,

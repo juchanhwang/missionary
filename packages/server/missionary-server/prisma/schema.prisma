@@ -172,6 +172,10 @@ model Missionary {
   // Status
   status MissionStatus @default(ENROLLMENT_OPENED)
 
+  // Form submission toggle
+  isAcceptingResponses Boolean  @default(true) @map("is_accepting_responses")
+  closedMessage        String?  @map("closed_message")
+
   // Foreign keys
   missionGroupId String? @map("mission_group_id")
   createdById String @map("created_by_id")

@@ -27,6 +27,8 @@ export function makeMissionary(
     bankAccountHolder: null,
     bankAccountNumber: null,
     status: 'ENROLLMENT_OPENED',
+    isAcceptingResponses: true,
+    closedMessage: null,
     missionGroupId: null,
     createdById: randomUUID(),
     order: null,
