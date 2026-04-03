@@ -101,6 +101,21 @@ export class ParticipationProcessor extends WorkerHost {
       dto.missionaryId,
     );
 
+    // Auto-close enrollment when capacity is reached
+    const newCount = missionary.currentParticipantCount + 1;
+    if (
+      missionary.maximumParticipantCount !== null &&
+      newCount >= missionary.maximumParticipantCount &&
+      missionary.status !== 'ENROLLMENT_CLOSED'
+    ) {
+      await this.missionaryRepository.update(dto.missionaryId, {
+        status: 'ENROLLMENT_CLOSED',
+      });
+      this.logger.log(
+        `Missionary ${dto.missionaryId} enrollment auto-closed: capacity reached (${newCount}/${missionary.maximumParticipantCount})`,
+      );
+    }
+
     this.logger.log(
       `Successfully created participation ${result.id} for missionary ${dto.missionaryId}`,
     );
