@@ -17,6 +17,7 @@ import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.i
 
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
+import { UpdateAcceptingResponsesDto } from './dto/update-accepting-responses.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
 import { MissionaryService } from './missionary.service';
 
@@ -55,6 +56,16 @@ export class MissionaryController {
     @Body() dto: UpdateMissionaryDto,
   ) {
     return this.missionaryService.update(id, dto);
+  }
+
+  @Patch(':id/accepting-responses')
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
+  @ApiOperation({ summary: '등록 수신 상태 변경 (관리자/스탭 전용)' })
+  updateAcceptingResponses(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateAcceptingResponsesDto,
+  ) {
+    return this.missionaryService.updateAcceptingResponses(id, dto);
   }
 
   @Delete(':id')

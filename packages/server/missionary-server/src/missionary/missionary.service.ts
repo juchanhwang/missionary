@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import {
   MISSION_GROUP_REPOSITORY,
@@ -8,6 +13,7 @@ import {
 import { CreateMissionaryPosterDto } from './dto/create-missionary-poster.dto';
 import { CreateMissionaryRegionDto } from './dto/create-missionary-region.dto';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
+import { UpdateAcceptingResponsesDto } from './dto/update-accepting-responses.dto';
 import { UpdateMissionaryRegionDto } from './dto/update-missionary-region.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
 import {
@@ -138,6 +144,21 @@ export class MissionaryService {
     if (dto.status !== undefined) data.status = dto.status;
 
     return this.missionaryRepository.update(id, data);
+  }
+
+  async updateAcceptingResponses(id: string, dto: UpdateAcceptingResponsesDto) {
+    const missionary = await this.findOne(id);
+
+    if (missionary.status !== 'ENROLLMENT_OPENED') {
+      throw new BadRequestException(
+        '모집 중(ENROLLMENT_OPENED) 상태에서만 변경 가능합니다',
+      );
+    }
+
+    return this.missionaryRepository.update(id, {
+      isAcceptingResponses: dto.isAcceptingResponses,
+      closedMessage: dto.closedMessage ?? null,
+    });
   }
 
   async remove(id: string) {

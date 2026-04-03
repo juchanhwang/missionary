@@ -58,6 +58,10 @@ export class ParticipationProcessor extends WorkerHost {
       throw new NotFoundException('Missionary not found');
     }
 
+    if (!missionary.isAcceptingResponses) {
+      throw new ConflictException('Missionary is not accepting responses');
+    }
+
     if (
       missionary.maximumParticipantCount !== null &&
       missionary.currentParticipantCount >= missionary.maximumParticipantCount

@@ -89,6 +89,14 @@ describe('ParticipationProcessor', () => {
       status: missionary.status,
     });
 
+    // create()는 isAcceptingResponses를 항상 true로 설정하므로
+    // override가 false인 경우 update로 반영
+    if (overrides.isAcceptingResponses === false) {
+      await fakeMissionaryRepo.update(missionaryId, {
+        isAcceptingResponses: false,
+      });
+    }
+
     const user = makeUser({ id: userId });
     const option = makeMissionaryAttendanceOption({
       id: attendanceOptionId,
@@ -143,6 +151,25 @@ describe('ParticipationProcessor', () => {
 
       const updated = await fakeMissionaryRepo.findWithDetails(missionaryId);
       expect(updated?.status).toBe('ENROLLMENT_OPENED');
+    });
+  });
+
+  describe('등록 수신 중지 시 등록 차단', () => {
+    it('isAcceptingResponses가 false이면 ConflictException을 던진다', async () => {
+      await setupMissionary({ isAcceptingResponses: false });
+
+      await expect(processor.process(makeJob(makeDto()))).rejects.toThrow(
+        ConflictException,
+      );
+    });
+
+    it('isAcceptingResponses가 true이면 정상 등록된다', async () => {
+      await setupMissionary({ isAcceptingResponses: true });
+
+      const result = await processor.process(makeJob(makeDto()));
+
+      expect(result).toBeDefined();
+      expect(result.id).toBeDefined();
     });
   });
 
