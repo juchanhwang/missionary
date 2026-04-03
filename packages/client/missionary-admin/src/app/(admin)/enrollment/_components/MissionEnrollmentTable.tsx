@@ -26,10 +26,10 @@ const PAGE_SIZE = 20;
 
 const STATUS_VARIANTS: Record<
   string,
-  'success' | 'warning' | 'info' | 'outline'
+  'success' | 'destructive' | 'info' | 'outline'
 > = {
   ENROLLMENT_OPENED: 'info',
-  ENROLLMENT_CLOSED: 'warning',
+  ENROLLMENT_CLOSED: 'destructive',
   IN_PROGRESS: 'success',
   COMPLETED: 'outline',
 };
@@ -39,9 +39,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   ABROAD: '해외',
 };
 
-const CATEGORY_VARIANTS: Record<string, 'success' | 'info'> = {
-  DOMESTIC: 'success',
-  ABROAD: 'info',
+const CATEGORY_VARIANTS: Record<string, 'outline'> = {
+  DOMESTIC: 'outline',
+  ABROAD: 'outline',
 };
 
 const STATUS_SORT_ORDER: Record<string, number> = {
@@ -209,15 +209,7 @@ export function MissionEnrollmentTable({
                         <>
                           {formatDeadlineDate(mission.enrollmentDeadline)}
                           {daysLeft !== null && (
-                            <span
-                              className={`ml-1.5 ${
-                                daysLeft < 0
-                                  ? 'font-semibold text-red-600'
-                                  : daysLeft <= 7
-                                    ? 'font-semibold text-warning-70'
-                                    : 'text-gray-400'
-                              }`}
-                            >
+                            <span className="ml-1.5 text-gray-400">
                               {daysLeft < 0 ? '(마감)' : `(D-${daysLeft})`}
                             </span>
                           )}

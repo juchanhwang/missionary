@@ -72,19 +72,11 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
       <div className="p-5">
         {/* 카테고리 Badge + D-day Badge */}
         <div className="flex items-center justify-between mb-3">
-          <Badge variant={mission.category === 'DOMESTIC' ? 'success' : 'info'}>
+          <Badge variant="outline">
             {mission.category === 'DOMESTIC' ? '국내' : '해외'}
           </Badge>
           {daysLeft !== null && (
-            <span
-              className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-bold ${
-                daysLeft < 0
-                  ? 'bg-red-50 text-red-600'
-                  : daysLeft <= 7
-                    ? 'bg-warning-10 text-warning-70'
-                    : 'bg-gray-100 text-gray-500'
-              }`}
-            >
+            <span className="inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-bold bg-gray-100 text-gray-500">
               {daysLeft < 0 ? '마감' : `D-${daysLeft}`}
             </span>
           )}
@@ -111,13 +103,7 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
         {mission.enrollmentDeadline && (
           <div className="flex items-center gap-1.5 text-xs mb-4">
             <Clock size={12} className="shrink-0 text-gray-400" />
-            <span
-              className={
-                daysLeft !== null && daysLeft <= 7
-                  ? 'text-warning-70 font-semibold'
-                  : 'text-gray-500'
-              }
-            >
+            <span className="text-gray-500">
               신청 마감 {formatDate(mission.enrollmentDeadline)}
             </span>
           </div>
