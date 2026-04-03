@@ -12,7 +12,7 @@ import { FormFieldSettings, type LocalFormField } from './FormFieldSettings';
 const FIELD_TYPE_BADGE_STYLES: Record<string, string> = {
   TEXT: 'bg-gray-100 text-gray-400 border-gray-200',
   TEXTAREA: 'bg-gray-100 text-gray-400 border-gray-200',
-  NUMBER: 'bg-warning-10 text-warning-50 border-warning-50',
+  NUMBER: 'bg-warning-10 text-warning-60 border-warning-60',
   BOOLEAN: 'bg-gray-100 text-gray-400 border-gray-200',
   SELECT: 'bg-blue-10 text-blue-60 border-blue-60',
   DATE: 'bg-gray-100 text-gray-400 border-gray-200',
