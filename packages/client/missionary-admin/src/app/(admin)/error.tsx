@@ -22,7 +22,7 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
           </h2>
           <p className="text-sm text-gray-400">
             {process.env.NODE_ENV === 'development'
-              ? error.message
+              ? error.message || '일시적인 오류가 발생했습니다.'
               : '일시적인 오류가 발생했습니다.'}
           </p>
         </div>
