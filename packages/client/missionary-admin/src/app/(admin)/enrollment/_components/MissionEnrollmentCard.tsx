@@ -83,7 +83,7 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
         </div>
 
         {/* 선교명 + 부제 */}
-        <h3 className="text-base font-bold text-gray-900 mb-0.5 group-hover:text-primary-50 transition-colors mb-4">
+        <h3 className="text-base font-bold text-gray-900 transition-colors mb-4">
           {mission.name}
         </h3>
 
@@ -153,7 +153,7 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
         <span className="text-xs text-gray-400">
           {mission.managerName ? `담당: ${mission.managerName}` : '\u00A0'}
         </span>
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 group-hover:text-primary-50">
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600">
           관리하기
           <ChevronRight size={12} />
         </span>
