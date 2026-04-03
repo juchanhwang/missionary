@@ -8,8 +8,6 @@ interface CategoryBadgeProps {
 
 export function CategoryBadge({ category }: CategoryBadgeProps) {
   return (
-    <Badge variant={category === 'ABROAD' ? 'info' : 'success'}>
-      {category === 'ABROAD' ? '해외' : '국내'}
-    </Badge>
+    <Badge variant="outline">{category === 'ABROAD' ? '해외' : '국내'}</Badge>
   );
 }

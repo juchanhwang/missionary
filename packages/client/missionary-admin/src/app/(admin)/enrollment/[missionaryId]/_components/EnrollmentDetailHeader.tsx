@@ -81,7 +81,7 @@ export function EnrollmentDetailHeader({
       {/* 타이틀 + 뱃지 */}
       <div className="flex items-center gap-2.5">
         <h2 className="text-lg font-semibold text-gray-900">{mission.name}</h2>
-        <Badge variant={mission.category === 'DOMESTIC' ? 'success' : 'info'}>
+        <Badge variant="outline">
           {mission.category === 'DOMESTIC' ? '국내' : '해외'}
         </Badge>
         <Badge variant={STATUS_VARIANTS[mission.status] ?? 'outline'}>
