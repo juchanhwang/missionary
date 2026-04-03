@@ -30,6 +30,8 @@ export interface Missionary {
   order?: number;
   missionGroup?: MissionGroup;
   status: MissionStatus;
+  isAcceptingResponses?: boolean;
+  closedMessage?: string | null;
   createdAt: string;
 }
 
@@ -88,5 +90,12 @@ export const missionaryApi = {
 
   deleteMissionary(id: string) {
     return api.delete(`/missionaries/${id}`);
+  },
+
+  toggleAcceptingResponses(
+    id: string,
+    data: { isAcceptingResponses: boolean; closedMessage?: string | null },
+  ) {
+    return api.patch(`/missionaries/${id}/accepting-responses`, data);
   },
 };

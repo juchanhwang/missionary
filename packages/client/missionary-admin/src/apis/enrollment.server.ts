@@ -30,6 +30,8 @@ export async function getServerEnrollmentSummary(): Promise<GetEnrollmentSummary
       paidCount: 0,
       managerName: m.pastorName ?? null,
       missionGroupName: m.missionGroup?.name ?? null,
+      isAcceptingResponses: m.isAcceptingResponses ?? true,
+      closedMessage: m.closedMessage ?? null,
     }));
 
     const recruiting = missions.filter((m) => m.status === 'ENROLLMENT_OPENED');

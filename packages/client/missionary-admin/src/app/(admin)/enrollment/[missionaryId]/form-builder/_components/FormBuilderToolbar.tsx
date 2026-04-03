@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, Button } from '@samilhero/design-system';
+import { Badge, Button, Switch } from '@samilhero/design-system';
 import { ArrowLeft, ChevronRight, Eye, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -24,6 +24,9 @@ interface FormBuilderToolbarProps {
   isSaving: boolean;
   onSave: () => void;
   onPreview: () => void;
+  isAcceptingResponses: boolean;
+  isToggleEnabled: boolean;
+  onToggleChange: (checked: boolean) => void;
 }
 
 export function FormBuilderToolbar({
@@ -32,7 +35,17 @@ export function FormBuilderToolbar({
   isSaving,
   onSave,
   onPreview,
+  isAcceptingResponses,
+  isToggleEnabled,
+  onToggleChange,
 }: FormBuilderToolbarProps) {
+  const toggleChecked = isToggleEnabled ? isAcceptingResponses : false;
+  const toggleLabel = toggleChecked ? '등록 수신 중' : '등록 일시 중지';
+
+  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onToggleChange(e.target.checked);
+  };
+
   return (
     <div className="sticky top-0 z-20 flex items-center justify-between px-8 py-4 bg-gray-100/95 backdrop-blur-sm border-b border-gray-200">
       <div className="flex flex-col gap-1">
@@ -69,6 +82,38 @@ export function FormBuilderToolbar({
       </div>
       {/* 액션 영역 */}
       <div className="flex items-center gap-2">
+        {/* 등록 수신 토글 */}
+        <div className="flex items-center gap-2 pr-3 border-r border-gray-200">
+          {isToggleEnabled ? (
+            <Switch
+              checked={toggleChecked}
+              onChange={handleSwitchChange}
+              label={toggleLabel}
+              className={
+                toggleChecked ? 'font-medium text-gray-700' : 'text-gray-400'
+              }
+              aria-label="등록 수신 상태 전환"
+            />
+          ) : (
+            <div className="relative group">
+              <Switch
+                checked={false}
+                disabled
+                label={toggleLabel}
+                className="text-gray-400"
+                aria-label="등록 수신 상태 전환"
+                aria-disabled="true"
+              />
+              {/* 툴팁 */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-30">
+                <div className="bg-gray-800 text-white text-xs rounded px-2.5 py-1.5 whitespace-nowrap shadow-lg">
+                  모집 중(ENROLLMENT_OPENED) 상태에서만 변경 가능합니다
+                </div>
+                <div className="w-2 h-2 bg-gray-800 rotate-45 mx-auto -mt-1" />
+              </div>
+            </div>
+          )}
+        </div>
         {isDirty && (
           <span className="text-xs text-gray-400">미저장 변경사항 있음</span>
         )}
