@@ -18,17 +18,11 @@ import { useState } from 'react';
 
 import { MissionStatusChips, type StatusFilter } from './MissionStatusChips';
 import { ProgressBar } from './ProgressBar';
+import { MISSION_STATUS_LABEL } from '../../missions/_utils/missionStatus';
 
 import type { EnrollmentMissionSummary } from 'apis/enrollment';
 
 const PAGE_SIZE = 20;
-
-const STATUS_LABELS: Record<string, string> = {
-  ENROLLMENT_OPENED: '모집 중',
-  ENROLLMENT_CLOSED: '모집 마감',
-  IN_PROGRESS: '진행 중',
-  COMPLETED: '종료',
-};
 
 const STATUS_VARIANTS: Record<
   string,
@@ -275,7 +269,7 @@ export function MissionEnrollmentTable({
                       <Badge
                         variant={STATUS_VARIANTS[mission.status] ?? 'outline'}
                       >
-                        {STATUS_LABELS[mission.status] ?? mission.status}
+                        {MISSION_STATUS_LABEL[mission.status] ?? mission.status}
                       </Badge>
                     </TableCell>
                   </TableRow>

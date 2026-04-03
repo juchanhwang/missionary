@@ -6,14 +6,9 @@ import { ArrowLeft, ChevronRight, Table2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-import type { EnrollmentMissionSummary } from 'apis/enrollment';
+import { MISSION_STATUS_LABEL } from '../../../missions/_utils/missionStatus';
 
-const STATUS_LABELS: Record<string, string> = {
-  ENROLLMENT_OPENED: '모집 중',
-  ENROLLMENT_CLOSED: '모집 마감',
-  IN_PROGRESS: '진행 중',
-  COMPLETED: '종료',
-};
+import type { EnrollmentMissionSummary } from 'apis/enrollment';
 
 const STATUS_VARIANTS: Record<
   string,
@@ -90,7 +85,7 @@ export function EnrollmentDetailHeader({
           {mission.category === 'DOMESTIC' ? '국내' : '해외'}
         </Badge>
         <Badge variant={STATUS_VARIANTS[mission.status] ?? 'outline'}>
-          {STATUS_LABELS[mission.status] ?? mission.status}
+          {MISSION_STATUS_LABEL[mission.status] ?? mission.status}
         </Badge>
       </div>
 

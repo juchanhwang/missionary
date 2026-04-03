@@ -1,5 +1,7 @@
 'use client';
 
+import { MISSION_STATUS_LABEL } from '../../missions/_utils/missionStatus';
+
 import type { EnrollmentStatus } from 'apis/enrollment';
 
 type StatusFilter = EnrollmentStatus | 'ALL';
@@ -11,10 +13,10 @@ interface MissionStatusChipsProps {
 
 const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
   { value: 'ALL', label: '전체' },
-  { value: 'ENROLLMENT_OPENED', label: '모집 중' },
-  { value: 'ENROLLMENT_CLOSED', label: '모집 마감' },
-  { value: 'IN_PROGRESS', label: '진행 중' },
-  { value: 'COMPLETED', label: '종료' },
+  ...Object.entries(MISSION_STATUS_LABEL).map(([value, label]) => ({
+    value: value as StatusFilter,
+    label,
+  })),
 ];
 
 export type { StatusFilter };
