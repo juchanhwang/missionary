@@ -18,24 +18,18 @@ import { useState } from 'react';
 
 import { MissionStatusChips, type StatusFilter } from './MissionStatusChips';
 import { ProgressBar } from './ProgressBar';
+import { MISSION_STATUS_LABEL } from '../../missions/_utils/missionStatus';
 
 import type { EnrollmentMissionSummary } from 'apis/enrollment';
 
 const PAGE_SIZE = 20;
 
-const STATUS_LABELS: Record<string, string> = {
-  ENROLLMENT_OPENED: '모집 중',
-  ENROLLMENT_CLOSED: '모집 마감',
-  IN_PROGRESS: '진행 중',
-  COMPLETED: '종료',
-};
-
 const STATUS_VARIANTS: Record<
   string,
-  'success' | 'warning' | 'info' | 'outline'
+  'success' | 'destructive' | 'info' | 'outline'
 > = {
   ENROLLMENT_OPENED: 'info',
-  ENROLLMENT_CLOSED: 'warning',
+  ENROLLMENT_CLOSED: 'destructive',
   IN_PROGRESS: 'success',
   COMPLETED: 'outline',
 };
@@ -45,9 +39,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   ABROAD: '해외',
 };
 
-const CATEGORY_VARIANTS: Record<string, 'success' | 'info'> = {
-  DOMESTIC: 'success',
-  ABROAD: 'info',
+const CATEGORY_VARIANTS: Record<string, 'outline'> = {
+  DOMESTIC: 'outline',
+  ABROAD: 'outline',
 };
 
 const STATUS_SORT_ORDER: Record<string, number> = {
@@ -215,15 +209,7 @@ export function MissionEnrollmentTable({
                         <>
                           {formatDeadlineDate(mission.enrollmentDeadline)}
                           {daysLeft !== null && (
-                            <span
-                              className={`ml-1.5 ${
-                                daysLeft < 0
-                                  ? 'font-semibold text-red-600'
-                                  : daysLeft <= 7
-                                    ? 'font-semibold text-warning-70'
-                                    : 'text-gray-400'
-                              }`}
-                            >
+                            <span className="ml-1.5 text-gray-400">
                               {daysLeft < 0 ? '(마감)' : `(D-${daysLeft})`}
                             </span>
                           )}
@@ -252,14 +238,14 @@ export function MissionEnrollmentTable({
                             value={progressPercent}
                             className={`h-1.5 w-20 ${
                               progressPercent > 100
-                                ? 'text-warning-70'
+                                ? 'text-warning-60'
                                 : 'text-blue-60'
                             }`}
                           />
                           <span
                             className={`text-xs ${
                               progressPercent > 100
-                                ? 'font-semibold text-warning-70'
+                                ? 'font-semibold text-warning-60'
                                 : 'text-gray-500'
                             }`}
                           >
@@ -275,7 +261,7 @@ export function MissionEnrollmentTable({
                       <Badge
                         variant={STATUS_VARIANTS[mission.status] ?? 'outline'}
                       >
-                        {STATUS_LABELS[mission.status] ?? mission.status}
+                        {MISSION_STATUS_LABEL[mission.status] ?? mission.status}
                       </Badge>
                     </TableCell>
                   </TableRow>

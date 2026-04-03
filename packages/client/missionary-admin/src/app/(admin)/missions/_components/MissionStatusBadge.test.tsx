@@ -7,7 +7,7 @@ describe('MissionStatusBadge', () => {
   it.each<[MissionStatus, string]>([
     ['ENROLLMENT_OPENED', '모집 중'],
     ['ENROLLMENT_CLOSED', '모집 종료'],
-    ['IN_PROGRESS', '진행 중'],
+    ['IN_PROGRESS', '선교 중'],
     ['COMPLETED', '완료'],
   ])('상태가 %s일 때 "%s" 텍스트를 렌더링한다', (status, expectedLabel) => {
     render(<MissionStatusBadge status={status} />);

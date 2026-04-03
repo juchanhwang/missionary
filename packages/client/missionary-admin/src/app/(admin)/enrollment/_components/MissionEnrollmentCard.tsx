@@ -40,7 +40,7 @@ function formatMissionPeriod(start: string, end: string): string {
 
 function getColorBarClass(daysLeft: number | null): string {
   if (daysLeft !== null && daysLeft < 0) return 'bg-red-600';
-  if (daysLeft !== null && daysLeft <= 7) return 'bg-warning-70';
+  if (daysLeft !== null && daysLeft <= 7) return 'bg-warning-60';
   return 'bg-blue-60';
 }
 
@@ -72,26 +72,18 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
       <div className="p-5">
         {/* 카테고리 Badge + D-day Badge */}
         <div className="flex items-center justify-between mb-3">
-          <Badge variant={mission.category === 'DOMESTIC' ? 'success' : 'info'}>
+          <Badge variant="outline">
             {mission.category === 'DOMESTIC' ? '국내' : '해외'}
           </Badge>
           {daysLeft !== null && (
-            <span
-              className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-bold ${
-                daysLeft < 0
-                  ? 'bg-red-50 text-red-600'
-                  : daysLeft <= 7
-                    ? 'bg-warning-10 text-warning-70'
-                    : 'bg-gray-100 text-gray-500'
-              }`}
-            >
+            <span className="inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-bold bg-gray-100 text-gray-500">
               {daysLeft < 0 ? '마감' : `D-${daysLeft}`}
             </span>
           )}
         </div>
 
         {/* 선교명 + 부제 */}
-        <h3 className="text-base font-bold text-gray-900 mb-0.5 group-hover:text-primary-50 transition-colors mb-4">
+        <h3 className="text-base font-bold text-gray-900 transition-colors mb-4">
           {mission.name}
         </h3>
 
@@ -111,13 +103,7 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
         {mission.enrollmentDeadline && (
           <div className="flex items-center gap-1.5 text-xs mb-4">
             <Clock size={12} className="shrink-0 text-gray-400" />
-            <span
-              className={
-                daysLeft !== null && daysLeft <= 7
-                  ? 'text-warning-70 font-semibold'
-                  : 'text-gray-500'
-              }
-            >
+            <span className="text-gray-500">
               신청 마감 {formatDate(mission.enrollmentDeadline)}
             </span>
           </div>
@@ -146,7 +132,7 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
             <ProgressBar
               value={progressPercent}
               className={`h-1.5 ${
-                progressPercent > 100 ? 'text-warning-70' : 'text-blue-60'
+                progressPercent > 100 ? 'text-warning-60' : 'text-blue-60'
               }`}
             />
           ) : (
@@ -167,7 +153,7 @@ export function MissionEnrollmentCard({ mission }: MissionEnrollmentCardProps) {
         <span className="text-xs text-gray-400">
           {mission.managerName ? `담당: ${mission.managerName}` : '\u00A0'}
         </span>
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 group-hover:text-primary-50">
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600">
           관리하기
           <ChevronRight size={12} />
         </span>

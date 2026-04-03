@@ -106,7 +106,7 @@ export function EnrollmentSummaryCard({
         <div className="flex items-start justify-between mb-3">
           <div>
             <p className="text-xs font-medium text-gray-400 mb-1">미납</p>
-            <p className="text-2xl font-bold text-warning-70">
+            <p className="text-2xl font-bold text-warning-60">
               {unpaidCount}
               <span className="text-base font-medium text-gray-400 ml-1">
                 명
@@ -114,7 +114,7 @@ export function EnrollmentSummaryCard({
             </p>
           </div>
           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-warning-10">
-            <AlertCircle size={18} className="text-warning-70" />
+            <AlertCircle size={18} className="text-warning-60" />
           </div>
         </div>
         <div className="flex flex-col gap-1.5">
@@ -126,7 +126,7 @@ export function EnrollmentSummaryCard({
           </div>
           <ProgressBar
             value={unpaidPercent}
-            className="h-1.5 text-warning-70"
+            className="h-1.5 text-warning-60"
           />
         </div>
       </div>
