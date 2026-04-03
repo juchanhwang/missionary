@@ -21,7 +21,9 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
             페이지를 불러올 수 없습니다
           </h2>
           <p className="text-sm text-gray-400">
-            {error.message || '일시적인 오류가 발생했습니다.'}
+            {process.env.NODE_ENV === 'development'
+              ? error.message || '일시적인 오류가 발생했습니다.'
+              : '일시적인 오류가 발생했습니다.'}
           </p>
         </div>
         <div className="flex items-center gap-2 mt-2">

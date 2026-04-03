@@ -1,3 +1,4 @@
+import axios from 'axios';
 import 'server-only';
 
 import { createServerApi } from './serverInstance';
@@ -42,6 +43,12 @@ export async function getServerEnrollmentSummary(): Promise<GetEnrollmentSummary
       ),
     };
   } catch (error) {
+    if (
+      axios.isAxiosError(error) &&
+      (error.response?.status === 401 || error.response?.status === 403)
+    ) {
+      throw error;
+    }
     console.error('[enrollment] 등록 관리 데이터 조회 실패:', error);
     return {
       missions: [],
