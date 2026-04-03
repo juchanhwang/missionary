@@ -42,6 +42,11 @@ export async function getServerEnrollmentSummary(): Promise<GetEnrollmentSummary
       ),
     };
   } catch (error) {
+    const status = (error as { response?: { status?: number } })?.response
+      ?.status;
+    if (status === 401 || status === 403) {
+      throw error;
+    }
     console.error('[enrollment] 등록 관리 데이터 조회 실패:', error);
     return {
       missions: [],
