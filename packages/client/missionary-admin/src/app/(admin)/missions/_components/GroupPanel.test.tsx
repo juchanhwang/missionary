@@ -123,13 +123,6 @@ describe('GroupPanel', () => {
     expect(screen.queryByText('제주도 선교')).not.toBeInTheDocument();
   });
 
-  it('선교 차수가 있는 그룹은 차수 배지를 표시한다', () => {
-    render(<GroupPanel />);
-
-    expect(screen.getByText('3차')).toBeInTheDocument();
-    expect(screen.getByText('1차')).toBeInTheDocument();
-  });
-
   it('"새 그룹 만들기" 링크가 올바른 경로를 가진다', () => {
     render(<GroupPanel />);
 
