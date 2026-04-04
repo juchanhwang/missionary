@@ -128,7 +128,7 @@ export function FormBuilderSection({ mission }: FormBuilderSectionProps) {
   // --- 등록 수신 토글 ---
   const isToggleEnabled = mission.status === 'ENROLLMENT_OPENED';
   const [isAcceptingResponses, setIsAcceptingResponses] = useState(
-    mission.isAcceptingResponses,
+    mission.isAcceptingResponses ?? true,
   );
   const [closedMessage, setClosedMessage] = useState(
     mission.closedMessage ?? '',
@@ -174,6 +174,8 @@ export function FormBuilderSection({ mission }: FormBuilderSectionProps) {
   };
 
   const handleClosedMessageBlur = () => {
+    if (isAcceptingResponses || toggleMutation.isPending) return;
+
     const trimmed = closedMessage.trim();
     const prevValue = closedMessageRef.current;
 
