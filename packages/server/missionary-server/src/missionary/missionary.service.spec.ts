@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import {
@@ -760,6 +760,105 @@ describe('MissionaryService', () => {
       await expect(service.restoreRegion(group.id, region.id)).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  // ──────────────────────────────────────────────
+  // updateAcceptingResponses
+  // ──────────────────────────────────────────────
+  describe('updateAcceptingResponses', () => {
+    it('ENROLLMENT_OPENED 상태에서 등록 수신을 중지할 수 있다', async () => {
+      const created = await fakeMissionaryRepo.create({
+        name: '테스트선교',
+        startDate: new Date(),
+        endDate: new Date(),
+        createdById: 'user-1',
+        status: 'ENROLLMENT_OPENED',
+      });
+
+      const result = await service.updateAcceptingResponses(created.id, {
+        isAcceptingResponses: false,
+        closedMessage: '잠시 중단합니다.',
+      });
+
+      expect(result.isAcceptingResponses).toBe(false);
+      expect(result.closedMessage).toBe('잠시 중단합니다.');
+    });
+
+    it('등록 수신 중지 후 다시 재개할 수 있다', async () => {
+      const created = await fakeMissionaryRepo.create({
+        name: '테스트선교',
+        startDate: new Date(),
+        endDate: new Date(),
+        createdById: 'user-1',
+        status: 'ENROLLMENT_OPENED',
+      });
+
+      await service.updateAcceptingResponses(created.id, {
+        isAcceptingResponses: false,
+      });
+
+      const result = await service.updateAcceptingResponses(created.id, {
+        isAcceptingResponses: true,
+      });
+
+      expect(result.isAcceptingResponses).toBe(true);
+    });
+
+    it('closedMessage를 생략하면 null로 저장된다', async () => {
+      const created = await fakeMissionaryRepo.create({
+        name: '테스트선교',
+        startDate: new Date(),
+        endDate: new Date(),
+        createdById: 'user-1',
+        status: 'ENROLLMENT_OPENED',
+      });
+
+      const result = await service.updateAcceptingResponses(created.id, {
+        isAcceptingResponses: false,
+      });
+
+      expect(result.closedMessage).toBeNull();
+    });
+
+    it('ENROLLMENT_CLOSED 상태에서는 BadRequestException을 던진다', async () => {
+      const created = await fakeMissionaryRepo.create({
+        name: '테스트선교',
+        startDate: new Date(),
+        endDate: new Date(),
+        createdById: 'user-1',
+        status: 'ENROLLMENT_CLOSED',
+      });
+
+      await expect(
+        service.updateAcceptingResponses(created.id, {
+          isAcceptingResponses: false,
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('IN_PROGRESS 상태에서는 BadRequestException을 던진다', async () => {
+      const created = await fakeMissionaryRepo.create({
+        name: '테스트선교',
+        startDate: new Date(),
+        endDate: new Date(),
+        createdById: 'user-1',
+        status: 'IN_PROGRESS',
+      });
+
+      await expect(
+        service.updateAcceptingResponses(created.id, {
+          isAcceptingResponses: false,
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('존재하지 않는 선교에 대해 NotFoundException을 던진다', async () => {
+      await expect(
+        service.updateAcceptingResponses('non-existent-id', {
+          isAcceptingResponses: false,
+        }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

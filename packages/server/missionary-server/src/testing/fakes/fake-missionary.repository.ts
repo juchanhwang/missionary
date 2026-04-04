@@ -49,6 +49,8 @@ export class FakeMissionaryRepository implements MissionaryRepository {
       bankAccountHolder: data.bankAccountHolder ?? null,
       bankAccountNumber: data.bankAccountNumber ?? null,
       status: (data.status ?? 'ENROLLMENT_OPENED') as MissionStatus,
+      isAcceptingResponses: true,
+      closedMessage: null,
       missionGroupId: data.missionGroupId ?? null,
       createdById: data.createdById,
       order: data.order ?? null,

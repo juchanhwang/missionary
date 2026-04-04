@@ -22,6 +22,8 @@ export interface EnrollmentMissionSummary {
   paidCount: number;
   managerName: string | null;
   missionGroupName: string | null;
+  isAcceptingResponses: boolean;
+  closedMessage: string | null;
 }
 
 export interface GetEnrollmentSummaryResponse {
@@ -60,6 +62,8 @@ function toEnrollmentSummary(
     paidCount: 0, // GET /missionaries에서 제공하지 않음
     managerName: m.pastorName ?? null,
     missionGroupName: m.missionGroup?.name ?? null,
+    isAcceptingResponses: m.isAcceptingResponses ?? true,
+    closedMessage: m.closedMessage ?? null,
   }));
 
   const recruiting = missions.filter((m) => m.status === 'ENROLLMENT_OPENED');

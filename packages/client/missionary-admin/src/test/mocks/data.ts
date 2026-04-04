@@ -175,6 +175,8 @@ export function createMockEnrollmentSummary(
     paidCount: 20,
     managerName: '김목사',
     missionGroupName: '필리핀 선교',
+    isAcceptingResponses: true,
+    closedMessage: null,
     ...overrides,
   };
 }

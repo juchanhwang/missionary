@@ -15,8 +15,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { overlay } from '@samilhero/design-system';
-import { Info } from 'lucide-react';
-import { useState } from 'react';
+import { AlertTriangle, Info } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { AddFieldButton } from './AddFieldButton';
@@ -25,13 +25,17 @@ import { FormBuilderToolbar } from './FormBuilderToolbar';
 import { FormFieldCard } from './FormFieldCard';
 import { FormPreviewModal } from './FormPreviewModal';
 import { LockedFieldCard } from './LockedFieldCard';
+import { PauseConfirmModal } from './PauseConfirmModal';
 import { useGetAttendanceOptions } from '../../_hooks/useGetAttendanceOptions';
 import { useBeforeUnloadGuard } from '../_hooks/useBeforeUnloadGuard';
 import { useFormSave } from '../_hooks/useFormSave';
 import { useGetFormFields } from '../_hooks/useGetFormFields';
 import { useLocalFields } from '../_hooks/useLocalFields';
+import { useToggleAcceptingResponses } from '../_hooks/useToggleAcceptingResponses';
 
 import type { EnrollmentMissionSummary } from 'apis/enrollment';
+
+const PANEL_TRANSITION_MS = 300;
 
 interface LockedField {
   label: string;
@@ -121,6 +125,69 @@ export function FormBuilderSection({ mission }: FormBuilderSectionProps) {
     },
   });
 
+  // --- 등록 수신 토글 ---
+  const isToggleEnabled = mission.status === 'ENROLLMENT_OPENED';
+  const [isAcceptingResponses, setIsAcceptingResponses] = useState(
+    mission.isAcceptingResponses ?? true,
+  );
+  const [closedMessage, setClosedMessage] = useState(
+    mission.closedMessage ?? '',
+  );
+  const closedMessageRef = useRef(mission.closedMessage ?? '');
+
+  const toggleMutation = useToggleAcceptingResponses(missionaryId);
+
+  const handleToggleChange = async (newChecked: boolean) => {
+    if (!newChecked) {
+      // ON → OFF: 확인 모달 표시
+      const confirmed = await overlay.openAsync<boolean>(
+        ({ isOpen, close, unmount }) => (
+          <PauseConfirmModal
+            isOpen={isOpen}
+            close={(result) => {
+              close(result);
+              setTimeout(unmount, PANEL_TRANSITION_MS);
+            }}
+          />
+        ),
+      );
+      if (!confirmed) return;
+    }
+
+    setIsAcceptingResponses(newChecked);
+    toggleMutation.mutate(
+      { isAcceptingResponses: newChecked },
+      {
+        onError: () => {
+          // 실패 시 롤백
+          setIsAcceptingResponses(!newChecked);
+        },
+        onSuccess: () => {
+          if (newChecked) {
+            toast.success('등록 수신이 재개되었습니다.');
+          } else {
+            toast.success('등록이 일시 중지되었습니다.');
+          }
+        },
+      },
+    );
+  };
+
+  const handleClosedMessageBlur = () => {
+    if (isAcceptingResponses || toggleMutation.isPending) return;
+
+    const trimmed = closedMessage.trim();
+    const prevValue = closedMessageRef.current;
+
+    if (trimmed === prevValue) return;
+
+    closedMessageRef.current = trimmed;
+    toggleMutation.mutate({
+      isAcceptingResponses: false,
+      closedMessage: trimmed || null,
+    });
+  };
+
   // --- 브라우저 가드 ---
   useBeforeUnloadGuard(isDirty);
 
@@ -198,7 +265,43 @@ export function FormBuilderSection({ mission }: FormBuilderSectionProps) {
         isSaving={isSaving}
         onSave={save}
         onPreview={handlePreview}
+        isAcceptingResponses={isAcceptingResponses}
+        isToggleEnabled={isToggleEnabled}
+        onToggleChange={handleToggleChange}
       />
+
+      {/* 등록 일시 중지 경고 배너 + 차단 메시지 textarea */}
+      {isToggleEnabled && !isAcceptingResponses && (
+        <>
+          <div
+            role="alert"
+            className="flex items-center gap-2 px-8 py-3 bg-amber-50 border-b border-amber-200"
+          >
+            <AlertTriangle size={16} className="text-amber-600 shrink-0" />
+            <p className="text-sm font-medium text-amber-800">
+              현재 등록이 일시 중지되어 있습니다. 새로운 등록이 차단됩니다.
+            </p>
+          </div>
+          <div className="px-8 py-4 bg-amber-50 border-b border-amber-200">
+            <label className="block text-xs font-semibold text-amber-800 mb-1.5">
+              사용자에게 표시할 차단 메시지{' '}
+              <span className="font-normal">(선택)</span>
+            </label>
+            <textarea
+              rows={3}
+              className="w-full max-w-2xl text-sm text-gray-700 border border-amber-200 rounded-lg px-3 py-2 bg-white resize-none focus:outline-none focus:ring-1 focus:ring-amber-400"
+              placeholder="현재 등록을 일시적으로 중단하고 있습니다. 잠시 후 다시 시도해주세요."
+              value={closedMessage}
+              onChange={(e) => setClosedMessage(e.target.value)}
+              onBlur={handleClosedMessageBlur}
+              aria-label="사용자 차단 메시지 입력"
+            />
+            <p className="text-xs text-amber-700 mt-1.5">
+              비워두면 기본 문구가 사용자 앱에 표시됩니다.
+            </p>
+          </div>
+        </>
+      )}
 
       {/* 폼 빌더 콘텐츠 */}
       <div className="flex flex-col items-center px-8 py-8 pb-16">

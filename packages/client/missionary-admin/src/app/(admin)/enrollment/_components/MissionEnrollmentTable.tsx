@@ -258,11 +258,20 @@ export function MissionEnrollmentTable({
                     </TableCell>
                     <TableCell>{mission.paidCount}명</TableCell>
                     <TableCell>
-                      <Badge
-                        variant={STATUS_VARIANTS[mission.status] ?? 'outline'}
-                      >
-                        {MISSION_STATUS_LABEL[mission.status] ?? mission.status}
-                      </Badge>
+                      <div className="flex items-center gap-1.5">
+                        <Badge
+                          variant={STATUS_VARIANTS[mission.status] ?? 'outline'}
+                        >
+                          {MISSION_STATUS_LABEL[mission.status] ??
+                            mission.status}
+                        </Badge>
+                        {mission.status === 'ENROLLMENT_OPENED' &&
+                          !mission.isAcceptingResponses && (
+                            <span className="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">
+                              등록 일시 중지
+                            </span>
+                          )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
