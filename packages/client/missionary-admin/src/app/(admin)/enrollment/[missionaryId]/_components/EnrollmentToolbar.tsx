@@ -116,15 +116,16 @@ export function EnrollmentToolbar({
         )}
         CSV
       </Button>
-      {isAdmin && selectedCount > 0 && (
+      {isAdmin && (
         <Button
           variant="filled"
           color="primary"
           size="sm"
           onClick={onBulkApprove}
+          disabled={selectedCount === 0}
         >
           <Check size={14} />
-          납부 승인 ({selectedCount})
+          납부 승인{selectedCount > 0 ? ` (${selectedCount})` : ''}
         </Button>
       )}
     </div>
