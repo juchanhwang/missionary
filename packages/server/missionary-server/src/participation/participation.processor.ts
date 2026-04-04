@@ -2,6 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Inject,
   Injectable,
   Logger,
@@ -59,7 +60,7 @@ export class ParticipationProcessor extends WorkerHost {
     }
 
     if (!missionary.isAcceptingResponses) {
-      throw new ConflictException('Missionary is not accepting responses');
+      throw new ForbiddenException('현재 등록이 일시 중지되어 있습니다.');
     }
 
     if (

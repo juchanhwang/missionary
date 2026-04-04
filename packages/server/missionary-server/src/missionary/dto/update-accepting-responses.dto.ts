@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  MaxLength,
+  ValidateIf,
+} from 'class-validator';
 
 export class UpdateAcceptingResponsesDto {
   @ApiProperty({
@@ -15,6 +21,7 @@ export class UpdateAcceptingResponsesDto {
     required: false,
   })
   @IsOptional()
+  @ValidateIf((o) => o.closedMessage !== null)
   @IsString()
   @MaxLength(500)
   declare closedMessage?: string | null;

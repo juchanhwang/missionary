@@ -1,4 +1,8 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { makeMissionaryAttendanceOption } from '@/testing/factories/attendance-option.factory';
 import { makeMissionary } from '@/testing/factories/missionary.factory';
@@ -155,11 +159,11 @@ describe('ParticipationProcessor', () => {
   });
 
   describe('등록 수신 중지 시 등록 차단', () => {
-    it('isAcceptingResponses가 false이면 ConflictException을 던진다', async () => {
+    it('isAcceptingResponses가 false이면 ForbiddenException을 던진다', async () => {
       await setupMissionary({ isAcceptingResponses: false });
 
       await expect(processor.process(makeJob(makeDto()))).rejects.toThrow(
-        ConflictException,
+        ForbiddenException,
       );
     });
 
