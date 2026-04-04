@@ -115,6 +115,7 @@ export function ParticipantTable({
 
   const handleBulkApprove = async () => {
     const ids = Array.from(checkedIds);
+    if (ids.length === 0) return;
     const confirmed = await overlay.openAsync<boolean>(
       ({ isOpen, close, unmount }) => (
         <BulkApproveModal
