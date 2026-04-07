@@ -370,6 +370,41 @@ describe('ParticipationService', () => {
       expect(result.name).toBe('관리자수정');
     });
 
+    it('STAFF가 타인 participation의 일반 필드를 수정할 수 있다 (PRD §2 정합)', async () => {
+      // Notable Change 의도 박제:
+      // be-plan §4-B에서 USER teamId 차단과 함께 owner-check를
+      // isAdminOrStaff로 확장했기 때문에, STAFF가 타인 participation의
+      // teamId가 아닌 일반 필드(name 등)도 수정할 수 있어야 한다.
+      // 이는 PRD §2 권한 표(STAFF에게 운영 권한 부여)와 정합한다.
+      // 이 테스트가 실패하면 누군가 owner-check를 ADMIN-only로 되돌린 것이다.
+      const ownerId = 'owner-1';
+      const staffId = 'staff-1';
+      const missionaryId = 'missionary-1';
+      const user = makeUser({ id: ownerId });
+      const missionary = makeMissionary({ id: missionaryId });
+
+      fakeParticipationRepo.setUser(ownerId, user);
+      fakeParticipationRepo.setMissionary(missionaryId, missionary);
+
+      const participation = makeParticipation({
+        id: 'participation-1',
+        userId: ownerId,
+        missionaryId,
+      });
+      await fakeParticipationRepo.create(participation);
+
+      const staffUser = makeAuthUser({ id: staffId, role: 'STAFF' });
+      const dto: UpdateParticipationDto = {
+        name: '스태프수정',
+        affiliation: '수정교회',
+      };
+
+      const result = await service.update('participation-1', dto, staffUser);
+
+      expect(result.name).toBe('스태프수정');
+      expect(result.affiliation).toBe('수정교회');
+    });
+
     // ──────────────────────────────────────────────
     // Wave 4: teamId 배치/해제 (be-plan §3-D, §3-E, §4-B)
     // ──────────────────────────────────────────────
