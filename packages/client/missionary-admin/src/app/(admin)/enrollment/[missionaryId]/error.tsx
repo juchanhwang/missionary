@@ -26,7 +26,7 @@ export default function EnrollmentDetailError({
           <p className="text-sm text-gray-400">
             {process.env.NODE_ENV === 'development'
               ? error.message || '일시적인 오류가 발생했습니다.'
-              : '일시적인 오류가 발생했습니다.'}
+              : `일시적인 오류가 발생했습니다.${error.digest ? ` (${error.digest})` : ''}`}
           </p>
         </div>
         <div className="flex items-center gap-2 mt-2">
