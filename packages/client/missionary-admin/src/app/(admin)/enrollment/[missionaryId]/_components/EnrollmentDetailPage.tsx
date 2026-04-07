@@ -2,8 +2,9 @@
 
 import { useDebounce } from 'hooks/useDebounce';
 import { useSearchParams } from 'next/navigation';
-import { use, useState } from 'react';
+import { useState } from 'react';
 
+import { EnrollmentDetailHeader } from './EnrollmentDetailHeader';
 import { EnrollmentSummaryCard } from './EnrollmentSummaryCard';
 import { ParticipantPanelContainer } from './panel/ParticipantPanelContainer';
 import { ParticipantTable } from './ParticipantTable';
@@ -21,28 +22,21 @@ import type {
 
 const PAGE_SIZE = 20;
 
-interface EnrollmentDetailContentProps {
+interface EnrollmentDetailPageProps {
   mission: EnrollmentMissionSummary;
-  participationsPromise: Promise<PaginatedParticipationsResponse>;
-  enrollmentSummaryPromise: Promise<MissionEnrollmentSummary>;
-  formFieldsPromise: Promise<FormFieldDefinition[]>;
-  attendanceOptionsPromise: Promise<AttendanceOption[]>;
+  initialParticipations: PaginatedParticipationsResponse;
+  initialEnrollmentSummary: MissionEnrollmentSummary;
+  formFields: FormFieldDefinition[];
+  attendanceOptions: AttendanceOption[];
 }
 
-export function EnrollmentDetailContent({
+export function EnrollmentDetailPage({
   mission,
-  participationsPromise,
-  enrollmentSummaryPromise,
-  formFieldsPromise,
-  attendanceOptionsPromise,
-}: EnrollmentDetailContentProps) {
-  // 서버에서 내려준 promise를 use()로 unwrap.
-  // 미해결 상태에서는 부모 Suspense boundary가 fallback을 표시한다.
-  const initialParticipations = use(participationsPromise);
-  const initialEnrollmentSummary = use(enrollmentSummaryPromise);
-  const formFields = use(formFieldsPromise);
-  const attendanceOptions = use(attendanceOptionsPromise);
-
+  initialParticipations,
+  initialEnrollmentSummary,
+  formFields,
+  attendanceOptions,
+}: EnrollmentDetailPageProps) {
   const searchParams = useSearchParams();
 
   // --- 공용 상태: Table(렌더)과 Panel(prev/next)이 함께 사용 ---
@@ -76,23 +70,26 @@ export function EnrollmentDetailContent({
   });
 
   return (
-    <>
-      <EnrollmentSummaryCard
-        missionaryId={mission.id}
-        initialData={initialEnrollmentSummary}
-      />
+    <div className="flex flex-col flex-1 min-h-0 min-w-0">
+      <div className="flex flex-col flex-1 p-8 gap-5 min-h-0">
+        <EnrollmentDetailHeader mission={mission} />
 
-      <ParticipantTable
-        data={data}
-        isLoading={isLoading}
-        formFields={formFields}
-        missionaryId={mission.id}
-        missionName={mission.name}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+        <EnrollmentSummaryCard
+          missionaryId={mission.id}
+          initialData={initialEnrollmentSummary}
+        />
 
-      {/* SidePanel은 fixed positioned이므로 DOM 위치는 시각 layout과 무관 */}
+        <ParticipantTable
+          data={data}
+          isLoading={isLoading}
+          formFields={formFields}
+          missionaryId={mission.id}
+          missionName={mission.name}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+      </div>
+
       <ParticipantPanelContainer
         participants={data?.data ?? []}
         missionaryId={mission.id}
@@ -100,6 +97,6 @@ export function EnrollmentDetailContent({
         initialAttendanceOptions={attendanceOptions}
         formFields={formFields}
       />
-    </>
+    </div>
   );
 }
