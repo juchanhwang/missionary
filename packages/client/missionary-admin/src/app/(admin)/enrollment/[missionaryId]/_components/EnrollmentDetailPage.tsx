@@ -2,7 +2,7 @@
 
 import { useDebounce } from 'hooks/useDebounce';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { use, useState } from 'react';
 
 import { EnrollmentDetailHeader } from './EnrollmentDetailHeader';
 import { EnrollmentSummaryCard } from './EnrollmentSummaryCard';
@@ -24,19 +24,26 @@ const PAGE_SIZE = 20;
 
 interface EnrollmentDetailPageProps {
   mission: EnrollmentMissionSummary;
-  initialParticipations: PaginatedParticipationsResponse;
-  initialEnrollmentSummary: MissionEnrollmentSummary;
-  formFields: FormFieldDefinition[];
-  attendanceOptions: AttendanceOption[];
+  participationsPromise: Promise<PaginatedParticipationsResponse>;
+  enrollmentSummaryPromise: Promise<MissionEnrollmentSummary>;
+  formFieldsPromise: Promise<FormFieldDefinition[]>;
+  attendanceOptionsPromise: Promise<AttendanceOption[]>;
 }
 
 export function EnrollmentDetailPage({
   mission,
-  initialParticipations,
-  initialEnrollmentSummary,
-  formFields,
-  attendanceOptions,
+  participationsPromise,
+  enrollmentSummaryPromise,
+  formFieldsPromise,
+  attendanceOptionsPromise,
 }: EnrollmentDetailPageProps) {
+  // 서버에서 내려준 promise를 use()로 unwrap
+  // 미해결 상태에서는 부모 Suspense boundary가 fallback을 표시한다.
+  const initialParticipations = use(participationsPromise);
+  const initialEnrollmentSummary = use(enrollmentSummaryPromise);
+  const formFields = use(formFieldsPromise);
+  const attendanceOptions = use(attendanceOptionsPromise);
+
   const searchParams = useSearchParams();
 
   // --- 공용 상태: Table(렌더)과 Panel(prev/next)이 함께 사용 ---
