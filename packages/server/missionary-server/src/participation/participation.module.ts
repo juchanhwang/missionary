@@ -5,6 +5,7 @@ import { CsvExportService } from '@/common/csv/csv-export.service';
 import { PiiCleanupScheduler } from '@/common/scheduler/pii-cleanup.scheduler';
 import { PrismaModule } from '@/database/prisma.module';
 import { MissionaryModule } from '@/missionary/missionary.module';
+import { TeamModule } from '@/team/team.module';
 
 import { ParticipationController } from './participation.controller';
 import { ParticipationProcessor } from './participation.processor';
@@ -18,6 +19,7 @@ import { PrismaParticipationRepository } from './repositories/prisma-participati
   imports: [
     PrismaModule,
     MissionaryModule,
+    TeamModule,
     BullModule.registerQueue({
       name: 'participation-queue',
     }),
