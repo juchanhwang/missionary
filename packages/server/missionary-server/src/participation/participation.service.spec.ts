@@ -10,14 +10,17 @@ import { CsvExportService } from '@/common/csv/csv-export.service';
 import { EncryptionService } from '@/common/encryption/encryption.service';
 import type { AuthenticatedUser } from '@/common/interfaces/authenticated-user.interface';
 import { FORM_FIELD_REPOSITORY } from '@/missionary/repositories/form-field-repository.interface';
+import { TEAM_REPOSITORY } from '@/team/repositories';
 import { makeMissionaryAttendanceOption } from '@/testing/factories/attendance-option.factory';
 import { makeMissionaryFormField } from '@/testing/factories/form-field.factory';
 import { makeMissionary } from '@/testing/factories/missionary.factory';
 import { makeParticipation } from '@/testing/factories/participation.factory';
+import { makeTeam } from '@/testing/factories/team.factory';
 import { makeUser } from '@/testing/factories/user.factory';
 import { FakeFormAnswerRepository } from '@/testing/fakes/fake-form-answer.repository';
 import { FakeFormFieldRepository } from '@/testing/fakes/fake-form-field.repository';
 import { FakeParticipationRepository } from '@/testing/fakes/fake-participation.repository';
+import { FakeTeamRepository } from '@/testing/fakes/fake-team.repository';
 
 import { CreateParticipationDto } from './dto/create-participation.dto';
 import { UpdateFormAnswersDto } from './dto/update-form-answers.dto';
@@ -41,6 +44,7 @@ describe('ParticipationService', () => {
   let fakeParticipationRepo: FakeParticipationRepository;
   let fakeFormAnswerRepo: FakeFormAnswerRepository;
   let fakeFormFieldRepo: FakeFormFieldRepository;
+  let fakeTeamRepo: FakeTeamRepository;
   let mockEncryptionService: { encrypt: jest.Mock; decrypt: jest.Mock };
   let mockCsvExportService: { generateParticipationCsv: jest.Mock };
   let mockQueue: { add: jest.Mock };
@@ -49,6 +53,7 @@ describe('ParticipationService', () => {
     fakeParticipationRepo = new FakeParticipationRepository();
     fakeFormAnswerRepo = new FakeFormAnswerRepository();
     fakeFormFieldRepo = new FakeFormFieldRepository();
+    fakeTeamRepo = new FakeTeamRepository();
 
     mockEncryptionService = {
       encrypt: jest.fn((value: string) => `encrypted-${value}`),
@@ -77,6 +82,10 @@ describe('ParticipationService', () => {
         {
           provide: FORM_FIELD_REPOSITORY,
           useValue: fakeFormFieldRepo,
+        },
+        {
+          provide: TEAM_REPOSITORY,
+          useValue: fakeTeamRepo,
         },
         { provide: EncryptionService, useValue: mockEncryptionService },
         { provide: CsvExportService, useValue: mockCsvExportService },
@@ -359,6 +368,122 @@ describe('ParticipationService', () => {
 
       const result = await service.update('participation-1', dto, adminUser);
       expect(result.name).toBe('관리자수정');
+    });
+
+    // ──────────────────────────────────────────────
+    // Wave 4: teamId 배치/해제 (be-plan §3-D, §3-E, §4-B)
+    // ──────────────────────────────────────────────
+
+    describe('teamId 배치/해제', () => {
+      const ownerId = 'owner-1';
+      const adminId = 'admin-1';
+      const staffId = 'staff-1';
+      const missionaryId = 'missionary-1';
+      const otherMissionaryId = 'missionary-2';
+      const teamId = 'team-1';
+
+      beforeEach(async () => {
+        const owner = makeUser({ id: ownerId });
+        const missionary = makeMissionary({ id: missionaryId });
+        const otherMissionary = makeMissionary({ id: otherMissionaryId });
+
+        fakeParticipationRepo.setUser(ownerId, owner);
+        fakeParticipationRepo.setMissionary(missionaryId, missionary);
+        fakeParticipationRepo.setMissionary(otherMissionaryId, otherMissionary);
+
+        await fakeParticipationRepo.create(
+          makeParticipation({
+            id: 'participation-1',
+            userId: ownerId,
+            missionaryId,
+            teamId: null,
+          }),
+        );
+      });
+
+      it('STAFF가 같은 missionary의 teamId로 팀에 배치할 수 있다', async () => {
+        const team = makeTeam({ id: teamId, missionaryId });
+        fakeTeamRepo.seed(team);
+
+        const staffUser = makeAuthUser({ id: staffId, role: 'STAFF' });
+        const dto: UpdateParticipationDto = { teamId };
+
+        const result = await service.update('participation-1', dto, staffUser);
+
+        expect(result.teamId).toBe(teamId);
+      });
+
+      it('ADMIN이 teamId를 null로 지정하여 팀 배치를 해제할 수 있다', async () => {
+        const team = makeTeam({ id: teamId, missionaryId });
+        fakeTeamRepo.seed(team);
+
+        // 우선 배치된 상태로 만든다
+        const staffUser = makeAuthUser({ id: staffId, role: 'STAFF' });
+        await service.update('participation-1', { teamId }, staffUser);
+
+        const adminUser = makeAuthUser({ id: adminId, role: 'ADMIN' });
+        const dto: UpdateParticipationDto = { teamId: null };
+
+        const result = await service.update('participation-1', dto, adminUser);
+
+        expect(result.teamId).toBeNull();
+      });
+
+      it('teamId가 undefined이면 기존 teamId가 유지된다', async () => {
+        const team = makeTeam({ id: teamId, missionaryId });
+        fakeTeamRepo.seed(team);
+
+        // 우선 팀에 배치
+        const staffUser = makeAuthUser({ id: staffId, role: 'STAFF' });
+        await service.update('participation-1', { teamId }, staffUser);
+
+        // teamId를 빼고 다른 필드만 수정
+        const adminUser = makeAuthUser({ id: adminId, role: 'ADMIN' });
+        const result = await service.update(
+          'participation-1',
+          { name: '이름변경' },
+          adminUser,
+        );
+
+        expect(result.teamId).toBe(teamId);
+        expect(result.name).toBe('이름변경');
+      });
+
+      it('존재하지 않는 teamId를 지정하면 NotFoundException을 던진다', async () => {
+        const staffUser = makeAuthUser({ id: staffId, role: 'STAFF' });
+        const dto: UpdateParticipationDto = { teamId: 'non-existent-team' };
+
+        await expect(
+          service.update('participation-1', dto, staffUser),
+        ).rejects.toThrow(NotFoundException);
+      });
+
+      it('다른 missionary 소속의 teamId를 지정하면 BadRequestException을 던진다', async () => {
+        const otherTeam = makeTeam({
+          id: 'team-other',
+          missionaryId: otherMissionaryId,
+        });
+        fakeTeamRepo.seed(otherTeam);
+
+        const staffUser = makeAuthUser({ id: staffId, role: 'STAFF' });
+        const dto: UpdateParticipationDto = { teamId: 'team-other' };
+
+        await expect(
+          service.update('participation-1', dto, staffUser),
+        ).rejects.toThrow(BadRequestException);
+      });
+
+      it('USER 권한으로 teamId를 변경하면 ForbiddenException을 던진다', async () => {
+        const team = makeTeam({ id: teamId, missionaryId });
+        fakeTeamRepo.seed(team);
+
+        const userAuth = makeAuthUser({ id: ownerId, role: 'USER' });
+        const dto: UpdateParticipationDto = { teamId };
+
+        await expect(
+          service.update('participation-1', dto, userAuth),
+        ).rejects.toThrow(ForbiddenException);
+      });
     });
   });
 

@@ -54,6 +54,14 @@ export class FakeTeamRepository
     this.users.set(user.id, user);
   }
 
+  /** 테스트에서 Team 엔티티 자체를 미리 세팅한다 (id 보존) */
+  seed(team: Team): void {
+    this.store.set(team.id, team);
+    if (!this.members.has(team.id)) {
+      this.members.set(team.id, []);
+    }
+  }
+
   /** 테스트에서 팀에 연결된 participation id를 시드한다 */
   seedParticipationForTeam(teamId: string, participationId: string): void {
     const set = this.participationsByTeam.get(teamId) ?? new Set();
