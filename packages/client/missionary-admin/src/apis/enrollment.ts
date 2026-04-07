@@ -21,6 +21,7 @@ export interface EnrollmentMissionSummary {
   currentParticipantCount: number;
   paidCount: number;
   managerName: string | null;
+  missionGroupId: string | null;
   missionGroupName: string | null;
   isAcceptingResponses: boolean;
   closedMessage: string | null;
@@ -61,6 +62,7 @@ function toEnrollmentSummary(
     currentParticipantCount: m.currentParticipantCount,
     paidCount: 0, // GET /missionaries에서 제공하지 않음
     managerName: m.pastorName ?? null,
+    missionGroupId: m.missionGroupId ?? null,
     missionGroupName: m.missionGroup?.name ?? null,
     isAcceptingResponses: m.isAcceptingResponses ?? true,
     closedMessage: m.closedMessage ?? null,

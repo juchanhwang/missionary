@@ -174,6 +174,7 @@ export function createMockEnrollmentSummary(
     currentParticipantCount: 30,
     paidCount: 20,
     managerName: '김목사',
+    missionGroupId: 'mission-group-1',
     missionGroupName: '필리핀 선교',
     isAcceptingResponses: true,
     closedMessage: null,

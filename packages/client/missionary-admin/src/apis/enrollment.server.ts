@@ -36,6 +36,7 @@ export const getServerEnrollmentSummary = cache(
       currentParticipantCount: m.currentParticipantCount,
       paidCount: 0,
       managerName: m.pastorName ?? null,
+      missionGroupId: m.missionGroupId ?? null,
       missionGroupName: m.missionGroup?.name ?? null,
       isAcceptingResponses: m.isAcceptingResponses ?? true,
       closedMessage: m.closedMessage ?? null,
