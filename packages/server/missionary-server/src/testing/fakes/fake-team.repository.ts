@@ -11,6 +11,7 @@ import { BaseFakeRepository } from './base-fake-repository';
 import type {
   Church,
   Missionary,
+  MissionaryRegion,
   Team,
   TeamMember,
   User,
@@ -29,7 +30,9 @@ export class FakeTeamRepository
   // 테스트 헬퍼: 관계 데이터를 미리 세팅
   private missionaries = new Map<string, Missionary>();
   private churches = new Map<string, Church>();
+  private regions = new Map<string, MissionaryRegion>();
   private users = new Map<string, User>();
+  private participationsByTeam = new Map<string, Set<string>>();
 
   /** 테스트에서 Missionary 데이터를 미리 세팅한다 */
   seedMissionary(missionary: Missionary): void {
@@ -41,9 +44,26 @@ export class FakeTeamRepository
     this.churches.set(church.id, church);
   }
 
+  /** 테스트에서 MissionaryRegion 데이터를 미리 세팅한다 */
+  seedRegion(region: MissionaryRegion): void {
+    this.regions.set(region.id, region);
+  }
+
   /** 테스트에서 User 데이터를 미리 세팅한다 */
   seedUser(user: User): void {
     this.users.set(user.id, user);
+  }
+
+  /** 테스트에서 팀에 연결된 participation id를 시드한다 */
+  seedParticipationForTeam(teamId: string, participationId: string): void {
+    const set = this.participationsByTeam.get(teamId) ?? new Set();
+    set.add(participationId);
+    this.participationsByTeam.set(teamId, set);
+  }
+
+  /** 테스트 검증용: 특정 팀에 연결된 participation 수 */
+  countParticipationsForTeam(teamId: string): number {
+    return this.participationsByTeam.get(teamId)?.size ?? 0;
   }
 
   override clear(): void {
@@ -51,7 +71,9 @@ export class FakeTeamRepository
     this.members.clear();
     this.missionaries.clear();
     this.churches.clear();
+    this.regions.clear();
     this.users.clear();
+    this.participationsByTeam.clear();
   }
 
   protected buildEntity(data: TeamCreateInput): Team {
@@ -153,6 +175,18 @@ export class FakeTeamRepository
     this.members.set(teamId, existing);
   }
 
+  async deleteWithDetachParticipants(id: string): Promise<Team> {
+    const existing = this.store.get(id);
+    if (!existing) {
+      throw new Error(`Team not found for delete: ${id}`);
+    }
+    // OQ-2: 팀 삭제 시 연결된 participation의 teamId를 NULL 처리한 뒤 hard delete.
+    this.participationsByTeam.delete(id);
+    this.store.delete(id);
+    this.members.delete(id);
+    return existing;
+  }
+
   // 내부 헬퍼
   private toWithRelations(team: Team): TeamWithRelations {
     const missionary =
@@ -163,6 +197,11 @@ export class FakeTeamRepository
       ? (this.churches.get(team.churchId) ?? this.stubChurch(team.churchId))
       : null;
 
+    const missionaryRegion = team.missionaryRegionId
+      ? (this.regions.get(team.missionaryRegionId) ??
+        this.stubRegion(team.missionaryRegionId))
+      : null;
+
     const teamMembers: TeamMemberWithUser[] = (
       this.members.get(team.id) ?? []
     ).filter((m) => m.deletedAt === null);
@@ -171,6 +210,7 @@ export class FakeTeamRepository
       ...team,
       missionary,
       church,
+      missionaryRegion,
       teamMembers,
     };
   }
@@ -202,6 +242,17 @@ export class FakeTeamRepository
         flat.churchId = rel.connect.id;
       } else if (rel && 'disconnect' in rel && rel.disconnect) {
         flat.churchId = null;
+      }
+    }
+    if ('missionaryRegion' in data && data.missionaryRegion !== undefined) {
+      const rel = data.missionaryRegion as {
+        connect?: { id: string };
+        disconnect?: boolean;
+      } | null;
+      if (rel && 'connect' in rel && rel.connect) {
+        flat.missionaryRegionId = rel.connect.id;
+      } else if (rel && 'disconnect' in rel && rel.disconnect) {
+        flat.missionaryRegionId = null;
       }
     }
 
@@ -248,6 +299,25 @@ export class FakeTeamRepository
       pastorPhone: null,
       addressBasic: null,
       addressDetail: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      createdBy: null,
+      updatedBy: null,
+      version: 0,
+      deletedAt: null,
+    };
+  }
+
+  private stubRegion(id: string): MissionaryRegion {
+    return {
+      id,
+      missionGroupId: '',
+      name: `Region ${id}`,
+      pastorName: null,
+      pastorPhone: null,
+      addressBasic: null,
+      addressDetail: null,
+      note: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       createdBy: null,

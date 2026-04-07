@@ -1,7 +1,16 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { makeChurch, makeMissionary, makeUser } from '@/testing/factories';
+import { MISSIONARY_REGION_REPOSITORY } from '@/missionary/repositories/missionary-region-repository.interface';
+import { MISSIONARY_REPOSITORY } from '@/missionary/repositories/missionary-repository.interface';
+import {
+  makeChurch,
+  makeMissionary,
+  makeMissionaryRegion,
+  makeUser,
+} from '@/testing/factories';
+import { FakeMissionaryRegionRepository } from '@/testing/fakes/fake-missionary-region.repository';
+import { FakeMissionaryRepository } from '@/testing/fakes/fake-missionary.repository';
 import { FakeTeamRepository } from '@/testing/fakes/fake-team.repository';
 
 import { TEAM_REPOSITORY } from './repositories';
@@ -10,14 +19,20 @@ import { TeamService } from './team.service';
 describe('TeamService', () => {
   let service: TeamService;
   let fakeTeamRepo: FakeTeamRepository;
+  let fakeMissionaryRepo: FakeMissionaryRepository;
+  let fakeRegionRepo: FakeMissionaryRegionRepository;
 
   beforeEach(async () => {
     fakeTeamRepo = new FakeTeamRepository();
+    fakeMissionaryRepo = new FakeMissionaryRepository();
+    fakeRegionRepo = new FakeMissionaryRegionRepository();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TeamService,
         { provide: TEAM_REPOSITORY, useValue: fakeTeamRepo },
+        { provide: MISSIONARY_REPOSITORY, useValue: fakeMissionaryRepo },
+        { provide: MISSIONARY_REGION_REPOSITORY, useValue: fakeRegionRepo },
       ],
     }).compile();
 
@@ -26,6 +41,8 @@ describe('TeamService', () => {
 
   afterEach(() => {
     fakeTeamRepo.clear();
+    fakeMissionaryRepo.clear();
+    fakeRegionRepo.clear();
   });
 
   describe('create', () => {
@@ -85,6 +102,110 @@ describe('TeamService', () => {
       const result = await service.create(dto);
 
       expect(result.church).toBeNull();
+    });
+
+    it('missionaryRegionId 없이 생성하면 missionaryRegion이 null이다', async () => {
+      const missionary = makeMissionary();
+      fakeTeamRepo.seedMissionary(missionary);
+
+      const result = await service.create({
+        missionaryId: missionary.id,
+        leaderUserId: 'leader-user-id',
+        leaderUserName: '김팀장',
+        teamName: '미연결팀',
+      });
+
+      expect(result.missionaryRegionId).toBeNull();
+      expect(result.missionaryRegion).toBeNull();
+    });
+
+    it('같은 missionGroup의 missionaryRegionId로 생성하면 성공한다', async () => {
+      const missionGroupId = 'mg-1';
+      const missionary = makeMissionary({ missionGroupId });
+      const region = makeMissionaryRegion({ missionGroupId });
+      fakeMissionaryRepo.seed(missionary);
+      fakeRegionRepo.seed(region);
+      fakeTeamRepo.seedMissionary(missionary);
+      fakeTeamRepo.seedRegion(region);
+
+      const result = await service.create({
+        missionaryId: missionary.id,
+        missionaryRegionId: region.id,
+        leaderUserId: 'leader-1',
+        leaderUserName: '김팀장',
+        teamName: '연계팀',
+      });
+
+      expect(result.missionaryRegionId).toBe(region.id);
+      expect(result.missionaryRegion).toMatchObject({ id: region.id });
+    });
+
+    it('다른 missionGroup의 missionaryRegionId로 생성하면 BadRequestException을 던진다', async () => {
+      const missionary = makeMissionary({ missionGroupId: 'mg-1' });
+      const region = makeMissionaryRegion({ missionGroupId: 'mg-2' });
+      fakeMissionaryRepo.seed(missionary);
+      fakeRegionRepo.seed(region);
+      fakeTeamRepo.seedMissionary(missionary);
+
+      await expect(
+        service.create({
+          missionaryId: missionary.id,
+          missionaryRegionId: region.id,
+          leaderUserId: 'leader-1',
+          leaderUserName: '김팀장',
+          teamName: '잘못된팀',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('존재하지 않는 missionaryRegionId로 생성하면 BadRequestException을 던진다', async () => {
+      const missionary = makeMissionary({ missionGroupId: 'mg-1' });
+      fakeMissionaryRepo.seed(missionary);
+      fakeTeamRepo.seedMissionary(missionary);
+
+      await expect(
+        service.create({
+          missionaryId: missionary.id,
+          missionaryRegionId: 'nonexistent-region-id',
+          leaderUserId: 'leader-1',
+          leaderUserName: '김팀장',
+          teamName: '없는연계지팀',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('missionGroupId가 null인 missionary에 missionaryRegionId를 연결하면 BadRequestException을 던진다', async () => {
+      const missionary = makeMissionary({ missionGroupId: null });
+      const region = makeMissionaryRegion({ missionGroupId: 'mg-1' });
+      fakeMissionaryRepo.seed(missionary);
+      fakeRegionRepo.seed(region);
+      fakeTeamRepo.seedMissionary(missionary);
+
+      await expect(
+        service.create({
+          missionaryId: missionary.id,
+          missionaryRegionId: region.id,
+          leaderUserId: 'leader-1',
+          leaderUserName: '김팀장',
+          teamName: '그룹없음팀',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('존재하지 않는 missionaryId로 region 검증을 시도하면 NotFoundException을 던진다', async () => {
+      const region = makeMissionaryRegion({ missionGroupId: 'mg-1' });
+      fakeRegionRepo.seed(region);
+      // missionary는 fakeMissionaryRepo에 시드하지 않음 → findWithDetails가 null 반환
+
+      await expect(
+        service.create({
+          missionaryId: 'nonexistent-missionary-id',
+          missionaryRegionId: region.id,
+          leaderUserId: 'leader-1',
+          leaderUserName: '김팀장',
+          teamName: '없는선교팀',
+        }),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -284,6 +405,73 @@ describe('TeamService', () => {
         service.update('non-existent-id', { teamName: '변경' }),
       ).rejects.toThrow(NotFoundException);
     });
+
+    it('missionaryRegionId를 새로 연결한다', async () => {
+      const missionary = makeMissionary({ missionGroupId: 'mg-1' });
+      const region = makeMissionaryRegion({ missionGroupId: 'mg-1' });
+      fakeMissionaryRepo.seed(missionary);
+      fakeRegionRepo.seed(region);
+      fakeTeamRepo.seedMissionary(missionary);
+      fakeTeamRepo.seedRegion(region);
+
+      const created = await service.create({
+        missionaryId: missionary.id,
+        leaderUserId: 'leader-1',
+        leaderUserName: '리더',
+        teamName: '팀',
+      });
+
+      const result = await service.update(created.id, {
+        missionaryRegionId: region.id,
+      });
+
+      expect(result.missionaryRegionId).toBe(region.id);
+      expect(result.missionaryRegion).toMatchObject({ id: region.id });
+    });
+
+    it('missionaryRegionId에 빈 문자열을 전달하면 연계지 연결을 해제한다', async () => {
+      const missionary = makeMissionary({ missionGroupId: 'mg-1' });
+      const region = makeMissionaryRegion({ missionGroupId: 'mg-1' });
+      fakeMissionaryRepo.seed(missionary);
+      fakeRegionRepo.seed(region);
+      fakeTeamRepo.seedMissionary(missionary);
+      fakeTeamRepo.seedRegion(region);
+
+      const created = await service.create({
+        missionaryId: missionary.id,
+        missionaryRegionId: region.id,
+        leaderUserId: 'leader-1',
+        leaderUserName: '리더',
+        teamName: '팀',
+      });
+      expect(created.missionaryRegionId).toBe(region.id);
+
+      const result = await service.update(created.id, {
+        missionaryRegionId: '',
+      });
+
+      expect(result.missionaryRegionId).toBeNull();
+      expect(result.missionaryRegion).toBeNull();
+    });
+
+    it('다른 missionGroup의 missionaryRegionId로 변경하면 BadRequestException을 던진다', async () => {
+      const missionary = makeMissionary({ missionGroupId: 'mg-1' });
+      const otherRegion = makeMissionaryRegion({ missionGroupId: 'mg-2' });
+      fakeMissionaryRepo.seed(missionary);
+      fakeRegionRepo.seed(otherRegion);
+      fakeTeamRepo.seedMissionary(missionary);
+
+      const created = await service.create({
+        missionaryId: missionary.id,
+        leaderUserId: 'leader-1',
+        leaderUserName: '리더',
+        teamName: '팀',
+      });
+
+      await expect(
+        service.update(created.id, { missionaryRegionId: otherRegion.id }),
+      ).rejects.toThrow(BadRequestException);
+    });
   });
 
   describe('remove', () => {
@@ -311,6 +499,28 @@ describe('TeamService', () => {
       await expect(service.remove('non-existent-id')).rejects.toThrow(
         NotFoundException,
       );
+    });
+
+    it('팀을 삭제하면 연결된 participation의 teamId가 함께 detach된다', async () => {
+      const missionary = makeMissionary();
+      fakeTeamRepo.seedMissionary(missionary);
+
+      const created = await service.create({
+        missionaryId: missionary.id,
+        leaderUserId: 'leader-1',
+        leaderUserName: '리더',
+        teamName: '연결팀',
+      });
+
+      // 팀과 연결된 participation을 시드
+      fakeTeamRepo.seedParticipationForTeam(created.id, 'p-1');
+      fakeTeamRepo.seedParticipationForTeam(created.id, 'p-2');
+      expect(fakeTeamRepo.countParticipationsForTeam(created.id)).toBe(2);
+
+      await service.remove(created.id);
+
+      // OQ-2: 팀 삭제 후 participation 연결이 해제되어야 함
+      expect(fakeTeamRepo.countParticipationsForTeam(created.id)).toBe(0);
     });
   });
 
