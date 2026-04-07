@@ -78,6 +78,11 @@ export interface UpdateParticipationPayload {
   isCollegeStudent?: boolean;
   isPaid?: boolean;
   answers?: { formFieldId: string; value: string }[];
+  /**
+   * 팀 배치 ID. `null`로 보내면 미배치 상태로 되돌린다.
+   * BE Wave 4: `PATCH /participations/:id { teamId }` 지원.
+   */
+  teamId?: string | null;
 }
 
 // === API 함수 ===
