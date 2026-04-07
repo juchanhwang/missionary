@@ -9,6 +9,7 @@ import type { Team } from 'apis/team';
 interface KanbanBoardProps {
   teams: Team[];
   grouped: GroupedParticipations;
+  onCreateTeam?: () => void;
 }
 
 /**
@@ -21,14 +22,22 @@ interface KanbanBoardProps {
  * W4에서 이 컴포넌트에 `DndContext` + `onDragStart/Over/End` 핸들러와
  * `DragOverlayCard`를 추가한다.
  */
-export function KanbanBoard({ teams, grouped }: KanbanBoardProps) {
+export function KanbanBoard({
+  teams,
+  grouped,
+  onCreateTeam,
+}: KanbanBoardProps) {
   return (
     <div
       data-testid="kanban-board"
       className="flex flex-row flex-1 gap-4 min-h-[560px]"
     >
       <UnassignedSidebar unassigned={grouped.unassigned} />
-      <TeamColumnGrid teams={teams} byTeamId={grouped.byTeamId} />
+      <TeamColumnGrid
+        teams={teams}
+        byTeamId={grouped.byTeamId}
+        onCreateTeam={onCreateTeam}
+      />
     </div>
   );
 }
