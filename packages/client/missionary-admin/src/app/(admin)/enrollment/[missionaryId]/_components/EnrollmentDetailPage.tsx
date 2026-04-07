@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { EnrollmentDetailHeader } from './EnrollmentDetailHeader';
+import { EnrollmentDetailTabs } from './EnrollmentDetailTabs';
 import { EnrollmentSummaryCard } from './EnrollmentSummaryCard';
 import { ParticipantPanelContainer } from './panel/ParticipantPanelContainer';
 import { ParticipantTable } from './ParticipantTable';
@@ -79,14 +80,26 @@ export function EnrollmentDetailPage({
           initialData={initialEnrollmentSummary}
         />
 
-        <ParticipantTable
-          data={data}
-          isLoading={isLoading}
-          formFields={formFields}
-          missionaryId={mission.id}
-          missionName={mission.name}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
+        <EnrollmentDetailTabs
+          participantsContent={
+            <ParticipantTable
+              data={data}
+              isLoading={isLoading}
+              formFields={formFields}
+              missionaryId={mission.id}
+              missionName={mission.name}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
+          }
+          teamsContent={
+            <div
+              data-testid="team-management-placeholder"
+              className="flex flex-1 items-center justify-center text-sm text-gray-500"
+            >
+              팀 관리 기능은 W1 이후 단계에서 제공됩니다.
+            </div>
+          }
         />
       </div>
 
