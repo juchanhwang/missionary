@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsOptional, IsString, IsUUID, ValidateIf } from 'class-validator';
 
 export class CreateTeamDto {
   @ApiProperty({
@@ -45,6 +45,7 @@ export class CreateTeamDto {
     required: false,
   })
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsUUID()
-  declare missionaryRegionId?: string;
+  declare missionaryRegionId?: string | null;
 }

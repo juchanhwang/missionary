@@ -68,13 +68,25 @@ export class TeamService {
   async update(id: string, dto: UpdateTeamDto) {
     const existing = await this.findOne(id);
 
-    // OQ-A: missionaryRegionId가 새로 연결되는 경우(빈 값/disconnect 제외) 검증
+    // OQ-A: missionaryRegionId가 새로 연결되는 경우 새 missionary 기준으로 검증
     if (dto.missionaryRegionId) {
       // dto.missionaryId가 함께 변경되면 새 값을, 아니면 기존 값을 사용
       const targetMissionaryId = dto.missionaryId ?? existing.missionaryId;
       await this.validateRegionMissionGroup(
         targetMissionaryId,
         dto.missionaryRegionId,
+      );
+    } else if (
+      dto.missionaryId &&
+      dto.missionaryId !== existing.missionaryId &&
+      existing.missionaryRegionId &&
+      dto.missionaryRegionId !== null
+    ) {
+      // Bug fix: missionaryId만 변경되고 기존 region이 있으면 재검증이 필요하다.
+      // 새 missionary의 missionGroup과 기존 region의 missionGroup이 다르면 불일치 상태가 된다.
+      await this.validateRegionMissionGroup(
+        dto.missionaryId,
+        existing.missionaryRegionId,
       );
     }
 
@@ -89,9 +101,11 @@ export class TeamService {
         : { disconnect: true };
     }
     if (dto.missionaryRegionId !== undefined) {
-      data.missionaryRegion = dto.missionaryRegionId
-        ? { connect: { id: dto.missionaryRegionId } }
-        : { disconnect: true };
+      // null = disconnect 시그널로 통일 (DTO `@ValidateIf`가 null만 허용).
+      data.missionaryRegion =
+        dto.missionaryRegionId === null
+          ? { disconnect: true }
+          : { connect: { id: dto.missionaryRegionId } };
     }
     if (dto.leaderUserId !== undefined) data.leaderUserId = dto.leaderUserId;
     if (dto.leaderUserName !== undefined)
