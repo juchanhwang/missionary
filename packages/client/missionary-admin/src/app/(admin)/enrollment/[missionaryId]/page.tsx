@@ -15,6 +15,9 @@ export default async function EnrollmentDetailRoute({
 }: EnrollmentDetailPageParams) {
   const { missionaryId } = await params;
 
+  // 5개 fetcher를 Promise.all로 병렬 await.
+  // 로딩 상태는 loading.tsx (Next.js 자동 Suspense boundary)가 담당하고,
+  // 에러는 라우트 error.tsx (ErrorBoundary)가 받는다.
   const [
     summaryData,
     participationsData,
