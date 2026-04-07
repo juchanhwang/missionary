@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { cache } from 'react';
 import 'server-only';
 
 import { createServerApi } from './serverInstance';
@@ -10,8 +10,15 @@ import type {
 } from './enrollment';
 import type { Missionary } from './missionary';
 
-export async function getServerEnrollmentSummary(): Promise<GetEnrollmentSummaryResponse> {
-  try {
+/**
+ * 등록 관리 요약 조회.
+ *
+ * - `React.cache()`로 감싸 동일 렌더 내 중복 호출을 dedupe한다.
+ * - 에러는 별도 가공 없이 그대로 throw하여 라우트 `error.tsx` ErrorBoundary가
+ *   책임지도록 위임한다 (인증/권한 에러 포함).
+ */
+export const getServerEnrollmentSummary = cache(
+  async (): Promise<GetEnrollmentSummaryResponse> => {
     const serverApi = await createServerApi();
     const { data: missionaries } =
       await serverApi.get<Missionary[]>('/missionaries');
@@ -44,18 +51,5 @@ export async function getServerEnrollmentSummary(): Promise<GetEnrollmentSummary
         0,
       ),
     };
-  } catch (error) {
-    if (
-      axios.isAxiosError(error) &&
-      (error.response?.status === 401 || error.response?.status === 403)
-    ) {
-      throw error;
-    }
-    console.error('[enrollment] 등록 관리 데이터 조회 실패:', error);
-    return {
-      missions: [],
-      totalRecruitingCount: 0,
-      totalRecruitingParticipants: 0,
-    };
-  }
-}
+  },
+);
