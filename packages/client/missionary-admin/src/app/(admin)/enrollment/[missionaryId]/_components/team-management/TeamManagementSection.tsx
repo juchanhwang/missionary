@@ -3,6 +3,7 @@
 import { Users } from 'lucide-react';
 
 import { groupParticipationsByTeam } from './_utils/groupParticipationsByTeam';
+import { KanbanBoard } from './KanbanBoard';
 import { TeamManagementToolbar } from './TeamManagementToolbar';
 import { useGetParticipations } from '../../_hooks/useGetParticipations';
 import { useGetTeams } from '../../_hooks/useGetTeams';
@@ -70,14 +71,7 @@ export function TeamManagementSection({
       {teams.length === 0 ? (
         <TeamsEmptyState />
       ) : (
-        // W2-2에서 KanbanBoard로 교체. 현재는 placeholder로 데이터 파이프만 증명.
-        <div
-          data-testid="kanban-board-placeholder"
-          className="flex flex-1 items-center justify-center min-h-[400px] text-sm text-gray-400"
-        >
-          칸반 보드는 W2-2에서 렌더됩니다 ({teams.length}팀 ·{' '}
-          {grouped.unassigned.length}명 미배치)
-        </div>
+        <KanbanBoard teams={teams} grouped={grouped} />
       )}
     </div>
   );

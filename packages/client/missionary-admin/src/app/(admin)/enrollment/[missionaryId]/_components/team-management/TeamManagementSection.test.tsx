@@ -88,7 +88,7 @@ describe('TeamManagementSection', () => {
     expect(screen.getByText('팀이 아직 없습니다')).toBeInTheDocument();
   });
 
-  it('팀이 존재하면 툴바(팀 수 + 미배치 수)와 칸반 placeholder를 보여준다', async () => {
+  it('팀이 존재하면 툴바(팀 수 + 미배치 수)와 칸반 보드를 보여준다', async () => {
     server.use(
       http.get(`${API_URL}/teams`, () =>
         HttpResponse.json([
@@ -118,7 +118,7 @@ describe('TeamManagementSection', () => {
     expect(screen.getByTestId('unassigned-count-badge')).toHaveTextContent(
       '2명',
     );
-    expect(screen.getByTestId('kanban-board-placeholder')).toBeInTheDocument();
+    expect(screen.getByTestId('kanban-board')).toBeInTheDocument();
   });
 
   it('팀 조회 실패 시 에러 상태를 보여준다', async () => {
