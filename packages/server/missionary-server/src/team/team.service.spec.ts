@@ -455,7 +455,8 @@ describe('TeamService', () => {
       expect(result.missionaryRegion).toMatchObject({ id: region.id });
     });
 
-    it('missionaryRegionId에 빈 문자열을 전달하면 연계지 연결을 해제한다', async () => {
+    it('missionaryRegionId에 null을 전달하면 연계지 연결을 해제한다', async () => {
+      // DTO는 null만 disconnect 시그널로 허용한다 (빈 문자열은 @IsUUID()가 거부).
       const missionary = makeMissionary({ missionGroupId: 'mg-1' });
       const region = makeMissionaryRegion({ missionGroupId: 'mg-1' });
       fakeMissionaryRepo.seed(missionary);
@@ -473,7 +474,7 @@ describe('TeamService', () => {
       expect(created.missionaryRegionId).toBe(region.id);
 
       const result = await service.update(created.id, {
-        missionaryRegionId: '',
+        missionaryRegionId: null,
       });
 
       expect(result.missionaryRegionId).toBeNull();
@@ -558,6 +559,66 @@ describe('TeamService', () => {
 
       expect(result.missionaryId).toBe(newMissionary.id);
       expect(result.missionaryRegionId).toBe(newRegion.id);
+    });
+
+    it('missionaryId만 변경하면 기존 region과 새 missionaryId의 missionGroup 일치를 재검증한다', async () => {
+      // Bug fix (review #1): missionaryId 단독 변경 시 기존 region이 있으면 재검증해야 한다.
+      // 기존 Team: missionaryId=mg-1 missionary, missionaryRegionId=mg-1 region
+      // PATCH { missionaryId: mg-2 missionary } → 기존 region(mg-1)과 불일치이므로 400.
+      const oldMissionary = makeMissionary({ missionGroupId: 'mg-1' });
+      const newMissionary = makeMissionary({ missionGroupId: 'mg-2' });
+      const region = makeMissionaryRegion({ missionGroupId: 'mg-1' });
+
+      fakeMissionaryRepo.seed(oldMissionary);
+      fakeMissionaryRepo.seed(newMissionary);
+      fakeRegionRepo.seed(region);
+      fakeTeamRepo.seedMissionary(oldMissionary);
+      fakeTeamRepo.seedMissionary(newMissionary);
+      fakeTeamRepo.seedRegion(region);
+
+      const created = await service.create({
+        missionaryId: oldMissionary.id,
+        missionaryRegionId: region.id,
+        leaderUserId: 'leader-1',
+        leaderUserName: '리더',
+        teamName: '팀',
+      });
+
+      await expect(
+        service.update(created.id, { missionaryId: newMissionary.id }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('missionaryId만 변경하고 missionaryRegionId=null이면 disconnect만 수행하고 재검증하지 않는다', async () => {
+      // Bug fix (review #1) 엣지케이스: missionaryId 변경 + region=null(disconnect)이면
+      // region이 어차피 사라지므로 재검증하지 않아야 한다. 재검증하면 이전 region 기준으로
+      // 불일치 판정되어 불필요한 400이 발생한다.
+      const oldMissionary = makeMissionary({ missionGroupId: 'mg-1' });
+      const newMissionary = makeMissionary({ missionGroupId: 'mg-2' });
+      const region = makeMissionaryRegion({ missionGroupId: 'mg-1' });
+
+      fakeMissionaryRepo.seed(oldMissionary);
+      fakeMissionaryRepo.seed(newMissionary);
+      fakeRegionRepo.seed(region);
+      fakeTeamRepo.seedMissionary(oldMissionary);
+      fakeTeamRepo.seedMissionary(newMissionary);
+      fakeTeamRepo.seedRegion(region);
+
+      const created = await service.create({
+        missionaryId: oldMissionary.id,
+        missionaryRegionId: region.id,
+        leaderUserId: 'leader-1',
+        leaderUserName: '리더',
+        teamName: '팀',
+      });
+
+      const result = await service.update(created.id, {
+        missionaryId: newMissionary.id,
+        missionaryRegionId: null,
+      });
+
+      expect(result.missionaryId).toBe(newMissionary.id);
+      expect(result.missionaryRegionId).toBeNull();
     });
   });
 
