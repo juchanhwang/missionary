@@ -9,6 +9,7 @@ import { EnrollmentDetailTabs } from './EnrollmentDetailTabs';
 import { EnrollmentSummaryCard } from './EnrollmentSummaryCard';
 import { ParticipantPanelContainer } from './panel/ParticipantPanelContainer';
 import { ParticipantTable } from './ParticipantTable';
+import { TeamManagementSection } from './team-management/TeamManagementSection';
 import { useGetParticipations } from '../_hooks/useGetParticipations';
 
 import type {
@@ -92,14 +93,7 @@ export function EnrollmentDetailPage({
               onSearchChange={setSearchQuery}
             />
           }
-          teamsContent={
-            <div
-              data-testid="team-management-placeholder"
-              className="flex flex-1 items-center justify-center text-sm text-gray-500"
-            >
-              팀 관리 기능은 W1 이후 단계에서 제공됩니다.
-            </div>
-          }
+          teamsContent={<TeamManagementSection missionaryId={mission.id} />}
         />
       </div>
 
