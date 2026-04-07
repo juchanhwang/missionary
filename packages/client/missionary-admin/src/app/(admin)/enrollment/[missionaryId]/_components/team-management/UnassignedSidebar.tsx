@@ -2,6 +2,8 @@
 
 import { CheckCircle2 } from 'lucide-react';
 
+import { UnassignedParticipantCard } from './UnassignedParticipantCard';
+
 import type { Participation } from 'apis/participation';
 
 interface UnassignedSidebarProps {
@@ -39,19 +41,14 @@ export function UnassignedSidebar({ unassigned }: UnassignedSidebarProps) {
       {unassigned.length === 0 ? (
         <UnassignedEmptyState />
       ) : (
-        <ul className="flex flex-col gap-1.5 list-none m-0 p-0">
+        <div className="flex flex-col gap-1.5">
           {unassigned.map((participation) => (
-            <li
+            <UnassignedParticipantCard
               key={participation.id}
-              data-testid={`unassigned-card-${participation.id}`}
-              className="bg-white border border-gray-200 rounded-lg px-2.5 py-2"
-            >
-              <p className="text-sm font-semibold text-gray-900">
-                {participation.name}
-              </p>
-            </li>
+              participation={participation}
+            />
           ))}
-        </ul>
+        </div>
       )}
     </aside>
   );

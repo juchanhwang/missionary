@@ -1,6 +1,7 @@
 'use client';
 
 import { TeamColumnHeader } from './TeamColumnHeader';
+import { TeamMemberCard } from './TeamMemberCard';
 
 import type { Participation } from 'apis/participation';
 import type { Team } from 'apis/team';
@@ -39,15 +40,7 @@ export function TeamColumn({ team, members }: TeamColumnProps) {
           <EmptyMembersDropHint />
         ) : (
           members.map((member) => (
-            <div
-              key={member.id}
-              data-testid={`team-member-placeholder-${member.id}`}
-              className="bg-white border border-gray-200 rounded-lg px-2.5 py-2"
-            >
-              <p className="text-sm font-semibold text-gray-900">
-                {member.name}
-              </p>
-            </div>
+            <TeamMemberCard key={member.id} participation={member} />
           ))
         )}
       </div>
