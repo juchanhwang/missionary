@@ -63,6 +63,7 @@ export class FakeTeamRepository
       leaderUserName: data.leaderUserName ?? '',
       missionaryId: data.missionaryId ?? '',
       churchId: data.churchId ?? null,
+      missionaryRegionId: data.missionaryRegionId ?? null,
       createdAt: now,
       updatedAt: now,
       createdBy: data.createdBy ?? null,
