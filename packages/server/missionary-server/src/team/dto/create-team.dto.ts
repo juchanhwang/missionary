@@ -38,4 +38,13 @@ export class CreateTeamDto {
   })
   @IsString()
   declare teamName: string;
+
+  @ApiProperty({
+    example: 'uuid-string',
+    description: '연계지 ID (optional)',
+    required: false,
+  })
+  @IsOptional()
+  @IsUUID()
+  declare missionaryRegionId?: string;
 }
