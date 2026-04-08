@@ -39,7 +39,11 @@ export function UnassignedParticipantCard({
       {...listeners}
       {...attributes}
       data-testid={`unassigned-card-${participation.id}`}
-      aria-label={`${participation.name} 미배치 참가자 드래그`}
+      aria-label={
+        subText !== null
+          ? `${participation.name}, ${subText}, 미배치 참가자 드래그 가능`
+          : `${participation.name}, 미배치 참가자 드래그 가능`
+      }
       className={`flex items-start gap-2 bg-white border border-gray-200 rounded-lg px-2.5 py-2 cursor-grab active:cursor-grabbing focus:outline-none focus:ring-2 focus:ring-gray-400 ${
         isDragging ? 'opacity-30' : ''
       }`}

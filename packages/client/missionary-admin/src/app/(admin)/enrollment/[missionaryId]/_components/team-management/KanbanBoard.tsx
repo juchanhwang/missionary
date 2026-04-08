@@ -8,9 +8,12 @@ import {
   pointerWithin,
   useSensor,
   useSensors,
+  type Announcements,
   type DragEndEvent,
   type DragStartEvent,
+  type ScreenReaderInstructions,
 } from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useState } from 'react';
 
 import { resolveDropAssignment } from './_utils/resolveDropAssignment';
@@ -69,7 +72,9 @@ export function KanbanBoard({
     useSensor(PointerSensor, {
       activationConstraint: { distance: 8 },
     }),
-    useSensor(KeyboardSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -101,6 +106,10 @@ export function KanbanBoard({
     <DndContext
       sensors={sensors}
       collisionDetection={pointerWithin}
+      accessibility={{
+        announcements: KANBAN_ANNOUNCEMENTS,
+        screenReaderInstructions: KANBAN_SCREEN_READER_INSTRUCTIONS,
+      }}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
@@ -132,6 +141,37 @@ export function KanbanBoard({
   );
 }
 
+/**
+ * dnd-kit 스크린리더 한국어 안내. fe-plan v1.2 §10.
+ * 기본값은 영문이라 한국어 UI와 튀므로 동일한 의미의 한글 문구로 대체한다.
+ * 참고: https://docs.dndkit.com/api-documentation/context-provider/accessibility
+ */
+const KANBAN_SCREEN_READER_INSTRUCTIONS: ScreenReaderInstructions = {
+  draggable:
+    '드래그 가능한 항목에 포커스한 뒤 스페이스 또는 엔터를 눌러 잡으세요. 방향키로 이동하고, 다시 스페이스나 엔터를 눌러 놓을 수 있습니다. 취소하려면 Esc를 누르세요.',
+};
+
+const KANBAN_ANNOUNCEMENTS: Announcements = {
+  onDragStart({ active }) {
+    return `${String(active.id)} 항목을 잡았습니다.`;
+  },
+  onDragOver({ active, over }) {
+    if (over) {
+      return `${String(active.id)} 항목이 ${String(over.id)} 위에 있습니다.`;
+    }
+    return `${String(active.id)} 항목이 드롭 영역 밖으로 이동했습니다.`;
+  },
+  onDragEnd({ active, over }) {
+    if (over) {
+      return `${String(active.id)} 항목을 ${String(over.id)} 위에 놓았습니다.`;
+    }
+    return `${String(active.id)} 항목을 놓았습니다.`;
+  },
+  onDragCancel({ active }) {
+    return `${String(active.id)} 항목 드래그가 취소되었습니다.`;
+  },
+};
+
 function findInTeams(
   byTeamId: Map<string, Participation[]>,
   participationId: string,
@@ -155,6 +195,7 @@ function TeamFilterEmptyState({
   return (
     <div
       data-testid="team-filter-empty-state"
+      role="status"
       className="flex flex-1 flex-col items-center justify-center gap-2 text-center text-sm text-gray-500"
     >
       <p>조건에 맞는 팀이 없습니다.</p>

@@ -98,6 +98,8 @@ export function TeamFilterBar({
 
       <span
         data-testid="team-filter-counter"
+        role="status"
+        aria-live="polite"
         className="ml-auto text-xs text-gray-500 self-center"
       >
         {filteredCount}/{totalCount}팀 표시 중
