@@ -1,11 +1,11 @@
 'use client';
 
-import { useDroppable } from '@dnd-kit/core';
+import { useDndContext, useDroppable } from '@dnd-kit/core';
 
 import { TeamColumnHeader } from './TeamColumnHeader';
 import { TeamMemberCard } from './TeamMemberCard';
 
-import type { DropData } from './types';
+import type { DragData, DropData } from './types';
 import type { Participation } from 'apis/participation';
 import type { Team } from 'apis/team';
 
@@ -17,11 +17,18 @@ interface TeamColumnProps {
 }
 
 /**
- * 단일 팀 컬럼. ui-spec §3-4, §4-3.
+ * 단일 팀 컬럼. ui-spec §3-4, §4-3, §5-3, §5-4.
  *
  * - `useDroppable({ id: 'team-{teamId}' })`로 드롭 타깃이 된다.
  * - 헤더 메뉴에서 수정/삭제 모달을 호출한다 (W3-4).
- * - `isOver`일 때 파란 테두리 하이라이트.
+ * - 드래그 시각 상태 (mockup Screen 6-A/6-B):
+ *   - **idle**: `border border-gray-200`
+ *   - **highlighted** (드래그 진행 중, 자기 컬럼은 소스가 아님):
+ *     `border-2 border-dashed border-blue-300 bg-blue-50/30`
+ *   - **isOver** (호버): `border-2 border-blue-500 bg-blue-50/50` + 외곽 그로우
+ * - 드래그 소스 컬럼은 드롭 불가이므로 강조에서 제외 (`fromTeamId === team.id`).
+ *
+ * `useDndContext`로 active drag를 직접 구독해 KanbanBoard prop drilling을 피한다.
  */
 export function TeamColumn({
   team,
@@ -37,14 +44,23 @@ export function TeamColumn({
     data: dropData,
   });
 
+  const { active } = useDndContext();
+  const dragData = active?.data.current as DragData | undefined;
+  const isSourceColumn = dragData?.fromTeamId === team.id;
+  const isHighlighted = active !== null && !isSourceColumn && !isOver;
+
   return (
     <div
       ref={setNodeRef}
       data-testid={`team-column-${team.id}`}
       role="group"
       aria-label={`${team.teamName} 드롭 영역`}
-      className={`w-[220px] shrink-0 flex flex-col bg-white rounded-xl border shadow-sm min-h-[200px] transition-colors ${
-        isOver ? 'border-blue-400 ring-2 ring-blue-200' : 'border-gray-200'
+      className={`w-[220px] shrink-0 flex flex-col rounded-xl shadow-sm min-h-[200px] transition-colors ${
+        isOver
+          ? 'border-2 border-blue-500 bg-blue-50/50 shadow-[0_0_0_4px_rgba(59,130,246,0.1)]'
+          : isHighlighted
+            ? 'border-2 border-dashed border-blue-300 bg-blue-50/30'
+            : 'border border-gray-200 bg-white'
       }`}
     >
       <TeamColumnHeader
