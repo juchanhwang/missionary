@@ -21,8 +21,8 @@ interface UnassignedSidebarProps {
  * - 드래그 시각 상태:
  *   - **idle**: `bg-gray-50 border-gray-200`
  *   - **highlighted** (팀에서 드래그 시작 — 미배치로 되돌릴 수 있음):
- *     `border-2 border-dashed border-blue-200 bg-blue-50/20`
- *   - **isOver** (호버): `bg-blue-50 border-blue-300`
+ *     `border-2 border-dashed border-blue-30 bg-blue-10/40`
+ *   - **isOver** (호버): `bg-blue-10 border-blue-30`
  * - 미배치에서 드래그 시작한 경우 자기가 소스이므로 highlighted 제외.
  */
 export function UnassignedSidebar({ unassigned }: UnassignedSidebarProps) {
@@ -45,9 +45,9 @@ export function UnassignedSidebar({ unassigned }: UnassignedSidebarProps) {
       aria-label="미배치 참가자 목록"
       className={`w-[260px] shrink-0 self-start sticky top-0 rounded-xl p-3 max-h-[calc(100vh-200px)] overflow-y-auto transition-colors ${
         isOver
-          ? 'border border-blue-300 bg-blue-50'
+          ? 'border border-blue-30 bg-blue-10'
           : isHighlighted
-            ? 'border-2 border-dashed border-blue-200 bg-blue-50/20'
+            ? 'border-2 border-dashed border-blue-30 bg-blue-10/40'
             : 'border border-gray-200 bg-gray-50'
       }`}
     >

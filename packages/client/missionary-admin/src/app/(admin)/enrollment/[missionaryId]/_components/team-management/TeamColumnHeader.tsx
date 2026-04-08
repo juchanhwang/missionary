@@ -53,7 +53,7 @@ export function TeamColumnHeader({
           {showPreview ? (
             <span
               data-testid={`team-member-count-preview-${team.id}`}
-              className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700"
+              className="inline-flex items-center rounded-full bg-blue-20 px-2 py-0.5 text-xs font-semibold text-blue-70"
             >
               {memberCount} → {previewCount}명
             </span>

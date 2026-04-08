@@ -32,8 +32,8 @@ interface TeamColumnProps {
  * - 드래그 시각 상태 (mockup Screen 6-A/6-B):
  *   - **idle**: `border border-gray-200`
  *   - **highlighted** (드래그 진행 중, 자기 컬럼은 소스가 아님):
- *     `border-2 border-dashed border-blue-300 bg-blue-50/30`
- *   - **isOver** (호버): `border-2 border-blue-500 bg-blue-50/50` + 외곽 그로우
+ *     `border-2 border-dashed border-blue-30 bg-blue-20/30`
+ *   - **isOver** (호버): `border-2 border-blue-50 bg-blue-20/50` + 외곽 그로우
  * - 드래그 소스 컬럼은 드롭 불가이므로 강조에서 제외 (`fromTeamId === team.id`).
  *
  * `useDndContext`로 active drag를 직접 구독해 KanbanBoard prop drilling을 피한다.
@@ -68,11 +68,12 @@ export function TeamColumn({
       data-testid={`team-column-${team.id}`}
       role="group"
       aria-label={`${team.teamName} 드롭 영역`}
+      // shadow rgba(59,130,246) = #3b82f6 = DS blue-50
       className={`w-[220px] shrink-0 flex flex-col rounded-xl shadow-sm min-h-[200px] transition-colors ${
         isOver
-          ? 'border-2 border-blue-500 bg-blue-50/50 shadow-[0_0_0_4px_rgba(59,130,246,0.1)]'
+          ? 'border-2 border-blue-50 bg-blue-20/50 shadow-[0_0_0_4px_rgba(59,130,246,0.1)]'
           : isHighlighted
-            ? 'border-2 border-dashed border-blue-300 bg-blue-50/30'
+            ? 'border-2 border-dashed border-blue-30 bg-blue-20/30'
             : 'border border-gray-200 bg-white'
       }`}
     >
