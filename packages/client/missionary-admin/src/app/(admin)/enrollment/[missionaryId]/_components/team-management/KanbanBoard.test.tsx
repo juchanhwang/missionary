@@ -18,7 +18,7 @@ function renderKanbanBoard(teams: Team[], grouped: GroupedParticipations) {
   return render(
     <KanbanBoard teams={teams} grouped={grouped}>
       <UnassignedSidebar unassigned={grouped.unassigned} />
-      <TeamColumnGrid teams={teams} byTeamId={grouped.byTeamId} />
+      <TeamColumnGrid teams={teams} grouped={grouped} />
     </KanbanBoard>,
   );
 }

@@ -108,7 +108,7 @@ export function TeamManagementSection({
           ) : (
             <TeamColumnGrid
               teams={filteredTeams}
-              byTeamId={grouped.byTeamId}
+              grouped={grouped}
               onCreateTeam={openCreateModal}
               onEditTeam={openEditModal}
               onDeleteTeam={openDeleteModal}

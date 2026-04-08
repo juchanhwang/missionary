@@ -2,6 +2,7 @@
 
 import { useDndContext, useDroppable } from '@dnd-kit/core';
 
+import { GhostMemberCard } from './GhostMemberCard';
 import { TeamColumnHeader } from './TeamColumnHeader';
 import { TeamMemberCard } from './TeamMemberCard';
 
@@ -12,6 +13,13 @@ import type { Team } from 'apis/team';
 interface TeamColumnProps {
   team: Team;
   members: Participation[];
+  /**
+   * 현재 드래그 중인 참가자 객체 (없으면 `null`).
+   * 호버 상태일 때 ghost 카드와 카운트 미리보기 렌더에 사용한다.
+   * `useActiveParticipation`은 `TeamColumnGrid`에서 한 번만 호출하고
+   * 컬럼별 props로 내려보낸다 (각 컬럼이 직접 호출하면 N번 lookup).
+   */
+  activeParticipation: Participation | null;
   onEdit?: (team: Team) => void;
   onDelete?: (team: Team, memberCount: number) => void;
 }
@@ -33,6 +41,7 @@ interface TeamColumnProps {
 export function TeamColumn({
   team,
   members,
+  activeParticipation,
   onEdit,
   onDelete,
 }: TeamColumnProps) {
@@ -48,6 +57,10 @@ export function TeamColumn({
   const dragData = active?.data.current as DragData | undefined;
   const isSourceColumn = dragData?.fromTeamId === team.id;
   const isHighlighted = active !== null && !isSourceColumn && !isOver;
+
+  // 호버 상태 + 드래그 소스가 자기 자신이 아닐 때만 ghost / 카운트 미리보기 노출.
+  const showGhost = isOver && !isSourceColumn && activeParticipation !== null;
+  const previewCount = showGhost ? memberCount + 1 : undefined;
 
   return (
     <div
@@ -66,17 +79,18 @@ export function TeamColumn({
       <TeamColumnHeader
         team={team}
         memberCount={memberCount}
+        previewCount={previewCount}
         onEdit={onEdit ? () => onEdit(team) : undefined}
         onDelete={onDelete ? () => onDelete(team, memberCount) : undefined}
       />
 
       <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1.5">
-        {memberCount === 0 ? (
-          <EmptyMembersDropHint />
-        ) : (
-          members.map((member) => (
-            <TeamMemberCard key={member.id} participation={member} />
-          ))
+        {memberCount === 0 && !showGhost && <EmptyMembersDropHint />}
+        {members.map((member) => (
+          <TeamMemberCard key={member.id} participation={member} />
+        ))}
+        {showGhost && activeParticipation !== null && (
+          <GhostMemberCard participation={activeParticipation} />
         )}
       </div>
     </div>
