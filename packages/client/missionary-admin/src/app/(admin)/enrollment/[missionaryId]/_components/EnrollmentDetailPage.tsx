@@ -81,8 +81,8 @@ export function EnrollmentDetailPage({
           initialData={initialEnrollmentSummary}
         />
 
-        <EnrollmentDetailTabs
-          participantsContent={
+        <EnrollmentDetailTabs>
+          <EnrollmentDetailTabs.Participants>
             <ParticipantTable
               data={data}
               isLoading={isLoading}
@@ -92,14 +92,14 @@ export function EnrollmentDetailPage({
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
             />
-          }
-          teamsContent={
+          </EnrollmentDetailTabs.Participants>
+          <EnrollmentDetailTabs.Teams>
             <TeamManagementSection
               missionaryId={mission.id}
               missionGroupId={mission.missionGroupId}
             />
-          }
-        />
+          </EnrollmentDetailTabs.Teams>
+        </EnrollmentDetailTabs>
       </div>
 
       <ParticipantPanelContainer

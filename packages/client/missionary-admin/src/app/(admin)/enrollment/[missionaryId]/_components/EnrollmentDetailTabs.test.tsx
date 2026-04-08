@@ -6,12 +6,14 @@ import { EnrollmentDetailTabs } from './EnrollmentDetailTabs';
 
 function renderTabs() {
   return render(
-    <EnrollmentDetailTabs
-      participantsContent={
+    <EnrollmentDetailTabs>
+      <EnrollmentDetailTabs.Participants>
         <div data-testid="panel-participants">참가자 패널</div>
-      }
-      teamsContent={<div data-testid="panel-teams">팀 패널</div>}
-    />,
+      </EnrollmentDetailTabs.Participants>
+      <EnrollmentDetailTabs.Teams>
+        <div data-testid="panel-teams">팀 패널</div>
+      </EnrollmentDetailTabs.Teams>
+    </EnrollmentDetailTabs>,
   );
 }
 
