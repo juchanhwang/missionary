@@ -100,6 +100,7 @@ describe('useAssignParticipationToTeam', () => {
       initialSnapshot,
     );
 
+    const cancelQueriesSpy = vi.spyOn(queryClient, 'cancelQueries');
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
     const { result } = renderHook(() => useAssignParticipationToTeam(), {
@@ -121,6 +122,10 @@ describe('useAssignParticipationToTeam', () => {
 
     expect(receivedId).toBe('p-1');
     expect(receivedBody).toEqual({ teamId: 'team-a' });
+    // in-flight 쿼리가 optimistic update를 덮어쓰지 않도록 onMutate에서 취소해야 한다.
+    expect(cancelQueriesSpy).toHaveBeenCalledWith({
+      queryKey: queryKeys.participations.all,
+    });
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: queryKeys.participations.all,
     });

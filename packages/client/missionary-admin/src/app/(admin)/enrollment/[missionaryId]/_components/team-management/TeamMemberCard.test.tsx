@@ -60,4 +60,26 @@ describe('TeamMemberCard', () => {
 
     expect(screen.getByText('5기')).toBeInTheDocument();
   });
+
+  it('aria-label에 이름·기수·소속이 포함된다', () => {
+    render(<TeamMemberCard participation={createParticipation()} />);
+
+    expect(screen.getByTestId('team-member-card-p-1')).toHaveAttribute(
+      'aria-label',
+      '홍길동, 12기 · 대학부, 팀 멤버 드래그 가능',
+    );
+  });
+
+  it('서브텍스트가 없으면 aria-label에 이름만 포함된다', () => {
+    render(
+      <TeamMemberCard
+        participation={createParticipation({ cohort: 0, affiliation: '' })}
+      />,
+    );
+
+    expect(screen.getByTestId('team-member-card-p-1')).toHaveAttribute(
+      'aria-label',
+      '홍길동, 팀 멤버 드래그 가능',
+    );
+  });
 });

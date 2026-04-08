@@ -53,4 +53,29 @@ describe('UnassignedParticipantCard', () => {
     expect(screen.getByText('박민수')).toBeInTheDocument();
     expect(screen.queryByText(/기/)).not.toBeInTheDocument();
   });
+
+  it('aria-label에 이름·기수·소속이 포함된다', () => {
+    render(
+      <UnassignedParticipantCard
+        participation={createParticipation({
+          cohort: 8,
+          affiliation: '청년부',
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId('unassigned-card-p-1')).toHaveAttribute(
+      'aria-label',
+      '박민수, 8기 · 청년부, 미배치 참가자 드래그 가능',
+    );
+  });
+
+  it('서브텍스트가 없으면 aria-label에 이름만 포함된다', () => {
+    render(<UnassignedParticipantCard participation={createParticipation()} />);
+
+    expect(screen.getByTestId('unassigned-card-p-1')).toHaveAttribute(
+      'aria-label',
+      '박민수, 미배치 참가자 드래그 가능',
+    );
+  });
 });
