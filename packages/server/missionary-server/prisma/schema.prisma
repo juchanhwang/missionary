@@ -284,6 +284,7 @@ model MissionaryRegion {
 
   // Relations
   missionGroup MissionGroup @relation(fields: [missionGroupId], references: [id])
+  teams        Team[]
 
   @@map("missionary_region")
 }
@@ -468,8 +469,9 @@ model Team {
   leaderUserName String @map("leader_user_name")
 
   // Foreign keys
-  missionaryId String  @map("missionary_id")
-  churchId     String? @map("church_id")
+  missionaryId       String  @map("missionary_id")
+  churchId           String? @map("church_id")
+  missionaryRegionId String? @map("missionary_region_id")
 
   // Audit fields
   createdAt DateTime @default(now()) @map("created_at")
@@ -482,11 +484,13 @@ model Team {
   deletedAt DateTime? @map("deleted_at")
 
   // Relations
-  missionary      Missionary      @relation(fields: [missionaryId], references: [id])
-  church          Church?         @relation(fields: [churchId], references: [id])
-  teamMembers     TeamMember[]
-  participations  Participation[]
+  missionary       Missionary        @relation(fields: [missionaryId], references: [id])
+  church           Church?           @relation(fields: [churchId], references: [id])
+  missionaryRegion MissionaryRegion? @relation(fields: [missionaryRegionId], references: [id])
+  teamMembers      TeamMember[]
+  participations   Participation[]
 
+  @@index([missionaryRegionId])
   @@map("team")
 }
 

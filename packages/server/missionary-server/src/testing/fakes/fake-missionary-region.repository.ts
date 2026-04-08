@@ -223,6 +223,11 @@ export class FakeMissionaryRegionRepository implements MissionaryRegionRepositor
 
   // --- 테스트 헬퍼 ---
 
+  /** 테스트에서 MissionaryRegion 엔티티 자체를 미리 세팅한다 */
+  seed(region: MissionaryRegion): void {
+    this.store.set(region.id, region);
+  }
+
   setMissionGroup(missionGroupId: string, info: MissionGroupInfo): void {
     this.missionGroupMap.set(missionGroupId, info);
   }

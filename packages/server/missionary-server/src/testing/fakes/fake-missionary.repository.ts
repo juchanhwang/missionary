@@ -149,6 +149,11 @@ export class FakeMissionaryRepository implements MissionaryRepository {
 
   // --- 테스트 헬퍼 ---
 
+  /** 테스트에서 Missionary 엔티티 자체를 미리 세팅한다 */
+  seed(missionary: Missionary): void {
+    this.store.set(missionary.id, missionary);
+  }
+
   setGroup(id: string, group: MissionGroup): void {
     this.groups.set(id, group);
   }

@@ -16,6 +16,7 @@ import {
   FORM_FIELD_REPOSITORY,
   type FormFieldRepository,
 } from '@/missionary/repositories/form-field-repository.interface';
+import { TEAM_REPOSITORY, type TeamRepository } from '@/team/repositories';
 
 import { CreateParticipationDto } from './dto/create-participation.dto';
 import { UpdateParticipationDto } from './dto/update-participation.dto';
@@ -45,6 +46,8 @@ export class ParticipationService {
     private readonly formAnswerRepository: FormAnswerRepository,
     @Inject(FORM_FIELD_REPOSITORY)
     private readonly formFieldRepository: FormFieldRepository,
+    @Inject(TEAM_REPOSITORY)
+    private readonly teamRepository: TeamRepository,
     private readonly encryptionService: EncryptionService,
     private readonly csvExportService: CsvExportService,
     @InjectQueue('participation-queue') private readonly queue: Queue,
@@ -115,10 +118,51 @@ export class ParticipationService {
       throw new NotFoundException(`Participation with ID ${id} not found`);
     }
 
-    if (user.role !== UserRole.ADMIN && participation.userId !== user.id) {
+    // PRD §2: ADMIN/STAFF는 모든 participation을 수정 가능,
+    // 일반 USER는 본인 등록만 수정 가능.
+    const isAdminOrStaff =
+      user.role === UserRole.ADMIN || user.role === UserRole.STAFF;
+    if (!isAdminOrStaff && participation.userId !== user.id) {
       throw new ForbiddenException(
         'You can only update your own participations',
       );
+    }
+
+    // §4-B: 팀 배치는 ADMIN/STAFF만 변경할 수 있다.
+    // 일반 USER가 본인 등록의 다른 필드를 수정할 수 있도록 컨트롤러 가드 대신
+    // 서비스에서 필드별로 분기한다.
+    if (dto.teamId !== undefined && !isAdminOrStaff) {
+      throw new ForbiddenException(
+        '팀 배치는 관리자/스태프만 변경할 수 있습니다',
+      );
+    }
+
+    // 옵션 C: formAnswers(answers)는 사용자 주관 데이터로 ADMIN 또는 본인만
+    // 수정 가능하다. STAFF는 teamId/name/affiliation 등 운영 필드는 수정할
+    // 수 있으나 타인의 formAnswers는 수정할 수 없다. `updateAnswers()` API와
+    // 권한 기준을 일치시켜 계약을 단순화한다.
+    if (
+      dto.answers !== undefined &&
+      dto.answers.length > 0 &&
+      user.role !== UserRole.ADMIN &&
+      participation.userId !== user.id
+    ) {
+      throw new ForbiddenException(
+        'formAnswers는 관리자 또는 본인만 수정할 수 있습니다',
+      );
+    }
+
+    // teamId가 지정되면 (1) 팀이 존재하는지 (2) 같은 missionary 소속인지 검증
+    if (dto.teamId !== undefined && dto.teamId !== null) {
+      const team = await this.teamRepository.findUnique({ id: dto.teamId });
+      if (!team) {
+        throw new NotFoundException(`Team with ID ${dto.teamId} not found`);
+      }
+      if (team.missionaryId !== participation.missionaryId) {
+        throw new BadRequestException(
+          '다른 선교에 속한 팀으로 배치할 수 없습니다',
+        );
+      }
     }
 
     const { answers, ...fixedFields } = dto;

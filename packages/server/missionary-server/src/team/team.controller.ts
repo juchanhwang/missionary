@@ -33,7 +33,8 @@ export class TeamController {
   }
 
   @Get()
-  @ApiOperation({ summary: '팀 목록 조회' })
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
+  @ApiOperation({ summary: '팀 목록 조회 (관리자/스태프 전용)' })
   @ApiQuery({
     name: 'missionaryId',
     required: false,
@@ -44,7 +45,8 @@ export class TeamController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: '팀 단건 조회 (멤버 포함)' })
+  @Roles(UserRole.ADMIN, UserRole.STAFF)
+  @ApiOperation({ summary: '팀 단건 조회 (멤버 포함, 관리자/스태프 전용)' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.teamService.findOne(id);
   }

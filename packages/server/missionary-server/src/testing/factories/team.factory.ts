@@ -10,6 +10,7 @@ export function makeTeam(overrides: Partial<Team> = {}): Team {
     leaderUserName: '테스트리더',
     missionaryId: randomUUID(),
     churchId: null,
+    missionaryRegionId: null,
     createdAt: new Date('2024-01-01T00:00:00Z'),
     updatedAt: new Date('2024-01-01T00:00:00Z'),
     createdBy: null,

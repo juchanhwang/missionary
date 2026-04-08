@@ -3,6 +3,7 @@ import type { BaseRepository } from '@/common/repositories';
 import type {
   Church,
   Missionary,
+  MissionaryRegion,
   Prisma,
   Team,
   TeamMember,
@@ -16,6 +17,7 @@ export interface TeamMemberWithUser extends TeamMember {
 export interface TeamWithRelations extends Team {
   missionary: Missionary;
   church: Church | null;
+  missionaryRegion: MissionaryRegion | null;
   teamMembers: TeamMemberWithUser[];
 }
 
@@ -37,6 +39,7 @@ export interface TeamRepository extends BaseRepository<
   ): Promise<TeamWithRelations>;
   addMembers(teamId: string, userIds: string[]): Promise<void>;
   softDeleteMembers(teamId: string, userIds: string[]): Promise<void>;
+  deleteWithDetachParticipants(id: string): Promise<Team>;
 }
 
 export const TEAM_REPOSITORY = Symbol('TEAM_REPOSITORY');

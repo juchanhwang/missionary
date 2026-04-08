@@ -13,6 +13,7 @@ import type { Prisma, Team } from '../../../prisma/generated/prisma';
 const TEAM_INCLUDE = {
   missionary: true,
   church: true,
+  missionaryRegion: true,
   teamMembers: {
     where: { deletedAt: null },
     include: { user: true },
@@ -122,5 +123,17 @@ export class PrismaTeamRepository implements TeamRepository {
     );
 
     await Promise.all(updatePromises);
+  }
+
+  async deleteWithDetachParticipants(id: string): Promise<Team> {
+    // OQ-2: 팀 삭제 시 연결된 participation의 teamId를 명시적으로 NULL 처리한 뒤 hard delete.
+    // FK는 ON DELETE SET NULL이지만, 의도를 코드에 드러내기 위해 트랜잭션으로 감싼다.
+    return this.prisma.$transaction(async (tx) => {
+      await tx.participation.updateMany({
+        where: { teamId: id },
+        data: { teamId: null },
+      });
+      return tx.team.delete({ where: { id } });
+    });
   }
 }
