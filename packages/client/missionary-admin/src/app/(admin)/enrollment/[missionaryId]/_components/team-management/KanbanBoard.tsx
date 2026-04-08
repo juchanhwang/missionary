@@ -84,7 +84,7 @@ export function KanbanBoard({
 
       <DragOverlay dropAnimation={null}>
         {activeParticipation ? (
-          <DragOverlayCard participation={activeParticipation} />
+          <DragOverlayCard participation={activeParticipation} teams={teams} />
         ) : null}
       </DragOverlay>
     </DndContext>
