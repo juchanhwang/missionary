@@ -406,6 +406,128 @@ describe('ParticipationService', () => {
     });
 
     // ──────────────────────────────────────────────
+    // 옵션 C: formAnswers 권한 분리
+    // (PRD §2, be-plan v1.2 §4-B)
+    //
+    // STAFF는 운영 필드(teamId/name/affiliation)는 수정할 수 있으나,
+    // formAnswers는 사용자 주관 데이터이므로 ADMIN 또는 본인만 수정할 수 있다.
+    // updateAnswers() API와 권한 기준을 일치시켜 계약을 단순화한다.
+    // ──────────────────────────────────────────────
+
+    describe('formAnswers 권한 (옵션 C)', () => {
+      it('STAFF가 타인 participation의 answers를 수정하려 하면 ForbiddenException을 던진다', async () => {
+        const ownerId = 'owner-1';
+        const staffId = 'staff-1';
+        const missionaryId = 'missionary-1';
+        const user = makeUser({ id: ownerId });
+        const missionary = makeMissionary({ id: missionaryId });
+
+        fakeParticipationRepo.setUser(ownerId, user);
+        fakeParticipationRepo.setMissionary(missionaryId, missionary);
+
+        const participation = makeParticipation({
+          id: 'participation-1',
+          userId: ownerId,
+          missionaryId,
+        });
+        await fakeParticipationRepo.create(participation);
+
+        const staffUser = makeAuthUser({ id: staffId, role: 'STAFF' });
+        const dto: UpdateParticipationDto = {
+          answers: [{ formFieldId: 'field-1', value: '탑승' }],
+        };
+
+        await expect(
+          service.update('participation-1', dto, staffUser),
+        ).rejects.toThrow(ForbiddenException);
+      });
+
+      it('STAFF가 타인 participation의 answers와 함께 일반 필드를 보내도 차단된다', async () => {
+        // 혼합 payload에서도 answers가 포함되면 차단되는지 확인.
+        // 부분 성공(일반 필드만 업데이트)으로 빠지지 않고 전체 요청이 실패해야 한다.
+        const ownerId = 'owner-1';
+        const staffId = 'staff-1';
+        const missionaryId = 'missionary-1';
+        const user = makeUser({ id: ownerId });
+        const missionary = makeMissionary({ id: missionaryId });
+
+        fakeParticipationRepo.setUser(ownerId, user);
+        fakeParticipationRepo.setMissionary(missionaryId, missionary);
+
+        const participation = makeParticipation({
+          id: 'participation-1',
+          userId: ownerId,
+          missionaryId,
+          name: '원본이름',
+        });
+        await fakeParticipationRepo.create(participation);
+
+        const staffUser = makeAuthUser({ id: staffId, role: 'STAFF' });
+        const dto: UpdateParticipationDto = {
+          name: '스태프수정',
+          answers: [{ formFieldId: 'field-1', value: '탑승' }],
+        };
+
+        await expect(
+          service.update('participation-1', dto, staffUser),
+        ).rejects.toThrow(ForbiddenException);
+      });
+
+      it('ADMIN이 타인 participation의 answers를 수정할 수 있다', async () => {
+        const ownerId = 'owner-1';
+        const adminId = 'admin-1';
+        const missionaryId = 'missionary-1';
+        const user = makeUser({ id: ownerId });
+        const missionary = makeMissionary({ id: missionaryId });
+
+        fakeParticipationRepo.setUser(ownerId, user);
+        fakeParticipationRepo.setMissionary(missionaryId, missionary);
+
+        const participation = makeParticipation({
+          id: 'participation-1',
+          userId: ownerId,
+          missionaryId,
+        });
+        await fakeParticipationRepo.create(participation);
+
+        const adminUser = makeAuthUser({ id: adminId, role: 'ADMIN' });
+        const dto: UpdateParticipationDto = {
+          answers: [{ formFieldId: 'field-1', value: '관리자값' }],
+        };
+
+        await expect(
+          service.update('participation-1', dto, adminUser),
+        ).resolves.toBeDefined();
+      });
+
+      it('본인이 본인 participation의 answers를 수정할 수 있다', async () => {
+        const ownerId = 'owner-1';
+        const missionaryId = 'missionary-1';
+        const user = makeUser({ id: ownerId });
+        const missionary = makeMissionary({ id: missionaryId });
+
+        fakeParticipationRepo.setUser(ownerId, user);
+        fakeParticipationRepo.setMissionary(missionaryId, missionary);
+
+        const participation = makeParticipation({
+          id: 'participation-1',
+          userId: ownerId,
+          missionaryId,
+        });
+        await fakeParticipationRepo.create(participation);
+
+        const authUser = makeAuthUser({ id: ownerId, role: 'USER' });
+        const dto: UpdateParticipationDto = {
+          answers: [{ formFieldId: 'field-1', value: '본인값' }],
+        };
+
+        await expect(
+          service.update('participation-1', dto, authUser),
+        ).resolves.toBeDefined();
+      });
+    });
+
+    // ──────────────────────────────────────────────
     // Wave 4: teamId 배치/해제 (be-plan §3-D, §3-E, §4-B)
     // ──────────────────────────────────────────────
 
