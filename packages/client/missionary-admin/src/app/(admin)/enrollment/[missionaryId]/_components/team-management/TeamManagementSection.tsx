@@ -1,15 +1,24 @@
 'use client';
 
+import { overlay } from '@samilhero/design-system';
 import { Users } from 'lucide-react';
 
 import { groupParticipationsByTeam } from './_utils/groupParticipationsByTeam';
 import { KanbanBoard } from './KanbanBoard';
+import { TeamCreateModal } from './TeamCreateModal';
+import { TeamDeleteModal } from './TeamDeleteModal';
+import { TeamEditModal } from './TeamEditModal';
 import { TeamManagementToolbar } from './TeamManagementToolbar';
+import { useGetMissionGroupRegions } from '../../_hooks/useGetMissionGroupRegions';
 import { useGetParticipations } from '../../_hooks/useGetParticipations';
 import { useGetTeams } from '../../_hooks/useGetTeams';
 
+import type { Participation } from 'apis/participation';
+import type { Team } from 'apis/team';
+
 interface TeamManagementSectionProps {
   missionaryId: string;
+  missionGroupId: string | null;
 }
 
 /**
@@ -18,7 +27,9 @@ interface TeamManagementSectionProps {
  * 책임:
  * - `useGetTeams({ missionaryId })`로 팀 메타 조회 (participations 비임베드, R-2 옵션 B)
  * - `useGetParticipations({ missionaryId, limit 생략 })`로 참가자 전체 조회 (R-3)
+ * - `useGetMissionGroupRegions({ missionGroupId })`로 모달 연계지 옵션 조회
  * - `groupParticipationsByTeam`으로 미배치/팀별 그룹 derive
+ * - 팀 생성/수정/삭제 모달 호출 (`overlay.openAsync<boolean>`)
  * - 로딩/에러/빈 상태 분기 + 자식에 데이터 전달
  *
  * 참고 — 지연 패칭(lazy fetch) 스펙 편차:
@@ -30,6 +41,7 @@ interface TeamManagementSectionProps {
  */
 export function TeamManagementSection({
   missionaryId,
+  missionGroupId,
 }: TeamManagementSectionProps) {
   const {
     data: teams,
@@ -44,6 +56,56 @@ export function TeamManagementSection({
   } = useGetParticipations({
     params: { missionaryId },
   });
+
+  // 모달 연계지 옵션 — missionGroupId가 null이면 no-op.
+  const { data: regionsData } = useGetMissionGroupRegions({ missionGroupId });
+  const regions = regionsData?.data ?? [];
+
+  const participationList: Participation[] = participations?.data ?? [];
+
+  const handleCreateTeam = () => {
+    overlay.openAsync<boolean>(({ isOpen, close, unmount }) => (
+      <TeamCreateModal
+        isOpen={isOpen}
+        close={(result) => {
+          close(result);
+          setTimeout(unmount, 300);
+        }}
+        missionaryId={missionaryId}
+        participations={participationList}
+        regions={regions}
+      />
+    ));
+  };
+
+  const handleEditTeam = (team: Team) => {
+    overlay.openAsync<boolean>(({ isOpen, close, unmount }) => (
+      <TeamEditModal
+        isOpen={isOpen}
+        close={(result) => {
+          close(result);
+          setTimeout(unmount, 300);
+        }}
+        team={team}
+        participations={participationList}
+        regions={regions}
+      />
+    ));
+  };
+
+  const handleDeleteTeam = (team: Team, memberCount: number) => {
+    overlay.openAsync<boolean>(({ isOpen, close, unmount }) => (
+      <TeamDeleteModal
+        isOpen={isOpen}
+        close={(result) => {
+          close(result);
+          setTimeout(unmount, 300);
+        }}
+        team={team}
+        memberCount={memberCount}
+      />
+    ));
+  };
 
   const isLoading = isTeamsLoading || isParticipationsLoading;
   const isError = isTeamsError || isParticipationsError;
@@ -66,12 +128,19 @@ export function TeamManagementSection({
       <TeamManagementToolbar
         teamCount={teams.length}
         unassignedCount={grouped.unassigned.length}
+        onCreateTeam={handleCreateTeam}
       />
 
       {teams.length === 0 ? (
-        <TeamsEmptyState />
+        <TeamsEmptyState onCreateTeam={handleCreateTeam} />
       ) : (
-        <KanbanBoard teams={teams} grouped={grouped} />
+        <KanbanBoard
+          teams={teams}
+          grouped={grouped}
+          onCreateTeam={handleCreateTeam}
+          onEditTeam={handleEditTeam}
+          onDeleteTeam={handleDeleteTeam}
+        />
       )}
     </div>
   );
@@ -107,7 +176,7 @@ function TeamsLoadingSkeleton() {
 /**
  * 팀 0개 Empty State. ui-spec §6-1.
  */
-function TeamsEmptyState() {
+function TeamsEmptyState({ onCreateTeam }: { onCreateTeam?: () => void }) {
   return (
     <div
       data-testid="teams-empty-state"
@@ -118,6 +187,16 @@ function TeamsEmptyState() {
       <p className="text-xs text-gray-400">
         상단 &ldquo;팀 추가&rdquo; 버튼으로 첫 팀을 만들어보세요
       </p>
+      {onCreateTeam && (
+        <button
+          type="button"
+          onClick={onCreateTeam}
+          data-testid="teams-empty-create-button"
+          className="mt-2 inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+        >
+          팀 추가
+        </button>
+      )}
     </div>
   );
 }

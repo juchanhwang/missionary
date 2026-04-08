@@ -93,7 +93,12 @@ export function EnrollmentDetailPage({
               onSearchChange={setSearchQuery}
             />
           }
-          teamsContent={<TeamManagementSection missionaryId={mission.id} />}
+          teamsContent={
+            <TeamManagementSection
+              missionaryId={mission.id}
+              missionGroupId={mission.missionGroupId}
+            />
+          }
         />
       </div>
 

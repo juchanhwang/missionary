@@ -10,6 +10,8 @@ interface TeamColumnGridProps {
   teams: Team[];
   byTeamId: Map<string, Participation[]>;
   onCreateTeam?: () => void;
+  onEditTeam?: (team: Team) => void;
+  onDeleteTeam?: (team: Team, memberCount: number) => void;
 }
 
 /**
@@ -25,6 +27,8 @@ export function TeamColumnGrid({
   teams,
   byTeamId,
   onCreateTeam,
+  onEditTeam,
+  onDeleteTeam,
 }: TeamColumnGridProps) {
   return (
     <div
@@ -36,6 +40,8 @@ export function TeamColumnGrid({
           key={team.id}
           team={team}
           members={byTeamId.get(team.id) ?? []}
+          onEdit={onEditTeam}
+          onDelete={onDeleteTeam}
         />
       ))}
       <NewTeamGhostColumn onClick={onCreateTeam} />

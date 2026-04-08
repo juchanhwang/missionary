@@ -67,7 +67,12 @@ describe('TeamManagementSection', () => {
       }),
     );
 
-    render(<TeamManagementSection missionaryId={MISSIONARY_ID} />);
+    render(
+      <TeamManagementSection
+        missionaryId={MISSIONARY_ID}
+        missionGroupId={null}
+      />,
+    );
 
     expect(screen.getByTestId('team-management-loading')).toBeInTheDocument();
   });
@@ -80,7 +85,12 @@ describe('TeamManagementSection', () => {
       ),
     );
 
-    render(<TeamManagementSection missionaryId={MISSIONARY_ID} />);
+    render(
+      <TeamManagementSection
+        missionaryId={MISSIONARY_ID}
+        missionGroupId={null}
+      />,
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId('teams-empty-state')).toBeInTheDocument();
@@ -108,7 +118,12 @@ describe('TeamManagementSection', () => {
       ),
     );
 
-    render(<TeamManagementSection missionaryId={MISSIONARY_ID} />);
+    render(
+      <TeamManagementSection
+        missionaryId={MISSIONARY_ID}
+        missionGroupId={null}
+      />,
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId('team-management-toolbar')).toBeInTheDocument();
@@ -131,7 +146,12 @@ describe('TeamManagementSection', () => {
       ),
     );
 
-    render(<TeamManagementSection missionaryId={MISSIONARY_ID} />);
+    render(
+      <TeamManagementSection
+        missionaryId={MISSIONARY_ID}
+        missionGroupId={null}
+      />,
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId('team-management-error')).toBeInTheDocument();
