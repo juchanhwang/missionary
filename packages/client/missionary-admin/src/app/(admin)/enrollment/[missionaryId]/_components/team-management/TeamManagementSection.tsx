@@ -155,7 +155,7 @@ export function TeamManagementSection({
   return (
     <div
       data-testid="team-management-section"
-      className="flex flex-col flex-1 min-h-0 gap-4 p-4"
+      className="flex flex-col flex-1 min-h-0 gap-4"
     >
       <TeamManagementToolbar
         teamCount={teams.length}

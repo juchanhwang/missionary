@@ -63,11 +63,18 @@ export function EnrollmentDetailTabs({
         `aria-labelledby`로 탭 버튼에 연결할 수 없고, 대신 `aria-label`로
         패널 이름을 직접 지정한다.
       */}
+      {/*
+        탭 nav와 콘텐츠 사이 여백은 ui-spec §3-1 "콘텐츠 gap = gap-5 (20px)"에 맞춘다.
+        mockup Screen 1은 부모(`p-8 flex flex-col gap-5`)의 직접 자식으로 탭과 콘텐츠를
+        나란히 두지만, 코드는 EnrollmentDetailTabs를 sub-container로 분리했기 때문에
+        부모 gap-5가 Tab → tabpanel 사이로 내려오지 못한다. 그래서 tabpanel 자체에서
+        `pt-5`로 보정해 양쪽 탭 모두 일관된 20px 여백을 만든다.
+      */}
       <div
         role="tabpanel"
         aria-label="참가자 목록"
         hidden={activeTab !== 'participants'}
-        className="flex flex-col flex-1 min-h-0"
+        className="flex flex-col flex-1 min-h-0 pt-5"
       >
         {participantsContent}
       </div>
@@ -76,7 +83,7 @@ export function EnrollmentDetailTabs({
         role="tabpanel"
         aria-label="팀 관리"
         hidden={activeTab !== 'teams'}
-        className="flex flex-col flex-1 min-h-0"
+        className="flex flex-col flex-1 min-h-0 pt-5"
       >
         {teamsContent}
       </div>

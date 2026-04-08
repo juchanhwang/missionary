@@ -61,6 +61,20 @@ describe('EnrollmentDetailTabs', () => {
     expect(teamsPanel).not.toHaveAttribute('hidden');
   });
 
+  it('두 tabpanel은 탭 nav와 콘텐츠 사이 여백(pt-5)을 가진다', () => {
+    // 회귀 가드: ui-spec §3-1 "콘텐츠 gap = gap-5(20px)"에 따라
+    // 탭 → 콘텐츠 사이 여백을 양쪽 탭 모두 동일하게 20px로 유지해야 한다.
+    // 이전에는 tabpanel에 padding이 없어 mockup과 시각 차이가 있었다.
+    renderTabs();
+
+    const participantsPanel =
+      screen.getByTestId('panel-participants').parentElement;
+    const teamsPanel = screen.getByTestId('panel-teams').parentElement;
+
+    expect(participantsPanel).toHaveClass('pt-5');
+    expect(teamsPanel).toHaveClass('pt-5');
+  });
+
   it('탭을 전환해도 양쪽 콘텐츠는 unmount되지 않는다', async () => {
     const user = userEvent.setup();
     renderTabs();
