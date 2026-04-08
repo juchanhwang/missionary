@@ -88,7 +88,11 @@ export function TeamColumn({
       <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1.5">
         {memberCount === 0 && !showGhost && <EmptyMembersDropHint />}
         {members.map((member) => (
-          <TeamMemberCard key={member.id} participation={member} />
+          <TeamMemberCard
+            key={member.id}
+            participation={member}
+            isLeader={member.userId === team.leaderUserId}
+          />
         ))}
         {showGhost && activeParticipation !== null && (
           <GhostMemberCard participation={activeParticipation} />

@@ -82,4 +82,50 @@ describe('TeamMemberCard', () => {
       '홍길동, 팀 멤버 드래그 가능',
     );
   });
+
+  describe('isLeader', () => {
+    it('팀장일 때 "팀장" 배지를 렌더한다', () => {
+      render(<TeamMemberCard participation={createParticipation()} isLeader />);
+
+      expect(
+        screen.getByTestId('team-member-card-p-1-leader-badge'),
+      ).toHaveTextContent('팀장');
+    });
+
+    it('팀장일 때 Crown 아이콘을 렌더한다 (GripVertical 대신)', () => {
+      render(<TeamMemberCard participation={createParticipation()} isLeader />);
+
+      expect(
+        screen.getByTestId('team-member-card-p-1-leader-icon'),
+      ).toBeInTheDocument();
+    });
+
+    it('팀장이 아니면 "팀장" 배지나 Crown 아이콘을 렌더하지 않는다', () => {
+      render(<TeamMemberCard participation={createParticipation()} />);
+
+      expect(
+        screen.queryByTestId('team-member-card-p-1-leader-badge'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('team-member-card-p-1-leader-icon'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('팀장일 때 aria-label에 "팀장, 드래그 불가"가 포함된다', () => {
+      render(<TeamMemberCard participation={createParticipation()} isLeader />);
+
+      expect(screen.getByTestId('team-member-card-p-1')).toHaveAttribute(
+        'aria-label',
+        '홍길동, 12기 · 대학부, 팀장, 드래그 불가',
+      );
+    });
+
+    it('팀장일 때 cursor-default 클래스를 가진다 (드래그 커서 아님)', () => {
+      render(<TeamMemberCard participation={createParticipation()} isLeader />);
+
+      const card = screen.getByTestId('team-member-card-p-1');
+      expect(card.className).toContain('cursor-default');
+      expect(card.className).not.toContain('cursor-grab');
+    });
+  });
 });
