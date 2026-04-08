@@ -137,6 +137,21 @@ export class ParticipationService {
       );
     }
 
+    // 옵션 C: formAnswers(answers)는 사용자 주관 데이터로 ADMIN 또는 본인만
+    // 수정 가능하다. STAFF는 teamId/name/affiliation 등 운영 필드는 수정할
+    // 수 있으나 타인의 formAnswers는 수정할 수 없다. `updateAnswers()` API와
+    // 권한 기준을 일치시켜 계약을 단순화한다.
+    if (
+      dto.answers !== undefined &&
+      dto.answers.length > 0 &&
+      user.role !== UserRole.ADMIN &&
+      participation.userId !== user.id
+    ) {
+      throw new ForbiddenException(
+        'formAnswers는 관리자 또는 본인만 수정할 수 있습니다',
+      );
+    }
+
     // teamId가 지정되면 (1) 팀이 존재하는지 (2) 같은 missionary 소속인지 검증
     if (dto.teamId !== undefined && dto.teamId !== null) {
       const team = await this.teamRepository.findUnique({ id: dto.teamId });
