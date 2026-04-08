@@ -57,9 +57,15 @@ export function EnrollmentDetailTabs({
         className="border-b border-gray-200"
       />
 
+      {/*
+        DS `Tab` 컴포넌트는 `<button role="tab">`에 id를 렌더하지 않는다
+        (`design-system/src/components/tab/index.tsx`). 따라서 tabpanel을
+        `aria-labelledby`로 탭 버튼에 연결할 수 없고, 대신 `aria-label`로
+        패널 이름을 직접 지정한다.
+      */}
       <div
         role="tabpanel"
-        aria-labelledby="tab-participants"
+        aria-label="참가자 목록"
         hidden={activeTab !== 'participants'}
         className="flex flex-col flex-1 min-h-0"
       >
@@ -68,7 +74,7 @@ export function EnrollmentDetailTabs({
 
       <div
         role="tabpanel"
-        aria-labelledby="tab-teams"
+        aria-label="팀 관리"
         hidden={activeTab !== 'teams'}
         className="flex flex-col flex-1 min-h-0"
       >

@@ -102,12 +102,30 @@ export function KanbanBoard({
     setActiveParticipation(null);
   };
 
+  // dnd-kit id(예: `participation-p-1`)를 사람이 읽을 수 있는 이름으로 변환한다.
+  // 내부 ID가 그대로 스크린리더에 노출되지 않도록 한다. fe-plan §10.
+  const announcements = buildKanbanAnnouncements({
+    resolveParticipationName: (id) => {
+      const participationId = stripPrefix(id, 'participation-');
+      const found =
+        grouped.unassigned.find((p) => p.id === participationId) ??
+        findInTeams(grouped.byTeamId, participationId);
+      return found?.name ?? '참가자';
+    },
+    resolveDropAreaName: (id) => {
+      if (id === 'unassigned') return '미배치 영역';
+      const teamId = stripPrefix(id, 'team-');
+      const team = teams.find((t) => t.id === teamId);
+      return team ? `${team.teamName} 팀` : '팀';
+    },
+  });
+
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={pointerWithin}
       accessibility={{
-        announcements: KANBAN_ANNOUNCEMENTS,
+        announcements,
         screenReaderInstructions: KANBAN_SCREEN_READER_INSTRUCTIONS,
       }}
       onDragStart={handleDragStart}
@@ -151,26 +169,48 @@ const KANBAN_SCREEN_READER_INSTRUCTIONS: ScreenReaderInstructions = {
     '드래그 가능한 항목에 포커스한 뒤 스페이스 또는 엔터를 눌러 잡으세요. 방향키로 이동하고, 다시 스페이스나 엔터를 눌러 놓을 수 있습니다. 취소하려면 Esc를 누르세요.',
 };
 
-const KANBAN_ANNOUNCEMENTS: Announcements = {
-  onDragStart({ active }) {
-    return `${String(active.id)} 항목을 잡았습니다.`;
-  },
-  onDragOver({ active, over }) {
-    if (over) {
-      return `${String(active.id)} 항목이 ${String(over.id)} 위에 있습니다.`;
-    }
-    return `${String(active.id)} 항목이 드롭 영역 밖으로 이동했습니다.`;
-  },
-  onDragEnd({ active, over }) {
-    if (over) {
-      return `${String(active.id)} 항목을 ${String(over.id)} 위에 놓았습니다.`;
-    }
-    return `${String(active.id)} 항목을 놓았습니다.`;
-  },
-  onDragCancel({ active }) {
-    return `${String(active.id)} 항목 드래그가 취소되었습니다.`;
-  },
-};
+interface KanbanAnnouncementLookup {
+  /** dnd-kit draggable id(`participation-p-1`)를 참가자 이름으로 변환한다. */
+  resolveParticipationName: (id: string) => string;
+  /** dnd-kit droppable id(`team-t-1` 또는 `unassigned`)를 드롭 영역 이름으로 변환한다. */
+  resolveDropAreaName: (id: string) => string;
+}
+
+/**
+ * 한국어 스크린리더 안내 팩토리. dnd-kit 내부 ID가 아닌
+ * 참가자 이름/팀 이름을 읽어주도록 lookup을 주입받는다.
+ */
+function buildKanbanAnnouncements({
+  resolveParticipationName,
+  resolveDropAreaName,
+}: KanbanAnnouncementLookup): Announcements {
+  return {
+    onDragStart({ active }) {
+      return `${resolveParticipationName(String(active.id))} 항목을 잡았습니다.`;
+    },
+    onDragOver({ active, over }) {
+      const name = resolveParticipationName(String(active.id));
+      if (over) {
+        return `${name} 항목이 ${resolveDropAreaName(String(over.id))} 위에 있습니다.`;
+      }
+      return `${name} 항목이 드롭 영역 밖으로 이동했습니다.`;
+    },
+    onDragEnd({ active, over }) {
+      const name = resolveParticipationName(String(active.id));
+      if (over) {
+        return `${name} 항목을 ${resolveDropAreaName(String(over.id))} 위에 놓았습니다.`;
+      }
+      return `${name} 항목을 놓았습니다.`;
+    },
+    onDragCancel({ active }) {
+      return `${resolveParticipationName(String(active.id))} 항목 드래그가 취소되었습니다.`;
+    },
+  };
+}
+
+function stripPrefix(value: string, prefix: string): string {
+  return value.startsWith(prefix) ? value.slice(prefix.length) : value;
+}
 
 function findInTeams(
   byTeamId: Map<string, Participation[]>,

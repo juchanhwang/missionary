@@ -19,6 +19,12 @@ interface AssignArgs {
  * - `onError`에서 snapshot을 복원하고 에러 토스트
  * - `onSettled`에서 `participations` invalidate하여 BE 정합성 보장
  *
+ * 직렬화:
+ * - `scope.id`를 지정하여 같은 scope의 mutation이 병렬 실행되지 않도록 한다.
+ *   연속 드래그 시 A 실패 + B 성공이 뒤섞여 B의 optimistic update가 A의 rollback
+ *   snapshot으로 덮여 UI가 플리커하는 race condition을 방지한다.
+ *   참고: https://tanstack.com/query/latest/docs/reference/useMutation
+ *
  * toast 전략:
  * - 성공 시 토스트 생략 (드래그는 빈번한 액션, 노이즈 방지)
  * - 실패 시에만 토스트 + optimistic rollback
@@ -27,6 +33,7 @@ export function useAssignParticipationToTeam() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    scope: { id: 'assign-participation-team' },
     mutationFn: ({ participationId, teamId }: AssignArgs) =>
       participationApi.updateParticipation(participationId, { teamId }),
 

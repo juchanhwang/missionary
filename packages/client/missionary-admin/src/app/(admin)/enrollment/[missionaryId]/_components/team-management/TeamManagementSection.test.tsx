@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { server } from 'test/mocks/server';
 import { render, screen, waitFor } from 'test/test-utils';
@@ -156,5 +157,44 @@ describe('TeamManagementSection', () => {
     await waitFor(() => {
       expect(screen.getByTestId('team-management-error')).toBeInTheDocument();
     });
+  });
+
+  it('에러 상태의 "다시 시도" 버튼을 누르면 refetch가 실행된다', async () => {
+    let teamsCallCount = 0;
+    server.use(
+      http.get(`${API_URL}/teams`, () => {
+        teamsCallCount += 1;
+        if (teamsCallCount === 1) {
+          return HttpResponse.json(
+            { message: 'Server Error' },
+            { status: 500 },
+          );
+        }
+        return HttpResponse.json([
+          createTeam({ id: 'team-1', teamName: '1팀' }),
+        ]);
+      }),
+      http.get(`${API_URL}/participations`, () =>
+        HttpResponse.json({ data: [], total: 0 }),
+      ),
+    );
+
+    render(
+      <TeamManagementSection
+        missionaryId={MISSIONARY_ID}
+        missionGroupId={null}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('team-management-error')).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByTestId('team-management-error-retry'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('kanban-board')).toBeInTheDocument();
+    });
+    expect(teamsCallCount).toBeGreaterThanOrEqual(2);
   });
 });

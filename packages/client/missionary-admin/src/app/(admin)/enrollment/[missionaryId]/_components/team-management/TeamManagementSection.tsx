@@ -53,15 +53,22 @@ export function TeamManagementSection({
     data: teams,
     isLoading: isTeamsLoading,
     isError: isTeamsError,
+    refetch: refetchTeams,
   } = useGetTeams({ missionaryId });
 
   const {
     data: participations,
     isLoading: isParticipationsLoading,
     isError: isParticipationsError,
+    refetch: refetchParticipations,
   } = useGetParticipations({
     params: { missionaryId },
   });
+
+  const handleRetryFetch = () => {
+    refetchTeams();
+    refetchParticipations();
+  };
 
   // 모달 연계지 옵션 — missionGroupId가 null이면 no-op.
   const { data: regionsData } = useGetMissionGroupRegions({ missionGroupId });
@@ -133,7 +140,7 @@ export function TeamManagementSection({
   }
 
   if (isError || !teams || !participations) {
-    return <TeamsErrorState />;
+    return <TeamsErrorState onRetry={handleRetryFetch} />;
   }
 
   const grouped = groupParticipationsByTeam(participations.data);
@@ -238,14 +245,24 @@ function TeamsEmptyState({ onCreateTeam }: { onCreateTeam?: () => void }) {
  * 팀 또는 참가자 조회 실패 시 표시. 간단한 에러 알림.
  * 상세 에러 경계는 상위 `error.tsx`가 담당.
  */
-function TeamsErrorState() {
+function TeamsErrorState({ onRetry }: { onRetry?: () => void }) {
   return (
     <div
       data-testid="team-management-error"
       role="alert"
-      className="flex flex-1 items-center justify-center min-h-[400px] text-sm text-gray-500"
+      className="flex flex-1 flex-col items-center justify-center gap-3 min-h-[400px] text-sm text-gray-500"
     >
-      팀 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.
+      <p>팀 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</p>
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          data-testid="team-management-error-retry"
+          className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+        >
+          다시 시도
+        </button>
+      )}
     </div>
   );
 }
