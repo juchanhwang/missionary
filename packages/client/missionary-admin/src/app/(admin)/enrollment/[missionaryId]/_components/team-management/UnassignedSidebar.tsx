@@ -21,7 +21,7 @@ interface UnassignedSidebarProps {
  * - 드래그 시각 상태:
  *   - **idle**: `bg-gray-50 border-gray-200`
  *   - **highlighted** (팀에서 드래그 시작 — 미배치로 되돌릴 수 있음):
- *     `border-2 border-dashed border-blue-30 bg-blue-10/40`
+ *     `border-2 border-dashed border-blue-20 bg-blue-10`
  *   - **isOver** (호버): `bg-blue-10 border-blue-30`
  * - 미배치에서 드래그 시작한 경우 자기가 소스이므로 highlighted 제외.
  */
@@ -47,7 +47,7 @@ export function UnassignedSidebar({ unassigned }: UnassignedSidebarProps) {
         isOver
           ? 'border border-blue-30 bg-blue-10'
           : isHighlighted
-            ? 'border-2 border-dashed border-blue-30 bg-blue-10/40'
+            ? 'border-2 border-dashed border-blue-20 bg-blue-10'
             : 'border border-gray-200 bg-gray-50'
       }`}
     >

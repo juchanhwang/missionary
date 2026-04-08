@@ -19,8 +19,8 @@ interface DragOverlayCardProps {
  * `DragOverlay` 내부에 렌더되는 floating 카드. ui-spec §4-6, mockup `.drag-floating`/`.drag-label`.
  *
  * mockup 토큰:
- * - 카드: `shadow-xl ring-1 ring-blue-30 rotate-[1.5deg] bg-white`
- * - drag label: `bg-blue-10 text-blue-60 border border-blue-30 rounded-md px-2 py-0.5 text-[11px] font-semibold`
+ * - 카드: `shadow-xl ring-1 ring-blue-30 rotate-[1.5deg] bg-white border border-blue-20`
+ * - drag label: `bg-blue-10 text-blue-60 border border-blue-20 rounded-md px-2 py-0.5 text-[11px] font-semibold`
  *
  * 호버 중인 드롭 타깃 정보는 `useDndContext().over`로 직접 구독한다.
  * `KanbanBoard`가 `DragOverlay` 슬롯에 주입한다.
@@ -38,12 +38,12 @@ export function DragOverlayCard({
   return (
     <div
       data-testid="drag-overlay-card"
-      className="relative flex items-start gap-2 bg-white border border-blue-30 rounded-lg px-2.5 py-2 shadow-xl ring-1 ring-blue-30 rotate-[1.5deg] w-[200px]"
+      className="relative flex items-start gap-2 bg-white border border-blue-20 rounded-lg px-2.5 py-2 shadow-xl ring-1 ring-blue-30 rotate-[1.5deg] w-[200px]"
     >
       {overLabel !== null && (
         <span
           data-testid="drag-overlay-label"
-          className="absolute -top-2.5 left-1/2 -translate-x-1/2 inline-flex items-center bg-blue-10 text-blue-60 border border-blue-30 rounded-md px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap shadow-sm"
+          className="absolute -top-2.5 left-1/2 -translate-x-1/2 inline-flex items-center bg-blue-10 text-blue-60 border border-blue-20 rounded-md px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap shadow-sm"
         >
           → {overLabel}
         </span>
