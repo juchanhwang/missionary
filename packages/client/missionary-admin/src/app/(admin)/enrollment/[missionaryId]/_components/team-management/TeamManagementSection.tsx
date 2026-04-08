@@ -1,19 +1,24 @@
 'use client';
 
 import { overlay } from '@samilhero/design-system';
+import { useDebounce } from 'hooks/useDebounce';
 import { Users } from 'lucide-react';
+import { useState } from 'react';
 
 import { groupParticipationsByTeam } from './_utils/groupParticipationsByTeam';
+import { filterTeams } from './filterTeams';
 import { KanbanBoard } from './KanbanBoard';
 import { TeamCreateModal } from './TeamCreateModal';
 import { TeamDeleteModal } from './TeamDeleteModal';
 import { TeamEditModal } from './TeamEditModal';
+import { TeamFilterBar } from './TeamFilterBar';
 import { TeamManagementToolbar } from './TeamManagementToolbar';
 import { useAssignParticipationToTeam } from '../../_hooks/useAssignParticipationToTeam';
 import { useGetMissionGroupRegions } from '../../_hooks/useGetMissionGroupRegions';
 import { useGetParticipations } from '../../_hooks/useGetParticipations';
 import { useGetTeams } from '../../_hooks/useGetTeams';
 
+import type { TeamFilterState } from './types';
 import type { Participation } from 'apis/participation';
 import type { Team } from 'apis/team';
 
@@ -61,6 +66,13 @@ export function TeamManagementSection({
   // 모달 연계지 옵션 — missionGroupId가 null이면 no-op.
   const { data: regionsData } = useGetMissionGroupRegions({ missionGroupId });
   const regions = regionsData?.data ?? [];
+
+  // 팀 검색/필터 — 로컬 상태 + 팀명은 200ms 디바운스. fe-plan §4-1, §6-3.
+  const [filter, setFilter] = useState<TeamFilterState>({
+    query: '',
+    regionId: '',
+  });
+  const debouncedQuery = useDebounce(filter.query, 200);
 
   const assignTeam = useAssignParticipationToTeam();
   const handleAssignTeam = (participationId: string, teamId: string | null) => {
@@ -125,6 +137,10 @@ export function TeamManagementSection({
   }
 
   const grouped = groupParticipationsByTeam(participations.data);
+  const filteredTeams = filterTeams(teams, {
+    query: debouncedQuery,
+    regionId: filter.regionId,
+  });
 
   return (
     <div
@@ -137,16 +153,26 @@ export function TeamManagementSection({
         onCreateTeam={handleCreateTeam}
       />
 
+      <TeamFilterBar
+        filter={filter}
+        onFilterChange={setFilter}
+        regions={regions}
+        filteredCount={filteredTeams.length}
+        totalCount={teams.length}
+      />
+
       {teams.length === 0 ? (
         <TeamsEmptyState onCreateTeam={handleCreateTeam} />
       ) : (
         <KanbanBoard
-          teams={teams}
+          teams={filteredTeams}
           grouped={grouped}
           onCreateTeam={handleCreateTeam}
           onEditTeam={handleEditTeam}
           onDeleteTeam={handleDeleteTeam}
           onAssignTeam={handleAssignTeam}
+          filterEmpty={filteredTeams.length === 0}
+          onResetFilter={() => setFilter({ query: '', regionId: '' })}
         />
       )}
     </div>
