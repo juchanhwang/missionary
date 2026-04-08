@@ -136,6 +136,21 @@ describe('KanbanBoard', () => {
     expect(screen.getByText('모두 배치 완료!')).toBeInTheDocument();
   });
 
+  it('flex chain min-h-0을 무력화하지 않도록 명시적 min-height를 갖지 않는다', () => {
+    // 회귀 가드: 이전에 `min-h-[560px]`가 부모(`flex-1 min-h-0`) chain을 무력화해
+    // 자식 `TeamColumnGrid`의 `overflow-y-auto`가 동작하지 않았고, leak이
+    // admin shell의 `overflow-hidden`에서 잘려 사용자가 스크롤할 수 없었다.
+    // KanbanBoard는 부모 height을 그대로 받아야 하므로 명시적 min-h를 가지면 안 된다.
+    const teams = [createTeam({ id: 'team-1' })];
+    const grouped = groupParticipationsByTeam([]);
+
+    renderKanbanBoard(teams, grouped);
+
+    const board = screen.getByTestId('kanban-board');
+    expect(board).toHaveClass('min-h-0');
+    expect(board.className).not.toMatch(/\bmin-h-\[/);
+  });
+
   it('미배치 참가자가 있으면 이름을 사이드바 카드 리스트로 렌더한다', () => {
     const teams = [createTeam({ id: 'team-1' })];
     const participations = [

@@ -137,7 +137,7 @@ export function KanbanBoard({
     >
       <div
         data-testid="kanban-board"
-        className="flex flex-row flex-1 gap-4 min-h-[560px]"
+        className="flex flex-row flex-1 gap-4 min-h-0"
       >
         {sidebar}
         {columns}
