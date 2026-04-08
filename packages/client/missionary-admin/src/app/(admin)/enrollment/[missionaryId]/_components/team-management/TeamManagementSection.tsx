@@ -178,23 +178,22 @@ export function TeamManagementSection({
           teams={filteredTeams}
           grouped={grouped}
           onAssignTeam={handleAssignTeam}
-          sidebar={<UnassignedSidebar unassigned={grouped.unassigned} />}
-          columns={
-            filteredTeams.length === 0 ? (
-              <TeamFilterEmptyState
-                onResetFilter={() => setFilter({ query: '', regionId: '' })}
-              />
-            ) : (
-              <TeamColumnGrid
-                teams={filteredTeams}
-                byTeamId={grouped.byTeamId}
-                onCreateTeam={handleCreateTeam}
-                onEditTeam={handleEditTeam}
-                onDeleteTeam={handleDeleteTeam}
-              />
-            )
-          }
-        />
+        >
+          <UnassignedSidebar unassigned={grouped.unassigned} />
+          {filteredTeams.length === 0 ? (
+            <TeamFilterEmptyState
+              onResetFilter={() => setFilter({ query: '', regionId: '' })}
+            />
+          ) : (
+            <TeamColumnGrid
+              teams={filteredTeams}
+              byTeamId={grouped.byTeamId}
+              onCreateTeam={handleCreateTeam}
+              onEditTeam={handleEditTeam}
+              onDeleteTeam={handleDeleteTeam}
+            />
+          )}
+        </KanbanBoard>
       )}
     </div>
   );

@@ -10,18 +10,16 @@ import type { Participation } from 'apis/participation';
 import type { Team } from 'apis/team';
 
 /**
- * KanbanBoard는 DnD 전담 shell이라 sidebar/columns 슬롯을 상위에서 주입받는다.
- * 테스트에서는 실제 `UnassignedSidebar`/`TeamColumnGrid`를 주입해
+ * KanbanBoard는 DnD 전담 shell이라 children으로 보드 내부 트리를 주입받는다.
+ * 테스트에서는 실제 `UnassignedSidebar`/`TeamColumnGrid`를 합성해
  * 통합 레이아웃을 검증한다.
  */
 function renderKanbanBoard(teams: Team[], grouped: GroupedParticipations) {
   return render(
-    <KanbanBoard
-      teams={teams}
-      grouped={grouped}
-      sidebar={<UnassignedSidebar unassigned={grouped.unassigned} />}
-      columns={<TeamColumnGrid teams={teams} byTeamId={grouped.byTeamId} />}
-    />,
+    <KanbanBoard teams={teams} grouped={grouped}>
+      <UnassignedSidebar unassigned={grouped.unassigned} />
+      <TeamColumnGrid teams={teams} byTeamId={grouped.byTeamId} />
+    </KanbanBoard>,
   );
 }
 
