@@ -14,37 +14,43 @@ import {
   type ScreenReaderInstructions,
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { resolveDropAssignment } from './_utils/resolveDropAssignment';
-import { TeamColumnGrid } from './TeamColumnGrid';
-import { UnassignedSidebar } from './UnassignedSidebar';
 
 import type { DragData, DropData, GroupedParticipations } from './types';
 import type { Participation } from 'apis/participation';
 import type { Team } from 'apis/team';
 
 interface KanbanBoardProps {
+  /** 스크린리더 안내 lookup에서 팀 이름 변환에 사용한다. */
   teams: Team[];
+  /** DnD source 및 active 카드 lookup에 사용한다. */
   grouped: GroupedParticipations;
-  onCreateTeam?: () => void;
-  onEditTeam?: (team: Team) => void;
-  onDeleteTeam?: (team: Team, memberCount: number) => void;
+  /** 드롭 결과로 mutation을 수행하는 상위 핸들러. */
   onAssignTeam?: (participationId: string, teamId: string | null) => void;
-  /** 필터 결과가 비어 있는지. fe-plan §6-3: 빈 결과 안내 표시용. */
-  filterEmpty?: boolean;
-  /** 필터 초기화 콜백. `filterEmpty`일 때 안내 영역에 버튼으로 노출. */
-  onResetFilter?: () => void;
+  /** 좌측 슬롯 — 보통 `UnassignedSidebar`. */
+  sidebar: ReactNode;
+  /** 우측 슬롯 — 보통 `TeamColumnGrid` 또는 `TeamFilterEmptyState`. */
+  columns: ReactNode;
 }
 
 /**
- * 칸반 보드 루트. fe-plan v1.2 §3-1, §3-3, ui-spec §3-2.
+ * 칸반 보드 DnD 콘텍스트 셸. fe-plan v1.2 §3-1, §3-3, ui-spec §3-2.
  *
- * - 좌측: `UnassignedSidebar` (w-[260px] sticky)
- * - 우측: `TeamColumnGrid` (flex-1 flex-wrap) + Ghost 컬럼
- * - DndContext로 카드 드래그 → 팀/미배치 드롭 영역으로 이동
+ * 이 컴포넌트는 **DnD 전담**이다. 좌/우 영역의 조합은 상위
+ * (`TeamManagementSection`)가 결정하여 `sidebar`/`columns` 슬롯으로 주입한다.
+ *
+ * 책임:
+ * - `DndContext` 세팅 (sensors, collisionDetection, accessibility)
+ * - 드래그 라이프사이클(`onDragStart`/`onDragEnd`/`onDragCancel`)에서
+ *   `activeParticipation` 추적 및 `onAssignTeam` 위임
  * - `DragOverlay`로 드래그 중인 카드를 포인터에 고정 렌더
- * - `onAssignTeam`을 통해 상위에서 mutation을 수행 (optimistic)
+ * - 스크린리더 한국어 안내 (`buildKanbanAnnouncements`)
+ *
+ * 이 컴포넌트가 알 **필요 없는** 것:
+ * - 팀 생성/수정/삭제 콜백 (→ 우측 슬롯에 직접 주입)
+ * - 필터 빈 상태 여부 (→ 상위에서 우측 슬롯을 교체)
  *
  * 센서:
  * - PointerSensor (activationConstraint: 8px 이동) — 클릭과 드래그 구분
@@ -58,12 +64,9 @@ interface KanbanBoardProps {
 export function KanbanBoard({
   teams,
   grouped,
-  onCreateTeam,
-  onEditTeam,
-  onDeleteTeam,
   onAssignTeam,
-  filterEmpty = false,
-  onResetFilter,
+  sidebar,
+  columns,
 }: KanbanBoardProps) {
   const [activeParticipation, setActiveParticipation] =
     useState<Participation | null>(null);
@@ -136,18 +139,8 @@ export function KanbanBoard({
         data-testid="kanban-board"
         className="flex flex-row flex-1 gap-4 min-h-[560px]"
       >
-        <UnassignedSidebar unassigned={grouped.unassigned} />
-        {filterEmpty ? (
-          <TeamFilterEmptyState onResetFilter={onResetFilter} />
-        ) : (
-          <TeamColumnGrid
-            teams={teams}
-            byTeamId={grouped.byTeamId}
-            onCreateTeam={onCreateTeam}
-            onEditTeam={onEditTeam}
-            onDeleteTeam={onDeleteTeam}
-          />
-        )}
+        {sidebar}
+        {columns}
       </div>
 
       <DragOverlay dropAnimation={null}>
@@ -221,36 +214,6 @@ function findInTeams(
     if (found) return found;
   }
   return undefined;
-}
-
-/**
- * 검색/필터 결과가 없을 때 팀 컬럼 영역에 렌더되는 안내. fe-plan §6-3.
- * 미배치 사이드바는 그대로 유지되므로 KanbanBoard 내부에서 처리한다.
- */
-function TeamFilterEmptyState({
-  onResetFilter,
-}: {
-  onResetFilter?: () => void;
-}) {
-  return (
-    <div
-      data-testid="team-filter-empty-state"
-      role="status"
-      className="flex flex-1 flex-col items-center justify-center gap-2 text-center text-sm text-gray-500"
-    >
-      <p>조건에 맞는 팀이 없습니다.</p>
-      {onResetFilter && (
-        <button
-          type="button"
-          onClick={onResetFilter}
-          data-testid="team-filter-empty-reset"
-          className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
-        >
-          필터 초기화
-        </button>
-      )}
-    </div>
-  );
 }
 
 /**

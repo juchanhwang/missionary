@@ -2,9 +2,28 @@ import { render, screen } from 'test/test-utils';
 
 import { groupParticipationsByTeam } from './_utils/groupParticipationsByTeam';
 import { KanbanBoard } from './KanbanBoard';
+import { TeamColumnGrid } from './TeamColumnGrid';
+import { UnassignedSidebar } from './UnassignedSidebar';
 
+import type { GroupedParticipations } from './types';
 import type { Participation } from 'apis/participation';
 import type { Team } from 'apis/team';
+
+/**
+ * KanbanBoard는 DnD 전담 shell이라 sidebar/columns 슬롯을 상위에서 주입받는다.
+ * 테스트에서는 실제 `UnassignedSidebar`/`TeamColumnGrid`를 주입해
+ * 통합 레이아웃을 검증한다.
+ */
+function renderKanbanBoard(teams: Team[], grouped: GroupedParticipations) {
+  return render(
+    <KanbanBoard
+      teams={teams}
+      grouped={grouped}
+      sidebar={<UnassignedSidebar unassigned={grouped.unassigned} />}
+      columns={<TeamColumnGrid teams={teams} byTeamId={grouped.byTeamId} />}
+    />,
+  );
+}
 
 function createTeam(overrides: Partial<Team> = {}): Team {
   return {
@@ -62,7 +81,7 @@ describe('KanbanBoard', () => {
     ];
     const grouped = groupParticipationsByTeam(participations);
 
-    render(<KanbanBoard teams={teams} grouped={grouped} />);
+    renderKanbanBoard(teams, grouped);
 
     expect(screen.getByTestId('kanban-board')).toBeInTheDocument();
     expect(screen.getByTestId('unassigned-sidebar')).toBeInTheDocument();
@@ -86,7 +105,7 @@ describe('KanbanBoard', () => {
     ];
     const grouped = groupParticipationsByTeam(participations);
 
-    render(<KanbanBoard teams={teams} grouped={grouped} />);
+    renderKanbanBoard(teams, grouped);
 
     expect(screen.getByText('1팀')).toBeInTheDocument();
     expect(screen.getByTestId('team-member-count-team-1')).toHaveTextContent(
@@ -99,7 +118,7 @@ describe('KanbanBoard', () => {
     const teams = [createTeam({ id: 'team-empty', teamName: '빈팀' })];
     const grouped = groupParticipationsByTeam([]);
 
-    render(<KanbanBoard teams={teams} grouped={grouped} />);
+    renderKanbanBoard(teams, grouped);
 
     expect(screen.getByTestId('empty-members-drop-hint')).toBeInTheDocument();
   });
@@ -111,7 +130,7 @@ describe('KanbanBoard', () => {
     ];
     const grouped = groupParticipationsByTeam(participations);
 
-    render(<KanbanBoard teams={teams} grouped={grouped} />);
+    renderKanbanBoard(teams, grouped);
 
     expect(screen.getByTestId('unassigned-empty-state')).toBeInTheDocument();
     expect(screen.getByText('모두 배치 완료!')).toBeInTheDocument();
@@ -125,7 +144,7 @@ describe('KanbanBoard', () => {
     ];
     const grouped = groupParticipationsByTeam(participations);
 
-    render(<KanbanBoard teams={teams} grouped={grouped} />);
+    renderKanbanBoard(teams, grouped);
 
     expect(screen.getByTestId('unassigned-sidebar-count')).toHaveTextContent(
       '2',

@@ -8,11 +8,14 @@ import { useState } from 'react';
 import { groupParticipationsByTeam } from './_utils/groupParticipationsByTeam';
 import { filterTeams } from './filterTeams';
 import { KanbanBoard } from './KanbanBoard';
+import { TeamColumnGrid } from './TeamColumnGrid';
 import { TeamCreateModal } from './TeamCreateModal';
 import { TeamDeleteModal } from './TeamDeleteModal';
 import { TeamEditModal } from './TeamEditModal';
 import { TeamFilterBar } from './TeamFilterBar';
+import { TeamFilterEmptyState } from './TeamFilterEmptyState';
 import { TeamManagementToolbar } from './TeamManagementToolbar';
+import { UnassignedSidebar } from './UnassignedSidebar';
 import { useAssignParticipationToTeam } from '../../_hooks/useAssignParticipationToTeam';
 import { useGetMissionGroupRegions } from '../../_hooks/useGetMissionGroupRegions';
 import { useGetParticipations } from '../../_hooks/useGetParticipations';
@@ -174,12 +177,23 @@ export function TeamManagementSection({
         <KanbanBoard
           teams={filteredTeams}
           grouped={grouped}
-          onCreateTeam={handleCreateTeam}
-          onEditTeam={handleEditTeam}
-          onDeleteTeam={handleDeleteTeam}
           onAssignTeam={handleAssignTeam}
-          filterEmpty={filteredTeams.length === 0}
-          onResetFilter={() => setFilter({ query: '', regionId: '' })}
+          sidebar={<UnassignedSidebar unassigned={grouped.unassigned} />}
+          columns={
+            filteredTeams.length === 0 ? (
+              <TeamFilterEmptyState
+                onResetFilter={() => setFilter({ query: '', regionId: '' })}
+              />
+            ) : (
+              <TeamColumnGrid
+                teams={filteredTeams}
+                byTeamId={grouped.byTeamId}
+                onCreateTeam={handleCreateTeam}
+                onEditTeam={handleEditTeam}
+                onDeleteTeam={handleDeleteTeam}
+              />
+            )
+          }
         />
       )}
     </div>
