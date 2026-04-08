@@ -1,8 +1,11 @@
 'use client';
 
+import { useDroppable } from '@dnd-kit/core';
+
 import { TeamColumnHeader } from './TeamColumnHeader';
 import { TeamMemberCard } from './TeamMemberCard';
 
+import type { DropData } from './types';
 import type { Participation } from 'apis/participation';
 import type { Team } from 'apis/team';
 
@@ -16,9 +19,9 @@ interface TeamColumnProps {
 /**
  * 단일 팀 컬럼. ui-spec §3-4, §4-3.
  *
- * W2-2 범위: 정적 레이아웃 (w-[220px] 고정) + 팀 헤더 + 멤버 카드.
- * W3: 헤더 메뉴 → 수정/삭제 모달 콜백 연결.
- * W4: `useDroppable({ id: 'team-{teamId}' })`로 드롭 타깃이 된다.
+ * - `useDroppable({ id: 'team-{teamId}' })`로 드롭 타깃이 된다.
+ * - 헤더 메뉴에서 수정/삭제 모달을 호출한다 (W3-4).
+ * - `isOver`일 때 파란 테두리 하이라이트.
  */
 export function TeamColumn({
   team,
@@ -28,12 +31,21 @@ export function TeamColumn({
 }: TeamColumnProps) {
   const memberCount = members.length;
 
+  const dropData: DropData = { type: 'team', teamId: team.id };
+  const { setNodeRef, isOver } = useDroppable({
+    id: `team-${team.id}`,
+    data: dropData,
+  });
+
   return (
     <div
+      ref={setNodeRef}
       data-testid={`team-column-${team.id}`}
       role="group"
       aria-label={`${team.teamName} 드롭 영역`}
-      className="w-[220px] shrink-0 flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm min-h-[200px]"
+      className={`w-[220px] shrink-0 flex flex-col bg-white rounded-xl border shadow-sm min-h-[200px] transition-colors ${
+        isOver ? 'border-blue-400 ring-2 ring-blue-200' : 'border-gray-200'
+      }`}
     >
       <TeamColumnHeader
         team={team}

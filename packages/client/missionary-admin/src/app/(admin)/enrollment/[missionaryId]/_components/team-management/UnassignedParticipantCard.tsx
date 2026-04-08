@@ -1,9 +1,11 @@
 'use client';
 
+import { useDraggable } from '@dnd-kit/core';
 import { GripVertical } from 'lucide-react';
 
 import { getParticipationSubText } from './_utils/getParticipationSubText';
 
+import type { DragData } from './types';
 import type { Participation } from 'apis/participation';
 
 interface UnassignedParticipantCardProps {
@@ -14,19 +16,33 @@ interface UnassignedParticipantCardProps {
  * 미배치 참가자 카드. ui-spec §4-5.
  *
  * 사이드바의 `bg-gray-50` 배경 위에 놓이는 카드. 구조는 `TeamMemberCard`와 동일하지만
- * W4에서 `useDraggable({ data: { fromTeamId: null } })`로 드래그 소스 컨텍스트가 다르다.
- *
- * 카드 내부 "팀 선택" Select는 W3에서 추가한다 (키보드 a11y 대안).
+ * `useDraggable`에 `data.fromTeamId = null`을 넘겨 드래그 소스가 "미배치"임을 표시한다.
  */
 export function UnassignedParticipantCard({
   participation,
 }: UnassignedParticipantCardProps) {
   const subText = getParticipationSubText(participation);
 
+  const dragData: DragData = {
+    participationId: participation.id,
+    fromTeamId: null,
+  };
+
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `participation-${participation.id}`,
+    data: dragData,
+  });
+
   return (
     <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
       data-testid={`unassigned-card-${participation.id}`}
-      className="flex items-start gap-2 bg-white border border-gray-200 rounded-lg px-2.5 py-2"
+      aria-label={`${participation.name} 미배치 참가자 드래그`}
+      className={`flex items-start gap-2 bg-white border border-gray-200 rounded-lg px-2.5 py-2 cursor-grab active:cursor-grabbing focus:outline-none focus:ring-2 focus:ring-gray-400 ${
+        isDragging ? 'opacity-30' : ''
+      }`}
     >
       <GripVertical
         size={14}

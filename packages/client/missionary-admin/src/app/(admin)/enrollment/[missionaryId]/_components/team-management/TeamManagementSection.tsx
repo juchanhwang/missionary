@@ -9,6 +9,7 @@ import { TeamCreateModal } from './TeamCreateModal';
 import { TeamDeleteModal } from './TeamDeleteModal';
 import { TeamEditModal } from './TeamEditModal';
 import { TeamManagementToolbar } from './TeamManagementToolbar';
+import { useAssignParticipationToTeam } from '../../_hooks/useAssignParticipationToTeam';
 import { useGetMissionGroupRegions } from '../../_hooks/useGetMissionGroupRegions';
 import { useGetParticipations } from '../../_hooks/useGetParticipations';
 import { useGetTeams } from '../../_hooks/useGetTeams';
@@ -60,6 +61,11 @@ export function TeamManagementSection({
   // 모달 연계지 옵션 — missionGroupId가 null이면 no-op.
   const { data: regionsData } = useGetMissionGroupRegions({ missionGroupId });
   const regions = regionsData?.data ?? [];
+
+  const assignTeam = useAssignParticipationToTeam();
+  const handleAssignTeam = (participationId: string, teamId: string | null) => {
+    assignTeam.mutate({ participationId, teamId });
+  };
 
   const participationList: Participation[] = participations?.data ?? [];
 
@@ -140,6 +146,7 @@ export function TeamManagementSection({
           onCreateTeam={handleCreateTeam}
           onEditTeam={handleEditTeam}
           onDeleteTeam={handleDeleteTeam}
+          onAssignTeam={handleAssignTeam}
         />
       )}
     </div>
