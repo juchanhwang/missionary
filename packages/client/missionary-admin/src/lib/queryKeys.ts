@@ -49,4 +49,9 @@ export const queryKeys = {
     list: (missionaryId: string) =>
       [...queryKeys.attendanceOptions.all, 'list', missionaryId] as const,
   },
+  teams: {
+    all: ['teams'] as const,
+    list: (missionaryId: string) =>
+      [...queryKeys.teams.all, 'list', missionaryId] as const,
+  },
 } as const;
