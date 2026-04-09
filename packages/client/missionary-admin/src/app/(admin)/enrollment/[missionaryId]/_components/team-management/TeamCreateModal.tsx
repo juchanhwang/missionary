@@ -49,6 +49,7 @@ export function TeamCreateModal({
     createTeam.mutate(
       {
         missionaryId,
+        leaderParticipationId: leader.id,
         teamName: values.teamName.trim(),
         leaderUserId: leader.userId,
         leaderUserName: leader.name,
@@ -105,6 +106,7 @@ export function TeamCreateModal({
           }}
           participations={participations}
           regions={regions}
+          currentTeamId={null}
           isPending={createTeam.isPending}
           onSubmit={handleSubmit}
           onCancel={() => close(false)}

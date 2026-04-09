@@ -58,8 +58,13 @@ describe('useUpdateTeam', () => {
   });
 
   it('성공 시 teams.list + participations.all을 invalidate하고 토스트를 띄운다', async () => {
+    let assignPayload: unknown = null;
     server.use(
       http.patch(`${API_URL}/teams/:id`, () => HttpResponse.json(createTeam())),
+      http.patch(`${API_URL}/participations/:id`, async ({ request }) => {
+        assignPayload = await request.json();
+        return HttpResponse.json({});
+      }),
     );
 
     const { queryClient, Wrapper } = createWrapper();
@@ -69,6 +74,7 @@ describe('useUpdateTeam', () => {
 
     result.current.mutate({
       id: 'team-1',
+      leaderParticipationId: 'p-1',
       data: { teamName: '수정된 팀' },
     });
 
@@ -82,6 +88,7 @@ describe('useUpdateTeam', () => {
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: ['participations'],
     });
+    expect(assignPayload).toEqual({ teamId: 'team-1' });
     expect(toast.success).toHaveBeenCalledWith('팀 정보가 수정되었습니다.');
   });
 
@@ -97,6 +104,7 @@ describe('useUpdateTeam', () => {
 
     result.current.mutate({
       id: 'team-1',
+      leaderParticipationId: 'p-1',
       data: { teamName: '수정된 팀' },
     });
 

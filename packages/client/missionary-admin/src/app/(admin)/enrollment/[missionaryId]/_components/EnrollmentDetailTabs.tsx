@@ -1,7 +1,8 @@
 'use client';
 
 import { Tab } from '@samilhero/design-system';
-import { createContext, useContext, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { createContext, useContext } from 'react';
 
 import type { ReactNode } from 'react';
 
@@ -38,6 +39,10 @@ function isEnrollmentTabValue(value: string): value is EnrollmentTabValue {
   return value === 'participants' || value === 'teams';
 }
 
+function parseEnrollmentTabValue(value: string | null): EnrollmentTabValue {
+  return value !== null && isEnrollmentTabValue(value) ? value : 'participants';
+}
+
 interface EnrollmentDetailTabsRootProps {
   children: ReactNode;
 }
@@ -54,8 +59,18 @@ interface EnrollmentDetailTabsRootProps {
  * - URL 동기화는 하지 않는다 (브라우저 새로고침 시 항상 `participants`).
  */
 function EnrollmentDetailTabsRoot({ children }: EnrollmentDetailTabsRootProps) {
-  const [activeTab, setActiveTab] =
-    useState<EnrollmentTabValue>('participants');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeTab = parseEnrollmentTabValue(searchParams.get('tab'));
+
+  const setActiveTab = (nextTab: EnrollmentTabValue) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', nextTab);
+    const qs = params.toString();
+
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
 
   return (
     <EnrollmentDetailTabsContext.Provider value={{ activeTab }}>

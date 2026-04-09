@@ -15,6 +15,7 @@ interface TeamFormProps {
   defaultValues: TeamFormValues;
   participations: Participation[];
   regions: RegionListItem[];
+  currentTeamId?: string | null;
   isPending: boolean;
   onSubmit: (values: TeamFormValues) => void;
   onCancel: () => void;
@@ -35,6 +36,7 @@ export function TeamForm({
   defaultValues,
   participations,
   regions,
+  currentTeamId = null,
   isPending,
   onSubmit,
   onCancel,
@@ -48,6 +50,11 @@ export function TeamForm({
   });
 
   const selectedLeaderUserId = form.watch('leaderUserId');
+  const leaderCandidates = getLeaderCandidates(
+    participations,
+    currentTeamId,
+    selectedLeaderUserId,
+  );
   const selectedLeader = participations.find(
     (p) => p.userId === selectedLeaderUserId,
   );
@@ -89,12 +96,12 @@ export function TeamForm({
               )}
             </Select.Trigger>
             <Select.Options>
-              {participations.length === 0 ? (
+              {leaderCandidates.length === 0 ? (
                 <div className="px-3 py-2 text-xs text-gray-400">
                   선택 가능한 참가자가 없습니다
                 </div>
               ) : (
-                participations.map((participation) => (
+                leaderCandidates.map((participation) => (
                   <Select.Option
                     key={participation.userId}
                     item={participation.userId}
@@ -160,6 +167,22 @@ export function TeamForm({
       </div>
     </form>
   );
+}
+
+function getLeaderCandidates(
+  participations: Participation[],
+  currentTeamId: string | null,
+  selectedLeaderUserId: string,
+) {
+  return participations.filter((participation) => {
+    if (participation.userId === selectedLeaderUserId) {
+      return true;
+    }
+
+    return (
+      participation.teamId === null || participation.teamId === currentTeamId
+    );
+  });
 }
 
 function TeamLeaderOptionLabel({

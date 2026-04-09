@@ -58,10 +58,15 @@ describe('useCreateTeam', () => {
   });
 
   it('성공 시 teams.list(missionaryId) 캐시를 invalidate하고 토스트를 띄운다', async () => {
+    let assignPayload: unknown = null;
     server.use(
       http.post(`${API_URL}/teams`, () =>
         HttpResponse.json(createTeam(), { status: 201 }),
       ),
+      http.patch(`${API_URL}/participations/:id`, async ({ request }) => {
+        assignPayload = await request.json();
+        return HttpResponse.json({});
+      }),
     );
 
     const { queryClient, Wrapper } = createWrapper();
@@ -76,7 +81,10 @@ describe('useCreateTeam', () => {
       leaderUserName: '홍길동',
     };
 
-    result.current.mutate(payload);
+    result.current.mutate({
+      ...payload,
+      leaderParticipationId: 'p-1',
+    });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -85,6 +93,10 @@ describe('useCreateTeam', () => {
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: ['teams', 'list', 'missionary-1'],
     });
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: ['participations'],
+    });
+    expect(assignPayload).toEqual({ teamId: 'team-new' });
     expect(toast.success).toHaveBeenCalledWith('팀이 생성되었습니다.');
   });
 
@@ -100,6 +112,7 @@ describe('useCreateTeam', () => {
 
     result.current.mutate({
       missionaryId: 'missionary-1',
+      leaderParticipationId: 'p-1',
       teamName: '신규팀',
       leaderUserId: 'user-1',
       leaderUserName: '홍길동',

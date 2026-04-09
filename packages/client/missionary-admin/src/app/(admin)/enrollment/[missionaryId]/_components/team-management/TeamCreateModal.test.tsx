@@ -140,6 +140,32 @@ describe('TeamCreateModal', () => {
     expect(close).toHaveBeenCalledWith(false);
   });
 
+  it('다른 팀에 이미 배치된 참가자는 팀장 후보에서 보이지 않는다', async () => {
+    const assignedParticipation = createParticipation({
+      id: 'p-3',
+      userId: 'user-3',
+      name: '박영희',
+      teamId: 'team-2',
+      team: { id: 'team-2', teamName: '2팀' },
+    });
+
+    const { user } = render(
+      <TeamCreateModal
+        isOpen={true}
+        close={vi.fn()}
+        missionaryId={MISSIONARY_ID}
+        participations={[...PARTICIPATIONS, assignedParticipation]}
+        regions={REGIONS}
+      />,
+    );
+
+    await user.click(screen.getByText('등록자 중 선택'));
+
+    expect(screen.getByText('홍길동')).toBeInTheDocument();
+    expect(screen.getByText('김철수')).toBeInTheDocument();
+    expect(screen.queryByText('박영희')).not.toBeInTheDocument();
+  });
+
   it('isOpen=false면 내용을 렌더하지 않는다', () => {
     render(
       <TeamCreateModal

@@ -1,8 +1,17 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { EnrollmentDetailTabs } from './EnrollmentDetailTabs';
+
+const mockReplace = vi.fn();
+let mockSearchParams = new URLSearchParams();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ replace: mockReplace }),
+  usePathname: () => '/enrollment/missionary-1',
+  useSearchParams: () => mockSearchParams,
+}));
 
 function renderTabs() {
   return render(
@@ -18,6 +27,11 @@ function renderTabs() {
 }
 
 describe('EnrollmentDetailTabs', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSearchParams = new URLSearchParams();
+  });
+
   it('기본 탭은 "참가자 목록"이고 해당 패널만 표시된다', () => {
     renderTabs();
 
@@ -42,9 +56,25 @@ describe('EnrollmentDetailTabs', () => {
 
   it('"팀 관리" 탭을 클릭하면 활성 탭이 전환되고 팀 패널이 노출된다', async () => {
     const user = userEvent.setup();
-    renderTabs();
+    const view = renderTabs();
 
     await user.click(screen.getByRole('tab', { name: '팀 관리' }));
+    expect(mockReplace).toHaveBeenCalledWith(
+      '/enrollment/missionary-1?tab=teams',
+      { scroll: false },
+    );
+
+    mockSearchParams = new URLSearchParams('tab=teams');
+    view.rerender(
+      <EnrollmentDetailTabs>
+        <EnrollmentDetailTabs.Participants>
+          <div data-testid="panel-participants">참가자 패널</div>
+        </EnrollmentDetailTabs.Participants>
+        <EnrollmentDetailTabs.Teams>
+          <div data-testid="panel-teams">팀 패널</div>
+        </EnrollmentDetailTabs.Teams>
+      </EnrollmentDetailTabs>,
+    );
 
     expect(screen.getByRole('tab', { name: '팀 관리' })).toHaveAttribute(
       'aria-selected',
@@ -94,5 +124,22 @@ describe('EnrollmentDetailTabs', () => {
 
     expect(screen.getByTestId('panel-participants')).toBeInTheDocument();
     expect(screen.getByTestId('panel-teams')).toBeInTheDocument();
+  });
+
+  it('URL에 tab=teams가 있으면 새로고침 후에도 팀 관리 탭을 유지한다', () => {
+    mockSearchParams = new URLSearchParams('tab=teams');
+
+    renderTabs();
+
+    expect(screen.getByRole('tab', { name: '팀 관리' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(screen.getByTestId('panel-teams').parentElement).not.toHaveAttribute(
+      'hidden',
+    );
+    expect(
+      screen.getByTestId('panel-participants').parentElement,
+    ).toHaveAttribute('hidden');
   });
 });

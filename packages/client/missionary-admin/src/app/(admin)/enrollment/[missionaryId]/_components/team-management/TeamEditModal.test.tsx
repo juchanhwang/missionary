@@ -89,12 +89,23 @@ describe('TeamEditModal', () => {
   it('저장 버튼 클릭 시 PATCH /teams/:id 호출 + close(true)', async () => {
     let receivedBody: unknown = null;
     let receivedId: string | null = null;
+    let assignRequest: unknown = null;
     server.use(
       http.patch(`${API_URL}/teams/:id`, async ({ params, request }) => {
         receivedId = params.id as string;
         receivedBody = await request.json();
-        return HttpResponse.json({ id: params.id });
+        return HttpResponse.json(createTeam({ id: params.id as string }));
       }),
+      http.patch(
+        `${API_URL}/participations/:id`,
+        async ({ params, request }) => {
+          assignRequest = {
+            id: params.id,
+            body: await request.json(),
+          };
+          return HttpResponse.json({});
+        },
+      ),
     );
 
     const close = vi.fn();
@@ -124,6 +135,10 @@ describe('TeamEditModal', () => {
       teamName: '수정된 팀',
       leaderUserId: 'user-1',
       leaderUserName: '홍길동',
+    });
+    expect(assignRequest).toEqual({
+      id: 'p-1',
+      body: { teamId: 'team-42' },
     });
   });
 
@@ -177,5 +192,38 @@ describe('TeamEditModal', () => {
     });
     expect(requestCount).toBe(0);
     expect(close).not.toHaveBeenCalled();
+  });
+
+  it('현재 팀 소속 참가자는 팀장 후보로 유지하고 다른 팀 소속 참가자는 제외한다', async () => {
+    const currentTeamMember = createParticipation({
+      id: 'p-3',
+      userId: 'user-3',
+      name: '이현재',
+      teamId: 'team-1',
+      team: { id: 'team-1', teamName: '기존 팀' },
+    });
+    const otherTeamMember = createParticipation({
+      id: 'p-4',
+      userId: 'user-4',
+      name: '최다른',
+      teamId: 'team-2',
+      team: { id: 'team-2', teamName: '다른 팀' },
+    });
+
+    const { user } = render(
+      <TeamEditModal
+        isOpen={true}
+        close={vi.fn()}
+        team={createTeam()}
+        participations={[...PARTICIPATIONS, currentTeamMember, otherTeamMember]}
+        regions={REGIONS}
+      />,
+    );
+
+    await user.click(screen.getByText('홍길동'));
+
+    expect(screen.getAllByText('홍길동')).toHaveLength(2);
+    expect(screen.getByText('이현재')).toBeInTheDocument();
+    expect(screen.queryByText('최다른')).not.toBeInTheDocument();
   });
 });

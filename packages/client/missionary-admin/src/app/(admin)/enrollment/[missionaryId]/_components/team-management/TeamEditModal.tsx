@@ -48,6 +48,7 @@ export function TeamEditModal({
     updateTeam.mutate(
       {
         id: team.id,
+        leaderParticipationId: leader.id,
         data: {
           teamName: values.teamName.trim(),
           leaderUserId: leader.userId,
@@ -106,6 +107,7 @@ export function TeamEditModal({
           }}
           participations={participations}
           regions={regions}
+          currentTeamId={team.id}
           isPending={updateTeam.isPending}
           onSubmit={handleSubmit}
           onCancel={() => close(false)}
