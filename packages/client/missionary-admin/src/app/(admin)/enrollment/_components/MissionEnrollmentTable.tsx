@@ -137,7 +137,7 @@ export function MissionEnrollmentTable({
       </div>
 
       {/* 필터 툴바 */}
-      <div className="shrink-0 flex items-center gap-2.5 px-5 py-3 border-b border-gray-100 bg-gray-50/80">
+      <div className="shrink-0 flex items-center gap-2.5 px-5 py-3 border-b border-gray-100 bg-white">
         <div className="flex-1 max-w-[280px]">
           <SearchBox
             value={searchQuery}

@@ -32,9 +32,9 @@ export function AdminLayoutClient({
             <SidebarProvider>
               <div className="flex h-screen overflow-hidden">
                 <Sidebar />
-                <div className="flex flex-col flex-1 min-h-0 min-w-0 ml-0 lg:ml-[260px] bg-gray-50 transition-[margin-left] duration-300 ease-in-out">
+                <div className="flex flex-col flex-1 min-h-0 min-w-0 ml-0 lg:ml-[260px] bg-white transition-[margin-left] duration-300 ease-in-out">
                   <Header />
-                  <main className="flex flex-col flex-1 min-h-0">
+                  <main className="flex flex-col flex-1 min-h-0 bg-white">
                     {children}
                   </main>
                 </div>
