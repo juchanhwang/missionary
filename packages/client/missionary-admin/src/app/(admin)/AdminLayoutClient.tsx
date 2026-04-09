@@ -34,7 +34,7 @@ export function AdminLayoutClient({
                 <Sidebar />
                 <div className="flex flex-col flex-1 min-h-0 min-w-0 ml-0 lg:ml-[260px] bg-white transition-[margin-left] duration-300 ease-in-out">
                   <Header />
-                  <main className="flex flex-col flex-1 min-h-0 bg-white">
+                  <main className="flex flex-col flex-1 min-h-0">
                     {children}
                   </main>
                 </div>

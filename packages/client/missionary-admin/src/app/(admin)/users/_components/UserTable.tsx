@@ -149,29 +149,33 @@ export function UserTable({
         <TableCaption>유저 목록</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="sticky top-0 left-0 z-20 bg-white">
+            <TableHead className="sticky top-0 left-0 z-20 bg-gray-50">
               이름
             </TableHead>
-            <TableHead className="sticky top-0 z-10 bg-white">이메일</TableHead>
-            <TableHead className="sticky top-0 z-10 bg-white">역할</TableHead>
-            <TableHead className="sticky top-0 z-10 bg-white">
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
+              이메일
+            </TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">역할</TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
               인증방식
             </TableHead>
-            <TableHead className="sticky top-0 z-10 bg-white">
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
               로그인ID
             </TableHead>
-            <TableHead className="sticky top-0 z-10 bg-white">
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
               전화번호
             </TableHead>
-            <TableHead className="sticky top-0 z-10 bg-white">
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
               생년월일
             </TableHead>
-            <TableHead className="sticky top-0 z-10 bg-white">성별</TableHead>
-            <TableHead className="sticky top-0 z-10 bg-white">세례</TableHead>
-            <TableHead className="sticky top-0 z-10 bg-white">
+            <TableHead className="sticky top-0 z-10 bg-gray-50">성별</TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">세례</TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
               주민번호
             </TableHead>
-            <TableHead className="sticky top-0 z-10 bg-white">가입일</TableHead>
+            <TableHead className="sticky top-0 z-10 bg-gray-50">
+              가입일
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
