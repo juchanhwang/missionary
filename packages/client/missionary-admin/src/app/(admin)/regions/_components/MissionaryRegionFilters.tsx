@@ -34,7 +34,7 @@ export function MissionaryRegionFilters({
   };
 
   return (
-    <div className="flex items-center gap-2.5 px-5 py-3 border-b border-gray-100 bg-gray-50/80">
+    <div className="flex items-center gap-2.5 px-5 py-3 border-b border-gray-100 bg-white">
       <div className="flex-1 max-w-[280px]">
         <SearchBox
           value={localKeyword}

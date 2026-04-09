@@ -57,7 +57,7 @@ export function GroupPanel() {
   };
 
   return (
-    <aside className="flex flex-col w-[260px] shrink-0 bg-gray-50 border-r border-gray-200">
+    <aside className="flex flex-col w-[260px] shrink-0 bg-white border-r border-gray-200">
       <div className="flex items-center justify-between px-4 pt-5 pb-3">
         <h3 className="text-sm font-bold text-gray-900">선교 그룹</h3>
         <Link
