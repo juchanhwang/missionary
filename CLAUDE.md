@@ -10,6 +10,7 @@ This file is the root knowledge base for this monorepo.
 
 하위 `CLAUDE.md`가 있으면 하위 규칙이 우선이고, 공통 규칙은 이 파일을 따른다.
 
+- `../docs/CLAUDE.md` (feature planning workspace, git 외부)
 - `./CLAUDE.md` (root, global)
 - `./packages/client/CLAUDE.md` (frontend shared)
 - `./packages/client/design-system/CLAUDE.md` (design system local)

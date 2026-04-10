@@ -23,6 +23,7 @@
 - React 19
 - TypeScript 5.9 (`moduleResolution: bundler`)
 - Tailwind CSS 4
+- @dnd-kit/core, @dnd-kit/sortable (admin 팀 배치 UI)
 - Vitest + jsdom
 
 ## Shared Architecture

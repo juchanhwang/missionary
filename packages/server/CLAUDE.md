@@ -14,6 +14,7 @@
 
 - NestJS 11
 - Prisma ORM + PostgreSQL
+- BullMQ + Redis (비동기 큐 처리, 로컬 개발 시 Redis 인스턴스 필요)
 - TypeScript 5.9 (`moduleResolution: node`, CommonJS)
 
 ## Shared Architecture
