@@ -18,6 +18,7 @@ interface TeamEditModalProps {
   team: Team;
   participations: Participation[];
   regions: RegionListItem[];
+  existingTeamNames: string[];
 }
 
 /**
@@ -32,6 +33,7 @@ export function TeamEditModal({
   team,
   participations,
   regions,
+  existingTeamNames,
 }: TeamEditModalProps) {
   const updateTeam = useUpdateTeam();
 
@@ -107,6 +109,9 @@ export function TeamEditModal({
           }}
           participations={participations}
           regions={regions}
+          existingTeamNames={existingTeamNames.filter(
+            (n) => n !== team.teamName,
+          )}
           currentTeamId={team.id}
           isPending={updateTeam.isPending}
           onSubmit={handleSubmit}

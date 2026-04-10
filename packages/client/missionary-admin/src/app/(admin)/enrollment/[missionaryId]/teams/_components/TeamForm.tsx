@@ -15,6 +15,7 @@ interface TeamFormProps {
   defaultValues: TeamFormValues;
   participations: Participation[];
   regions: RegionListItem[];
+  existingTeamNames: string[];
   currentTeamId?: string | null;
   isPending: boolean;
   onSubmit: (values: TeamFormValues) => void;
@@ -36,6 +37,7 @@ export function TeamForm({
   defaultValues,
   participations,
   regions,
+  existingTeamNames,
   currentTeamId = null,
   isPending,
   onSubmit,
@@ -48,6 +50,15 @@ export function TeamForm({
     mode: 'onBlur',
     defaultValues,
   });
+
+  const handleFormSubmit = (values: TeamFormValues) => {
+    const trimmedName = values.teamName.trim();
+    if (existingTeamNames.includes(trimmedName)) {
+      form.setError('teamName', { message: '이미 사용 중인 팀 이름입니다' });
+      return;
+    }
+    onSubmit(values);
+  };
 
   const selectedLeaderUserId = form.watch('leaderUserId');
   const leaderCandidates = getLeaderCandidates(
@@ -64,7 +75,7 @@ export function TeamForm({
 
   return (
     <form
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(handleFormSubmit)}
       className="flex flex-col gap-3.5 px-6 pb-6"
       noValidate
     >

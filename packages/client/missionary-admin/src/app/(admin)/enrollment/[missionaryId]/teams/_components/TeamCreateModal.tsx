@@ -17,6 +17,7 @@ interface TeamCreateModalProps {
   missionaryId: string;
   participations: Participation[];
   regions: RegionListItem[];
+  existingTeamNames: string[];
 }
 
 /**
@@ -33,6 +34,7 @@ export function TeamCreateModal({
   missionaryId,
   participations,
   regions,
+  existingTeamNames,
 }: TeamCreateModalProps) {
   const createTeam = useCreateTeam();
 
@@ -106,6 +108,7 @@ export function TeamCreateModal({
           }}
           participations={participations}
           regions={regions}
+          existingTeamNames={existingTeamNames}
           currentTeamId={null}
           isPending={createTeam.isPending}
           onSubmit={handleSubmit}

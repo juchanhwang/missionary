@@ -61,6 +61,7 @@ export function TeamManagementPage({
   const { openCreateModal, openEditModal, openDeleteModal } =
     useTeamModalActions({
       missionaryId: mission.id,
+      teams: teams ?? [],
       participations: participations ?? [],
       regions,
     });
