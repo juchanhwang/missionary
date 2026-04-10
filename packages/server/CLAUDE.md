@@ -1,7 +1,5 @@
 # Server (Backend) CLAUDE.md
 
-이 파일은 `packages/server/**` 공통 규칙이다. 루트 규칙은 `../../CLAUDE.md`를 따른다.
-
 ## Scope
 
 - `missionary-server`
@@ -46,7 +44,6 @@
 - Service 로직을 Controller에 직접 넣지 않는다.
 - DTO 검증/글로벌 ValidationPipe를 우회하지 않는다.
 - Prisma schema와 애플리케이션 타입을 임의로 불일치 상태로 두지 않는다.
-- 생성물(`dist/`)과 배포 파일을 애플리케이션 소스처럼 수정하지 않는다.
 
 ## Commands
 

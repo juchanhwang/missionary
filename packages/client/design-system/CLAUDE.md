@@ -1,7 +1,5 @@
 # Design System CLAUDE.md
 
-이 파일은 `packages/client/design-system/**` 전용 규칙이다. 상위 규칙은 `../CLAUDE.md`를 따른다.
-
 ## Overview
 
 `@samilhero/design-system`은 공통 UI 라이브러리다. `vite build` 결과를 `dist/`로 배포하며, 앱은 `workspace:*`로 이 패키지를 소비한다.
@@ -36,7 +34,6 @@ src/
 
 ## Anti-Patterns
 
-- `dist/`, `storybook-static/`를 수정하지 않는다.
 - 앱 전용 로직(`missionary-app`, `missionary-admin`)을 디자인시스템에 넣지 않는다.
 - alias 규칙(`@assets`, `@components`, `@hooks` 등)을 깨는 경로를 추가하지 않는다.
 - 공용 컴포넌트의 breaking change를 `src/index.tsx` export 확인 없이 반영하지 않는다.

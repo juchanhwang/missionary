@@ -1,7 +1,5 @@
 # Missionary Admin CLAUDE.md
 
-이 파일은 `packages/client/missionary-admin/**` 전용 규칙이다. 상위 규칙은 `../CLAUDE.md`를 따른다.
-
 ## Overview
 
 `missionary-admin`은 관리자용 Next.js App Router 앱이다. 미션/그룹 관리 도메인 라우트가 핵심이며, 서버 액션과 클라이언트 mutation이 함께 사용된다.

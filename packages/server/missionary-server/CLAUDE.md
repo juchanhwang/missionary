@@ -1,7 +1,5 @@
 # Missionary Server CLAUDE.md
 
-이 파일은 `packages/server/missionary-server/**` 전용 규칙이다. 상위 규칙은 `../CLAUDE.md`를 따른다.
-
 ## Overview
 
 `missionary-server`는 NestJS API 서버다. Prisma(PostgreSQL) 기반이며, 인증/OAuth/도메인 모듈을 `src/*` 경계로 분리한다.
@@ -146,7 +144,6 @@ TermsContent (별도 테이블, 약관 본문 버저닝)
 
 ## Anti-Patterns
 
-- `dist/`를 직접 수정하지 않는다.
 - DTO/validation 없이 요청 body를 service에 직접 전달하지 않는다.
 - Prisma migration 없이 schema 변경을 배포하지 않는다.
 - 인증 관련 토큰/쿠키 정책을 controller 외부에서 중복 구현하지 않는다.

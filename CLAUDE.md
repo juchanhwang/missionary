@@ -69,13 +69,6 @@ main/
 pnpm lint:all
 pnpm lint:fix:all
 pnpm type-check
-
-# package-focused workflows
-pnpm --filter missionary-app dev
-pnpm --filter missionary-admin dev
-pnpm --filter design-system build
-pnpm --filter missionary-server test
-pnpm --filter missionary-server prisma:generate
 ```
 
 ## PR Convention (Global)

@@ -1,7 +1,5 @@
 # Missionary App CLAUDE.md
 
-이 파일은 `packages/client/missionary-app/**` 전용 규칙이다. 상위 규칙은 `../CLAUDE.md`를 따른다.
-
 ## Overview
 
 `missionary-app`은 사용자용 Next.js App Router 앱이다. 인증 상태에 따라 공개/보호 라우트를 분기한다.
