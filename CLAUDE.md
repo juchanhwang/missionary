@@ -2,10 +2,6 @@
 
 This file is the root knowledge base for this monorepo.
 
-**Generated:** 2026-02-22 00:04:03 KST  
-**Commit:** `86cf506`  
-**Branch:** `docs/update-claude-md`
-
 ## Overview
 
 `missionary`는 `pnpm` 워크스페이스 기반 모노레포다. 프런트엔드 3개 패키지(디자인시스템 + 2개 Next 앱)와 백엔드 1개 NestJS 패키지로 구성된다.
