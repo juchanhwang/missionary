@@ -2,6 +2,7 @@ import { getServerEnrollmentSummary } from 'apis/enrollment.server';
 import { getServerMissionGroupRegions } from 'apis/missionaryRegion.server';
 import { getServerParticipations } from 'apis/participation.server';
 import { getServerTeams } from 'apis/team.server';
+import { notFound } from 'next/navigation';
 
 import { TeamManagementPage } from './_components/TeamManagementPage';
 
@@ -20,11 +21,7 @@ export default async function TeamsRoute({ params }: TeamsRouteParams) {
 
   const mission = summaryData.missions.find((m) => m.id === missionaryId);
   if (!mission) {
-    return (
-      <div className="flex flex-1 items-center justify-center">
-        <p className="text-sm text-gray-500">선교를 찾을 수 없습니다.</p>
-      </div>
-    );
+    notFound();
   }
 
   // regions는 missionGroupId에 의존 → mission 확보 후 순차 await
