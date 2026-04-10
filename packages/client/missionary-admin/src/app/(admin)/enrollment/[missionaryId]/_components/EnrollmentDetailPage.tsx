@@ -9,7 +9,6 @@ import { EnrollmentDetailTabs } from './EnrollmentDetailTabs';
 import { EnrollmentSummaryCard } from './EnrollmentSummaryCard';
 import { ParticipantPanelContainer } from './panel/ParticipantPanelContainer';
 import { ParticipantTable } from './ParticipantTable';
-import { TeamManagementSection } from './team-management/TeamManagementSection';
 import { useGetParticipations } from '../_hooks/useGetParticipations';
 
 import type {
@@ -94,10 +93,9 @@ export function EnrollmentDetailPage({
             />
           </EnrollmentDetailTabs.Participants>
           <EnrollmentDetailTabs.Teams>
-            <TeamManagementSection
-              missionaryId={mission.id}
-              missionGroupId={mission.missionGroupId}
-            />
+            <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
+              팀 관리는 전용 페이지로 이동했습니다.
+            </div>
           </EnrollmentDetailTabs.Teams>
         </EnrollmentDetailTabs>
       </div>

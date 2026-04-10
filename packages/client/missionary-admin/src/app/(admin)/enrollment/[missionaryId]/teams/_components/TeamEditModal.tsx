@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import Modal from 'react-modal';
 
 import { TeamForm } from './TeamForm';
-import { useUpdateTeam } from '../../_hooks/useUpdateTeam';
+import { useUpdateTeam } from '../_hooks/useUpdateTeam';
 
 import type { TeamFormValues } from './_schemas/teamSchema';
 import type { RegionListItem } from 'apis/missionaryRegion';
