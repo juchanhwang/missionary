@@ -126,14 +126,18 @@ export class PrismaTeamRepository implements TeamRepository {
   }
 
   async deleteWithDetachParticipants(id: string): Promise<Team> {
-    // OQ-2: 팀 삭제 시 연결된 participation의 teamId를 명시적으로 NULL 처리한 뒤 hard delete.
-    // FK는 ON DELETE SET NULL이지만, 의도를 코드에 드러내기 위해 트랜잭션으로 감싼다.
+    // 팀 삭제 시 연결된 participation의 teamId를 명시적으로 NULL 처리한 뒤 soft delete.
+    // PrismaService.$extends의 delete 확장은 $transaction 내부에서 this 컨텍스트가
+    // 트랜잭션 클라이언트가 아닌 루트 클라이언트를 참조하므로 update를 직접 호출한다.
     return this.prisma.$transaction(async (tx) => {
       await tx.participation.updateMany({
         where: { teamId: id },
         data: { teamId: null },
       });
-      return tx.team.delete({ where: { id } });
+      return tx.team.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
     });
   }
 }

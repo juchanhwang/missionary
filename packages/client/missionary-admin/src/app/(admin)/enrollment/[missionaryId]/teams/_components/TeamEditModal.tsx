@@ -5,36 +5,37 @@ import { useEffect } from 'react';
 import Modal from 'react-modal';
 
 import { TeamForm } from './TeamForm';
-import { useCreateTeam } from '../../_hooks/useCreateTeam';
+import { useUpdateTeam } from '../_hooks/useUpdateTeam';
 
 import type { TeamFormValues } from './_schemas/teamSchema';
 import type { RegionListItem } from 'apis/missionaryRegion';
 import type { Participation } from 'apis/participation';
+import type { Team } from 'apis/team';
 
-interface TeamCreateModalProps {
+interface TeamEditModalProps {
   isOpen: boolean;
-  close: (created: boolean) => void;
-  missionaryId: string;
+  close: (updated: boolean) => void;
+  team: Team;
   participations: Participation[];
   regions: RegionListItem[];
+  existingTeamNames: string[];
 }
 
 /**
- * 팀 생성 모달. fe-plan v1.2 §3-1, ui-spec §5, mockup Screen 3.
+ * 팀 수정 모달. fe-plan v1.2 §3-1, ui-spec §5, mockup Screen 4.
  *
- * 호출 패턴: `overlay.openAsync<boolean>(({ isOpen, close, unmount }) => ...)`
- * 성공 시 `close(true)`, 취소 시 `close(false)`.
- *
- * 폼 상태는 `TeamForm`이 관리하고, 이 컴포넌트는 mutation + 모달 shell만 담당.
+ * `TeamForm`을 재사용하며 `defaultValues`에 기존 팀 정보를 주입한다.
+ * 제출 시 `useUpdateTeam`이 `{ teamName, leaderUserId, leaderUserName, missionaryRegionId }`를 PATCH.
  */
-export function TeamCreateModal({
+export function TeamEditModal({
   isOpen,
   close,
-  missionaryId,
+  team,
   participations,
   regions,
-}: TeamCreateModalProps) {
-  const createTeam = useCreateTeam();
+  existingTeamNames,
+}: TeamEditModalProps) {
+  const updateTeam = useUpdateTeam();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -46,14 +47,16 @@ export function TeamCreateModal({
     const leader = participations.find((p) => p.userId === values.leaderUserId);
     if (!leader) return;
 
-    createTeam.mutate(
+    updateTeam.mutate(
       {
-        missionaryId,
+        id: team.id,
         leaderParticipationId: leader.id,
-        teamName: values.teamName.trim(),
-        leaderUserId: leader.userId,
-        leaderUserName: leader.name,
-        missionaryRegionId: values.missionaryRegionId || undefined,
+        data: {
+          teamName: values.teamName.trim(),
+          leaderUserId: leader.userId,
+          leaderUserName: leader.name,
+          missionaryRegionId: values.missionaryRegionId || undefined,
+        },
       },
       {
         onSuccess: () => close(true),
@@ -65,31 +68,31 @@ export function TeamCreateModal({
     <Modal
       isOpen={isOpen}
       onRequestClose={() => {
-        if (!createTeam.isPending) close(false);
+        if (!updateTeam.isPending) close(false);
       }}
-      contentLabel="팀 추가"
+      contentLabel="팀 수정"
       className="fixed inset-0 flex items-center justify-center p-4"
       overlayClassName="fixed inset-0 z-50 bg-black/30 flex items-center justify-center"
-      shouldCloseOnEsc={!createTeam.isPending}
-      shouldCloseOnOverlayClick={!createTeam.isPending}
+      shouldCloseOnEsc={!updateTeam.isPending}
+      shouldCloseOnOverlayClick={!updateTeam.isPending}
     >
       <div
         className="bg-white rounded-xl border border-gray-50 w-full max-w-sm flex flex-col"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="team-create-modal-title"
+        aria-labelledby="team-edit-modal-title"
       >
         <div className="flex items-center justify-between px-6 py-4">
           <h2
-            id="team-create-modal-title"
+            id="team-edit-modal-title"
             className="text-base font-bold text-gray-900"
           >
-            팀 추가
+            팀 수정
           </h2>
           <button
             type="button"
             onClick={() => close(false)}
-            disabled={createTeam.isPending}
+            disabled={updateTeam.isPending}
             aria-label="닫기"
             className="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed"
           >
@@ -98,16 +101,19 @@ export function TeamCreateModal({
         </div>
 
         <TeamForm
-          mode="create"
+          mode="edit"
           defaultValues={{
-            teamName: '',
-            leaderUserId: '',
-            missionaryRegionId: '',
+            teamName: team.teamName,
+            leaderUserId: team.leaderUserId,
+            missionaryRegionId: team.missionaryRegionId ?? '',
           }}
           participations={participations}
           regions={regions}
-          currentTeamId={null}
-          isPending={createTeam.isPending}
+          existingTeamNames={existingTeamNames.filter(
+            (n) => n !== team.teamName,
+          )}
+          currentTeamId={team.id}
+          isPending={updateTeam.isPending}
           onSubmit={handleSubmit}
           onCancel={() => close(false)}
         />

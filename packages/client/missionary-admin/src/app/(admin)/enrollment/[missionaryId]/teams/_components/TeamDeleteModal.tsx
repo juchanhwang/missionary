@@ -5,7 +5,7 @@ import { AlertTriangle, X } from 'lucide-react';
 import { useEffect } from 'react';
 import Modal from 'react-modal';
 
-import { useDeleteTeam } from '../../_hooks/useDeleteTeam';
+import { useDeleteTeam } from '../_hooks/useDeleteTeam';
 
 import type { Team } from 'apis/team';
 

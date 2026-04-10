@@ -5,11 +5,9 @@ import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { EnrollmentDetailHeader } from './EnrollmentDetailHeader';
-import { EnrollmentDetailTabs } from './EnrollmentDetailTabs';
 import { EnrollmentSummaryCard } from './EnrollmentSummaryCard';
 import { ParticipantPanelContainer } from './panel/ParticipantPanelContainer';
 import { ParticipantTable } from './ParticipantTable';
-import { TeamManagementSection } from './team-management/TeamManagementSection';
 import { useGetParticipations } from '../_hooks/useGetParticipations';
 
 import type {
@@ -81,25 +79,15 @@ export function EnrollmentDetailPage({
           initialData={initialEnrollmentSummary}
         />
 
-        <EnrollmentDetailTabs>
-          <EnrollmentDetailTabs.Participants>
-            <ParticipantTable
-              data={data}
-              isLoading={isLoading}
-              formFields={formFields}
-              missionaryId={mission.id}
-              missionName={mission.name}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-            />
-          </EnrollmentDetailTabs.Participants>
-          <EnrollmentDetailTabs.Teams>
-            <TeamManagementSection
-              missionaryId={mission.id}
-              missionGroupId={mission.missionGroupId}
-            />
-          </EnrollmentDetailTabs.Teams>
-        </EnrollmentDetailTabs>
+        <ParticipantTable
+          data={data}
+          isLoading={isLoading}
+          formFields={formFields}
+          missionaryId={mission.id}
+          missionName={mission.name}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
       </div>
 
       <ParticipantPanelContainer

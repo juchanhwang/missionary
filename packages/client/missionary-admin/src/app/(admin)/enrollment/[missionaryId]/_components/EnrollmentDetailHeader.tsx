@@ -2,7 +2,7 @@
 
 import { Badge } from '@samilhero/design-system';
 import { useAuth } from 'lib/auth/AuthContext';
-import { ArrowLeft, ChevronRight, Table2 } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Table2, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -67,15 +67,23 @@ export function EnrollmentDetailHeader({
           <ChevronRight size={14} />
           <span className="text-gray-700 font-medium">{mission.name}</span>
         </div>
-        {isAdmin && (
+        <div className="flex items-center gap-2">
           <Link
-            href={`/enrollment/${missionaryId}/form-builder`}
+            href={`/enrollment/${missionaryId}/teams`}
             className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50"
           >
-            <Table2 size={14} />
-            등록 폼 관리
+            <Users size={14} />팀 관리
           </Link>
-        )}
+          {isAdmin && (
+            <Link
+              href={`/enrollment/${missionaryId}/form-builder`}
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50"
+            >
+              <Table2 size={14} />
+              등록 폼 관리
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* 타이틀 + 뱃지 */}

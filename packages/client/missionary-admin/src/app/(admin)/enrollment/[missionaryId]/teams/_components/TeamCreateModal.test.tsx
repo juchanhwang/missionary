@@ -60,6 +60,7 @@ describe('TeamCreateModal', () => {
         missionaryId={MISSIONARY_ID}
         participations={PARTICIPATIONS}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 
@@ -86,6 +87,7 @@ describe('TeamCreateModal', () => {
         missionaryId={MISSIONARY_ID}
         participations={PARTICIPATIONS}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 
@@ -109,6 +111,7 @@ describe('TeamCreateModal', () => {
         missionaryId={MISSIONARY_ID}
         participations={PARTICIPATIONS}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 
@@ -130,6 +133,7 @@ describe('TeamCreateModal', () => {
         missionaryId={MISSIONARY_ID}
         participations={PARTICIPATIONS}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 
@@ -156,6 +160,7 @@ describe('TeamCreateModal', () => {
         missionaryId={MISSIONARY_ID}
         participations={[...PARTICIPATIONS, assignedParticipation]}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 
@@ -174,6 +179,7 @@ describe('TeamCreateModal', () => {
         missionaryId={MISSIONARY_ID}
         participations={PARTICIPATIONS}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 

@@ -10,6 +10,10 @@ import type { RegionListItem } from 'apis/missionaryRegion';
 import type { Participation } from 'apis/participation';
 import type { Team } from 'apis/team';
 
+function getExistingTeamNames(teams: Team[]): string[] {
+  return teams.map((t) => t.teamName);
+}
+
 /**
  * overlay-kit unmount 지연 시간 — 닫힘 애니메이션이 끝난 뒤 DOM에서 제거.
  * 디자인 시스템 모달 fade-out 트랜지션이 약 200~250ms이므로 여유 50ms 추가.
@@ -18,6 +22,8 @@ const MODAL_UNMOUNT_DELAY_MS = 300;
 
 interface UseTeamModalActionsParams {
   missionaryId: string;
+  /** 중복 이름 검증에 사용한다. */
+  teams: Team[];
   /** 모달이 참가자 선택 UI를 그릴 때 사용한다. */
   participations: Participation[];
   /** 연계지 셀렉트 옵션. 데이터 패칭은 `useTeamManagementData`가 담당. */
@@ -42,10 +48,12 @@ interface UseTeamModalActionsReturn {
  */
 export function useTeamModalActions({
   missionaryId,
+  teams,
   participations,
   regions,
 }: UseTeamModalActionsParams): UseTeamModalActionsReturn {
   const openCreateModal = () => {
+    const existingTeamNames = getExistingTeamNames(teams);
     overlay.openAsync<boolean>(({ isOpen, close, unmount }) => (
       <TeamCreateModal
         isOpen={isOpen}
@@ -56,11 +64,13 @@ export function useTeamModalActions({
         missionaryId={missionaryId}
         participations={participations}
         regions={regions}
+        existingTeamNames={existingTeamNames}
       />
     ));
   };
 
   const openEditModal = (team: Team) => {
+    const existingTeamNames = getExistingTeamNames(teams);
     overlay.openAsync<boolean>(({ isOpen, close, unmount }) => (
       <TeamEditModal
         isOpen={isOpen}
@@ -71,6 +81,7 @@ export function useTeamModalActions({
         team={team}
         participations={participations}
         regions={regions}
+        existingTeamNames={existingTeamNames}
       />
     ));
   };

@@ -2,9 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { missionaryRegionApi } from 'apis/missionaryRegion';
 import { queryKeys } from 'lib/queryKeys';
 
+import type { RegionListResponse } from 'apis/missionaryRegion';
+
 interface UseGetMissionGroupRegionsOptions {
   missionGroupId: string | null;
   enabled?: boolean;
+  initialData?: RegionListResponse;
 }
 
 /**
@@ -17,6 +20,7 @@ interface UseGetMissionGroupRegionsOptions {
 export function useGetMissionGroupRegions({
   missionGroupId,
   enabled = true,
+  initialData,
 }: UseGetMissionGroupRegionsOptions) {
   return useQuery({
     queryKey: queryKeys.missionaryRegions.list({
@@ -29,5 +33,6 @@ export function useGetMissionGroupRegions({
     },
     enabled: enabled && missionGroupId !== null,
     staleTime: 60 * 1000,
+    initialData,
   });
 }

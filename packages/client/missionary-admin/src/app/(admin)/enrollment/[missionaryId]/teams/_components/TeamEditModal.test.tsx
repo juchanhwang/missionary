@@ -76,6 +76,7 @@ describe('TeamEditModal', () => {
         team={createTeam({ teamName: '1차 선교팀' })}
         participations={PARTICIPATIONS}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 
@@ -116,6 +117,7 @@ describe('TeamEditModal', () => {
         team={createTeam({ id: 'team-42', teamName: '원본' })}
         participations={PARTICIPATIONS}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 
@@ -151,6 +153,7 @@ describe('TeamEditModal', () => {
         team={createTeam()}
         participations={PARTICIPATIONS}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 
@@ -178,6 +181,7 @@ describe('TeamEditModal', () => {
         team={createTeam({ teamName: '원본' })}
         participations={PARTICIPATIONS}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 
@@ -217,6 +221,7 @@ describe('TeamEditModal', () => {
         team={createTeam()}
         participations={[...PARTICIPATIONS, currentTeamMember, otherTeamMember]}
         regions={REGIONS}
+        existingTeamNames={[]}
       />,
     );
 
