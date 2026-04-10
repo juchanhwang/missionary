@@ -1,7 +1,5 @@
 # Client (Frontend) CLAUDE.md
 
-이 파일은 `packages/client/**` 공통 규칙이다. 루트 규칙은 `../../CLAUDE.md`를 따른다.
-
 ## Scope
 
 다음 하위 패키지 전반에 적용된다.
@@ -23,6 +21,7 @@
 - React 19
 - TypeScript 5.9 (`moduleResolution: bundler`)
 - Tailwind CSS 4
+- @dnd-kit/core, @dnd-kit/sortable (admin 팀 배치 UI)
 - Vitest + jsdom
 
 ## Shared Architecture
@@ -63,7 +62,6 @@
 
 ## Anti-Patterns
 
-- `dist/`, `storybook-static/`를 수정 대상으로 취급하지 않는다.
 - 라우트 전용 코드(`app/**`)를 루트 공용 영역으로 무분별하게 끌어올리지 않는다.
 - alias 규칙을 깨고 상대경로 지옥을 만들지 않는다.
 - 클라이언트 패키지에서 서버 패키지 내부 구현을 직접 참조하지 않는다.

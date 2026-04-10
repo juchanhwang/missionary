@@ -2,10 +2,6 @@
 
 This file is the root knowledge base for this monorepo.
 
-**Generated:** 2026-02-22 00:04:03 KST  
-**Commit:** `86cf506`  
-**Branch:** `docs/update-claude-md`
-
 ## Overview
 
 `missionary`는 `pnpm` 워크스페이스 기반 모노레포다. 프런트엔드 3개 패키지(디자인시스템 + 2개 Next 앱)와 백엔드 1개 NestJS 패키지로 구성된다.
@@ -14,6 +10,7 @@ This file is the root knowledge base for this monorepo.
 
 하위 `CLAUDE.md`가 있으면 하위 규칙이 우선이고, 공통 규칙은 이 파일을 따른다.
 
+- `../docs/CLAUDE.md` (feature planning workspace, git 외부)
 - `./CLAUDE.md` (root, global)
 - `./packages/client/CLAUDE.md` (frontend shared)
 - `./packages/client/design-system/CLAUDE.md` (design system local)
@@ -72,13 +69,6 @@ main/
 pnpm lint:all
 pnpm lint:fix:all
 pnpm type-check
-
-# package-focused workflows
-pnpm --filter missionary-app dev
-pnpm --filter missionary-admin dev
-pnpm --filter design-system build
-pnpm --filter missionary-server test
-pnpm --filter missionary-server prisma:generate
 ```
 
 ## PR Convention (Global)
