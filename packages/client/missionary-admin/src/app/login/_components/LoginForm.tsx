@@ -7,9 +7,12 @@ import { useForm } from 'react-hook-form';
 
 import { useLoginAction } from '../_hooks/useLoginAction';
 import { useOAuthError } from '../_hooks/useOAuthError';
-// TODO(social-login): 도메인 구매 및 프로덕션 쿠키 크로스 도메인 이슈 해결 후 소셜 로그인 재활성화
-// import { useSocialLogin } from '../_hooks/useSocialLogin';
+import { useSocialLogin } from '../_hooks/useSocialLogin';
 import { loginSchema, type LoginFormData } from '../_schemas/loginSchema';
+
+// TODO(social-login): 도메인 구매 및 프로덕션 쿠키 크로스 도메인 이슈 해결 후 true로 전환
+// NOTE: `: boolean` annotation은 의도적 widening — 없으면 tsc가 리터럴 `false`로 좁혀 내부 JSX 참조를 dead code로 판정해 unused 에러 발생
+const SOCIAL_LOGIN_ENABLED: boolean = false;
 
 export function LoginForm() {
   const router = useRouter();
@@ -24,8 +27,7 @@ export function LoginForm() {
   });
 
   const loginMutation = useLoginAction();
-  // TODO(social-login): 도메인 구매 후 재활성화
-  // const { loginGoogle, loginKakao } = useSocialLogin();
+  const { loginGoogle, loginKakao } = useSocialLogin();
   useOAuthError(form);
 
   const onSubmit = (data: LoginFormData) => {
@@ -97,28 +99,30 @@ export function LoginForm() {
           </Button>
         </div>
 
-        {/* TODO(social-login): 도메인 구매 및 프로덕션 쿠키 크로스 도메인 이슈 해결 후 재활성화
-        <div className="relative flex items-center justify-center w-full my-6 before:content-[''] before:flex-1 before:h-px before:bg-gray-200 after:content-[''] after:flex-1 after:h-px after:bg-gray-200">
-          <span className="px-3 text-xs text-gray-400">또는</span>
-        </div>
+        {SOCIAL_LOGIN_ENABLED && (
+          <>
+            <div className="relative flex items-center justify-center w-full my-6 before:content-[''] before:flex-1 before:h-px before:bg-gray-200 after:content-[''] after:flex-1 after:h-px after:bg-gray-200">
+              <span className="px-3 text-xs text-gray-400">또는</span>
+            </div>
 
-        <div className="flex flex-col gap-3 w-full">
-          <button
-            type="button"
-            onClick={loginGoogle}
-            className="flex items-center justify-center h-11 w-full rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-          >
-            Google로 로그인
-          </button>
-          <button
-            type="button"
-            onClick={loginKakao}
-            className="flex items-center justify-center h-11 w-full rounded-lg bg-[#FEE500] text-sm font-medium text-[#191919] hover:bg-[#E6CF00] transition-colors"
-          >
-            Kakao로 로그인
-          </button>
-        </div>
-        */}
+            <div className="flex flex-col gap-3 w-full">
+              <button
+                type="button"
+                onClick={loginGoogle}
+                className="flex items-center justify-center h-11 w-full rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                Google로 로그인
+              </button>
+              <button
+                type="button"
+                onClick={loginKakao}
+                className="flex items-center justify-center h-11 w-full rounded-lg bg-[#FEE500] text-sm font-medium text-[#191919] hover:bg-[#E6CF00] transition-colors"
+              >
+                Kakao로 로그인
+              </button>
+            </div>
+          </>
+        )}
       </form>
     </div>
   );
