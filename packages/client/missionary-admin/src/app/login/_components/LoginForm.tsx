@@ -7,7 +7,8 @@ import { useForm } from 'react-hook-form';
 
 import { useLoginAction } from '../_hooks/useLoginAction';
 import { useOAuthError } from '../_hooks/useOAuthError';
-import { useSocialLogin } from '../_hooks/useSocialLogin';
+// TODO(social-login): 도메인 구매 및 프로덕션 쿠키 크로스 도메인 이슈 해결 후 소셜 로그인 재활성화
+// import { useSocialLogin } from '../_hooks/useSocialLogin';
 import { loginSchema, type LoginFormData } from '../_schemas/loginSchema';
 
 export function LoginForm() {
@@ -23,7 +24,8 @@ export function LoginForm() {
   });
 
   const loginMutation = useLoginAction();
-  const { loginGoogle, loginKakao } = useSocialLogin();
+  // TODO(social-login): 도메인 구매 후 재활성화
+  // const { loginGoogle, loginKakao } = useSocialLogin();
   useOAuthError(form);
 
   const onSubmit = (data: LoginFormData) => {
@@ -95,6 +97,7 @@ export function LoginForm() {
           </Button>
         </div>
 
+        {/* TODO(social-login): 도메인 구매 및 프로덕션 쿠키 크로스 도메인 이슈 해결 후 재활성화
         <div className="relative flex items-center justify-center w-full my-6 before:content-[''] before:flex-1 before:h-px before:bg-gray-200 after:content-[''] after:flex-1 after:h-px after:bg-gray-200">
           <span className="px-3 text-xs text-gray-400">또는</span>
         </div>
@@ -115,6 +118,7 @@ export function LoginForm() {
             Kakao로 로그인
           </button>
         </div>
+        */}
       </form>
     </div>
   );
